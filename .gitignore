@@ -1,0 +1,27 @@
+.git
+
+# Build
+build/
+*.o
+
+# Workspaces
+*.sublime-*
+*.vim
+
+# Debug
+valgrind*.txt
+*.a
+vgcore*
+
+# clangd
+.cache/
+
+# Backups
+bakup/
+*.bak
+
+# Not ready yet
+features.md
+
+# Silicon
+*.png
