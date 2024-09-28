@@ -1,0 +1,64 @@
+#pragma once
+
+#include <SDL2/SDL_events.h>
+#include "scarablib/typedef.hpp"
+#include "scarablib/proper/vector/vec2.hpp"
+
+enum class MouseBTN : uint8 {
+	LMB,
+	MMB,
+	RMB,
+	NONE
+};
+
+enum class Scroll : uint8 {
+	NONE,
+	UP,
+	DOWN
+};
+
+// Avoid foward declaration
+class Window;
+
+// TODO -- Vector for events so is possible to click and move in the same frame
+struct Mouse {
+	// To use handle_events in window
+	friend Window;
+
+	uint32 clicks = 0; // Clicks made
+	Scroll scroll = Scroll::NONE;
+
+	// Store all actions in frame to handle later
+	vec2<uint32> click_pos;  // Click position  (X: 0 - width / Y: 0 - height)
+	vec2<uint32> cursor_pos; // Motion position (X: 0 - width / Y: 0 - height)
+	vec2<int16> moved_dir;   // Direction moved (Ex.: -1, 0)
+
+	// Change cursor position in window
+	void set_cursor_position(const Window& window, const uint32 x, const uint32 y);
+
+	// Check if button is clicking
+	inline bool isclick(const MouseBTN button) const {
+		return this->down == button;
+	}
+
+	// Check if button is up
+	inline bool isup(const MouseBTN button) const {
+		return this->up == button;
+	}
+
+	// TODO -- For when implement the vector of mouse events
+	// Change the state of a key
+	// inline void set_btnstate(const MouseBTN button, const MouseState state) {
+	// 	this->btnstate[key] = state;
+	// }
+
+	private:
+		// Last button up and down
+		MouseBTN up = MouseBTN::NONE;
+		MouseBTN down = MouseBTN::NONE;
+
+		// std::vector<MouseState> btnstate = std::vector<MouseState>(3, MouseState::UP);
+
+		// Handle all mouse events (used on window class only)
+		void handle_event(const SDL_Event& event);
+};
