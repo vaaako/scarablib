@@ -12,7 +12,8 @@ namespace FileHelper {
 	// To delete correcly:
 	//
 	// - `delete []content;`
-	char* read_file(const std::string& path);
+	// char* read_file(const std::string& path);
+	std::string read_file(const std::string& path);
 
 	// Get the current file static path
 	inline std::filesystem::path current_path() {

@@ -211,7 +211,7 @@ struct vec4 {
 		return *this;
 	}
 
-	vec4<T>& operator=(const T other) noexcept {
+	vec4<T>& operator=(const T& other) noexcept {
 		this->x = other;
 		this->y = other;
 		this->z = other;

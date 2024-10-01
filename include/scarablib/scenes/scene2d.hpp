@@ -13,9 +13,7 @@ class Scene2D : public Scene {
 		// Draw a single shape
 		inline void draw_shape(const Shape2D& shape, const DrawMode drawmode = DrawMode::FILLMODE, const DrawType drawtype = DrawType::TRIANGLES) {
 			shape.draw(
-				(shape.get_texture() == nullptr)
-					? *this->shader
-					: *this->shader_texture,
+				this->shader,
 				drawmode, drawtype
 			);
 		}
@@ -42,9 +40,7 @@ class Scene2D : public Scene {
 			// Draw each from vector
 			for(const Shape2D* shape : buffer) {
 				shape->draw(
-					(shape->get_texture() == nullptr)
-						? *this->shader
-						: *this->shader_texture,
+					this->shader,
 					DrawMode::FILLMODE
 				);
 			}
@@ -60,19 +56,18 @@ class Scene2D : public Scene {
 			// Draw each from vector
 			for(const Shape2D* shape : buffer) {
 				shape->draw(
-					(shape->get_texture() == nullptr)
-						? *this->shader
-						: *this->shader_texture,
+					this->shader,
 					drawmode
 				);
 			}
 		}
-	private:
-		// Shaders
-		const char* vertex_shader = FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/2d/vertex.glsl");
-		const char* fragment_shader = FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/2d/fragment.glsl");
 
-		const char* vertex_shader_texture = FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/2d/vertex_texture.glsl");
-		const char* fragment_shader_texture = FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/2d/fragment_texture.glsl");
+	private:
+		// Shader need to be in header to find files in include/
+
+		Shader shader = Shader(
+			FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/2d/vertex.glsl").c_str(),
+			FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/2d/fragment.glsl").c_str()
+		);
 };
 

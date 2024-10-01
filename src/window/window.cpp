@@ -72,11 +72,14 @@ Window::Window(const WindowConf& config)
 	glViewport(0, 0, (GLsizei)config.width, (GLsizei)config.height);
 
 	// Enable transparency
+	// glEnable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // Non-premultiplied alpha
 
 	// More config
 	glEnable(GL_DEPTH_TEST);
+/* 	 */glDepthFunc(GL_ALWAYS);
+
 
 	// Show debug info
 	if(debug_info) {

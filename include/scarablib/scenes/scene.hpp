@@ -27,11 +27,6 @@ class Scene {
 			return *this->shader;
 		}
 
-		// Get shader texture reference
-		inline const Shader& get_shader_texture() const {
-			return *this->shader_texture;
-		}
-
 		// Update viewport using window object
 		virtual inline void update_viewport(const Window& window) = 0;
 
@@ -39,9 +34,8 @@ class Scene {
 		virtual inline void update_viewport(const uint32 width, const uint32 height) = 0;
 
 	protected:
-		// Pointers to avoid forced init on this constructor
+		// Pointer to avoid forced init on this constructor
 		const Shader* shader = nullptr;
-		const Shader* shader_texture = nullptr;
 
 		uint32 width;
 		uint32 height;

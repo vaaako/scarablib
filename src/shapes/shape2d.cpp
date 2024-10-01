@@ -33,7 +33,7 @@ Shape2D::Shape2D(const std::vector<Vertex>& vertices, const std::vector<uint32>&
 	// Build VBO
 	vbo.alloc_data(vertices.size() * sizeof(Vertex), vertices.data());
 	vbo.link_attrib(0, POSITION_DIMENSION, total_size, 0);
-	vbo.link_attrib(1, TEXTURE_DIMENSION, total_size, POSITION_DIMENSION);
+	vbo.link_attrib(1, TEXTURE_DIMENSION, total_size, POSITION_DIMENSION * sizeof(float));
 
 	// Unbind all
 	this->vao->unbind(); // VAO must unbind first
@@ -67,18 +67,17 @@ void Shape2D::draw(const Shader& shader, const DrawMode drawmode, const DrawType
 	shader.set_matrix4f("model", model);
 
 	// Set the color
-	shader.set_vector4f("shapeColor", color.normalize());
+	shader.set_vector4f("shapeColor", color.normalize()); // TODO -- normalize in shader
 
 
 	// Bind VAO using RAII
 	ScopedBind<VAO> scoped_vao_bind(*this->vao);
 
 	// RAII for texture binding
-	std::optional<ScopedBind<Texture>> scoped_texture_bind;
-
-	// TODO -- Put this check on shader
-	if(this->texture != nullptr) {
-		scoped_texture_bind.emplace(*this->texture);
+	// ScopedBind<Texture> scoped_texture_bind(*this->texture);
+	if(texture) {
+		shader.set_int("useTexture", 1);
+		this->texture->bind();
 	}
 
 	glDrawElements(drawtype, this->indices_size, GL_UNSIGNED_INT, (void*)0);

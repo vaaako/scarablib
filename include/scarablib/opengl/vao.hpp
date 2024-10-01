@@ -21,7 +21,6 @@ class VAO {
 		inline void unbind() const {
 			glBindVertexArray(0);
 		}
-
 	private:
 		GLuint id;
 };

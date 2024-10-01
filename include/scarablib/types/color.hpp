@@ -86,11 +86,13 @@ struct Color {
 	// Convert color component values to a normalized range (0-1) for OpenGL
 	inline const vec4<float> normalize() const {
 		// This is not optimized and i have no idea of how to make this optmized
+
+		// Multiplying by 0.004 gives an approximated result as dividing by 255
 		return {
-			this->red   / 255.0f,
-			this->green / 255.0f,
-			this->blue  / 255.0f,
-			this->alpha / 255.0f
+			this->red   * 0.004f,
+			this->green * 0.004f,
+			this->blue  * 0.004f,
+			this->alpha * 0.004f
 		};
 	}
 
