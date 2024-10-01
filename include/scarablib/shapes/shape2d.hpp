@@ -15,6 +15,7 @@ class Shape2D {
 	public:
 		// Construct using a vector of vertices and a vector of indices values
 		Shape2D(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices);
+		Shape2D() = default;
 		// No need to delete texture, since is actually a "reference" to another texture
 		~Shape2D();
 
@@ -91,9 +92,10 @@ class Shape2D {
 		vec2<float> size = { 50.0f, 50.0f };
 		// vec2<float> size = { 1.0f, 1.0f };
 
+		VAO* vao = new VAO();
 		float angle = 0.0f;
 		// bool has_texuv = true;
 
-		VAO* vao = new VAO(); // Pointer because size will increase
+		
 		GLsizei indices_size; // Pre calculated indices size
 };

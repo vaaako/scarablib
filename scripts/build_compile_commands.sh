@@ -8,10 +8,4 @@ if [ ! -d src ]; then
 	exit
 fi
 
-if [ "$1" == "-d" ]; then
-	bear --output build/compile_commands.json -- make dev
-	exit
-fi
-
-# Default build
-bear --output build/compile_commands.json -- make
+bear --output build/compile_commands.json -- make dev
