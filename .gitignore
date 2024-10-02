@@ -17,7 +17,7 @@ vgcore*
 .cache/
 
 # Backups
-bakup/
+bakups/
 *.bak
 
 # Not ready yet
