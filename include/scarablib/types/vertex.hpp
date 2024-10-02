@@ -24,11 +24,11 @@
 
 // Used for setting coordinates for vertices position, texture and normals
 struct Vertex {
-	// union {
-	// 	glm::vec3 position;
-	// 	glm::vec2 position2d;
-	// };
-	glm::vec2 position2d;
+	union {
+		glm::vec3 position;
+		glm::vec2 position2d;
+	};
+
 	glm::vec2 texuv;
 
 	// bool operator==(const Vertex& other) const {
@@ -38,7 +38,7 @@ struct Vertex {
 
 // Used for loading models
 struct Face {
-	// Init with zero
+	// Init 3 spaces with zero
 	std::vector<int> vertex_index = std::vector<int>(3);
 	std::vector<int> texuv_index  = std::vector<int>(3);
 };

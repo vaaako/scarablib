@@ -68,20 +68,21 @@ struct Color {
 		return (this->red + this->green + this->blue + this->alpha) == 0;
 	}
 
-	// Convert the color to a vec4<uint8>
-	inline vec4<uint8> to_vec4() const {
-		return vec4(this->red, this->green, this->blue, this->alpha);
+	// Convert the color to a vec4 of any type T.
+	template <typename T>
+	inline vec4<T> to_vec4() const {
+		return vec4<T>(this->red, this->green, this->blue, this->alpha);
 	}
 
 	// Convert the color to an `SDL_Color` object for use with SDL.
-	inline SDL_Color to_sdl_color() const {
-		return {
-			this->red,
-			this->green,
-			this->blue,
-			this->alpha
-		};
-	}
+	// inline SDL_Color to_sdl_color() const {
+	// 	return {
+	// 		this->red,
+	// 		this->green,
+	// 		this->blue,
+	// 		this->alpha
+	// 	};
+	// }
 
 	// Convert color component values to a normalized range (0-1) for OpenGL
 	inline const vec4<float> normalize() const {

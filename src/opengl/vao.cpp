@@ -2,7 +2,9 @@
 #include "scarablib/proper/log.hpp"
 
 VAO::VAO() {
+#ifdef SCARAB_DEBUG_VAO
 	LOG_INFO_FN("VAO constructor");
+#endif
 	glGenVertexArrays(1, &this->id);
 }
 

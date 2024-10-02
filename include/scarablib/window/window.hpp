@@ -46,7 +46,7 @@ class Window {
 		// This should be called at the end of each frame
 		// to display the newly rendered frame to the screen
 		inline void swap_buffers() {
-			#ifdef SCRLIB_DEBUG_EVENT_COUNT
+			#ifdef SCARAB_DEBUG_EVENT_COUNT
 				if(frame_events.size() > 0) {
 					std::printf("Events in this frame: %zu\n", frame_events.size());
 					if(frame_events.size() > 5) {

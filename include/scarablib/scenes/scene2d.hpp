@@ -1,26 +1,42 @@
 #pragma once
 
-// #include "scarablib/types/font.hpp"
+#include "scarablib/opengl/vao.hpp"
 #include "scarablib/scenes/scene.hpp"
+#include "scarablib/shapes/2d/circle.hpp"
+#include "scarablib/shapes/2d/rectangle.hpp"
+#include "scarablib/shapes/2d/triangle.hpp"
 #include "scarablib/shapes/shape2d.hpp"
 #include "scarablib/utils/file.hpp"
 #include "scarablib/window/window.hpp"
 
+/**
+ * I could optimize more the draw method by using "begin_draw" and "end_draw" method like raylib
+ * Using these methods, I would use the same VAO bind for all shapes inside of it, which is more optimized
+ *
+ * I could also make something similar to love2d, where the color is changed using `love.graphics.color`
+ * and all shapes drawed after this are colorized using the color defined
+ * */
+
 class Scene2D : public Scene {
 	public:
 		Scene2D(const Window& window);
+		~Scene2D();
 
-		// Draw a single shape
-		inline void draw_shape(const Shape2D& shape, const DrawMode drawmode = DrawMode::FILLMODE, const DrawType drawtype = DrawType::TRIANGLES) {
-			shape.draw(
-				this->shader,
-				drawmode, drawtype
-			);
-		}
+		// Draw a rectangular shape using a reference.
+		// e.g., `scene2d.draw_rectangle(rectangle)` or `scene2d.draw_rectangle({ x, y }, { width, height }, color);`
+		void draw_rectangle(const Rectangle& rectangle) const;
 
-		// inline void draw_font(Font& font) const {
-		// 	font.draw2d(*this->shader_texture, DrawMode::FILL, GL_TRIANGLE_FAN);
-		// }
+		// Draw a triangular shape using a reference.
+		// e.g., `scene2d.draw_triangle(rectangle)` or `scene2d.draw_triangle({ x, y }, { width, height }, color);`
+		void draw_triangle(const Triangle& triangle) const;
+
+		// Draw a circular shape using a reference.
+		// e.g., `scene2d.draw_circle(circle)` or `scene2d.draw_circle({ x, y }, { width, height }, color);`
+		void draw_circle(const Circle& circle) const;
+
+		// Draw any 2D shape using a reference.
+		// e.g., `scene2d.draw_shape(rectangle)`
+		void draw_shape(const Shape2D& shape);
 
 		// Update scene viewport using window object
 		inline void update_viewport(const Window& window) {
@@ -30,44 +46,24 @@ class Scene2D : public Scene {
 		// Update scene viewport using width and height values
 		void update_viewport(const uint32 width, const uint32 height);
 
-		// Draw multiple shapes. You can draw how many shapes you want
-		//
-		// Ex.: `draw_shapes(shape1, shape2, shape3)`
-		template <typename... Shapes>
-		void draw_shapes(const Shapes&... meshes) const {
-			std::vector<const Shape2D*> buffer  = { &meshes... };
-
-			// Draw each from vector
-			for(const Shape2D* shape : buffer) {
-				shape->draw(
-					this->shader,
-					DrawMode::FILLMODE
-				);
-			}
-		}
-
-		// Draw multiple shapes with a common DrawMode. You can draw how many shapes you want
-		//
-		// Ex.: `draw_shapes(DrawMode::OUTLINEMODE, shape1, shape2, shape3)`
-		template <typename... Shapes>
-		void draw_shapes(const DrawMode drawmode, const Shapes&... meshes) const {
-			std::vector<const Shape2D*> buffer  = { &meshes... };
-
-			// Draw each from vector
-			for(const Shape2D* shape : buffer) {
-				shape->draw(
-					this->shader,
-					drawmode
-				);
-			}
-		}
-
 	private:
-		// Shader need to be in header to find files in include/
+		VAO* vao = new VAO();
 
-		Shader shader = Shader(
-			FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/2d/vertex.glsl").c_str(),
-			FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/2d/fragment.glsl").c_str()
-		);
+		// Storing all shaders
+		std::vector<Shader*> shaders = {
+			new Shader(
+				FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/2d/vertex.glsl").c_str(),
+				FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/2d/fragment.glsl").c_str()
+			),
+
+			new Shader(
+				FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/2d/vertex.glsl").c_str(),
+				FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/2d/circle_fragment.glsl").c_str()
+			)
+		};
+
+		// Better acess
+		Shader& shader = *shaders.at(0);
+		Shader& shader_circle = *shaders.at(1);
 };
 

@@ -1,101 +1,94 @@
 #pragma once
 
+#include <GL/glew.h>
 #include "scarablib/opengl/shader.hpp"
-#include "scarablib/opengl/vao.hpp"
 #include "scarablib/proper/vector/vec2.hpp"
-#include "scarablib/typedef.hpp"
 #include "scarablib/types/color.hpp"
-#include "scarablib/types/texture.hpp"
-#include "scarablib/types/vertex.hpp"
-#include "scarablib/scenes/scene.hpp"
 
-// NOTE -- Technically I could use the same VAO for Triangle and Rectangle
-
+// This is a struct used to make 2D shapes
 class Shape2D {
 	public:
-		// Construct using a vector of vertices and a vector of indices values
-		Shape2D(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices);
-		Shape2D() = default;
-		// No need to delete texture, since is actually a "reference" to another texture
-		~Shape2D();
+		// Initialize current shape using the following values:
+		// - `position`: Shape's position on the screen
+		// - `size`: Size of the shape in pixels
+		// - `color`: Shape's color (white by default)
+		// - `angle`: Shape's angle (0.0f by default)
+		Shape2D(const vec2<float>& position, const vec2<float>& size, const Color& color = Colors::WHITE, const float angle = 0.0f);
 
-		void draw(const Shader& shader, const DrawMode drawmode = DrawMode::FILLMODE, const DrawType drawtype = DrawType::TRIANGLES) const;
+		// Scene2D call this method.
+		// Draw current shape using shader defined by Scene2D class
+		virtual void draw(const Shader& shader) const = 0;
 
-		// Get current texture
-		inline Texture* get_texture() const {
-			return this->texture;
+		// GETTERS //
+
+		// Get current position
+		inline vec2<float> get_position() const {
+			return this->position;
 		}
 
-		// Set rotation angle in radians
-		inline Shape2D& set_angle(const float angle) {
-			this->angle = angle;
-			return *this;
+		// Get current size of each axis
+		inline vec2<float> get_size() const {
+			return this->size;
 		}
 
-		// Set the shape's color
-		//
-		// If a shape is using a texture and a color at the same time, the texture will colorize using the color defined
-		inline Shape2D& set_color(const Color& color) {
-			this->color = color;
-			return *this;
+		// Get current color
+		inline Color get_color() const {
+			return this->color;
 		}
 
+		// Get current angle
+		inline float get_angle() const {
+			return this->angle;
+		}
 
-		inline Shape2D& set_position(const vec2<float>& position) {
+		// SETTERS //
+
+		// Set a new position using a vector
+		inline void set_position(const vec2<float>& position) {
 			this->position = position;
-			return *this;
+			this->isdirty = true;
 		}
 
-		// Set size using a different value for each axis (X and Y)
-		inline Shape2D& set_size(const vec2<float>& size) {
+		// Set a new size using a vector (X and Y)
+		inline void set_size(const vec2<float>& size) {
 			this->size = size;
-			return *this;
+			this->isdirty = true;
 		}
 
-		// Set size using a single value for all axis
-		inline Shape2D& set_size(const float size) {
-			this->size = size;
-			return *this;
+		// Scale the shape using a single value for all axis.
+		// e.g., `size = size.xy * scale`
+		inline void set_scale(const float& scale) {
+			this->size * scale;
+			this->isdirty = true;
 		}
 
-		// Scale the shape using a single value for all axis
-		//
-		// Ex.: `new_scale = current_scale * new_scale`
-		inline Shape2D& set_scale(const float scale) {
-			this->size = this->size * scale;
-			return *this;
+		// Scale the shape using a different value for each axis.
+		// e.g., `size.x = size.x * scale` / `size.y = size.y * scale`
+		inline void set_scale(const vec2<float>& scale) {
+			this->size * scale;
+			this->isdirty = true;
 		}
 
-		// Sete a scale using different values for each axis (X and Y)
-		inline Shape2D& set_scale(const vec2<float>& scale) {
-			this->size = this->size * scale;
-			return *this;
+		// Set a new color
+		// If using a texture and a color at the same time, the texture will be colorized using the color defined
+		inline void set_color(const Color& color) {
+			this->color = color;
+			this->isdirty = true;
 		}
 
-		inline Shape2D& set_texture(Texture* texture) {
-			// TODO -- for 3d objects
-			// if(!has_texuv) {
-			// 	LOG_INFO("This mesh does not support texture");
-			// 	return *this;
-			// }
-
-			this->texture = texture;
-			return *this;
+		// Set a new rotation angle
+		inline void set_angle(const float angle) {
+			this->angle = angle;
+			this->isdirty = true;
 		}
 
+	protected:
+		vec2<float> position;
+		vec2<float> size;
+		Color color;
+		float angle;
 
-	private:
-		Texture* texture = nullptr; // Pointer because might be nullptr
-		Color color = { 255, 255, 255, 255 };
-
-		vec2<float> position = { 100.0f, 100.0f };
-		vec2<float> size = { 50.0f, 50.0f };
-		// vec2<float> size = { 1.0f, 1.0f };
-
-		VAO* vao = new VAO();
-		float angle = 0.0f;
-		// bool has_texuv = true;
-
-		
-		GLsizei indices_size; // Pre calculated indices size
+		mutable glm::mat4 model = glm::mat4(1.0f);
+		mutable bool isdirty = false; // Change value inside draw
 };
+

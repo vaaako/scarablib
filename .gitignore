@@ -9,7 +9,7 @@ build/
 *.vim
 
 # Debug
-valgrind*.txt
+valgrind*.txt*
 *.a
 vgcore*
 

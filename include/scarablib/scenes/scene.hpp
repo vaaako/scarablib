@@ -1,31 +1,21 @@
 #pragma once
 
 #include "scarablib/window/window.hpp"
-#include "scarablib/opengl/shader.hpp"
 
+// Different modes of drawing shapes
+// `OUTLINEMODE` draws the outline of the shape
+// `FILLMODE` draws the shape as normal
 enum DrawMode : uint32 {
 	OUTLINEMODE = GL_LINE,
 	FILLMODE = GL_FILL
 };
 
-enum DrawType : uint32 {
-	POINTS = GL_POINTS,
-	LINES = GL_LINES,
-	TRIANGLES = GL_TRIANGLES,
-};
-
+// Virtual class used to make Scene2D and Scene3D
 class Scene {
 	public:
+		// Build scene object using the window object for viewport
 		Scene(const Window& window);
-		~Scene() {
-			// delete this->shader;
-			// delete this->shader_texture;
-		}
-
-		// Get shader reference
-		inline const Shader& get_shader() const {
-			return *this->shader;
-		}
+		virtual ~Scene() = 0;
 
 		// Update viewport using window object
 		virtual inline void update_viewport(const Window& window) = 0;
@@ -34,9 +24,7 @@ class Scene {
 		virtual inline void update_viewport(const uint32 width, const uint32 height) = 0;
 
 	protected:
-		// Pointer to avoid forced init on this constructor
-		const Shader* shader = nullptr;
-
+		// Viewport
 		uint32 width;
 		uint32 height;
 };

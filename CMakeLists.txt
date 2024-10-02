@@ -30,6 +30,7 @@ link_directories(
 	lib/SDL2_ttf
 )
 
+add_definitions(-DSCARAB_DEBUG_VAO)
 file(GLOB_RECURSE SOURCES src/*.cpp src/*/*.cpp src/**/*.cpp)
 add_executable(scarablib_dev ${SOURCES} test/main.cpp)
 target_link_libraries(scarablib_dev GL GLEW SDL2 SDL2main SDL2_mixer SDL2_ttf)

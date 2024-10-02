@@ -5,19 +5,16 @@
 
 // Helper namespace with modules related to SDL. Used to help code the library
 namespace SDLHelper {
-	// Flips an image vertically
-	//
+	// Flips an image vertically.
 	// Original code: https://stackoverflow.com/questions/65815332/flipping-a-surface-vertically-in-sdl2
 	void flip_vertically(SDL_Surface* surface);
-	// Flips an image horizontally
-	//
+	// Flips an image horizontally.
 	// Original code: https://stackoverflow.com/questions/65815332/flipping-a-surface-vertically-in-sdl2
 	void flip_horizontally(SDL_Surface* surface);
 
 	// Original code: https://stackoverflow.com/questions/30016083/sdl2-opengl-sdl2-ttf-displaying-text
 	//
-	// Convert an image to have a dimension divisible by two
-	//
+	// Convert an image to have a dimension divisible by two.
 	// "So OpenGL requires that all textures have dimensions of Base2 on my system (2,4,16,32,64...)"
 	uint32 power_two_floor(uint32 value);
 

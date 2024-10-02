@@ -1,9 +1,9 @@
-#include "scarablib/shapes/2d/rectangle.hpp"
+#include "scarablib/shapes/2d/circle.hpp"
 
-Rectangle::Rectangle(const vec2<float>& position, const vec2<float>& size, const Color& color, const float angle)
+Circle::Circle(const vec2<float>& position, const vec2<float>& size, const Color& color, const float angle)
 	: Shape2D(position, size, color, angle) {}
 
-void Rectangle::draw(const Shader& shader) const {
+void Circle::draw(const Shader& shader) const {
 	// Apply transformations
 	if (this->isdirty) {
 		this->model = glm::mat4(1.0f);
@@ -14,5 +14,6 @@ void Rectangle::draw(const Shader& shader) const {
 
 	shader.set_matrix4f("model", this->model);
 	shader.set_vector4f("shapeColor", this->color.to_vec4<float>());
+	shader.set_float("blur", this->blur);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 }
