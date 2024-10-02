@@ -9,6 +9,12 @@ uniform sampler2D texSampler;
 uniform vec4 shapeColor; // Color defined by user later
 uniform bool useTexture; // To toggle texture usage
 
+
+// Multiplying by 0.004 gives an approximated result as dividing by 255
+vec4 normalized_color(vec4 color) {
+	return vec4(color.r * 0.004, color.g * 0.004, color.b * 0.004, color.a * 0.004);
+}
+
 void main() {
 	// vec3 baseColor = texture(texSampler, texCoord).rgb;
 	// float alpha = texture(mask, texCoord).r;
@@ -17,8 +23,8 @@ void main() {
 	// texture->bind(1) // mask, draw above
 
 	if (useTexture) {
-		FragColor = texture(texSampler, texCoord) * vec4(shapeColor.rgba); // Use texture
+		FragColor = texture(texSampler, texCoord) * normalized_color(shapeColor.rgba); // Use texture
 	} else {
-		FragColor = vec4(shapeColor.rgba); // Use solid color
+		FragColor = normalized_color(shapeColor.rgba); // Use solid color
 	}
 }
