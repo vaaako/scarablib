@@ -12,6 +12,12 @@ class VBO {
 		VBO();
 		~VBO();
 
+		// Disable copy and moving
+		VBO(const VBO&) = delete;
+		VBO(VBO&&) = delete;
+		VBO& operator=(const VBO&) = delete;
+		VBO& operator=(VBO&&) = delete;
+
 		// Activates the VBO in the OpenGL context
 		inline void bind() const {
 			glBindBuffer(GL_ARRAY_BUFFER, this->id);

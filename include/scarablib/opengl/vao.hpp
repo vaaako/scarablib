@@ -11,6 +11,12 @@ class VAO {
 		VAO();
 		~VAO();
 
+		// Disable copy and moving
+		VAO(const VAO&) = delete;
+		VAO(VAO&&) = delete;
+		VAO& operator=(const VAO&) = delete;
+		VAO& operator=(VAO&&) = delete;
+
 		// Activates the VAO in the OpenGL context.
 		// This enables the configuration stored in the VAO.
 		inline void bind() const {

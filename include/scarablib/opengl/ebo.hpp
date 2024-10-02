@@ -13,9 +13,16 @@ class EBO {
 		// Recommended types: uint32 and uint16
 		template <typename T = uint32>
 		EBO(const std::vector<T>& indices);
-		// Initialize and build before
+
+		// Initialize now and build later
 		EBO() = default;
 		~EBO();
+
+		// Disable copy and moving
+		EBO(const EBO&) = delete;
+		EBO(EBO&&) = delete;
+		EBO& operator=(const EBO&) = delete;
+		EBO& operator=(EBO&&) = delete;
 
 		// Make an EBO using a vector of indices.
 		// Used when you declare EBO first and want to initialize later.

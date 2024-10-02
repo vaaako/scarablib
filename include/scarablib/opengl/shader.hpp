@@ -14,7 +14,9 @@ struct Shader {
 
 		// Disable copy and moving
 		Shader(const Shader&) = delete;
-		Shader(const Shader&&) = delete;
+		Shader(Shader&&) = delete;
+		Shader& operator=(const Shader&) = delete;
+		Shader& operator=(Shader&&) = delete;
 
 		// Enable shader
 		inline void use() const {

@@ -9,12 +9,12 @@ class ScopedBind {
 		~ScopedBind();
 
 		// Prevent copying to avoid multiple bindings
-		// ScopedBind(const ScopedBind<T>&) = delete;
-		// ScopedBind& operator=(const ScopedBind<T>&) = delete;
+		ScopedBind(const ScopedBind<T>&) = delete;
+		ScopedBind& operator=(const ScopedBind<T>&) = delete;
 
 		// Allow moving
-		// ScopedBind(const ScopedBind<T>&&) = default;
-		// ScopedBind& operator=(ScopedBind<T>&&) = default;
+		ScopedBind(ScopedBind<T>&&) = default;
+		ScopedBind& operator=(ScopedBind<T>&&) = default;
 
 	private:
 		const T& bound_obj;
