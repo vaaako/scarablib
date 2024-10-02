@@ -1,4 +1,4 @@
-TODO library
+# TODO library
 - [ ] Use Vector2f and Vector3f instead of glm versions
 - [x] Change library name
 	+ Beetle relatable
@@ -37,6 +37,7 @@ TODO library
 - [ ] Unify shader and `shader_texture` somehow
 	+ Maybe set the texture alpha to zero when using just solid color?
 	+ put the if-check on glsl file?
+- [ ] Later use the old `shape2d` in bakcups folder for custom user shapes
 
 # TODO 3D
 - [x] Camera
@@ -86,36 +87,36 @@ Review for erros and improvement (header and declaration)
 	+ [x] shaders/
 		* [x] 2d/
 		* [x] 3d/
-	+ [ ] ebo.hpp
+	+ [x] ebo.hpp
 	+ [x] shader_program.hpp
 	+ [x] vao.hpp
-	+ [ ] vbo.hpp
+	+ [x] vbo.hpp
 - [x] proper/
 	+ [x] vector/
 		* [x] vec2.hpp
 		* [x] vec3.hpp
 		* [x] ...
 	+ [x] color.hpp
-- [ ] scenes/
-	+ [ ] scene.hpp
+- [x] scenes/
+	+ [x] scene.hpp
 	+ [ ] scene2d.hpp
-- [ ] shapes/
-	+ [ ] shape2d.hpp
+- [x] shapes/
+	+ [x] shape2d.hpp
 - [ ] types/
 	+ [x] audio.hpp
 	+ [x] color.hpp
 	+ [ ] font.hpp
 	+ [x] music.hpp (may contain some bug)
 	+ [x] sound.hpp
-	+ [ ] texture.hpp
-	+ [ ] vertex.hpp
-- [ ] utils/
-	+ [ ] file.hpp
-	+ [ ] log.hpp
-	+ [ ] math.hpp
-	+ [ ] sdl.hpp
+	+ [ ] texture.hpp (finish when implement fonts)
+	+ [x] vertex.hpp
+- x ] utils/
+	+ [x] file.hpp
+	+ [x] log.hpp
+	+ [x] math.hpp
+	+ [x] sdl.hpp
 	+ [x] string.hpp
-- [ ] window/
+- [x] window/
 	+ [x] events.hpp
-	+ [ ] window.hpp
+	+ [x] window.hpp
 + [x] typedef.hpp
