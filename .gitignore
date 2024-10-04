@@ -17,6 +17,7 @@ vgcore*
 .cache/
 
 # Backups
+backup/
 bakups/
 *.bak
 
