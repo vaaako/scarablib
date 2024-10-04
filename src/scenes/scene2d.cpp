@@ -41,12 +41,12 @@ Scene2D::Scene2D(const Window& window) : Scene(window) {
 	vbo.unbind();
 }
 
-
 Scene2D::~Scene2D() {
 	delete this->vao;
 
 	for(Shader* shader : this->shaders) {
 		delete shader;
+		this->shaders.pop_back();
 	}
 
 	this->shaders.clear();

@@ -15,7 +15,7 @@ class Scene {
 	public:
 		// Build scene object using the window object for viewport
 		Scene(const Window& window);
-		virtual ~Scene() = 0;
+		~Scene() = default;
 
 		// Update viewport using window object
 		virtual inline void update_viewport(const Window& window) = 0;
