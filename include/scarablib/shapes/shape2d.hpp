@@ -88,7 +88,8 @@ class Shape2D {
 		Color color;
 		float angle;
 
-		mutable glm::mat4 model = glm::mat4(1.0f);
-		mutable bool isdirty = false; // Change value inside draw
+		// This need to be intialized on constructor, so the inheritance goes well
+		mutable glm::mat4 model;
+		mutable bool isdirty; // Change model if changed
 };
 

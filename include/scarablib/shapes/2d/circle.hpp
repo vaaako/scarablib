@@ -3,7 +3,7 @@
 #include "scarablib/shapes/shape2d.hpp"
 
 // Circle shape object, used to draw circle
-struct Circle : public Shape2D {
+struct Circle : protected Shape2D {
 	// Initialize current shape using the following values:
 	// `position`: Shape's position on the screen
 	// `size`: Size of the shape in pixels

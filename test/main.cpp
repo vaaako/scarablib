@@ -32,7 +32,7 @@ int main() {
 	Window window = Window({
 		.width = 800,
 		.height = 600,
-		.clear_color = Colors::MOSS,
+		.clear_color = Colors::ORANGE,
 		.debug_info = true
 	});
 
@@ -72,12 +72,10 @@ int main() {
 			window.set_clear_color(Colors::MOSS);
 		}
 
-		scene2d.draw_rectangle(rectangle);
 		scene2d.draw_triangle(triangle);
-
+		scene2d.draw_rectangle(rectangle);
 		scene2d.draw_circle(circle);
 
-		// scene2d.draw_circle();
 
 		window.swap_buffers();
 	}

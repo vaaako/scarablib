@@ -77,7 +77,7 @@ Window::Window(const WindowConf& config)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // Non-premultiplied alpha
 
 	// More config
-	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST); // 2D shapes draw order may be opposite because of this
 	// glDepthFunc(GL_ALWAYS);
 
 

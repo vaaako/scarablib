@@ -3,7 +3,7 @@
 #include "scarablib/shapes/shape2d.hpp"
 
 // Triangle shape object, used to draw triangles
-struct Triangle : public Shape2D {
+struct Triangle : protected Shape2D {
 	// Initialize current shape using the following values:
 	// `position`: Shape's position on the screen
 	// `size`: Size of the shape in pixels

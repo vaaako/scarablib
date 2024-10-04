@@ -5,10 +5,10 @@ Circle::Circle(const vec2<float>& position, const vec2<float>& size, const Color
 
 void Circle::draw(const Shader& shader) const {
 	// Apply transformations
-	if (this->isdirty) {
+	if(this->isdirty) {
 		this->model = glm::mat4(1.0f);
 		this->model = glm::translate(this->model, glm::vec3(this->position.x, this->position.y, 0.0f))
-			  * glm::scale(this->model, glm::vec3(this->size.x, this->size.y, 1.0f));
+					* glm::scale(this->model, glm::vec3(this->size.x, this->size.y, 1.0f));
 		this->isdirty = false;
 	}
 
