@@ -28,7 +28,7 @@
 // }
 //
 
-std::string FileHelper::read_file(const std::string &path) {
+std::string FileHelper::read_file(const std::string& path) {
 	std::ifstream file = std::ifstream(path);
 	if(!file.is_open()) {
 		throw ScarabError("Could not open file %s", path.c_str());

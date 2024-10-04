@@ -78,7 +78,7 @@ Window::Window(const WindowConf& config)
 
 	// More config
 	glEnable(GL_DEPTH_TEST);
-/* 	 */glDepthFunc(GL_ALWAYS);
+	// glDepthFunc(GL_ALWAYS);
 
 
 	// Show debug info

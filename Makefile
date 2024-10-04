@@ -17,6 +17,7 @@ CXXFLAGS_DEV = -g \
 			   -Wunreachable-code
 
 CXXFLAGS = -std=c++20 -O3 -ffast-math \
+		   -MMD -MP \
 		   -I./include \
 		   -I./lib/SDL2/include -I./lib/SDL2/include/SDL2 \
 		   -I./lib/SDL2_mixer/include \
@@ -51,14 +52,14 @@ all: $(TARGET)
 # Link objects
 $(TARGET): $(OBJS)
 	@echo "nothing here yet"
-	# $(CXX) -shared -o $(BUILD_DIR)/$@ $^ -Wl,--no-as-needed $(LDFLAGS)
-	# $(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
+# $(CXX) -shared -o $(BUILD_DIR)/$@ $^ -Wl,--no-as-needed $(LDFLAGS)
+# $(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
 
 
 # Apply dev flags to target before
-# dev: CXXFLAGS += $(CXXFLAGS_DEV)
+dev: CXXFLAGS += $(CXXFLAGS_DEV)
 dev: $(OBJS)
-	$(CXX) $(CXXFLAGS) $(CXXFLAGS_DEV) $(OBJS) $(TEST_FILE) -o $(BUILD_DIR)/$(TARGET)_dev $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) $^ $(TEST_FILE) -o $(BUILD_DIR)/$(TARGET)_dev $(LDFLAGS)
 
 # Compile each object
 $(OBJS_DIR)/%.o: src/%.cpp
@@ -66,6 +67,6 @@ $(OBJS_DIR)/%.o: src/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -rf $(OBJS_DIR)
+	rm -rf $(BUILD_DIR)/$(TARGET) $(OBJS_DIR)
 
 .PHONY: all clean dev

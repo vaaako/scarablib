@@ -26,6 +26,8 @@
  * */
 
 
+// TODO -- memory leak somewhere
+
 int main() {
 	Window window = Window({
 		.width = 800,
@@ -59,7 +61,6 @@ int main() {
 	// Play music starting with a fade in
 	// music.play_fadein(5000);
 	while(window.is_open()) {
-		// TODO -- Save clean color to avoid division each frame
 		window.clear();
 		window.process_events();
 
