@@ -15,6 +15,9 @@
  *
  * I could also make something similar to love2d, where the color is changed using `love.graphics.color`
  * and all shapes drawed after this are colorized using the color defined
+ *
+ * Following the same idea, i could make the same for textures, this 3 changes would be much more optimized
+ * but i prefer the way that is currently, maybe sometime i change
  * */
 
 class Scene2D : public Scene {
@@ -22,21 +25,43 @@ class Scene2D : public Scene {
 		Scene2D(const Window& window);
 		~Scene2D();
 
+		// Disable copy and moving
+		Scene2D(const Scene2D&) = delete;
+		Scene2D& operator=(const Scene2D&) = delete;
+		Scene2D(Scene2D&&) = delete;
+		Scene2D& operator=(Scene2D&&) = delete;
+
 		// Draw a rectangular shape using a reference.
 		// e.g., `scene2d.draw_rectangle(rectangle)` or `scene2d.draw_rectangle({ x, y }, { width, height }, color);`
-		void draw_rectangle(const Rectangle& rectangle) const;
+		void draw_rectangle(Rectangle& rectangle);
 
 		// Draw a triangular shape using a reference.
 		// e.g., `scene2d.draw_triangle(rectangle)` or `scene2d.draw_triangle({ x, y }, { width, height }, color);`
-		void draw_triangle(const Triangle& triangle) const;
+		void draw_triangle(Triangle& triangle);
 
 		// Draw a circular shape using a reference.
 		// e.g., `scene2d.draw_circle(circle)` or `scene2d.draw_circle({ x, y }, { width, height }, color);`
-		void draw_circle(const Circle& circle) const;
+		void draw_circle(Circle& circle);
 
 		// Draw any 2D shape using a reference.
 		// e.g., `scene2d.draw_shape(rectangle)`
-		void draw_shape(const Shape2D& shape);
+		void draw_shape(Shape2D& shape);
+
+
+		// ADD LATER (batch draw)
+		void add_to_scene(Shape2D& shape);
+		void draw_all();
+
+
+		inline void begin_draw() {
+			this->shader.use();
+			this->vao->bind();
+		}
+
+		inline void end_draw() {
+			this->vao->unbind();
+			this->shader.unbind();
+		}
 
 		// Update scene viewport using window object
 		inline void update_viewport(const Window& window) {

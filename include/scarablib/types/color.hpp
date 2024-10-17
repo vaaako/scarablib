@@ -53,15 +53,19 @@ struct Color {
 	// Example:
 	// Color color1 = Color(0xFF5733);   // RGB (255, 87, 51) with alpha set to 255 .
 	// Color color2 = Color(0x80FF5733); // RGBA (128, 255, 87, 51) with alpha set to 128
-	Color(const int hex_value);
+	explicit Color(const uint32 hex_value);
 
 	// Initializes the color with specific RGBA values
 	Color(const uint8 red, const uint8 green, const uint8 blue, const uint8 alpha = 255);
 
 	// Copy constructor that initializes the color from another Color instance
 	// e.g., `Color color = Color({ 202, 23, 115 });`
-	Color(const Color& other) = default;
+	Color(const Color&) = default;
+	Color& operator=(const Color&) = default;
 
+	// Move
+	Color(Color&&) = default;
+	Color& operator=(Color&&) = default;
 
 	// Check if all color components are equal to 0
 	inline constexpr bool isempty() const {
@@ -73,16 +77,6 @@ struct Color {
 	inline vec4<T> to_vec4() const {
 		return vec4<T>(this->red, this->green, this->blue, this->alpha);
 	}
-
-	// Convert the color to an `SDL_Color` object for use with SDL.
-	// inline SDL_Color to_sdl_color() const {
-	// 	return {
-	// 		this->red,
-	// 		this->green,
-	// 		this->blue,
-	// 		this->alpha
-	// 	};
-	// }
 
 	// Convert color component values to a normalized range (0-1) for OpenGL
 	inline const vec4<float> normalize() const {
@@ -108,9 +102,6 @@ struct Color {
 		return !(*this == other);
 	}
 
-	Color& operator=(const Color& other) = default;
-
-	// This can be used to create shades of gray
 	Color& operator=(const uint8 scalar) noexcept {
 		this->red = scalar;
 		this->green = scalar;
@@ -118,6 +109,4 @@ struct Color {
 		this->alpha = scalar;
 		return *this;
 	}
-
-	private:
 };

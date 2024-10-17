@@ -3,7 +3,7 @@
 #include "scarablib/shapes/shape2d.hpp"
 
 // Rectangle shape object, used to draw rectangle
-struct Rectangle : protected Shape2D {
+struct Rectangle : public Shape2D {
 	// Initialize current shape using the following values:
 	// `position`: Shape's position on the screen
 	// `size`: Size of the shape in pixels
@@ -13,5 +13,5 @@ struct Rectangle : protected Shape2D {
 
 	// Scene2D call this method.
 	// Draw current shape using shader defined by Scene2D class
-	void draw(const Shader& shader) const override;
+	void draw(const Shader& shader) override;
 };

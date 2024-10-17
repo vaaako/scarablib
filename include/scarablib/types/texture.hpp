@@ -1,5 +1,6 @@
 #pragma once
 
+#include "scarablib/typedef.hpp"
 #include <SDL2/SDL_surface.h>
 #include <GL/glew.h>
 
@@ -24,7 +25,35 @@ struct Texture {
 	// Constructor to create a texture from a file path
 	// Optionally sets the filtering and wrapping methods
 	Texture(const char* path, const TextureFilter filter = TextureFilter::LINEAR, const TextureWrap wrap = TextureWrap::REPEAT);
-	Texture(const SDL_Surface* surface, const TextureFilter filter = TextureFilter::LINEAR);
+
+	// Uses pre-defined data to make a texture
+	Texture(const uint8* data, const uint32 width, const uint32 height, const GLenum format);
+
+	// NOTE -- I am not using default keyword just because of OpenGL ID, to avoid double deletion or any trouble with it 
+
+	// Default copy
+	Texture(const Texture&) = default;
+	Texture& operator=(const Texture& other) = default;
+
+	// Moving
+	Texture(Texture&& other) noexcept {
+		this->id = other.id;
+		this->tex_type = other.tex_type;
+		other.id = 0;
+	}
+
+	Texture& operator=(Texture&& other) noexcept {
+		if(this != &other) {
+			// Delete current
+			glDeleteTextures(1, &this->id);
+			this->id = other.id;
+			this->tex_type = other.tex_type;
+			other.id = 0;
+		}
+
+		return *this;
+	}
+
 	~Texture();
 
 	// Bind the texture for use in rendering
@@ -37,10 +66,10 @@ struct Texture {
 		glBindTexture(this->tex_type, 0);
 	}
 
-private:
-	GLuint id;
-	GLuint tex_type = GL_TEXTURE_2D; // Type of texture (2D by default)
+	private:
+		GLuint id;
+		GLuint tex_type = GL_TEXTURE_2D; // Type of texture (2D by default)
 
-	// Optional: Uncomment for using texture atlases
-	// GLuint tex_type = GL_TEXTURE_2D_ARRAY;
+		// Texture atlas
+		// GLuint tex_type = GL_TEXTURE_2D_ARRAY;
 };

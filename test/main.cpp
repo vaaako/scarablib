@@ -16,6 +16,8 @@
  * - Shader uniforms changes only when needed
  * - Model matrix make calculation only when needed
  *
+ * - scen2d.add_object(); -> scene2d.render_all();
+ *
  * - Use `scene.draw_shapes` for batching
  * - batch will not be possible manually, probably needing to add methods like `scene.add_to_pool()` and `scene.draw_batch()`
  *
@@ -36,14 +38,17 @@ int main() {
 		.debug_info = true
 	});
 
-	// Texture texture = Texture("test/assets/images/hideri.jpg");
+	Texture tex1 = Texture("test/assets/images/hideri.jpg");
+	Texture tex2 = Texture("test/assets/images/kuromi.png");
 	Scene2D scene2d = Scene2D(window);
 
 	Rectangle rectangle = {
 		vec2 { 100.0f, 100.0f },
-		vec2 { 100.0f },
-		Colors::CHIROYELLOW
+		vec2 { 200.0f },
+		// Colors::CHIROYELLOW
 	};
+
+	rectangle.set_texture(&tex2);
 
 	Triangle triangle = {
 		vec2 { 150.0f, 75.0f },
@@ -68,13 +73,20 @@ int main() {
 			window.close();
 		}
 
-		if (window.keyboard()->ispressed(Keycode::SPACE)) {
+		if(window.keyboard()->ispressed(Keycode::SPACE)) {
 			window.set_clear_color(Colors::MOSS);
 		}
 
-		scene2d.draw_triangle(triangle);
+		if(window.keyboard()->ispressed(Keycode::Q)) {
+			rectangle.remove_texture();
+		}
+
+
+		rectangle.set_angle((float)window.time() / 10);
 		scene2d.draw_rectangle(rectangle);
-		scene2d.draw_circle(circle);
+
+		// scene2d.draw_triangle(triangle);
+		// scene2d.draw_circle(circle);
 
 
 		window.swap_buffers();

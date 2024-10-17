@@ -7,12 +7,7 @@
 #define SOURCE_DIR std::filesystem::path(__FILE__).parent_path().string()
 
 namespace FileHelper {
-	// Reads a file content
-	//
-	// To delete correcly:
-	//
-	// - `delete []content;`
-	// char* read_file(const std::string& path);
+	// Return the content of a file
 	std::string read_file(const std::string& path);
 
 	// Get the current file static path

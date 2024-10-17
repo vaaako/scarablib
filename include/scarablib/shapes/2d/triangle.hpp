@@ -13,5 +13,5 @@ struct Triangle : protected Shape2D {
 
 	// Scene2D call this method.
 	// Draw current shape using shader defined by Scene2D class
-	void draw(const Shader& shader) const override;
+	void draw(const Shader& shader) override;
 };

@@ -4,6 +4,8 @@
 #include "scarablib/opengl/shader.hpp"
 #include "scarablib/proper/vector/vec2.hpp"
 #include "scarablib/types/color.hpp"
+#include "scarablib/types/texture.hpp"
+#include "scarablib/utils/file.hpp"
 
 // This is a struct used to make 2D shapes
 class Shape2D {
@@ -17,9 +19,14 @@ class Shape2D {
 
 		// Scene2D call this method.
 		// Draw current shape using shader defined by Scene2D class
-		virtual void draw(const Shader& shader) const = 0;
+		virtual void draw(const Shader& shader) = 0;
 
 		// GETTERS //
+
+		// Get current texture
+		inline Texture get_texture() const {
+			return *this->texture;
+		}
 
 		// Get current position
 		inline vec2<float> get_position() const {
@@ -42,6 +49,21 @@ class Shape2D {
 		}
 
 		// SETTERS //
+
+		// Set a texture to be used
+		inline void set_texture(Texture* texture) {
+			if(texture == nullptr){
+				this->texture = &this->get_deftex();
+				return;
+			}
+
+			this->texture = texture;
+		}
+
+		// Removes the shape's texture
+		inline void remove_texture() {
+			this->texture = &this->get_deftex();
+		}
 
 		// Set a new position using a vector
 		inline void set_position(const vec2<float>& position) {
@@ -73,7 +95,6 @@ class Shape2D {
 		// If using a texture and a color at the same time, the texture will be colorized using the color defined
 		inline void set_color(const Color& color) {
 			this->color = color;
-			this->isdirty = true;
 		}
 
 		// Set a new rotation angle
@@ -83,13 +104,28 @@ class Shape2D {
 		}
 
 	protected:
+		void update_model();
+
 		vec2<float> position;
 		vec2<float> size;
 		Color color;
 		float angle;
 
+		// Texture will always be a reference to another existing texture
+		Texture* texture = &this->get_deftex(); // Current texture being used
+
 		// This need to be intialized on constructor, so the inheritance goes well
-		mutable glm::mat4 model;
-		mutable bool isdirty; // Change model if changed
+		glm::mat4 model;
+		bool isdirty; // Change model if changed
+
+
+		// Default texture (solid white)
+		inline Texture& get_deftex() const {
+			// I don't like statically allocating this but whatever
+			static uint8 data[4] = { 255, 255, 255, 255 }; 
+
+			static Texture def_tex = Texture(data, 1, 1, GL_RGBA);
+			return def_tex;
+		}
 };
 

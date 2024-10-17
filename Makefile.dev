@@ -1,4 +1,6 @@
 CXX = clang++
+CXXFLAGS_DEV = -g \
+
 CXXFLAGS = -std=c++20 -O3 -ffast-math \
 		   -MMD -MP \
 		   -I./include \
@@ -7,7 +9,23 @@ CXXFLAGS = -std=c++20 -O3 -ffast-math \
 		   -I./lib/SDL2_ttf/include \
 		   -I./lib/glm/include \
 		   -I./lib/GLEW/include \
-		   -I./lib/stb/include
+		   -I./lib/stb/include \
+		   -g \
+		   -fdiagnostics-color=always \
+		   -Wextra \
+		   -Wall \
+		   -Wuninitialized \
+		   -Winit-self \
+		   -Wfloat-equal \
+		   -Wundef \
+		   -Wpointer-arith \
+		   -Wcast-align \
+		   -Wstrict-overflow=5 \
+		   -Wwrite-strings \
+		   -Wcast-qual \
+		   -Wswitch-default \
+		   -Wconversion \
+		   -Wunreachable-code
 
 # -I./lib/SDL2_image/include \
 
@@ -30,20 +48,11 @@ TEST_FILE = test/main.cpp
 
 TARGET = scarablib
 
-all: $(TARGET)
+all: dev
 
-# Link objects
-$(TARGET): $(OBJS)
-	@echo "nothing here yet"
+dev: $(OBJS)
+	$(CXX) $(CXXFLAGS) $^ $(TEST_FILE) -o $(BUILD_DIR)/$(TARGET)_dev $(LDFLAGS)
 
-# cp lib/*/*.a lib/
-# $(CXX) -shared -o $(BUILD_DIR)/$@ $^ -Wl,--no-as-needed $(LDFLAGS)
-# $(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
-
-dev:
-	make -f Makefile.dev
-
-# Compile each object
 $(OBJS_DIR)/%.o: src/%.cpp
 	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c $< -o $@

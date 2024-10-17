@@ -50,6 +50,8 @@ Scene2D::~Scene2D() {
 	}
 
 	this->shaders.clear();
+
+	// delete this->def_tex;
 }
 
 void Scene2D::update_viewport(const uint32 width, const uint32 height) {
@@ -61,7 +63,7 @@ void Scene2D::update_viewport(const uint32 width, const uint32 height) {
 	glm::mat4 projection = glm::ortho(0.0f, (float)width, (float)height, 0.0f);
 
 	// Update shader projection uniform
-	for (Shader* shader : shaders) {
+	for(Shader* shader : shaders) {
 		shader->use();
 		shader->set_matrix4f("projection", projection);
 	}
@@ -71,44 +73,38 @@ void Scene2D::update_viewport(const uint32 width, const uint32 height) {
 }
 
 
-void Scene2D::draw_rectangle(const Rectangle& rectangle) const {
+void Scene2D::draw_rectangle(Rectangle& rectangle) {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	this->shader.use();
+	this->begin_draw();
 
-	this->vao->bind();
-	rectangle.draw(shader);
-	this->vao->unbind();
+	rectangle.draw(this->shader);
 
-	this->shader.unbind();
+	this->end_draw();
 }
 
-void Scene2D::draw_triangle(const Triangle& triangle) const {
+void Scene2D::draw_triangle(Triangle& triangle) {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	this->shader.use();
+	this->begin_draw();
 
-	this->vao->bind();
-	triangle.draw(shader);
-	this->vao->unbind();
+	triangle.draw(this->shader);
 
-	this->shader.unbind();
+	this->end_draw();
 }
 
 // Min - 0.001
 // Default - 0.0
 // Max - 1.0
-void Scene2D::draw_circle(const Circle& circle) const {
+void Scene2D::draw_circle(Circle& circle) {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	this->shader_circle.use();
+	this->begin_draw();
 
-	this->vao->bind();
 	circle.draw(this->shader_circle);
-	this->vao->unbind();
 
-	this->shader_circle.unbind();
+	this->end_draw();
 }
 
 // Not proud of this
-void Scene2D::draw_shape(const Shape2D& shape) {
+void Scene2D::draw_shape(Shape2D& shape) {
 	Shader* shader = &this->shader;
 	if(typeid(shape) == typeid(Circle)) {
 		shader = &this->shader_circle;
