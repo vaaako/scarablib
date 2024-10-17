@@ -32,6 +32,7 @@
 	+ [ ] Texture atlas support
 	+ [ ] Opacity
 - [ ] Batch rendering
+- [ ] Discord RPC support
 
 # TODO 2D
 - [ ] Unify shader and `shader_texture` somehow

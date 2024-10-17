@@ -13,8 +13,8 @@ class VAO {
 
 		// Disable copy and moving
 		VAO(const VAO&) = delete;
-		VAO(VAO&&) = delete;
 		VAO& operator=(const VAO&) = delete;
+		VAO(VAO&&) = delete;
 		VAO& operator=(VAO&&) = delete;
 
 		// Activates the VAO in the OpenGL context.

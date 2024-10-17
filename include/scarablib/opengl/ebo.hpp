@@ -20,8 +20,8 @@ class EBO {
 
 		// Disable copy and moving
 		EBO(const EBO&) = delete;
-		EBO(EBO&&) = delete;
 		EBO& operator=(const EBO&) = delete;
+		EBO(EBO&&) = delete;
 		EBO& operator=(EBO&&) = delete;
 
 		// Make an EBO using a vector of indices.
