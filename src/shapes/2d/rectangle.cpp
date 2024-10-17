@@ -12,4 +12,5 @@ void Rectangle::draw(const Shader& shader) {
 	shader.set_vector4f("shapeColor", this->color.to_vec4<float>());
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
+	this->texture->unbind();
 }
