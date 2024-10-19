@@ -47,18 +47,13 @@ struct vec5 {
 	}
 
 	// The magnitude (length) of the vector
-	constexpr T length() const noexcept {
-		return std::sqrt(this->length_squared());
-	}
-
-	// The squared magnitude of the vector
-	constexpr T length_squared() const noexcept {
-		return this->dot(*this);
+	constexpr T magnitude() const noexcept {
+		return std::sqrt(this->dot(*this));
 	}
 
 	// Normalizes the vector to have a magnitude of 1 (unit vector)
 	constexpr vec5 normalize() const noexcept {
-		const T len = this->length();
+		const T len = this->magnitude();
 		return (len > 0) ? *this / len : *this;
 	}
 

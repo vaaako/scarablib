@@ -48,19 +48,14 @@ struct vec2 {
 		return this->x * other.x + this->y * other.y;
 	}
 
-	// The squared magnitude of the vector
-	constexpr T length_squared() const noexcept {
-		return this->dot(*this);
-	}
-
 	// The magnitude (length) of the vector
-	constexpr T length() const noexcept {
-		return std::sqrt(this->length_squared());
+	constexpr T magnitude() const noexcept {
+		return std::sqrt(this->dot(*this));
 	}
 
 	// Normalizes the vector to have a magnitude of 1 (unit vector)
 	constexpr vec2 normalized() const noexcept {
-		const T length = this->length();
+		const T length = this->magnitude();
 		return (length > 0) ? *this / length : *this;
 	}
 

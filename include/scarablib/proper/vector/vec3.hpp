@@ -39,38 +39,6 @@ struct vec3 {
 		return glm::vec3(this->x, this->y, this->z);
 	}
 
-
-	// 3D Cross product
-	constexpr vec3 cross(const vec3<T>& other) const noexcept {
-		return vec3(
-			this->y * other.z - this->z * other.y,
-			this->z * other.x - this->x * other.z,
-			this->x * other.y - this->y * other.x
-		);
-	}
-
-	// Multiplies and sums values with another vector
-	constexpr T dot(const vec3<T>& other) const noexcept {
-		return (this->x * other.x + this->y * other.y + this->z * other.z);
-	}
-
-	// The squared magnitude of the vector
-	constexpr T length_squared() const noexcept {
-		return this->dot(*this);
-	}
-
-	// The magnitude (length) of the vector
-	constexpr T length() const noexcept {
-		return std::sqrt(this->length_squared());
-	}
-
-	// Normalizes the vector to have a magnitude of 1 (unit vector)
-	constexpr vec3 normalize() const noexcept {
-		const T length = this->length();
-		return (length > 0) ? *this / length : *this;
-	}
-
-
 	// Addition
 	constexpr vec3 operator+(const vec3<T>& other) const noexcept {
 		return vec3(this->x + other.x, this->y + other.y, this->z + other.z);
