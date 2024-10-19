@@ -22,9 +22,4 @@ void main() {
 	// texture->bind(1) // mask, draw above
 
 	FragColor = texture(texSampler, texCoord) * normalized_color(shapeColor.rgba);
-	// if(useTexture) {
-	// 	FragColor = texture(texSampler, texCoord) * normalized_color(shapeColor.rgba); // Use texture
-	// } else {
-	// 	FragColor = normalized_color(shapeColor.rgba); // Use solid color
-	// }
 }

@@ -8,6 +8,9 @@ void Shape2D::update_model() {
 	// Use current texture
 	this->texture->bind();
 
+	// Get and bind shader
+	// this->shader->use();
+
 	// Just update if is dirty
 	if(!this->isdirty) {
 		return;

@@ -8,3 +8,8 @@ std::string StringHelper::file_extension(const std::string& filename) {
 		: ""; // Return an empty string if period is not found
 }
 
+
+std::string StringHelper::file_extension(const char* filename) {
+	return StringHelper::file_extension(std::string(filename));
+}
+

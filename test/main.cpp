@@ -2,35 +2,35 @@
 #include "scarablib/scenes/scene2d.hpp"
 #include "scarablib/types/color.hpp"
 #include "scarablib/proper/log.hpp"
+#include "scarablib/types/font.hpp"
 #include "scarablib/window/window.hpp"
 #include "scarablib/input/keycode.hpp"
 #include <cstdio>
+#include <iomanip>
+#include <sstream>
 
 /* Optimization Features:
  * - Batch Rendering
  * - Object Pooling for VAOs and Textures 
  *
- * - Unify shaders
- * - Prevent from making a new object each frame
- * - Share texture when is the case
- * - Shader uniforms changes only when needed
  * - Model matrix make calculation only when needed
  *
  * - scen2d.add_object(); -> scene2d.render_all();
  *
- * - Use `scene.draw_shapes` for batching
- * - batch will not be possible manually, probably needing to add methods like `scene.add_to_pool()` and `scene.draw_batch()`
- *
  * - Have a Scene3D like Scene2D and have a method `load_obj`, the VAO of this object will be stored in a vector, and use some key as index to get the right VAO
- * - VAO and VBO management like in Vakraft
+ * - VAO and VBO manager
  *
- * Start 3D implementation only when draw methods are solid
  * */
 
+// - review scene.hpp
+// - font
+// - inline shape class?
 
 // TODO -- memory leak somewhere
+// - Window not unloading correctly?
 
 int main() {
+	// Make window object
 	Window window = Window({
 		.width = 800,
 		.height = 600,
@@ -38,19 +38,19 @@ int main() {
 		.debug_info = true
 	});
 
+	// Load assets
 	Texture tex1 = Texture("test/assets/images/hideri.jpg");
 	Texture tex2 = Texture("test/assets/images/kuromi.png");
-	Scene2D scene2d = Scene2D(window);
+	Font msgothic = Font("test/assets/fonts/msgothic.ttf", "FPS: 0", 24);
 
 	Rectangle rectangle = {
-		vec2 { 100.0f, 100.0f },
+		vec2 { 500.0f, 150.0f },
 		vec2 { 200.0f },
-		// Colors::CHIROYELLOW
 	};
-
+	// Bind texture
 	rectangle.set_texture(&tex2);
 
-	Triangle triangle = {
+	Triangle triangle {
 		vec2 { 150.0f, 75.0f },
 		vec2 { 70.0f, 100.0f },
 		Colors::MAGENTA
@@ -62,13 +62,23 @@ int main() {
 		Colors::HOTPINK
 	};
 
+	// Make scene and add shapes
+	Scene2D scene2d = Scene2D(window);
 
-	// Play music starting with a fade in
-	// music.play_fadein(5000);
+	// Add shapes to scene
+	scene2d.add_to_scene({
+		&triangle,
+		&circle
+	});
+
+
 	while(window.is_open()) {
+		// Clear screen
 		window.clear();
+		// Get events
 		window.process_events();
 
+		// Handle input
 		if(window.keyboard()->ispressed(Keycode::ESCAPE) || window.on_event(Event::QUIT)) {
 			window.close();
 		}
@@ -81,14 +91,19 @@ int main() {
 			rectangle.remove_texture();
 		}
 
+		// Draw font
+		std::stringstream stream; stream << std::setprecision(2) << window.fps();
+		msgothic.set_text("FPS:" + stream.str());
+		scene2d.draw_rectangle(msgothic);
 
+		// Draw rectangle
 		rectangle.set_angle((float)window.time() / 10);
 		scene2d.draw_rectangle(rectangle);
 
-		// scene2d.draw_triangle(triangle);
-		// scene2d.draw_circle(circle);
+		// Draw shape
+		scene2d.draw_all();
 
-
+		// Swap buffers
 		window.swap_buffers();
 	}
 

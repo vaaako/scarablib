@@ -25,13 +25,19 @@ struct Mouse {
 	// To use handle_events in window
 	friend Window;
 
-	uint32 clicks = 0; // Clicks made
+	// Clicks made
+	uint32 clicks = 0;
+	// Scroll direction
 	Scroll scroll = Scroll::NONE;
 
 	// Store all actions in frame to handle later
-	vec2<uint32> click_pos;  // Click position  (X: 0 - width / Y: 0 - height)
-	vec2<uint32> cursor_pos; // Motion position (X: 0 - width / Y: 0 - height)
-	vec2<int16> moved_dir;   // Direction moved (Ex.: -1, 0)
+
+	// Click position  (X: 0 - width / Y: 0 - height)
+	vec2<uint32> click_pos;
+	// Motion position (X: 0 - width / Y: 0 - height)
+	vec2<uint32> motion;
+	// Direction moved (Ex.: -1, 0)
+	vec2<int16> moved_dir;
 
 	// Change cursor position in window
 	void set_cursor_position(const Window& window, const uint32 x, const uint32 y);

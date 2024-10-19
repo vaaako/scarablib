@@ -1,17 +1,38 @@
 #include "scarablib/types/texture.hpp"
-#include "scarablib/proper/error.hpp"
 #include "scarablib/proper/log.hpp"
+#include "scarablib/typedef.hpp"
 #include <SDL2/SDL_render.h>
 
 #define STB_IMAGE_IMPLEMENTATION // Enable STB
 #include <stb/stb_image.h>
+
+
+Texture::Texture() {
+	// Generate and bind texture
+	glGenTextures(1, &this->id); // num of textures, pointer
+	glBindTexture(this->tex_type, this->id);
+
+	// Filter
+	glTexParameteri(this->tex_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(this->tex_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(this->tex_type, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(this->tex_type, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	const uint8 data[4] = { 255, 255, 255, 255 }; 
+
+	// Generate
+	glTexImage2D(this->tex_type, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+	// Unbind
+	glBindTexture(this->tex_type, 0);
+}
 
 Texture::Texture(const char* path, const TextureFilter filter, const TextureWrap wrap) {
 	stbi_set_flip_vertically_on_load(true);
 
 	int width, height, nr_channels;
 	uint8* data = stbi_load(path, &width, &height, &nr_channels, 0); // STBI_rgb_alpha to standarlize
-	if (data == NULL) {
+	if(data == NULL) {
 		LOG_ERROR("Failed to load texture \"%s\"", path);
 		return;
 	}
@@ -53,16 +74,16 @@ Texture::Texture(const char* path, const TextureFilter filter, const TextureWrap
 	}
 
 	// Generate
-	glTexImage2D(GL_TEXTURE_2D,  0, (GLint)format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(this->tex_type,  0, static_cast<GLint>(format), width, height, 0, format, GL_UNSIGNED_BYTE, data);
 
 	// Generate mipmap
-	glGenerateMipmap(GL_TEXTURE_2D);
+	glGenerateMipmap(this->tex_type);
 
 	// Free image
 	stbi_image_free(data);
 
 	// Unbind
-	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindTexture(this->tex_type, 0);
 }
  
 Texture::Texture(const uint8* data, const uint32 width, const uint32 height, const GLenum format) {
@@ -77,11 +98,10 @@ Texture::Texture(const uint8* data, const uint32 width, const uint32 height, con
 	glTexParameteri(this->tex_type, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 	// Generate
-	glTexImage2D(GL_TEXTURE_2D, 0, (GLint)format, (GLint)width, (GLint)height, 0, format, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(this->tex_type, 0, static_cast<GLint>(format), static_cast<GLint>(width), static_cast<GLint>(height), 0, format, GL_UNSIGNED_BYTE, data);
 
 	// Unbind
-	glBindTexture(GL_TEXTURE_2D, 0);
-
+	glBindTexture(this->tex_type, 0);
 }
 
 Texture::~Texture() {
@@ -91,12 +111,3 @@ Texture::~Texture() {
 	}
 }
 
-
-
-// Assigns image to texture object
-// the type may beGL_TEXTURE_2D_ARRAY 
-// glTexImage3D(this->tex_type, 0, GL_RGBA, surface->w, surface->h, 0,
-// 	0, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
-//              Pixels type      Image bytes
-// First RGBA: Desired color channels / Second RGBA: Image color channels
-//                     ^- GL_RGB: jpg/jpeg, GL_RGBA: png

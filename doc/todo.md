@@ -12,6 +12,7 @@
 
 - [ ] All graphics logic possible to glsl *(GPU)*
 - [ ] Replace `enum class` to `enum` in some cases where there are multiple conversions
+- [ ] Discord RPC support
 
 # TODO Bug
 - [ ] Memory leak somewhere (i don't know if is on my `font.hpp` or SDL2 one)
@@ -32,7 +33,7 @@
 	+ [ ] Texture atlas support
 	+ [ ] Opacity
 - [ ] Batch rendering
-- [ ] Discord RPC support
+- [ ] Use the same font object for different texts
 
 # TODO 2D
 - [ ] Unify shader and `shader_texture` somehow

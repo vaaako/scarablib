@@ -1,4 +1,5 @@
 #include "scarablib/window/window.hpp"
+#include "SDL_ttf.h"
 #include "scarablib/proper/error.hpp"
 #include "scarablib/proper/log.hpp"
 
@@ -26,12 +27,14 @@ Window::Window(const WindowConf& config)
 
 	// Init SDL_mixer
 	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) != 0) {
-		SDL_Quit();
 		Mix_CloseAudio();
+		SDL_Quit();
 		throw ScarabError("Failed to init SDL_mixer: %s", SDL_GetError());
 	}
 
 	if (TTF_Init() != 0) {
+		Mix_CloseAudio();
+		SDL_Quit();
 		throw ScarabError("Failed to init SDL_ttf: %s", SDL_GetError());
 	}
 
@@ -44,13 +47,14 @@ Window::Window(const WindowConf& config)
 	);
 
 	if(!this->window) {
+		Mix_CloseAudio();
+		TTF_Quit();
 		SDL_Quit();
 		throw ScarabError("Failed to create a SDL window: %s", SDL_GetError());
 	}
 
 	// Load OpenGL
 	this->glContext = SDL_GL_CreateContext(window);
-
 
 	// Configurations
 	SDL_SetWindowResizable(this->window, (SDL_bool)config.resizable);
@@ -64,6 +68,9 @@ Window::Window(const WindowConf& config)
 	if(err != GLEW_OK) {
 		SDL_GL_DeleteContext(this->glContext);
 		SDL_DestroyWindow(this->window);
+		Mix_CloseAudio();
+		TTF_Quit();
+		SDL_CloseAudio();
 		SDL_Quit();
 		throw ScarabError("Failed to init GLEW: %s", glewGetErrorString(err));
 	}
@@ -80,7 +87,6 @@ Window::Window(const WindowConf& config)
 	glEnable(GL_DEPTH_TEST); // 2D shapes draw order may be opposite because of this
 	// glDepthFunc(GL_ALWAYS);
 
-
 	// Show debug info
 	if(debug_info) {
 		LOG_INFO("OpengGL Loaded!");
@@ -92,7 +98,7 @@ Window::Window(const WindowConf& config)
 }
 
 Window::~Window() {
-	// Delete objs
+	// Delete handlers
 	delete this->keyboard_handler;
 	delete this->mouse_handler;
 
@@ -101,12 +107,14 @@ Window::~Window() {
 		LOG_INFO("Window %d destroyed", SDL_GetWindowID(this->window));
 	}
 
+	// Close OpenGL
 	SDL_GL_DeleteContext(this->glContext);
-	SDL_DestroyWindow(this->window);
 
 	// Close all
-	SDL_CloseAudio();
+	SDL_DestroyWindow(this->window);
+	Mix_CloseAudio();
 	TTF_Quit();
+	SDL_CloseAudio();
 	SDL_Quit();
 }
 

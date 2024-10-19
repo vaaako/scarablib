@@ -35,7 +35,7 @@ void Mouse::handle_event(const SDL_Event& event) {
 		std::printf("Mouse dir: %i : %i\n", event.motion.xrel, event.motion.yrel);
 #endif
 
-		this->cursor_pos.set_values(motion.x, motion.y);
+		this->motion.set_values(motion.x, motion.y);
 		this->moved_dir.set_values(event.motion.xrel, event.motion.yrel);
 	}
 

@@ -22,6 +22,9 @@ enum class TextureWrap : int {
 
 // Texture object used for shapes (2D and 3D)
 struct Texture {
+	// This will make a empty solid white texture
+	Texture();
+
 	// Constructor to create a texture from a file path
 	// Optionally sets the filtering and wrapping methods
 	Texture(const char* path, const TextureFilter filter = TextureFilter::LINEAR, const TextureWrap wrap = TextureWrap::REPEAT);
@@ -29,11 +32,11 @@ struct Texture {
 	// Uses pre-defined data to make a texture
 	Texture(const uint8* data, const uint32 width, const uint32 height, const GLenum format);
 
-	// NOTE -- I am not using default keyword just because of OpenGL ID, to avoid double deletion or any trouble with it 
-
 	// Default copy
 	Texture(const Texture&) = default;
 	Texture& operator=(const Texture& other) = default;
+
+	// NOTE -- I am not using default keyword just because of OpenGL ID, to avoid double deletion or any trouble with it 
 
 	// Moving
 	Texture(Texture&& other) noexcept {

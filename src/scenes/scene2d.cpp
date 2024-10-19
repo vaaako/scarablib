@@ -1,5 +1,7 @@
 #include "scarablib/scenes/scene2d.hpp"
+#include "scarablib/opengl/vao.hpp"
 #include "scarablib/opengl/vbo.hpp"
+#include "scarablib/proper/log.hpp"
 #include "scarablib/types/vertex.hpp"
 #include "scarablib/window/window.hpp"
 #include <cstdio>
@@ -43,15 +45,8 @@ Scene2D::Scene2D(const Window& window) : Scene(window) {
 
 Scene2D::~Scene2D() {
 	delete this->vao;
-
-	for(Shader* shader : this->shaders) {
-		delete shader;
-		this->shaders.pop_back();
-	}
-
-	this->shaders.clear();
-
-	// delete this->def_tex;
+	delete this->shader;
+	delete this->shader_circle;
 }
 
 void Scene2D::update_viewport(const uint32 width, const uint32 height) {
@@ -62,22 +57,31 @@ void Scene2D::update_viewport(const uint32 width, const uint32 height) {
 	// Make Projection
 	glm::mat4 projection = glm::ortho(0.0f, (float)width, (float)height, 0.0f);
 
-	// Update shader projection uniform
-	for(Shader* shader : shaders) {
-		shader->use();
-		shader->set_matrix4f("projection", projection);
-	}
+	// Update shaders projection uniform
+	shader->use();
+	shader->set_matrix4f("projection", projection);
+	shader_circle->use();
+	shader_circle->set_matrix4f("projection", projection);
 
 	// Update viewport in opengl too
 	glViewport(0, 0, (GLsizei)width, (GLsizei)height);
 }
 
 
+void Scene2D::draw_font(Font& font) {
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	this->begin_draw();
+
+	font.draw(*this->shader);
+
+	this->end_draw();
+}
+
 void Scene2D::draw_rectangle(Rectangle& rectangle) {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	this->begin_draw();
 
-	rectangle.draw(this->shader);
+	rectangle.draw(*this->shader);
 
 	this->end_draw();
 }
@@ -86,7 +90,7 @@ void Scene2D::draw_triangle(Triangle& triangle) {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	this->begin_draw();
 
-	triangle.draw(this->shader);
+	triangle.draw(*this->shader);
 
 	this->end_draw();
 }
@@ -98,26 +102,73 @@ void Scene2D::draw_circle(Circle& circle) {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	this->begin_draw();
 
-	circle.draw(this->shader_circle);
+	circle.draw(*this->shader);
 
 	this->end_draw();
 }
 
 // Not proud of this
 void Scene2D::draw_shape(Shape2D& shape) {
-	Shader* shader = &this->shader;
-	if(typeid(shape) == typeid(Circle)) {
-		shader = &this->shader_circle;
-	}
-
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	shader->use();
 
 	this->vao->bind();
-	shape.draw(*shader);
+	if(typeid(shape) == typeid(Circle)) {
+		this->shader_circle->use();
+		shape.draw(*this->shader_circle);
+	} else {
+		this->shader->use();
+		shape.draw(*this->shader);
+	}
 	this->vao->unbind();
+}
 
-	shader->unbind();
+
+void Scene2D::add_to_scene(Shape2D* shape) {
+	this->scene.emplace_back(shape);
+}
+
+void Scene2D::add_to_scene(const std::vector<Shape2D*> shapes) {
+	for(Shape2D* shape : shapes) {
+		this->scene.emplace_back(shape);
+	}
+}
+
+void Scene2D::draw_all() {
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	this->vao->bind();
+
+	for(auto& shape : this->scene) {
+		// If circle use circle shader
+		if(dynamic_cast<Circle*>(shape)) {
+			this->shader_circle->use();
+			shape->draw(*this->shader_circle);
+
+		// If not, use default shader
+		} else {
+			this->shader->use();
+			shape->draw(*this->shader);
+		}
+	}
+
+	this->vao->unbind();
+}
+
+void Scene2D::remove_index(const uint32 index) {
+	const uint64 last_index = this->scene.size() -1;
+
+	if(index > last_index) {
+		LOG_ERROR("The index you are trying to remove is higher than the size of the objects in scene (%d)", this->scene.size());
+		return;
+	}
+
+	// Move to last place
+	if(index < last_index) {
+		std::swap(this->scene[index], this->scene[last_index]);
+	}
+
+	// Remove last element
+	this->scene.pop_back();
 }
 
 

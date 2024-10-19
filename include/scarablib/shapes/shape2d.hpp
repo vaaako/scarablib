@@ -5,17 +5,13 @@
 #include "scarablib/proper/vector/vec2.hpp"
 #include "scarablib/types/color.hpp"
 #include "scarablib/types/texture.hpp"
-#include "scarablib/utils/file.hpp"
 
 // This is a struct used to make 2D shapes
 class Shape2D {
 	public:
-		// Initialize current shape using the following values:
-		// - `position`: Shape's position on the screen
-		// - `size`: Size of the shape in pixels
-		// - `color`: Shape's color (white by default)
-		// - `angle`: Shape's angle (0.0f by default)
+		// Initialize current shape using position, size, color and angle (last two are optional)
 		Shape2D(const vec2<float>& position, const vec2<float>& size, const Color& color = Colors::WHITE, const float angle = 0.0f);
+		virtual ~Shape2D() = default;
 
 		// Scene2D call this method.
 		// Draw current shape using shader defined by Scene2D class
@@ -85,7 +81,7 @@ class Shape2D {
 		}
 
 		// Scale the shape using a different value for each axis.
-		// e.g., `size.x = size.x * scale` / `size.y = size.y * scale`
+		// e.g., `size.x = size.x * scale.x` and `size.y = size.y * scale.y`
 		inline void set_scale(const vec2<float>& scale) {
 			this->size * scale;
 			this->isdirty = true;
@@ -111,20 +107,16 @@ class Shape2D {
 		Color color;
 		float angle;
 
-		// Texture will always be a reference to another existing texture
+		// NOTE -- Texture will always be a "reference" to another existing texture (except for fonts). Using a pointer so the OpenGL ID doens't get copied
 		Texture* texture = &this->get_deftex(); // Current texture being used
 
 		// This need to be intialized on constructor, so the inheritance goes well
 		glm::mat4 model;
 		bool isdirty; // Change model if changed
 
-
 		// Default texture (solid white)
 		inline Texture& get_deftex() const {
-			// I don't like statically allocating this but whatever
-			static uint8 data[4] = { 255, 255, 255, 255 }; 
-
-			static Texture def_tex = Texture(data, 1, 1, GL_RGBA);
+			static Texture def_tex = Texture(); // Make solid white texture
 			return def_tex;
 		}
 };

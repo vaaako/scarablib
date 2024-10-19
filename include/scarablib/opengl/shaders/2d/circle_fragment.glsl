@@ -32,5 +32,4 @@ void main() {
 	// This method only works if the texture coordinates are normalized
 
 	FragColor = vec4(normalized_color(shapeColor.rgb), circle_area(texCoord, vec2(0.5, 0.5), 0.5, blur));
-	// FragColor = vec4(circle, 1.0);
 }

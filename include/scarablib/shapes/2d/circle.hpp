@@ -3,7 +3,7 @@
 #include "scarablib/shapes/shape2d.hpp"
 
 // Circle shape object, used to draw circle
-struct Circle : protected Shape2D {
+struct Circle : public Shape2D {
 	// Initialize current shape using the following values:
 	// `position`: Shape's position on the screen
 	// `size`: Size of the shape in pixels
@@ -20,7 +20,7 @@ struct Circle : protected Shape2D {
 		return this->blur;
 	}
 
-	// Set a new blur value
+	// Set a blur value around the circle
 	inline void set_blur(const float blur) {
 		this->blur = blur;
 	}
