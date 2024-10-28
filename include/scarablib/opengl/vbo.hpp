@@ -2,6 +2,7 @@
 
 #include <GL/glew.h>
 #include "scarablib/typedef.hpp"
+#include "scarablib/types/vertex.hpp"
 
 // OpenGL Vertex Buffer Object wrapped class.
 // This class handles the creation, binding, and data management of a Vertex Buffer Object (VBO),
@@ -33,6 +34,12 @@ class VBO {
 		// If `data` is nullptr, the buffer is allocated but left uninitialized.
 		void alloc_data(const uint64 size, const void* data, const GLenum drawtype = GL_STATIC_DRAW);
 
+		// Allocate and initialize the data store for the VBO using a vector of float
+		void alloc_data(const std::vector<float>& data, const GLenum drawtype = GL_STATIC_DRAW);
+
+		// Allocate and initialize the data store for the VBO using a vector of Vertex
+		// void alloc_data(const std::vector<Vertex>& data, const GLenum drawtype = GL_STATIC_DRAW);
+
 		// Link a vertex attribute to the VBO for use in a shader.
 		// `index` is the index of the vertex attribute in vertex shader. (e.g, "`layout (location = index) in ...`")
 		// `dimension` is the number of components per vertex attribute (e.g., 3 for vec3, 2 for vec2).
@@ -40,6 +47,19 @@ class VBO {
 		// `offset` is the byte offset of the attribute in a vertex (e.g., texture offset of a 3D mesh is is `3 * sizeof(float)`, since position has 3 float values and texture comes after it)
 		void link_attrib(const uint32 index, const uint32 dimension, const int total_byte_size, const uint32 offset);
 
+		// Link a vertex attribute to the VBO for use in a shader.
+		// `index` is the index of the vertex attribute in vertex shader. (e.g, "`layout (location = index) in ...`")
+		// `dimension` is the number of components per vertex attribute (e.g., 3 for vec3, 2 for vec2).
+		void link_attrib(const uint32 index, const uint32 dimension);
+
+		// Automatically make the VBO from a vector of Vertex.
+		// Don't use this with `alloc_data` or `link_attrib`
+		void make_from_vertex(const std::vector<Vertex>& data, const uint32 position_dimension);
+
+		// Generates a VBO attribute using index, dimension and the data itself.
+		// This is used when each coordinate is splited in different arrays.
+		// Don't use this with `alloc_data` or `link_attrib`
+		// void store_data(const uint32 index, const uint32 dimension, void* data);
 	private:
 		GLuint id;
 };

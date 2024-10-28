@@ -9,13 +9,9 @@
 // which is used to specify indices for drawing elements in OpenGL.
 class EBO {
 	public:
-		// Make an EBO using a vector of indices.
-		// Recommended types: uint32 and uint16
-		template <typename T = uint32>
-		EBO(const std::vector<T>& indices);
-
-		// Initialize now and build later
-		EBO() = default;
+		// Make an EBO using a vector of indices
+		EBO(const std::vector<uint32>& indices);
+		EBO(const std::vector<uint16>& indices);
 		~EBO();
 
 		// Disable copy and moving
@@ -23,12 +19,6 @@ class EBO {
 		EBO& operator=(const EBO&) = delete;
 		EBO(EBO&&) = delete;
 		EBO& operator=(EBO&&) = delete;
-
-		// Make an EBO using a vector of indices.
-		// Used when you declare EBO first and want to initialize later.
-		// Recommended types: uint32 and uint16
-		template <typename T = uint32>
-		inline void build(const std::vector<T>& indices);
 
 		// This effectively disables the EBO
 		inline void unbind() {
@@ -39,18 +29,3 @@ class EBO {
 		GLuint id;
 };
 
-// Template must be declared and implemented in the same file
-template <typename T>
-EBO::EBO(const std::vector<T>& indices) {
-	glGenBuffers(1, &this->id);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->id);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(T), indices.data(), GL_STATIC_DRAW);
-}
-
-
-template <typename T>
-inline void EBO::build(const std::vector<T>& indices) {
-	glGenBuffers(1, &this->id);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->id);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(T), indices.data(), GL_STATIC_DRAW);
-}
