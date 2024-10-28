@@ -1,4 +1,5 @@
 CXX = clang++
+# I know I could use something like a for loop here, but i prefer this way
 CXXFLAGS = -std=c++20 -O3 -ffast-math \
 		   -MMD -MP \
 		   -I./include \
@@ -17,8 +18,6 @@ LDFLAGS = -L./lib/GLEW \
 		  -L./lib/SDL2_ttf \
 		  -lGL -lGLEW -lSDL2 -lSDL2main -lSDL2_mixer -lSDL2_ttf
 
-# -L./lib/SDL2_image \
-
 # Dirs
 BUILD_DIR = build
 OBJS_DIR = $(BUILD_DIR)/objs
@@ -29,26 +28,49 @@ OBJS = $(patsubst src/%.cpp, $(OBJS_DIR)/%.o, $(SRC_FILES))
 TEST_FILE = test/main.cpp
 
 TARGET = scarablib
+TARGET_LIB = lib$(TARGET).a
 
 all: $(TARGET)
 
 # Link objects
 $(TARGET): $(OBJS)
-	@echo "nothing here yet"
+	mkdir -p $(BUILD_DIR)/temp_objs
+
+	# Initial target library with library objects
+	ar rcs $(BUILD_DIR)/$(TARGET_LIB) $(OBJS)
+
+	# Extract object from other libraries
+	for lib in lib/*/*.a; do \
+		(cd $(BUILD_DIR)/temp_objs && ar x ../../$$lib); \
+	done
+
+	# Append and remove
+	ar rcs $(BUILD_DIR)/$(TARGET_LIB) $(BUILD_DIR)/temp_objs/*.o
+	rm -rf $(BUILD_DIR)/temp_objs
+
+# # Extract object from other libraries
+# for lib in lib/*/*.a; do \
+# 	cp $$lib $(BUILD_DIR)/$(TARGET_LIB); \
+# done
+#
+# ar rcs $(BUILD_DIR)/$(TARGET_LIB) $(OBJS)
+
+
+
+# Compile objects
+$(OBJS_DIR)/%.o: src/%.cpp
+	@mkdir -p $(dir $@)objects
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # cp lib/*/*.a lib/
 # $(CXX) -shared -o $(BUILD_DIR)/$@ $^ -Wl,--no-as-needed $(LDFLAGS)
 # $(CXX) $(CXXFLAGS) -fPIC -c -o $@ $<
 
-dev:
+dev: $(TARGET)
 	make -f Makefile.dev
 
-# Compile each object
-$(OBJS_DIR)/%.o: src/%.cpp
-	@mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
 clean:
-	rm -rf $(BUILD_DIR)/$(TARGET) $(OBJS_DIR)
+	rm -rf $(BUILD_DIR)/$(TARGET_LIB)
+	make clean -f Makefile.dev
 
 .PHONY: all clean dev

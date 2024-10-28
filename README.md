@@ -23,11 +23,6 @@ See [examples/](examples/) to check some features (not all features have example
 - [`glm`](https://github.com/g-truc/glm) for mathematics
 <!-- - [`ENet`](https://github.com/zpl-c/enet) (fork) for networking -->
 
-
-<!-- # OpenGL folder -->
-<!-- a folder with multiple funcionalities for helping with opengl that can be used by itself -->
-
-
 <!-- # Roadmap -->
 <!-- - Load `obj` and `gltf` models -->
 <!-- - Light source -->
@@ -49,11 +44,25 @@ cmake --build build    # Compile
 ```
 
 ## Makefile
-Currently with `Make` you can only compile `test/main.cpp`, wich is the file used for testing the library
+## Static library
+With `Make` you can compile the library to a static library to use on your own project
+```
+make
+```
+
+This will generate a static library under `build/`
+
+>The generated library is kinda big, but this is `SDL_ttf` fault
+
+## Dev
+You can can compile `test/main.cpp`, wich is the file used for testing the library
 ```sh
 make dev              # Compile
 ./build/scarablib_dev # Run
 ```
+
+# Windows Support
+Currently the library does not provide a windows support, but you can try to compile it by yourself
 
 ## Scripts
 - `compile_and_run.sh`: Uses `make` to compile and run

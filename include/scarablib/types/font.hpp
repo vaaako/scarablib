@@ -11,7 +11,7 @@
 struct Font : public Rectangle {
 	// Build a font object passing a path to a .ttf file.
 	// Also pass font's text, size and color
-	Font(const char* path, const std::string& text, const uint16 size = 24, const Color color = Colors::WHITE, const TextureFilter filter = TextureFilter::LINEAR);
+	Font(const char* path, const uint16 size = 24, const TextureFilter filter = TextureFilter::LINEAR);
 	~Font() {
 		TTF_CloseFont(this->sdl_font);
 	}
@@ -33,9 +33,9 @@ struct Font : public Rectangle {
 		GLenum filter;
 		Texture* font_texture = new Texture(); // Track texture being used for font
 
-		std::string text;
+		std::string text = "Sample Text";
 		uint16 size;
-		Color color;
+		Color color = Colors::WHITE;
 
 		// After an update, this need to run
 		void update_texture();

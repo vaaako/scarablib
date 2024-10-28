@@ -1,28 +1,32 @@
 #pragma once
 
-#include "scarablib/proper/log.hpp"
-#include "scarablib/proper/vector/vec2.hpp"
-#include "scarablib/window/window_conf.hpp"
-#include "scarablib/types/color.hpp"
+
+// Used for building a window object
 #include "scarablib/input/keyboard.hpp"
 #include "scarablib/input/mouse.hpp"
+#include "scarablib/proper/log.hpp"
+#include "scarablib/typedef.hpp"
+#include "scarablib/types/color.hpp"
 #include "scarablib/window/events.hpp"
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_events.h>
-#include <SDL2/SDL_log.h>
-#include <SDL2/SDL_mouse.h>
-#include <SDL2/SDL_stdinc.h>
-#include <SDL2/SDL_timer.h>
-#include <SDL2/SDL_video.h>
-
-#include <SDL_audio.h>
-#include <SDL_ttf.h>
-
 #include <GL/glew.h>
+#include <SDL2/SDL_video.h>
 
 #include <string>
 #include <unordered_set>
+
+struct WindowConf {
+	// Required values
+	uint32 width;
+	uint32 height;
+	char* title; // char* in c++ goes grrr
+
+	// Optional
+	Color clear_color = Colors::WHITE;
+	bool vsync = true;
+	bool resizable = false;
+	bool debug_info = false;
+};
 
 // Main object of the library, used for making and managing a window and events
 class Window {

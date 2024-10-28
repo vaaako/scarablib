@@ -5,10 +5,12 @@
 #include "scarablib/proper/vector/vec2.hpp"
 
 enum class MouseBTN : uint8 {
+	NONE = 0,
 	LMB,
 	MMB,
 	RMB,
-	NONE
+	SIDE1,
+	SIDE2
 };
 
 enum class Scroll : uint8 {

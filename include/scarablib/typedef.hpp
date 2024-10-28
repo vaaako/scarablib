@@ -16,3 +16,6 @@ typedef uint64_t uint64;
 
 // float
 typedef double float64;
+
+// OpenGL
+// typedef uint32_t vaoid;

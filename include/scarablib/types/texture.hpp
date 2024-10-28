@@ -30,7 +30,7 @@ struct Texture {
 	Texture(const char* path, const TextureFilter filter = TextureFilter::LINEAR, const TextureWrap wrap = TextureWrap::REPEAT);
 
 	// Uses pre-defined data to make a texture
-	Texture(const uint8* data, const uint32 width, const uint32 height, const GLenum format);
+	Texture(const void* data, const uint32 width, const uint32 height, const GLint internal_format, const GLenum format);
 
 	// Default copy
 	Texture(const Texture&) = default;

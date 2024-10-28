@@ -18,13 +18,16 @@
  * and all shapes drawed after this are colorized using the color defined
  *
  * Following the same idea, i could make the same for textures, this 3 changes would be much more optimized
- * but i prefer the way that is currently, maybe sometime i change
+ * but i prefer the way that is currently, maybe in the future i change it
  *
- * I can't put shaders on Scene2D because of the viewport I need to set on shader creation
+ * I can't put shaders on Shape2D because of the viewport I need to set on shader creation, unless i make it static, like circle shader
+ * then the viewport would be updated on window, i could make this, maybe soon, i am too busy making 3D shapes work
  * */
 
+// Scene object for 2D shapes
 class Scene2D : public Scene {
 	public:
+		// Build the Scene using window object
 		Scene2D(const Window& window);
 		~Scene2D();
 
@@ -40,19 +43,19 @@ class Scene2D : public Scene {
 
 		// Draw a rectangular shape using a reference to an existing rectangle object.
 		// e.g., `scene2d.draw_rectangle(rectangle)` or `scene2d.draw_rectangle({ x, y }, { width, height }, color);`
-		void draw_rectangle(Rectangle& rectangle);
+		void draw_rectangle(Rectangle& rectangle, const DrawMode drawmode = DrawMode::FILLMODE);
 
 		// Draw a triangular shape using a reference to an existing triangle object.
 		// e.g., `scene2d.draw_triangle(rectangle)` or `scene2d.draw_triangle({ x, y }, { width, height }, color);`
-		void draw_triangle(Triangle& triangle);
+		void draw_triangle(Triangle& triangle, const DrawMode drawmode = DrawMode::FILLMODE);
 
 		// Draw a circular shape using a reference to an existing circle object.
 		// e.g., `scene2d.draw_circle(circle)` or `scene2d.draw_circle({ x, y }, { width, height }, color);`
-		void draw_circle(Circle& circle);
+		void draw_circle(Circle& circle, const DrawMode drawmode = DrawMode::FILLMODE);
 
 		// Draw any 2D shape using a reference to that object.
 		// e.g., `scene2d.draw_shape(rectangle)`
-		void draw_shape(Shape2D& shape);
+		void draw_shape(Shape2D& shape, const DrawMode drawmode = DrawMode::FILLMODE);
 
 		// Add a shape object to the scene.
 		// WARNING: Shapes added to the scene are not deleted automatically, is recommended to make the shape object and then add to the scene as a pointer
@@ -60,10 +63,10 @@ class Scene2D : public Scene {
 
 		// Add a vector of shape object to the scene.
 		// WARNING: Shapes added to the scene are not deleted automatically, is recommended to make the shape object and then add to the scene as a pointer
-		void add_to_scene(const std::vector<Shape2D*> shapes);
+		void add_to_scene(const std::vector<Shape2D*>& shapes);
 
 		// Draw all objects in scene
-		void draw_all();
+		void draw_all(const DrawMode drawmode = DrawMode::FILLMODE);
 
 		// Remove object from scene using it's index
 		void remove_index(const uint32 index);
@@ -74,26 +77,22 @@ class Scene2D : public Scene {
 		}
 
 		// Update scene viewport using window object
-		inline void update_viewport(const Window& window) {
+		inline void update_viewport(const Window& window) override {
 			this->update_viewport(window.get_width(), window.get_height());
 		}
 
 		// Update scene viewport using width and height values
-		void update_viewport(const uint32 width, const uint32 height);
+		void update_viewport(const uint32 width, const uint32 height) override;
 
 	private:
 		VAO* vao = new VAO();
+
 		// Change to shared_ptr?
 		std::vector<Shape2D*> scene;
 
 		Shader* shader = new Shader(
 			FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/2d/vertex.glsl").c_str(),
 			FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/2d/fragment.glsl").c_str()
-		);
-
-		Shader* shader_circle = new Shader(
-			FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/2d/vertex.glsl").c_str(),
-			FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/2d/circle_fragment.glsl").c_str()
 		);
 
 		inline void begin_draw() {

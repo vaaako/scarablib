@@ -1,13 +1,7 @@
 #include "scarablib/window/window.hpp"
-#include "SDL_ttf.h"
 #include "scarablib/proper/error.hpp"
-#include "scarablib/proper/log.hpp"
-
-#include <SDL2/SDL_error.h>
-#include <SDL2/SDL_events.h>
-#include <SDL2/SDL_mouse.h>
-#include <SDL2/SDL_video.h>
 #include <SDL_mixer.h>
+#include <SDL_ttf.h>
 
 Window::Window(const WindowConf& config)
 	: title(config.title), width(config.width), height(config.height), clear_color(config.clear_color.normalize()), debug_info(config.debug_info) {
@@ -84,7 +78,7 @@ Window::Window(const WindowConf& config)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // Non-premultiplied alpha
 
 	// More config
-	glEnable(GL_DEPTH_TEST); // 2D shapes draw order may be opposite because of this
+	// glEnable(GL_DEPTH_TEST); // 2D shapes draw order may be opposite because of this
 	// glDepthFunc(GL_ALWAYS);
 
 	// Show debug info

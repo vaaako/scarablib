@@ -22,11 +22,11 @@ void Camera::rotate(const Mouse& mouse) {
 	}
 
 	// Update orientation
-	vec3<float> front;
+	glm::vec3 front;
 	front.x = std::cos(MathHelper::radians(this->yaw)) * std::cos(MathHelper::radians(this->pitch));
 	front.y = std::sin(MathHelper::radians(this->pitch));
 	front.z = std::sin(MathHelper::radians(this->yaw)) * std::cos(MathHelper::radians(this->pitch));
-	this->orientation = vecutil::normalize(front);
+	this->orientation = glm::normalize(front);
 }
 
 

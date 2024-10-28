@@ -1,7 +1,7 @@
 #include "scarablib/shapes/2d/triangle.hpp"
 
-Triangle::Triangle(const vec2<float>& position, const vec2<float>& size, const Color& color, const float angle)
-	: Shape2D(position, size, color, angle) {
+Triangle::Triangle(const Shape2DConf& conf)
+	: Shape2D(conf) {
 }
 
 void Triangle::draw(const Shader& shader) {

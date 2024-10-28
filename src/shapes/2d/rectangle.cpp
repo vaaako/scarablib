@@ -1,8 +1,8 @@
 #include "scarablib/shapes/2d/rectangle.hpp"
 #include <cstdio>
 
-Rectangle::Rectangle(const vec2<float>& position, const vec2<float>& size, const Color& color, const float angle)
-	: Shape2D(position, size, color, angle) {}
+Rectangle::Rectangle(const Shape2DConf& conf)
+	: Shape2D(conf) {}
 
 void Rectangle::draw(const Shader& shader) {
 	// Apply transformations if needed

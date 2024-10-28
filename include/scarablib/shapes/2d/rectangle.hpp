@@ -4,12 +4,8 @@
 
 // Rectangle shape object, used to draw rectangle
 struct Rectangle : public Shape2D {
-	// Initialize current shape using the following values:
-	// `position`: Shape's position on the screen
-	// `size`: Size of the shape in pixels
-	// `color`: Shape's color (white by default)
-	// `angle`: Shape's angle (0.0f by default)
-	Rectangle(const vec2<float>& position, const vec2<float>& size, const Color& color = Colors::WHITE, const float angle = 0.0f);
+	// Initialize current shape using the Shape2DConf struct
+	Rectangle(const Shape2DConf& conf);
 
 	// Scene2D call this method.
 	// Draw current shape using shader defined by Scene2D class

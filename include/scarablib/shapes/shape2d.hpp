@@ -6,11 +6,19 @@
 #include "scarablib/types/color.hpp"
 #include "scarablib/types/texture.hpp"
 
+
+struct Shape2DConf {
+	const vec2<float> position;
+	const vec2<float> size;
+	Color color = Colors::WHITE;
+	float angle = 0.0f;
+};
+
 // This is a struct used to make 2D shapes
 class Shape2D {
 	public:
 		// Initialize current shape using position, size, color and angle (last two are optional)
-		Shape2D(const vec2<float>& position, const vec2<float>& size, const Color& color = Colors::WHITE, const float angle = 0.0f);
+		Shape2D(const Shape2DConf& conf);
 		virtual ~Shape2D() = default;
 
 		// Scene2D call this method.
@@ -110,7 +118,7 @@ class Shape2D {
 		// NOTE -- Texture will always be a "reference" to another existing texture (except for fonts). Using a pointer so the OpenGL ID doens't get copied
 		Texture* texture = &this->get_deftex(); // Current texture being used
 
-		// This need to be intialized on constructor, so the inheritance goes well
+		// These need to be intialized on constructor, so the inheritance goes right
 		glm::mat4 model;
 		bool isdirty; // Change model if changed
 

@@ -12,31 +12,25 @@ Scene2D::Scene2D(const Window& window) : Scene(window) {
 
 	const std::vector<Vertex> vertices = {
 		// Rectangle
-		{ .position2d = glm::vec2(0.0f, 0.0f), .texuv = glm::vec2(1.0f, 1.0f) }, // Bottom Left
-		{ .position2d = glm::vec2(1.0f, 0.0f), .texuv = glm::vec2(0.0f, 1.0f) }, // Bottom Right
-		{ .position2d = glm::vec2(1.0f, 1.0f), .texuv = glm::vec2(0.0f, 0.0f) }, // Top Right
-		{ .position2d = glm::vec2(0.0f, 1.0f), .texuv = glm::vec2(1.0f, 0.0f) },  // Top Left
+		{ .position = glm::vec3(0.0f, 0.0f, 0.0f), .texuv = glm::vec2(1.0f, 1.0f) }, // Bottom Left
+		{ .position = glm::vec3(1.0f, 0.0f, 0.0f), .texuv = glm::vec2(0.0f, 1.0f) }, // Bottom Right
+		{ .position = glm::vec3(1.0f, 1.0f, 0.0f), .texuv = glm::vec2(0.0f, 0.0f) }, // Top Right
+		{ .position = glm::vec3(0.0f, 1.0f, 0.0f), .texuv = glm::vec2(1.0f, 0.0f) },  // Top Left
 
 		// Triangle
-		{ .position2d = glm::vec2(1.0f, 1.0f), .texuv = glm::vec2(0.0f, 0.0f) }, // Bottom Right
-		{ .position2d = glm::vec2(0.0f, 1.0f), .texuv = glm::vec2(1.0f, 0.0f) }, // Bottom Left
-		{ .position2d = glm::vec2(0.5f, 0.0f), .texuv = glm::vec2(0.5f, 1.0f) }  // Middle
+		{ .position = glm::vec3(1.0f, 1.0f, 0.0f), .texuv = glm::vec2(0.0f, 0.0f) }, // Bottom Right
+		{ .position = glm::vec3(0.0f, 1.0f, 0.0f), .texuv = glm::vec2(1.0f, 0.0f) }, // Bottom Left
+		{ .position = glm::vec3(0.5f, 0.0f, 0.0f), .texuv = glm::vec2(0.5f, 1.0f) }  // Middle
 	};
 
 	// Indices are not necessary for simple shapes
-
-	#define POSITION_DIMENSION 2
-	#define TEXTURE_DIMENSION 2
-
 	VBO vbo = VBO();
 
 	// Make VAO
 	this->vao->bind();
 
 	// Build VBO
-	vbo.alloc_data(vertices.size() * sizeof(Vertex), vertices.data());
-	vbo.link_attrib(0, POSITION_DIMENSION, sizeof(Vertex), offsetof(Vertex, position2d));
-	vbo.link_attrib(1, TEXTURE_DIMENSION, sizeof(Vertex), offsetof(Vertex, texuv));
+	vbo.make_from_vertex(vertices, 2);
 
 	// Unbind all
 	this->vao->unbind();
@@ -46,7 +40,6 @@ Scene2D::Scene2D(const Window& window) : Scene(window) {
 Scene2D::~Scene2D() {
 	delete this->vao;
 	delete this->shader;
-	delete this->shader_circle;
 }
 
 void Scene2D::update_viewport(const uint32 width, const uint32 height) {
@@ -60,8 +53,11 @@ void Scene2D::update_viewport(const uint32 width, const uint32 height) {
 	// Update shaders projection uniform
 	shader->use();
 	shader->set_matrix4f("projection", projection);
-	shader_circle->use();
-	shader_circle->set_matrix4f("projection", projection);
+
+	// Update circle shader
+	Shader& circle_shader = Circle::get_circle_shader();
+	circle_shader.use();
+	circle_shader.set_matrix4f("projection", projection);
 
 	// Update viewport in opengl too
 	glViewport(0, 0, (GLsizei)width, (GLsizei)height);
@@ -69,7 +65,6 @@ void Scene2D::update_viewport(const uint32 width, const uint32 height) {
 
 
 void Scene2D::draw_font(Font& font) {
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	this->begin_draw();
 
 	font.draw(*this->shader);
@@ -77,8 +72,8 @@ void Scene2D::draw_font(Font& font) {
 	this->end_draw();
 }
 
-void Scene2D::draw_rectangle(Rectangle& rectangle) {
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+void Scene2D::draw_rectangle(Rectangle& rectangle, const DrawMode drawmode) {
+	glPolygonMode(GL_FRONT_AND_BACK, drawmode);
 	this->begin_draw();
 
 	rectangle.draw(*this->shader);
@@ -86,8 +81,8 @@ void Scene2D::draw_rectangle(Rectangle& rectangle) {
 	this->end_draw();
 }
 
-void Scene2D::draw_triangle(Triangle& triangle) {
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+void Scene2D::draw_triangle(Triangle& triangle, const DrawMode drawmode) {
+	glPolygonMode(GL_FRONT_AND_BACK, drawmode);
 	this->begin_draw();
 
 	triangle.draw(*this->shader);
@@ -98,8 +93,8 @@ void Scene2D::draw_triangle(Triangle& triangle) {
 // Min - 0.001
 // Default - 0.0
 // Max - 1.0
-void Scene2D::draw_circle(Circle& circle) {
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+void Scene2D::draw_circle(Circle& circle, const DrawMode drawmode) {
+	glPolygonMode(GL_FRONT_AND_BACK, drawmode);
 	this->begin_draw();
 
 	circle.draw(*this->shader);
@@ -108,17 +103,12 @@ void Scene2D::draw_circle(Circle& circle) {
 }
 
 // Not proud of this
-void Scene2D::draw_shape(Shape2D& shape) {
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+void Scene2D::draw_shape(Shape2D& shape, const DrawMode drawmode) {
+	glPolygonMode(GL_FRONT_AND_BACK, drawmode);
 
 	this->vao->bind();
-	if(typeid(shape) == typeid(Circle)) {
-		this->shader_circle->use();
-		shape.draw(*this->shader_circle);
-	} else {
-		this->shader->use();
-		shape.draw(*this->shader);
-	}
+	this->shader->use();
+	shape.draw(*this->shader); // If circle it will use the shader in the circle struct
 	this->vao->unbind();
 }
 
@@ -127,35 +117,27 @@ void Scene2D::add_to_scene(Shape2D* shape) {
 	this->scene.emplace_back(shape);
 }
 
-void Scene2D::add_to_scene(const std::vector<Shape2D*> shapes) {
+void Scene2D::add_to_scene(const std::vector<Shape2D*>& shapes) {
 	for(Shape2D* shape : shapes) {
 		this->scene.emplace_back(shape);
 	}
 }
 
-void Scene2D::draw_all() {
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+void Scene2D::draw_all(const DrawMode drawmode) {
+	glPolygonMode(GL_FRONT_AND_BACK, drawmode);
 
 	this->vao->bind();
+	this->shader->use();
 
 	for(auto& shape : this->scene) {
-		// If circle use circle shader
-		if(dynamic_cast<Circle*>(shape)) {
-			this->shader_circle->use();
-			shape->draw(*this->shader_circle);
-
-		// If not, use default shader
-		} else {
-			this->shader->use();
-			shape->draw(*this->shader);
-		}
+		shape->draw(*this->shader); // If circle it will use the shader in the circle struct
 	}
 
 	this->vao->unbind();
 }
 
 void Scene2D::remove_index(const uint32 index) {
-	const uint64 last_index = this->scene.size() -1;
+	const uint64 last_index = this->scene.size() - 1;
 
 	if(index > last_index) {
 		LOG_ERROR("The index you are trying to remove is higher than the size of the objects in scene (%d)", this->scene.size());

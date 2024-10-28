@@ -1,18 +1,17 @@
 #pragma once
 
 #include "scarablib/shapes/shape2d.hpp"
+#include "scarablib/utils/file.hpp"
 
 // Circle shape object, used to draw circle
 struct Circle : public Shape2D {
-	// Initialize current shape using the following values:
-	// `position`: Shape's position on the screen
-	// `size`: Size of the shape in pixels
-	// `color`: Shape's color (white by default)
-	// `angle`: Shape's angle (0.0f by default)
-	Circle(const vec2<float>& position, const vec2<float>& size, const Color& color = Colors::WHITE, const float angle = 0.0f);
+	friend class Scene2D; // To update viewport (not making a static variable because only Shape2D needs to access it)
 
-	// Scene2D call this method.
-	// Draw current shape using shader defined by Scene2D class
+	// Initialize current shape using the Shape2DConf struct
+	Circle(const Shape2DConf& conf);
+
+	// Draw the circle using the circle shader.
+	// No shader is needed here, since Circle has a different shader stored in the struct. This method is a virtual method from Shape2D.
 	void draw(const Shader& shader) override;
 
 	// Get the current blur value
@@ -27,4 +26,15 @@ struct Circle : public Shape2D {
 
 	private:
 		float blur = 0.01f;
+
+		// Make static so Scene2D can update viewport
+		static inline Shader& get_circle_shader() {
+			static Shader shader_circle = Shader(
+				FileHelper::read_file(SOURCE_DIR + "/../../opengl/shaders/2d/vertex.glsl").c_str(),
+				FileHelper::read_file(SOURCE_DIR + "/../../opengl/shaders/2d/circle_fragment.glsl").c_str()
+			);
+
+			return shader_circle;
+		}
+
 };

@@ -86,7 +86,7 @@ Texture::Texture(const char* path, const TextureFilter filter, const TextureWrap
 	glBindTexture(this->tex_type, 0);
 }
  
-Texture::Texture(const uint8* data, const uint32 width, const uint32 height, const GLenum format) {
+Texture::Texture(const void* data, const uint32 width, const uint32 height, const GLint internal_format, const GLenum format) {
 	// Generate and bind texture
 	glGenTextures(1, &this->id); // num of textures, pointer
 	glBindTexture(this->tex_type, this->id);
@@ -94,11 +94,14 @@ Texture::Texture(const uint8* data, const uint32 width, const uint32 height, con
 	// Filter
 	glTexParameteri(this->tex_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(this->tex_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(this->tex_type, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(this->tex_type, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	// glTexParameteri(this->tex_type, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	// glTexParameteri(this->tex_type, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 	// Generate
-	glTexImage2D(this->tex_type, 0, static_cast<GLint>(format), static_cast<GLint>(width), static_cast<GLint>(height), 0, format, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(this->tex_type, 0, internal_format, static_cast<GLint>(width), static_cast<GLint>(height), 0, format, GL_UNSIGNED_BYTE, data);
+
+	// Gen mipmap
+	glGenerateMipmap(this->tex_type);
 
 	// Unbind
 	glBindTexture(this->tex_type, 0);

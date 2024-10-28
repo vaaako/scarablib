@@ -15,13 +15,13 @@ class Scene {
 	public:
 		// Build scene object using the window object for viewport
 		Scene(const Window& window);
-		~Scene() = default;
+		virtual ~Scene() = default;
 
 		// Update viewport using window object
 		virtual inline void update_viewport(const Window& window) = 0;
 
 		// Update viewport using width and height values
-		virtual inline void update_viewport(const uint32 width, const uint32 height) = 0;
+		virtual void update_viewport(const uint32 width, const uint32 height) = 0;
 
 	protected:
 		// Viewport

@@ -7,8 +7,8 @@
 #include "scarablib/utils/string.hpp"
 
 // Rectangle init doesn't matter
-Font::Font(const char* path, const std::string& text, const uint16 size, const Color color, const TextureFilter filter)
-	: Rectangle({ 0, 0 }, { 1.0f, 1.0f }), path(path), filter((GLenum)filter), text(text), size(size), color(color) {
+Font::Font(const char* path, const uint16 size, const TextureFilter filter)
+	: Rectangle({ { 0, 0 }, { 0.0f } }), path(path), filter((GLenum)filter), size(size) {
 
 	if(StringHelper::file_extension(path) != "ttf") {
 		TTF_Quit();
@@ -27,8 +27,6 @@ Font::Font(const char* path, const std::string& text, const uint16 size, const C
 
 	// Config
 	this->set_size(size);
-	this->set_color(color);
-	this->set_text(text);
 	this->update_texture();
 }
 
@@ -50,7 +48,7 @@ void Font::update_texture() {
 
 	// Remove previous font's texture and set a new one
 	delete this->font_texture;
-	this->font_texture = new Texture(reinterpret_cast<uint8*>(surface->pixels), static_cast<uint32>(surface->w), static_cast<uint32>(surface->h), GL_RGBA);
+	this->font_texture = new Texture(surface->pixels, static_cast<uint32>(surface->w), static_cast<uint32>(surface->h), surface->format->BytesPerPixel, GL_BGRA);
 	this->set_texture(this->font_texture);
 
 	// Free surfaces
@@ -72,3 +70,4 @@ void Font::set_font_size(const uint16 size) {
 	this->size = size;
 	this->update_texture();
 }
+

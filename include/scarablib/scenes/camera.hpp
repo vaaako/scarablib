@@ -1,8 +1,11 @@
 #pragma once
 
+#include "glm/ext/vector_float3.hpp"
+#include "glm/geometric.hpp"
 #include "scarablib/input/mouse.hpp"
 #include "scarablib/proper/vector/vec3.hpp"
 #include "scarablib/proper/vector/vecutil.hpp"
+#include "scarablib/window/window.hpp"
 
 enum class Zoom : bool {
 	OUT = 0,
@@ -10,6 +13,9 @@ enum class Zoom : bool {
 };
 
 class Camera {
+	friend class Scene3D;
+	friend struct Mesh;
+
 	public:
 		Camera(const Window& window, const float fov = 45.0f, const float sensitivity = 100.0f);
 
@@ -27,11 +33,20 @@ class Camera {
 
 		// Get camera position
 		inline vec3<float> get_position() const {
-			return this->position;
+			// return this->position;
+			return { this->position.x, this->position.y, this->position.z };
 		}
 
 
 		// SETTERS
+		inline void update_viewport(const Window& window) {
+			this->update_viewport(window.get_width(), window.get_height());
+		}
+
+		inline void update_viewport(const uint32 width, const uint32 height) {
+			this->width = width;
+			this->height = height;
+		}
 
 		// Set camera's near plane. How near to render
 		void set_near_plane(const float near_plane);
@@ -63,26 +78,22 @@ class Camera {
 
 		// Moves foward to all axis except Y axis
 		inline void move_front() {
-			// this->position += glm::normalize(glm::vec3(this->orientation.x, 0.0f, this->orientation.z)) * this->speed;
-			this->position += vecutil::normalize(vec3<float>(this->orientation.x, 0.0f, this->orientation.z)) * this->speed;
+			this->position += glm::normalize(glm::vec3(this->orientation.x, 0.0f, this->orientation.z)) * this->speed;
 		}
 
 		// Moves backward to all axis except Y axis
 		inline void move_back() {
-			// this->position -= glm::normalize(glm::vec3(this->orientation.x, 0.0f, this->orientation.z)) * this->speed;
-			this->position -= vecutil::normalize(vec3<float>(this->orientation.x, 0.0f, this->orientation.z)) * this->speed;
+			this->position -= glm::normalize(glm::vec3(this->orientation.x, 0.0f, this->orientation.z)) * this->speed;
 		}
 
 		// Moves right on X and Z axis
 		inline void move_right() {
-			// this->position += glm::normalize(glm::cross(this->orientation, this->up)) * this->speed ;
-			this->position += vecutil::normalize(vecutil::cross(this->orientation, this->up)) * this->speed;
+			this->position += glm::normalize(glm::cross(this->orientation, this->up)) * this->speed ;
 		}
 
 		// Moves left on X and Z axis
 		inline void move_left() {
-			// this->position -= glm::normalize(glm::cross(this->orientation, this->up)) * this->speed;
-			this->position -= vecutil::normalize(vecutil::cross(this->orientation, this->up)) * this->speed;
+			this->position -= glm::normalize(glm::cross(this->orientation, this->up)) * this->speed;
 		}
 
 		// Fly
@@ -119,10 +130,10 @@ class Camera {
 		// -90 in yaw prevents camera from jumping on the first click
 		float yaw = -90.0f; // Horizontal rotation
 		float pitch = 0.0f; // Vertical rotation
+		
+		glm::vec3 position    = { 0.0f, 0.0f, 2.0f };
+		glm::vec3 orientation = { 0.0f, 0.0f, -1.0f };
 
-		vec3<float> position    = { 0.0f, 0.0f, 2.0f };
-		vec3<float> orientation = { 0.0f, 0.0f, -1.0f };
-
-		vec3<float> up    = { 0.0f, 1.0f, 0.0f };
-		vec3<float> front = { 0.0f, 0.0f, -1.0f };
+		glm::vec3 up    = { 0.0f, 1.0f, 0.0f };
+		glm::vec3 front = { 0.0f, 0.0f, -1.0f };
 };

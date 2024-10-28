@@ -12,6 +12,8 @@ void Mouse::handle_event(const SDL_Event& event) {
 		this->down = static_cast<MouseBTN>(button.button); // Button clicked
 		this->clicks = button.clicks;
 
+		LOG_INFO("Clicked button: %d", button.button);
+
 		// Click location
 		this->click_pos.set_values(button.x, button.y);
 
