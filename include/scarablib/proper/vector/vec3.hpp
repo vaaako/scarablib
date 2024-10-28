@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cmath> // std::sqrt
-#include <glm/ext/vector_float3.hpp>
 
 template <typename T>
 struct vec3 {
@@ -32,11 +31,6 @@ struct vec3 {
 		this->x = x;
 		this->y = y;
 		this->z = z;
-	}
-
-	// Converts to glm equivalent
-	inline glm::vec3 to_glm() const {
-		return glm::vec3(this->x, this->y, this->z);
 	}
 
 	// Addition

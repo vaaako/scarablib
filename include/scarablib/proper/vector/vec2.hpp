@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cmath> // std::sqrt
-#include <glm/ext/vector_float2.hpp>
 
 template <typename T>
 struct vec2 {
@@ -31,12 +30,6 @@ struct vec2 {
 		this->x = x;
 		this->y = y;
 	}
-
-	// Converts to glm equivalent
-	inline glm::vec2 to_glm() const {
-		return glm::vec2(this->x, this->y);
-	}
-
 
 	// 2D Cross product (returns a scalar)
 	constexpr T cross(const vec2<T>& other) const noexcept {

@@ -1,21 +1,67 @@
 #include "scarablib/proper/vector/vec3.hpp"
+#include "scarablib/proper/vector/vec4.hpp"
 #include "scarablib/utils/math.hpp"
 
 namespace vecutil {
-	// 3D Cross product
+	// VEC4
+
+	// 4D Cross product
 	template <typename T>
-	[[nodiscard]] constexpr vec3<T> cross(const vec3<T>& vector, const vec3<T>& other) noexcept {
-		return vec3(
-			vector.y * other.z - vector.z * other.y,
-			vector.z * other.x - vector.x * other.z,
-			vector.x * other.y - vector.y * other.x
+	[[nodiscard]] constexpr vec4<T> cross(const vec4<T>& a, const vec4<T>& b)  noexcept {
+		return vec4(
+			(a.y * b.z) - (a.z * b.y),
+			(a.z * b.x) - (a.x * b.z),
+			(a.x * b.y) - (a.y * b.x),
+			T(0) // 4D cross product is often defined in 3D subspace, so w-component is set to 0
 		);
 	}
 
 	// Multiplies and sums values with another vector
 	template <typename T>
-	[[nodiscard]] constexpr T dot(const vec3<T>& vector, const vec3<T>& other) noexcept {
-		return vector.x * other.x + vector.y * other.y + vector.z * other.z;
+	[[nodiscard]] constexpr T dot(const vec4<T>& a, const vec4<T>& b)  noexcept {
+		return (a.x * b.x) + (a.y * b.y) + (a.z * b.z) + (a.w * b.w);
+	}
+
+	// The magnitude (length) of the vector
+	template <typename T>
+	[[nodiscard]] constexpr T magnitude(const vec4<T>& vector)  noexcept {
+		return std::sqrt(vecutil::dot(vector,vector));
+	}
+
+	// The length (magnitude) of the vector
+	template <typename T>
+	[[nodiscard]] constexpr T length(const vec4<T>& vector)  noexcept {
+		return std::sqrt(vecutil::dot(vector, vector));
+	}
+
+	// Normalizes the vector to have a magnitude of 1 (unit vector)
+	template <typename T>
+	[[nodiscard]] constexpr vec4<T> normalized(const vec4<T>& vector)  noexcept {
+		const T length = vecutil::magnitude(vector);
+		if(!MathHelper::is_near_zero(length)) {
+			return vector / length;
+		}
+		return vector;
+	}
+
+
+
+	// VEC3
+
+	// 3D Cross product
+	template <typename T>
+	[[nodiscard]] constexpr vec3<T> cross(const vec3<T>& a, const vec3<T>& b) noexcept {
+		return vec3(
+			(a.y * b.z) - (a.z * b.y),
+			(a.z * b.x) - (a.x * b.z),
+			(a.x * b.y) - (a.y * b.x)
+		);
+	}
+
+	// Multiplies and sums values with another vector
+	template <typename T>
+	[[nodiscard]] constexpr T dot(const vec3<T>& a, const vec3<T>& b) noexcept {
+		return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
 	}
 
 	// The magnitude (length) of the vector
@@ -34,7 +80,6 @@ namespace vecutil {
 	template <typename T>
 	[[nodiscard]] constexpr vec3<T> normalize(const vec3<T>& vector) noexcept {
 		const T length = vecutil::magnitude(vector);
-
 		if(!MathHelper::is_near_zero(length)) {
 			return vector / length;
 		}

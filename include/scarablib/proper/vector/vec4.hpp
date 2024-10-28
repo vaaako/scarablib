@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cmath> // std::sqrt
-#include <glm/ext/vector_float4.hpp>
 
 template <typename T>
 struct vec4 {
@@ -37,39 +36,6 @@ struct vec4 {
 		this->z = z;
 		this->w = w;
 	}
-
-	// Converts to glm equivalent
-	inline glm::vec4 to_glm() const {
-		return glm::vec4(this->x, this->y, this->z, this->w);
-	}
-
-
-	// 4D Cross product
-	constexpr vec4 cross(const vec4<T>& other) const noexcept {
-		return vec4(
-			this->y * other.z - this->z * other.y,
-			this->z * other.x - this->x * other.z,
-			this->x * other.y - this->y * other.x,
-			T(0) // 4D cross product is often defined in 3D subspace, so w-component is set to 0
-		);
-	}
-
-	// Multiplies and sums values with another vector
-	constexpr T dot(const vec4<T>& other) const noexcept {
-		return (this->x * other.x + this->y * other.y + this->z * other.z + this->w * other.w);
-	}
-
-	// The magnitude (length) of the vector
-	constexpr T magnitude() const noexcept {
-		return std::sqrt(this->dot(*this));
-	}
-
-	// Normalizes the vector to have a magnitude of 1 (unit vector)
-	constexpr vec4 normalized() const noexcept {
-		const T length = this->magnitude();
-		return (length > 0) ? *this / length : *this;
-	}
-
 
 	// Addition
 	constexpr vec4 operator+(const vec4<T>& other) const noexcept {
@@ -226,4 +192,3 @@ struct vec4 {
 		return *this;
 	}
 };
-
