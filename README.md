@@ -28,16 +28,15 @@ See [examples/](examples/) to check some features (not all features have example
 - Light source
 - Network support
 
-<!--
 # Example
+This scene was made basically with the code below
 
 ![example.gif](medias/example.gif)
-
 ```cpp
 // Draw 3D shapes
 scene3d.draw_all({
 	&cube1,
-	// center, angle, radius
+	//                  center, angle, radius
 	&cube2.set_position(vecutil::orbitate_y(cube1.get_position(), rotation, 2.0f))
 });
 
@@ -58,7 +57,6 @@ if(rotation >= 360.0f) {
 ```
 
 
--->
 
 # Building and run
 You can use both `CMake` and `Makefile` to build the library and run tests.
