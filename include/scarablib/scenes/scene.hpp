@@ -1,5 +1,6 @@
 #pragma once
 
+#include "scarablib/shapes/mesh.hpp"
 #include "scarablib/window/window.hpp"
 
 // Different modes of drawing shapes
@@ -18,8 +19,8 @@ class Shape3D;
 template <typename T>
 class Scene {
 	// Only Shape2D and Shape3D are accepted
-	static_assert(std::is_same<T, Shape2D>::value || std::is_same<T, Shape3D>::value,
-			"Scene can only be instantiated with Shape2D or Shape3D");
+	static_assert(std::is_same<T, Shape2D>::value || std::is_same<T, Mesh>::value,
+			"Scene can only be instantiated with Shape2D or Mesh");
 
 	public:
 		// Build scene object using the window object for viewport

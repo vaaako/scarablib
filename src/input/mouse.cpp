@@ -17,6 +17,9 @@ void MouseHandler::handle_event(const SDL_Event& event) {
 		// Click location
 		this->click_pos.set_values(button.x, button.y);
 
+
+		// this->mousestate[event.button.button] = static_cast<MouseState>(MouseState::PRESSED);
+
 	} else if(event.type == SDL_MOUSEBUTTONUP) {
 		// Reset button down
 		this->up = static_cast<MouseBTN>(event.button.button);
@@ -25,6 +28,8 @@ void MouseHandler::handle_event(const SDL_Event& event) {
 		// Clear
 		this->clicks = 0;
 		this->click_pos.clear();
+
+		// this->mousestate[event.button.button] = static_cast<MouseState>(MouseState::RELEASED);
 	}
 
 

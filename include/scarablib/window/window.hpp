@@ -132,9 +132,9 @@ class Window {
 		// Enable or disable vertical sync (VSync).
 		// VSync synchronizes the frame rate with monitor's refresh rate.
 		// Disable it for potentially higher frame rates.
-		inline void set_vsync(const bool enable) {
-			if(SDL_GL_SetSwapInterval(enable) < 0) {
-				LOG_ERROR("Failed to enable VSync: %s", SDL_GetError());
+		inline void set_vsync(const bool state) {
+			if(SDL_GL_SetSwapInterval(state) < 0) {
+				LOG_ERROR("Failed to enable vsync: %s", SDL_GetError());
 			}
 		}
 

@@ -70,7 +70,7 @@ int main() {
 		.width = 800,
 		.height = 600,
 		.title = const_cast<char*>("Something idk"),
-		.clear_color = Colors::ORANGE,
+		.clear_color = Colors::PINK,
 		.vsync = true,
 		.debug_info = true
 	});
@@ -78,6 +78,7 @@ int main() {
 	// Load assets
 	Texture tex1 = Texture("test/assets/images/kuromi.png");
 	Texture tex2 = Texture("test/assets/images/purin.png");
+	Texture tex3 = Texture("test/assets/images/brick.png");
 
 	Font msgothic = Font("test/assets/fonts/msgothic.ttf", 24);
 
@@ -86,17 +87,27 @@ int main() {
 	Scene2D scene2d = Scene2D(window);
 	Scene3D scene3d = Scene3D(window, camera);
 
+	// Load mesh
+	Mesh cow = Mesh("test/assets/objs/cow.obj");
+	cow.set_position({ 0.0f, 0.0f, -5.0f });
+	cow.set_color(Colors::CHIROYELLOW);
+
 	// Make shapes
-	Cube cube = Cube({
+	// Cube position doesnt matter because will change later
+	Cube cube1 = Cube({
 		.position = 0.0f,
 	});
-	cube.set_texture(&tex1);
+	cube1.set_texture(&tex1);
 
 	Cube cube2 = Cube({
-		.position = { 0.0f, 0.0f, -5.0f },
-		.size = 0.5f
+		.position = 0.0f,
 	});
 	cube2.set_texture(&tex2);
+
+	Cube cube3 = Cube({
+		.position = 0.0f,
+	});
+	cube3.set_texture(&tex3);
 
 	Rectangle rectangle = Rectangle({
 		.position = { 400.0f, 300.0f },
@@ -127,9 +138,12 @@ int main() {
 
 		// More optimized
 		scene3d.draw_all({
-			&cube,
-			&cube2.set_position(vecutil::orbitate_y(cube.get_position(), rotation, 2.0f))
+			&cube1.set_position(vecutil::orbitate_x(cow.get_position(), rotation, 5.0f)),
+			&cube2.set_position(vecutil::orbitate_y(cow.get_position(), rotation, 5.0f)),
+			&cube3.set_position(vecutil::orbitate_z(cow.get_position(), -rotation, 5.0f))
 		});
+
+		scene3d.draw_mesh(cow);
 
 		// Draw 2D shapes
 		// Format FPS, ignore

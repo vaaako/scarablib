@@ -44,7 +44,7 @@ struct KeyboardHandler {
 	}
 
 	// Change the state of a key
-	inline void set_keystate(const Keycode key, const Keystate& state) {
+	inline void set_keystate(const Keycode key, const Keystate state) {
 		this->keystate[static_cast<uint32>(key)] = state;
 	}
 

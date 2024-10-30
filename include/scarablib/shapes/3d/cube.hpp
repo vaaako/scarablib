@@ -1,12 +1,12 @@
 #pragma once
 
-#include "scarablib/shapes/shape3d.hpp"
+#include "scarablib/shapes/mesh.hpp"
 
-struct Cube : public Shape3D {
-	Cube(const Shape3DConf& conf);
+struct Cube : public Mesh {
+	Cube(const MeshConf& conf);
 
-	inline VAO& get_vao() override {
-		static VAO vao = VAO();
+	inline const VAO& get_vao() override {
+		static const VAO vao = VAO();
 		return vao;
 	}
 };

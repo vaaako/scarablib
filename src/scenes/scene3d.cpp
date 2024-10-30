@@ -6,8 +6,9 @@ Scene3D::~Scene3D() {
 	delete this->shader;
 }
 
-void Scene3D::draw_mesh(Shape3D& shape) {
+void Scene3D::draw_mesh(Mesh& shape) {
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST); // I couldn't find out why Font gets a background when this is enabled and why 2D shapes draws below 3D shapes when this is disabled (i know how DEPTH TEST works, but i dont know why this is happening here and not on the code pre-revamp)
 
 	shape.get_vao().bind();
 	this->shader->use();
@@ -20,7 +21,7 @@ void Scene3D::draw_mesh(Shape3D& shape) {
 
 void Scene3D::draw_all(const DrawMode drawmode) {
 	glPolygonMode(GL_FRONT_AND_BACK, drawmode);
-	glEnable(GL_DEPTH_TEST); // I couldn't find out why Font gets a background when this is enabled and why 2D shapes draws below 3D shapes when this is disabled (i know how DEPTH TEST works, but i dont know why this is happening here and not on the code pre-revamp)
+	glEnable(GL_DEPTH_TEST);
 
 	this->shader->use();
 
@@ -29,12 +30,12 @@ void Scene3D::draw_all(const DrawMode drawmode) {
 	}
 }
 
-void Scene3D::draw_all(const std::vector<Shape3D*>& shapes, const DrawMode drawmode) {
+void Scene3D::draw_all(const std::vector<Mesh*>& shapes, const DrawMode drawmode) {
 	glPolygonMode(GL_FRONT_AND_BACK, drawmode);
-	glEnable(GL_DEPTH_TEST); // I couldn't find out why Font gets a background when this is enabled and why 2D shapes draws below 3D shapes when this is disabled (i know how DEPTH TEST works, but i dont know why this is happening here and not on the code pre-revamp)
+	glEnable(GL_DEPTH_TEST);
 
 	// Get shape VAO
-	VAO& vao = shapes.at(0)->get_vao();
+	const VAO& vao = shapes.at(0)->get_vao();
 
 	this->shader->use();
 	vao.bind();

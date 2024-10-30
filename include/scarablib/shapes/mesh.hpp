@@ -1,27 +1,39 @@
 #pragma once
 
-#include "glm/fwd.hpp"
-#include "scarablib/proper/vector/vec3.hpp"
-#include "scarablib/shapes/3d/mesh.hpp"
-#include "scarablib/types/color.hpp"
+#include <GL/glew.h>
+#include "scarablib/opengl/shader.hpp"
+#include "scarablib/opengl/vao.hpp"
+#include "scarablib/scenes/camera.hpp"
+#include "scarablib/typedef.hpp"
 #include "scarablib/types/texture.hpp"
+#include "scarablib/types/vertex.hpp"
 
-// Struct used to initialize Shape3D
-struct Shape3DConf {
+
+// Struct used to initialize a Mesh
+struct MeshConf {
 	const vec3<float> position;
 	const vec3<float> size = 1.0f;
 	Color color = Colors::WHITE;
 	float angle = 0.0f;
 };
 
-class Shape3D : public Mesh {
+// An object used for as a base for 3D Shapes
+class Mesh {
 	public:
-		Shape3D(const Shape3DConf& conf, const VAO* vao, const uint32 indices_length = 0);
-		virtual ~Shape3D() = default;
+		// Make a mesh from existing VAO and initial config
+		Mesh(const MeshConf& conf, const VAO* vao, const uint32 indices_length = 0);
+		Mesh(const char* path);
 
-		// Draw current shape.
+		// Mesh(const VAO* vao, const uint32 indices_length = 0);
+		//
+		// Init mesh using a vector of Vertex and Indices
+		// Mesh(const std::vector<Vertex>& data, const std::vector<uint32>& indices);
+		// Init mesh using a vector of Vertices, Texture Coordinates (optional) and Indices
+		// Mesh(const std::vector<float>& vertices, const std::vector<float>& tex_coords, const std::vector<uint32>& indices);
+
+		// Draw current mesh.
 		// It needs a camera object and a shader
-		void draw(const Camera& camera, const Shader& shader) override;
+		virtual void draw(const Camera& camera, const Shader& shader);
 
 		// Get current texture
 		inline Texture get_texture() const {
@@ -51,7 +63,7 @@ class Shape3D : public Mesh {
 		// SETTERS //
 
 		// Set a texture to be used
-		inline Shape3D& set_texture(Texture* texture) {
+		inline Mesh& set_texture(Texture* texture) {
 			if(texture == nullptr){
 				this->texture = &this->get_deftex();
 				return *this;
@@ -62,20 +74,20 @@ class Shape3D : public Mesh {
 		}
 
 		// Removes the shape's texture
-		inline Shape3D& remove_texture() {
+		inline Mesh& remove_texture() {
 			this->texture = &this->get_deftex();
 			return *this;
 		}
 
 		// Set a new position using a vector
-		inline Shape3D& set_position(const vec3<float>& position) {
+		inline Mesh& set_position(const vec3<float>& position) {
 			this->position = position;
 			this->isdirty = true;
 			return *this;
 		}
 
 		// Set a new size using a vector (X and Y)
-		inline Shape3D& set_size(const vec3<float>& size) {
+		inline Mesh& set_size(const vec3<float>& size) {
 			this->size = size;
 			this->isdirty = true;
 			return *this;
@@ -108,13 +120,28 @@ class Shape3D : public Mesh {
 		}
 
 
+		// Get current mesh VAO.
+		// If you are using this in a struct of a object, make it return a static VAO (like in cube.hpp).
+		// If not, it will return by default the VAO setted inside the Mesh constructor (used when loading external obj)
+		virtual inline const VAO& get_vao() {
+			return *this->vao;
+		}
+
 	protected:
 		void update_model();
 
-		vec3<float> position;
-		vec3<float> size;
-		Color color;
-		float angle;
+		// Reference to some VAO
+		const VAO* vao;
+		// Not const because when loading external obj, is not possible to explicitly set
+		uint32 indices_length;
+
+
+		// Shape members //
+
+		vec3<float> position = 0.0f;
+		vec3<float> size = 1.0f;
+		Color color = Colors::WHITE;
+		float angle = 0.0f;
 
 		// Texture will always be a "reference" to another existing texture
 		Texture* texture = &this->get_deftex(); // Current texture being used
@@ -123,6 +150,8 @@ class Shape3D : public Mesh {
 		glm::mat4 model;
 		bool isdirty; // Change model if changed
 
+		// Inline //
+
 		// Default texture (solid white)
 		inline Texture& get_deftex() const {
 			// I don't like data being statically allocated but whatever
@@ -130,3 +159,10 @@ class Shape3D : public Mesh {
 			return def_tex;
 		}
 };
+
+
+// Not happy with this here, but whatever
+
+// Load an external object and return it's vertices.
+// Takes a path and a vector of indices to be populate
+std::vector<Vertex> load_obj(const std::string& path, std::vector<uint32>& out_indices);

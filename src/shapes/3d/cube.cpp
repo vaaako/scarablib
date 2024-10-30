@@ -2,7 +2,7 @@
 #include "scarablib/opengl/ebo.hpp"
 #include "scarablib/opengl/vbo.hpp"
 
-Cube::Cube(const Shape3DConf& conf) : Shape3D(conf, &this->get_vao()) {
+Cube::Cube(const MeshConf& conf) : Mesh(conf, &this->get_vao()) {
 	std::vector<Vertex> vertices = {
 		// Vertices: 24
 		// Front face
@@ -68,12 +68,11 @@ Cube::Cube(const Shape3DConf& conf) : Shape3D(conf, &this->get_vao()) {
 		20, 22, 23
 	};
 
-	VAO& vao = this->get_vao();
+	const VAO& vao = this->get_vao();
 	vao.bind();
 
-	// Gen VBO
+	// Gen VBO and EBO
 	VBO vbo = VBO();
-	// Gen EBO
 	EBO ebo = EBO(indices); // segfault here idk
 
 	vbo.make_from_vertex(vertices);

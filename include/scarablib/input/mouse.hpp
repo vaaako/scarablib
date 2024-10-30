@@ -1,16 +1,22 @@
 #pragma once
 
 #include <SDL2/SDL_events.h>
+#include <vector>
 #include "scarablib/typedef.hpp"
 #include "scarablib/proper/vector/vec2.hpp"
 
 enum class MouseBTN : uint8 {
-	NONE = 0,
-	LMB,
-	MMB,
-	RMB,
-	SIDE1,
-	SIDE2
+	NONE  = 0,
+	LMB   = 1,
+	MMB   = 2,
+	RMB   = 3,
+	SIDE1 = 4,
+	SIDE2 = 5
+};
+
+enum class MouseState : uint8 {
+	RELEASED,
+	PRESSED
 };
 
 enum class Scroll : uint8 {
@@ -54,10 +60,14 @@ struct MouseHandler {
 		return this->up == button;
 	}
 
-	// TODO -- For when implement the vector of mouse events
-	// Change the state of a key
-	// inline void set_btnstate(const MouseBTN button, const MouseState state) {
-	// 	this->btnstate[key] = state;
+	// // Get the state of a key
+	// inline MouseState get_keystate(const MouseBTN key) const {
+	// 	return this->mousestate[static_cast<uint32>(key)];
+	// }
+	//
+	// // Change the state of a key
+	// inline void set_keystate(const MouseBTN key, const MouseState state) {
+	// 	this->mousestate[static_cast<uint32>(key)] = state;
 	// }
 
 	private:
@@ -65,7 +75,7 @@ struct MouseHandler {
 		MouseBTN up = MouseBTN::NONE;
 		MouseBTN down = MouseBTN::NONE;
 
-		// std::vector<MouseState> btnstate = std::vector<MouseState>(3, MouseState::UP);
+		// std::vector<MouseState> mousestate = std::vector<MouseState>(6, MouseState::RELEASED);
 
 		// Handle all mouse events (used on window class only)
 		void handle_event(const SDL_Event& event);
