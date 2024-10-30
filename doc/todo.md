@@ -1,5 +1,9 @@
+# Note
+I wrote most of the things here very tired, sorry for any english mistake
+
 # TODO library
-- [ ] Use Vector2f and Vector3f instead of glm versions
+- [x] Use my vectores instead of glm
+	- matrix still glm ones tho
 - [x] Change library name
 	+ Beetle relatable
 	+ Coleoptera
@@ -15,15 +19,15 @@
 - [ ] Discord RPC support
 
 # TODO Bug
-- [ ] Memory leak somewhere (i don't know if is on my `font.hpp` or SDL2 one)
-- [ ] Fix FPS drop when movement is enabled
+- [ ] Memory leak somewhere (i don't know if is in my code or in some library, but is not dangerous)
+- [X] Fix FPS drop when movement is enabled
 
 # TODO Window
 - [ ] Window Events
 	+ [X] Custom event enums
 	+ [X] Multiple events support
-	+ [ ] Resizing support. Is added but need to change viewport
-	+ [ ] Mouse handle click and motion at the same time
+	+ [ ] Resizing support (Is added but need to change viewport)
+	+ [ ] Mouse handle clicks and motion like keyboard
 - [x] Custom keyboard enums
 
 # TODO Features
@@ -32,14 +36,18 @@
 	+ [ ] Texture overlay
 	+ [ ] Texture atlas support
 	+ [ ] Opacity
-- [ ] Batch rendering
-- [ ] Use the same font object for different texts
+- [x] Batch rendering
+- [x] Use the same font object for different texts
+
+# TODO Shapes
+- [ ] Custom shapes support
+- [ ] Color matrix support
 
 # TODO 2D
-- [ ] Unify shader and `shader_texture` somehow
-	+ Maybe set the texture alpha to zero when using just solid color?
-	+ put the if-check on glsl file?
-- [ ] Later use the old `shape2d` in bakcups folder for custom user shapes
+- [x] Unify shader and `shader_texture` somehow
+	+ Use a blank texture as default (texture made in code)
+	+ Add to vertex attrib 2 on shape VBO and check if is to use on shape instance
+	+ This could be done by making a custom shape (e.g. `new Cube(custom_color)`), then all variants of this shape with custom color would have this color
 
 # TODO 3D
 - [x] Camera
@@ -50,17 +58,10 @@
 	+ [X] Shapes custom scale
 	+ [ ] Review [camera movement](https://github.com/swr06/Minecraft/blob/master/Source/Core/Camera.cpp)
 - [ ] Chunk mesh native support
-- [ ] Merge `set_angle` and `set_axis`
-- [ ] Different texture for each face
+- [ ] Merge `set_angle` and `set_axis` somehow
 - [ ] Sphere
 - [ ] Skybox
 - [ ] Normals / Shading value (both?)
-
-# Notes
-- [ ] Custom vertex colors for 2D
-	+ Add to vertex attrib 2 on shape VBO and check if is to use on shape instance
-	+ This could be done by making a custom shape (e.g. `new Cube(custom_color)`), then all variants from this shape with custom color would have this color
-
 
 
 # Features for later
@@ -85,7 +86,7 @@ Review for erros and improvement (header and declaration)
 	+ [x] keyboard.hpp
 	+ [x] keycode.hpp
 	+ [ ] mouse.hpp (recheck when implementing 3D space)
-- [ ] opengl/
+- [x] opengl/
 	+ [x] shaders/
 		* [x] 2d/
 		* [x] 3d/
@@ -101,18 +102,18 @@ Review for erros and improvement (header and declaration)
 	+ [x] color.hpp
 - [x] scenes/
 	+ [x] scene.hpp
-	+ [ ] scene2d.hpp
+	+ [x] scene2d.hpp
 - [x] shapes/
 	+ [x] shape2d.hpp
-- [ ] types/
+- [x] types/
 	+ [x] audio.hpp
 	+ [x] color.hpp
-	+ [ ] font.hpp
+	+ [x] font.hpp
 	+ [x] music.hpp (may contain some bug)
 	+ [x] sound.hpp
-	+ [ ] texture.hpp (finish when implement fonts)
+	+ [x] texture.hpp (finish when implement fonts)
 	+ [x] vertex.hpp
-- x ] utils/
+- [x] utils/
 	+ [x] file.hpp
 	+ [x] log.hpp
 	+ [x] math.hpp
