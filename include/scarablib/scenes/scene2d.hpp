@@ -26,7 +26,7 @@
 // (i know how depth test works, but i dont know why this is happening here and not on the code pre-revamp)
 
 // Scene object used for managing 2D objects
-class Scene2D : public Scene {
+class Scene2D : public Scene<Shape2D> {
 	public:
 		// Build the Scene using the window object
 		Scene2D(const Window& window);
@@ -42,23 +42,8 @@ class Scene2D : public Scene {
 		// e.g., `scene2d.draw_shape(rectangle)`
 		void draw_shape(Shape2D& shape, const DrawMode drawmode = DrawMode::FILLMODE);
 
-		// TODO -- Add to scene.hpp as virtual
-		// Add a shape object to the scene.
-		// WARNING: Shapes added to the scene are not deleted automatically, is recommended to make the shape object and then add to the scene as a pointer
-		void add_to_scene(Shape2D* shape);
-
-		// TODO -- Add to scene.hpp as virtual
-		// Add a vector of shape object to the scene.
-		// WARNING: Shapes added to the scene are not deleted automatically, is recommended to make the shape object and then add to the scene as a pointer
-		void add_to_scene(const std::vector<Shape2D*>& shapes);
-
-		// TODO -- Add to scene.hpp as virtual
 		// Draw all objects in scene
-		void draw_all(const DrawMode drawmode = DrawMode::FILLMODE);
-
-		// TODO -- Add to scene.hpp as virtual
-		// Remove object from scene using it's index
-		void remove_index(const uint32 index);
+		void draw_all(const DrawMode drawmode = DrawMode::FILLMODE) override;
 
 		// Get the number of objects in scene
 		inline uint64 length() {

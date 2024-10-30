@@ -7,7 +7,7 @@
 #include "scarablib/utils/file.hpp"
 
 // Scene object used for managing 3D objects
-class Scene3D : public Scene {
+class Scene3D : public Scene<Shape3D> {
 	public:
 		// Build 3D scene using the window object and a camera object
 		Scene3D(const Window& window, Camera& camera);
@@ -21,6 +21,13 @@ class Scene3D : public Scene {
 
 		// Draw a 3D mesh using a reference of it.
 		void draw_mesh(Shape3D& shape);
+
+		// Draw all objects in scene
+		void draw_all(const DrawMode drawmode = DrawMode::FILLMODE) override;
+
+		// Draw all of the same mesh.
+		// Use this to draw the same mesh more optimized
+		void draw_all(const std::vector<Shape3D*>& shapes, const DrawMode drawmode = DrawMode::FILLMODE);
 
 		inline void update_viewport(const Window& window) override {
 			this->camera.update_viewport(window);
@@ -38,3 +45,4 @@ class Scene3D : public Scene {
 			FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/3d/fragment.glsl").c_str()
 		);
 };
+

@@ -2,6 +2,7 @@
 #include "scarablib/scenes/camera.hpp"
 #include "scarablib/scenes/scene2d.hpp"
 #include "scarablib/scenes/scene3d.hpp"
+#include "scarablib/shapes/2d/rectangle.hpp"
 #include "scarablib/shapes/3d/cube.hpp"
 #include "scarablib/types/color.hpp"
 #include "scarablib/proper/log.hpp"
@@ -64,7 +65,6 @@ void rotate_camera(Window& window, Camera& camera, MouseHandler& mouse) {
 // - stbi maybe?
 int main() {
 	// TODO:
-	// - Keyboard and Mouse public instead of a getter
 	// - Mouse handle multiple inputs like keyboard
 	Window window = Window({
 		.width = 800,
@@ -79,17 +79,14 @@ int main() {
 	Texture tex1 = Texture("test/assets/images/kuromi.png");
 	Texture tex2 = Texture("test/assets/images/purin.png");
 
-	// TODO:
-	// - Remove background (GL_DEPTH_TEST is causing this or something else)
 	Font msgothic = Font("test/assets/fonts/msgothic.ttf", 24);
 
+	// Make scenes
 	Camera camera = Camera(window, 75.0f);
-
-	// TODO:
-	// - Instead of storing VAO object, store ID only
 	Scene2D scene2d = Scene2D(window);
 	Scene3D scene3d = Scene3D(window, camera);
 
+	// Make shapes
 	Cube cube = Cube({
 		.position = 0.0f,
 	});
@@ -101,16 +98,10 @@ int main() {
 	});
 	cube2.set_texture(&tex2);
 
-	Circle circle = Circle({
-		.position = { 400.0f },
-		.size = { 50.0f }
-	});
-
 	Rectangle rectangle = Rectangle({
-		.position = { 400.0f, 400.0f },
-		.size = { 50.0f, 50.0f },
+		.position = { 400.0f, 300.0f },
+		.size = { 5.0f },
 	});
-	// rectangle.set_texture(&tex1);
 
 
 	float rotation = 0.0f;
@@ -132,29 +123,29 @@ int main() {
 		rotate_camera(window, camera, window.mouse());
 
 		// WARNING -- When drawing 3D and 2D shapes together, draw 3D shapes first
+		// Until i figure out how to solve this
 
-		// Draw 3D shapes
-		scene3d.draw_mesh(cube);
-
-		// Set position to rotate around first cube
-		scene3d.draw_mesh(
-			cube2.set_position(vecutil::orbitate_y(cube.get_position(), rotation, 2.0f))
-		);
-
-		// Rotate
-		rotation += rotation_speed;
-		if(rotation >= 360.0f) {
-			rotation = 0.0f; // Wrap around to keep the angle within 0-360 degrees
-		}
+		// More optimized
+		scene3d.draw_all({
+			&cube,
+			&cube2.set_position(vecutil::orbitate_y(cube.get_position(), rotation, 2.0f))
+		});
 
 		// Draw 2D shapes
-		// Draw texts
 		// Format FPS, ignore
 		std::stringstream stream; stream << std::setprecision(2) << window.fps();
 		scene2d.draw_shape(msgothic.set_text("FPS: " + stream.str()).set_position(0.0f));
 		scene2d.draw_shape(msgothic.set_text("TESTING").set_position({ 0.0f, 24.0f }));
 
+		// Aim
 		scene2d.draw_shape(rectangle);
+
+
+		// Update rotation
+		rotation += rotation_speed;
+		if(rotation >= 360.0f) {
+			rotation = 0.0f; // Wrap around to keep the angle within 0-360 degrees
+		}
 
 		window.swap_buffers();
 	}

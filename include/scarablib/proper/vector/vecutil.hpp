@@ -7,7 +7,7 @@ namespace vecutil {
 
 	// 4D Cross product
 	template <typename T>
-	[[nodiscard]] constexpr vec4<T> cross(const vec4<T>& a, const vec4<T>& b)  noexcept {
+	[[nodiscard]] inline constexpr vec4<T> cross(const vec4<T>& a, const vec4<T>& b)  noexcept {
 		return vec4(
 			(a.y * b.z) - (a.z * b.y),
 			(a.z * b.x) - (a.x * b.z),
@@ -18,30 +18,29 @@ namespace vecutil {
 
 	// Multiplies and sums values with another vector
 	template <typename T>
-	[[nodiscard]] constexpr T dot(const vec4<T>& a, const vec4<T>& b)  noexcept {
+	[[nodiscard]] inline constexpr T dot(const vec4<T>& a, const vec4<T>& b)  noexcept {
 		return (a.x * b.x) + (a.y * b.y) + (a.z * b.z) + (a.w * b.w);
 	}
 
 	// The magnitude (length) of the vector
 	template <typename T>
-	[[nodiscard]] constexpr T magnitude(const vec4<T>& vector)  noexcept {
+	[[nodiscard]] inline constexpr T magnitude(const vec4<T>& vector)  noexcept {
 		return std::sqrt(vecutil::dot(vector,vector));
 	}
 
 	// The length (magnitude) of the vector
 	template <typename T>
-	[[nodiscard]] constexpr T length(const vec4<T>& vector)  noexcept {
+	[[nodiscard]] inline constexpr T length(const vec4<T>& vector)  noexcept {
 		return std::sqrt(vecutil::dot(vector, vector));
 	}
 
 	// Normalizes the vector to have a magnitude of 1 (unit vector)
 	template <typename T>
-	[[nodiscard]] constexpr vec4<T> normalized(const vec4<T>& vector)  noexcept {
+	[[nodiscard]] inline constexpr vec4<T> normalized(const vec4<T>& vector)  noexcept {
 		const T length = vecutil::magnitude(vector);
-		if(!MathHelper::is_near_zero(length)) {
-			return vector / length;
-		}
-		return vector;
+		return (!MathHelper::is_near_zero(length))
+			? vector / length
+			: vector;
 	}
 
 
@@ -50,7 +49,7 @@ namespace vecutil {
 
 	// 3D Cross product
 	template <typename T>
-	[[nodiscard]] constexpr vec3<T> cross(const vec3<T>& a, const vec3<T>& b) noexcept {
+	[[nodiscard]] inline constexpr vec3<T> cross(const vec3<T>& a, const vec3<T>& b) noexcept {
 		return vec3(
 			(a.y * b.z) - (a.z * b.y),
 			(a.z * b.x) - (a.x * b.z),
@@ -60,25 +59,25 @@ namespace vecutil {
 
 	// Multiplies and sums values with another vector
 	template <typename T>
-	[[nodiscard]] constexpr T dot(const vec3<T>& a, const vec3<T>& b) noexcept {
+	[[nodiscard]] inline constexpr T dot(const vec3<T>& a, const vec3<T>& b) noexcept {
 		return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
 	}
 
 	// The magnitude (length) of the vector
 	template <typename T>
-	[[nodiscard]] constexpr T magnitude(const vec3<T>& vector)noexcept {
+	[[nodiscard]] inline constexpr T magnitude(const vec3<T>& vector)noexcept {
 		return std::sqrt(vecutil::dot(vector, vector));
 	}
 
 	// The length (magnitude) of the vector
 	template <typename T>
-	[[nodiscard]] constexpr T length(const vec3<T>& vector)noexcept {
+	[[nodiscard]] inline constexpr T length(const vec3<T>& vector)noexcept {
 		return std::sqrt(vecutil::dot(vector, vector));
 	}
 
 	// Normalizes the vector to have a magnitude of 1 (unit vector)
 	template <typename T>
-	[[nodiscard]] constexpr vec3<T> normalize(const vec3<T>& vector) noexcept {
+	[[nodiscard]] inline constexpr vec3<T> normalize(const vec3<T>& vector) noexcept {
 		const T length = vecutil::magnitude(vector);
 		if(!MathHelper::is_near_zero(length)) {
 			return vector / length;

@@ -1,12 +1,11 @@
 #include "scarablib/scenes/scene2d.hpp"
 #include "scarablib/opengl/vao.hpp"
 #include "scarablib/opengl/vbo.hpp"
-#include "scarablib/proper/log.hpp"
 #include "scarablib/types/vertex.hpp"
 #include "scarablib/window/window.hpp"
 #include <cstdio>
 
-Scene2D::Scene2D(const Window& window) : Scene(window) {
+Scene2D::Scene2D(const Window& window) : Scene<Shape2D>(window) {
 	// Set projection
 	this->update_viewport(window.get_width(), window.get_height());
 
@@ -73,17 +72,6 @@ void Scene2D::draw_shape(Shape2D& shape, const DrawMode drawmode) {
 	this->vao->unbind();
 }
 
-
-void Scene2D::add_to_scene(Shape2D* shape) {
-	this->scene.emplace_back(shape);
-}
-
-void Scene2D::add_to_scene(const std::vector<Shape2D*>& shapes) {
-	for(Shape2D* shape : shapes) {
-		this->scene.emplace_back(shape);
-	}
-}
-
 void Scene2D::draw_all(const DrawMode drawmode) {
 	glPolygonMode(GL_FRONT_AND_BACK, drawmode);
 	glDisable(GL_DEPTH_TEST); // I couldn't find out why Font gets a background when this is enabled and why 2D shapes draws below 3D shapes when this is disabled (i know how DEPTH TEST works, but i dont know why this is happening here and not on the code pre-revamp)
@@ -96,23 +84,6 @@ void Scene2D::draw_all(const DrawMode drawmode) {
 	}
 
 	this->vao->unbind();
-}
-
-void Scene2D::remove_index(const uint32 index) {
-	const uint64 last_index = this->scene.size() - 1;
-
-	if(index > last_index) {
-		LOG_ERROR("The index you are trying to remove is higher than the size of the objects in scene (%d)", this->scene.size());
-		return;
-	}
-
-	// Move to last place
-	if(index < last_index) {
-		std::swap(this->scene[index], this->scene[last_index]);
-	}
-
-	// Remove last element
-	this->scene.pop_back();
 }
 
 

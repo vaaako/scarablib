@@ -23,10 +23,42 @@ See [examples/](examples/) to check some features (not all features have example
 - [`glm`](https://github.com/g-truc/glm) for mathematics
 <!-- - [`ENet`](https://github.com/zpl-c/enet) (fork) for networking -->
 
-<!-- # Roadmap -->
-<!-- - Load `obj` and `gltf` models -->
-<!-- - Light source -->
-<!-- - Network support -->
+# Roadmap
+- Load `obj` and `gltf` models
+- Light source
+- Network support
+
+<!--
+# Example
+
+![example.gif](medias/example.gif)
+
+```cpp
+// Draw 3D shapes
+scene3d.draw_all({
+	&cube1,
+	// center, angle, radius
+	&cube2.set_position(vecutil::orbitate_y(cube1.get_position(), rotation, 2.0f))
+});
+
+// Draw 2D shapes
+// Draw font
+scene2d.draw_shape(
+	msgothic.set_text("FPS: " + std::to_string(window.fps()))
+);
+
+// Aim
+scene2d.draw_shape(rectangle);
+
+// Update rotation
+rotation += rotation_speed;
+if(rotation >= 360.0f) {
+	rotation = 0.0f; // Keep the angle within 0-360 degrees
+}
+```
+
+
+-->
 
 # Building and run
 You can use both `CMake` and `Makefile` to build the library and run tests.
@@ -62,12 +94,12 @@ make dev              # Compile
 ```
 
 # Windows Support
-Currently the library does not provide a windows support, but you can try to compile it by yourself
+Currently the library does not provide a windows support, but you can try to compile it yourself
 
 ## Scripts
 - `compile_and_run.sh`: Uses `make` to compile and run
 - `debug.sh`: Debug using valgrind
--  `build_compile_commands.sh`: Uses [bear](https://github.com/rizsotto/Bear) to generate `compile_commands.json` file (Used for LSP)
+- `build_compile_commands.sh`: Uses [bear](https://github.com/rizsotto/Bear) to generate `compile_commands.json` file (Used for LSP)
 
 
 <!-- # Inspirations -->
