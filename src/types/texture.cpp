@@ -33,7 +33,7 @@ Texture::Texture(const char* path, const TextureFilter filter, const TextureWrap
 	int width, height, nr_channels;
 	uint8* data = stbi_load(path, &width, &height, &nr_channels, 0); // STBI_rgb_alpha to standarlize
 	if(data == NULL) {
-		LOG_ERROR("Failed to load texture \"%s\"", path);
+		LOG_ERROR("Failed to load texture %s", path);
 		return;
 	}
 
@@ -74,7 +74,7 @@ Texture::Texture(const char* path, const TextureFilter filter, const TextureWrap
 	}
 
 	// Generate
-	glTexImage2D(this->tex_type,  0, static_cast<GLint>(format), width, height, 0, format, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(this->tex_type, 0, static_cast<GLint>(format), width, height, 0, format, GL_UNSIGNED_BYTE, data);
 
 	// Generate mipmap
 	glGenerateMipmap(this->tex_type);
@@ -92,10 +92,8 @@ Texture::Texture(const void* data, const uint32 width, const uint32 height, cons
 	glBindTexture(this->tex_type, this->id);
 
 	// Filter
-	glTexParameteri(this->tex_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(this->tex_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	// glTexParameteri(this->tex_type, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	// glTexParameteri(this->tex_type, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(this->tex_type, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(this->tex_type, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	// Generate
 	glTexImage2D(this->tex_type, 0, internal_format, static_cast<GLint>(width), static_cast<GLint>(height), 0, format, GL_UNSIGNED_BYTE, data);

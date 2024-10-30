@@ -45,7 +45,7 @@ void VBO::make_from_vertex(const std::vector<Vertex>& data, const uint32 positio
 
 	glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(data.size() * sizeof(Vertex)), data.data(), GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, static_cast<GLint>(position_dimension), GL_FLOAT, GL_FALSE, size, (void*)0);
+	glVertexAttribPointer(0, static_cast<GLint>(position_dimension), GL_FLOAT, GL_FALSE, size, (void*)offsetof(Vertex, position));
 	glEnableVertexAttribArray(0);
 
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, size, (void*)offsetof(Vertex, texuv));
@@ -53,4 +53,21 @@ void VBO::make_from_vertex(const std::vector<Vertex>& data, const uint32 positio
 
 	this->unbind();
 }
+
+//
+// void VBO::make_from_vertex2d(const std::vector<Vertex2D>& data) {
+// 	constexpr GLsizei size = sizeof(Vertex2D);
+//
+// 	this->bind();
+//
+// 	glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(data.size() * sizeof(Vertex2D)), data.data(), GL_STATIC_DRAW);
+//
+// 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, size, (void*)offsetof(Vertex2D, position));
+// 	glEnableVertexAttribArray(0);
+//
+// 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, size, (void*)offsetof(Vertex2D, texuv));
+// 	glEnableVertexAttribArray(1);
+//
+// 	this->unbind();
+// }
 

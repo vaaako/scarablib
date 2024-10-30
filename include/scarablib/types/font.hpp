@@ -1,20 +1,23 @@
 #pragma once
 
-#include <SDL_ttf.h>
-#include "scarablib/shapes/2d/rectangle.hpp"
+#include "scarablib/shapes/shape2d.hpp"
 #include "scarablib/typedef.hpp"
 #include "scarablib/types/color.hpp"
 #include "scarablib/types/texture.hpp"
 #include <string>
+#include <SDL_ttf.h>
 
 // Font object used to draw text on the screen
-struct Font : public Rectangle {
+struct Font : public Shape2D {
 	// Build a font object passing a path to a .ttf file.
 	// Also pass font's text, size and color
 	Font(const char* path, const uint16 size = 24, const TextureFilter filter = TextureFilter::LINEAR);
 	~Font() {
 		TTF_CloseFont(this->sdl_font);
 	}
+
+	// Draw font using a shader object
+	void draw(const Shader& shader) override;
 
 	// Change the font's text
 	Font& set_text(const std::string& text);

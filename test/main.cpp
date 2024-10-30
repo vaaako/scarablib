@@ -14,7 +14,7 @@
 
 bool can_move = false;
 
-void camera_movement(Window& window, Camera& camera, Keyboard& keyboard) {
+void camera_movement(Window& window, Camera& camera, KeyboardHandler& keyboard) {
 	if(keyboard.isdown(Keycode::W)) {
 		camera.move_front();
 	} else if (keyboard.isdown(Keycode::S)) {
@@ -40,7 +40,7 @@ void camera_movement(Window& window, Camera& camera, Keyboard& keyboard) {
 	}
 }
 
-void rotate_camera(Window& window, Camera& camera, Mouse& mouse) {
+void rotate_camera(Window& window, Camera& camera, MouseHandler& mouse) {
 	// ROTATION //
 	// Only rotate when click on screen
 	if(mouse.isclick(MouseBTN::LMB) && !can_move) {
@@ -61,6 +61,7 @@ void rotate_camera(Window& window, Camera& camera, Mouse& mouse) {
 
 // TODO -- memory leak somewhere
 // - Window not unloading correctly?
+// - stbi maybe?
 int main() {
 	// TODO:
 	// - Keyboard and Mouse public instead of a getter
@@ -70,15 +71,16 @@ int main() {
 		.height = 600,
 		.title = const_cast<char*>("Something idk"),
 		.clear_color = Colors::ORANGE,
+		.vsync = true,
 		.debug_info = true
 	});
 
 	// Load assets
-	Texture tex1 = Texture("test/assets/images/hideri.jpg");
-	Texture tex2 = Texture("test/assets/images/kuromi.png");
+	Texture tex1 = Texture("test/assets/images/kuromi.png");
+	Texture tex2 = Texture("test/assets/images/purin.png");
 
 	// TODO:
-	// - Remove background (issue might come back, this is from GL_DEPTH_TEST)
+	// - Remove background (GL_DEPTH_TEST is causing this or something else)
 	Font msgothic = Font("test/assets/fonts/msgothic.ttf", 24);
 
 	Camera camera = Camera(window, 75.0f);
@@ -91,11 +93,13 @@ int main() {
 	Cube cube = Cube({
 		.position = 0.0f,
 	});
+	cube.set_texture(&tex1);
 
 	Cube cube2 = Cube({
 		.position = { 0.0f, 0.0f, -5.0f },
 		.size = 0.5f
 	});
+	cube2.set_texture(&tex2);
 
 	Circle circle = Circle({
 		.position = { 400.0f },
@@ -106,6 +110,7 @@ int main() {
 		.position = { 400.0f, 400.0f },
 		.size = { 50.0f, 50.0f },
 	});
+	// rectangle.set_texture(&tex1);
 
 
 	float rotation = 0.0f;
@@ -117,27 +122,23 @@ int main() {
 		window.process_events();
 
 		// Handle input
-		if((!can_move && window.keyboard()->ispressed(Keycode::ESCAPE)) || window.on_event(Event::QUIT)) {
+		if((!can_move && window.keyboard().ispressed(Keycode::ESCAPE)) || window.on_event(Event::QUIT)) {
 			window.close();
 		}
 
 		// Handle camera keyboard inputs
-		camera_movement(window, camera, *window.keyboard());
+		camera_movement(window, camera, window.keyboard());
 		// Handle camera mouse inputs
-		rotate_camera(window, camera, *window.mouse());
+		rotate_camera(window, camera, window.mouse());
 
-		// Draw texts
-		// Format FPS, ignore
-		std::stringstream stream; stream << std::setprecision(2) << window.fps();
-		scene2d.draw_shape(msgothic.set_text("FPS: " + stream.str()).set_position(0.0f));
-		scene2d.draw_shape(msgothic.set_text("TESTING").set_position({ 0.0f, 24.0f }));
+		// WARNING -- When drawing 3D and 2D shapes together, draw 3D shapes first
 
 		// Draw 3D shapes
 		scene3d.draw_mesh(cube);
 
 		// Set position to rotate around first cube
 		scene3d.draw_mesh(
-			cube2.set_position(vecutil::orbitate_y(cube.get_position(), rotation))
+			cube2.set_position(vecutil::orbitate_y(cube.get_position(), rotation, 2.0f))
 		);
 
 		// Rotate
@@ -145,6 +146,15 @@ int main() {
 		if(rotation >= 360.0f) {
 			rotation = 0.0f; // Wrap around to keep the angle within 0-360 degrees
 		}
+
+		// Draw 2D shapes
+		// Draw texts
+		// Format FPS, ignore
+		std::stringstream stream; stream << std::setprecision(2) << window.fps();
+		scene2d.draw_shape(msgothic.set_text("FPS: " + stream.str()).set_position(0.0f));
+		scene2d.draw_shape(msgothic.set_text("TESTING").set_position({ 0.0f, 24.0f }));
+
+		scene2d.draw_shape(rectangle);
 
 		window.swap_buffers();
 	}

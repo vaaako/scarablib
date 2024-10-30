@@ -4,6 +4,12 @@
 #include <glm/ext/vector_float3.hpp>
 #include <vector>
 
+
+struct Vertex2D {
+	glm::vec2 position;
+	glm::vec2 texuv;
+};
+
 // Used for setting coordinates for vertices position, texture and normals
 struct Vertex {
 	glm::vec3 position;

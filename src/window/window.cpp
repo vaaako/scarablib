@@ -52,7 +52,7 @@ Window::Window(const WindowConf& config)
 
 	// Configurations
 	SDL_SetWindowResizable(this->window, (SDL_bool)config.resizable);
-	if(SDL_GL_SetSwapInterval(true) < 0) {
+	if(SDL_GL_SetSwapInterval(config.vsync) < 0) {
 		LOG_ERROR("Failed to enable vsync: %s", SDL_GetError());
 	}
 
@@ -72,14 +72,16 @@ Window::Window(const WindowConf& config)
 	// Config opengl
 	glViewport(0, 0, (GLsizei)config.width, (GLsizei)config.height);
 
-	// Enable transparency
-	// glEnable(GL_CULL_FACE);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // Non-premultiplied alpha
 
-	// More config
-	// glEnable(GL_DEPTH_TEST); // 2D shapes draw order may be opposite because of this
-	// glDepthFunc(GL_ALWAYS);
+	// Enable transparency
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // Standard alpha blending
+	// glEnable(GL_CULL_FACE); // If enabled font disappear
+
+	// glEnable(GL_DEPTH_TEST); // 2D shapes draw order get opposite because of this
+	// glDepthFunc(GL_LEQUAL);
+
+
 
 	// Show debug info
 	if(debug_info) {
@@ -93,8 +95,8 @@ Window::Window(const WindowConf& config)
 
 Window::~Window() {
 	// Delete handlers
-	delete this->keyboard_handler;
-	delete this->mouse_handler;
+	// delete this->keyboard_handler;
+	// delete this->mouse_handler;
 
 	// Delete window
 	if(this->debug_info) {
@@ -146,7 +148,7 @@ void Window::process_events() {
 			// Keyboard events
 			case SDL_KEYDOWN:
 			case SDL_KEYUP:
-				this->keyboard_handler->handle_event(event);
+				this->keyboard_handler.handle_event(event);
 				break;
 
 			// Mouse eventsevent
@@ -154,7 +156,7 @@ void Window::process_events() {
 			case SDL_MOUSEBUTTONUP:
 			case SDL_MOUSEMOTION:
 			case SDL_MOUSEWHEEL:
-				this->mouse_handler->handle_event(event);
+				this->mouse_handler.handle_event(event);
 				break;
 
 			/*

@@ -76,7 +76,7 @@ Cube::Cube(const Shape3DConf& conf) : Shape3D(conf, &this->get_vao()) {
 	// Gen EBO
 	EBO ebo = EBO(indices); // segfault here idk
 
-	vbo.make_from_vertex(vertices, 3);
+	vbo.make_from_vertex(vertices);
 
 	// Unbind vao
 	vao.unbind();

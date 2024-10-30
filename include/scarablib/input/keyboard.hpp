@@ -20,7 +20,7 @@ enum class Keystate : uint8 {
 // Avoid foward declaration
 class Window;
 
-struct Keyboard {
+struct KeyboardHandler {
 	// To use handle_events in window
 	friend Window;
 

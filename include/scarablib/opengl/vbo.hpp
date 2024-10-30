@@ -54,7 +54,11 @@ class VBO {
 
 		// Automatically make the VBO from a vector of Vertex.
 		// Don't use this with `alloc_data` or `link_attrib`
-		void make_from_vertex(const std::vector<Vertex>& data, const uint32 position_dimension);
+		void make_from_vertex(const std::vector<Vertex>& data, const uint32 position_dimension = 3);
+
+		// Automatically make the VBO from a vector of 2D Vertex.
+		// Don't use this with `alloc_data` or `link_attrib`
+		// void make_from_vertex2d(const std::vector<Vertex2D>& data);
 
 		// Generates a VBO attribute using index, dimension and the data itself.
 		// This is used when each coordinate is splited in different arrays.

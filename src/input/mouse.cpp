@@ -2,7 +2,7 @@
 #include "scarablib/proper/log.hpp"
 #include "scarablib/window/window.hpp"
 
-void Mouse::handle_event(const SDL_Event& event) {
+void MouseHandler::handle_event(const SDL_Event& event) {
 	// CLICK //
 	if(event.type == SDL_MOUSEBUTTONDOWN) {
 		SDL_MouseButtonEvent button = event.button;
@@ -48,7 +48,7 @@ void Mouse::handle_event(const SDL_Event& event) {
 	}
 }
 
-void Mouse::set_cursor_position(const Window& window, const uint32 x, const uint32 y) {
+void MouseHandler::set_cursor_position(const Window& window, const uint32 x, const uint32 y) {
 	int int_x = static_cast<int>(x);
 	int int_y = static_cast<int>(y);
 	

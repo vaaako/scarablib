@@ -70,8 +70,8 @@ class Window {
 		// This should be called at the beginning of each frame to reset the drawing surface.
 		// It clears both the color and depth buffers.
 		inline void clear() const {
-			glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 		}
 
 
@@ -100,13 +100,13 @@ class Window {
 
 		// Return a pointer to the keyboard handler object.
 		// This allows access to input handling for the keyboard.
-		inline Keyboard* keyboard() const {
+		inline KeyboardHandler& keyboard() {
 			return this->keyboard_handler;
 		}
 
 		// Return a pointer to the mouse handler object.
 		// This allows access to input handling for the mouse.
-		inline Mouse* mouse() const {
+		inline MouseHandler& mouse() {
 			return this->mouse_handler;
 		}
 
@@ -243,7 +243,6 @@ class Window {
 		float FPS = 0.0f;
 
 		// KEYS
-		// NOTE -- Since window has a get for these objects, it need to be pointers, so i can pass as reference to other methods
-		Keyboard* keyboard_handler = new Keyboard();
-		Mouse* mouse_handler = new Mouse(); // To not have the same name as the "mouse" function
+		KeyboardHandler keyboard_handler = KeyboardHandler();
+		MouseHandler mouse_handler = MouseHandler(); // To not have the same name as the "mouse" function
 };

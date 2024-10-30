@@ -1,7 +1,7 @@
 #version 330 core
 
-out vec4 FragColor;
 in vec2 texCoord;
+out vec4 FragColor;
 
 uniform sampler2D texSampler;
 // uniform sampler2D mask; // Texture to go above

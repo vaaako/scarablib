@@ -3,10 +3,7 @@
 #include "scarablib/opengl/vao.hpp"
 #include "scarablib/scenes/scene.hpp"
 #include "scarablib/shapes/2d/circle.hpp"
-#include "scarablib/shapes/2d/rectangle.hpp"
-#include "scarablib/shapes/2d/triangle.hpp"
 #include "scarablib/shapes/shape2d.hpp"
-#include "scarablib/types/font.hpp"
 #include "scarablib/utils/file.hpp"
 #include "scarablib/window/window.hpp"
 
@@ -23,6 +20,10 @@
  * I can't put shaders on Shape2D because of the viewport I need to set on shader creation, unless i make it static, like circle shader
  * then the viewport would be updated on window, i could make this, maybe soon, i am too busy making 3D shapes work
  * */
+
+// I have to disable depth test when drawing 2D shapes
+// I couldn't find out why Font gets a background when this is enabled and why 2D shapes draws below 3D shapes when this is disabled
+// (i know how depth test works, but i dont know why this is happening here and not on the code pre-revamp)
 
 // Scene object used for managing 2D objects
 class Scene2D : public Scene {

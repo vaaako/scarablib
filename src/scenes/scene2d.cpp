@@ -65,6 +65,7 @@ void Scene2D::update_viewport(const uint32 width, const uint32 height) {
 
 void Scene2D::draw_shape(Shape2D& shape, const DrawMode drawmode) {
 	glPolygonMode(GL_FRONT_AND_BACK, drawmode);
+	glDisable(GL_DEPTH_TEST);
 
 	this->vao->bind();
 	this->shader->use();
@@ -85,6 +86,7 @@ void Scene2D::add_to_scene(const std::vector<Shape2D*>& shapes) {
 
 void Scene2D::draw_all(const DrawMode drawmode) {
 	glPolygonMode(GL_FRONT_AND_BACK, drawmode);
+	glDisable(GL_DEPTH_TEST); // I couldn't find out why Font gets a background when this is enabled and why 2D shapes draws below 3D shapes when this is disabled (i know how DEPTH TEST works, but i dont know why this is happening here and not on the code pre-revamp)
 
 	this->vao->bind();
 	this->shader->use();

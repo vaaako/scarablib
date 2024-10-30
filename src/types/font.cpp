@@ -1,14 +1,15 @@
 #include "scarablib/types/font.hpp"
-#include "SDL.h"
-#include "SDL_surface.h"
-#include "SDL_ttf.h"
 #include "scarablib/proper/log.hpp"
 #include "scarablib/utils/sdl.hpp"
 #include "scarablib/utils/string.hpp"
 
-// Rectangle init doesn't matter
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_surface.h>
+#include <SDL_ttf.h>
+
+// Shape2D init doesn't matter
 Font::Font(const char* path, const uint16 size, const TextureFilter filter)
-	: Rectangle({ { 0, 0 }, { 0.0f } }), path(path), filter((GLenum)filter), size(size) {
+	: Shape2D({ 0.0f, 0.0f }), path(path), filter((GLenum)filter), size(size) {
 
 	if(StringHelper::file_extension(path) != "ttf") {
 		TTF_Quit();
@@ -54,6 +55,19 @@ void Font::update_texture() {
 	// Free surfaces
 	SDL_FreeSurface(ttf_surface);
 	SDL_FreeSurface(surface);
+}
+
+
+void Font::draw(const Shader& shader) {
+	// Apply transformations if needed
+	this->update_model();
+
+	shader.set_matrix4f("model", this->model);
+	shader.set_vector4f("shapeColor", this->color.to_vec4<float>());
+
+	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+
+	this->texture->unbind();
 }
 
 Font& Font::set_text(const std::string& text) {

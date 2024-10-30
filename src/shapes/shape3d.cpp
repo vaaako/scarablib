@@ -26,11 +26,16 @@ void Shape3D::draw(const Camera& camera, const Shader& shader) {
 			(static_cast<float>(camera.get_width()) / static_cast<float>(camera.get_height())), camera.near_plane, camera.far_plane);
 
 	shader.use();
+
 	// Apply changes
 	shader.set_matrix4f("mvp", (proj * view) * model);
-	shader.set_vector4f("shapeColor", { 1.0f, 1.0f, 1.0f, 1.0f });
+	shader.set_vector4f("shapeColor", this->color.to_vec4<float>());
 
+	this->texture->bind();
 	this->vao->bind();
+
 	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(this->indices_length), GL_UNSIGNED_INT, (void*)0);
+
 	this->vao->unbind();
+	this->texture->unbind();
 }

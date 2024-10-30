@@ -7,5 +7,6 @@ Scene3D::~Scene3D() {
 }
 
 void Scene3D::draw_mesh(Shape3D& shape) {
+	glEnable(GL_DEPTH_TEST);
 	shape.draw(this->camera, *this->shader);
 }

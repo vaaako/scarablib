@@ -8,9 +8,6 @@ void Shape2D::update_model() {
 	// Use current texture
 	this->texture->bind();
 
-	// Get and bind shader
-	// this->shader->use();
-
 	// Just update if is dirty
 	if(!this->isdirty) {
 		return;
@@ -21,7 +18,7 @@ void Shape2D::update_model() {
 				* glm::translate(model, glm::vec3(0.5f * this->size.x, 0.5f * this->size.y, 0.0f))   // Origin from top-lef to center
 				* glm::rotate(model, glm::radians(this->angle), glm::vec3(0.0f, 0.0f, 1.0f))         // Rotate
 				* glm::translate(model, glm::vec3(-0.5f * this->size.x, -0.5f * this->size.y, 0.0f)) // Origin back to top-left
-				* glm::scale(this->model, glm::vec3(this->size.x, this->size.y, 1.0f));
+				* glm::scale(this->model, glm::vec3(this->size.x, this->size.y, 0.0f));
 	this->isdirty = false;
 }
 

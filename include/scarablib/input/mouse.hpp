@@ -23,7 +23,7 @@ enum class Scroll : uint8 {
 class Window;
 
 // TODO -- Vector for events so is possible to click and move in the same frame
-struct Mouse {
+struct MouseHandler {
 	// To use handle_events in window
 	friend Window;
 

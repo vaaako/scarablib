@@ -108,7 +108,7 @@ class Camera {
 		void zoom(const float speed, const Zoom zoom_dir);
 
 		// Use the mouse to rotate the camera view
-		void rotate(const Mouse& mouse);
+		void rotate(const MouseHandler& mouse);
 
 	private:
 		uint32 width;
