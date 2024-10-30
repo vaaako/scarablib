@@ -12,8 +12,9 @@
 #include <iomanip>
 #include <sstream>
 
+bool can_move = false;
 
-void camera_movement(Camera& camera, Keyboard& keyboard) {
+void camera_movement(Window& window, Camera& camera, Keyboard& keyboard) {
 	if(keyboard.isdown(Keycode::W)) {
 		camera.move_front();
 	} else if (keyboard.isdown(Keycode::S)) {
@@ -31,11 +32,15 @@ void camera_movement(Camera& camera, Keyboard& keyboard) {
 	} else if(keyboard.isdown(Keycode::LSHIFT)) {
 		camera.fly_down();
 	}
+
+	// Press TAB to not rotate anymore
+	if(can_move && keyboard.ispressed(Keycode::ESCAPE)) {
+		can_move = false;
+		window.hide_cursor(false);
+	}
 }
 
-
-bool can_move = false;
-void rotate_camera(Window& window, Keyboard& keyboard, Mouse& mouse, Camera& camera) {
+void rotate_camera(Window& window, Camera& camera, Mouse& mouse) {
 	// ROTATION //
 	// Only rotate when click on screen
 	if(mouse.isclick(MouseBTN::LMB) && !can_move) {
@@ -50,12 +55,6 @@ void rotate_camera(Window& window, Keyboard& keyboard, Mouse& mouse, Camera& cam
 	if(can_move) {
 		camera.rotate(mouse);
 		mouse.set_cursor_position(window, window.get_width() / 2, window.get_height() / 2); // Prevent cursor from exiting the screen
-	}
-
-	// Press TAB to not rotate anymore
-	if(can_move && keyboard.ispressed(Keycode::ESCAPE)) {
-		can_move = false;
-		window.hide_cursor(false);
 	}
 }
 
@@ -79,7 +78,7 @@ int main() {
 	Texture tex2 = Texture("test/assets/images/kuromi.png");
 
 	// TODO:
-	// - Remove background
+	// - Remove background (issue might come back, this is from GL_DEPTH_TEST)
 	Font msgothic = Font("test/assets/fonts/msgothic.ttf", 24);
 
 	Camera camera = Camera(window, 75.0f);
@@ -89,8 +88,14 @@ int main() {
 	Scene2D scene2d = Scene2D(window);
 	Scene3D scene3d = Scene3D(window, camera);
 
-	Cube cube = Cube();
-	Cube cube2 = Cube();
+	Cube cube = Cube({
+		.position = 0.0f,
+	});
+
+	Cube cube2 = Cube({
+		.position = { 0.0f, 0.0f, -5.0f },
+		.size = 0.5f
+	});
 
 	Circle circle = Circle({
 		.position = { 400.0f },
@@ -102,6 +107,9 @@ int main() {
 		.size = { 50.0f, 50.0f },
 	});
 
+
+	float rotation = 0.0f;
+	float rotation_speed = 1.0f;
 	while(window.is_open()) {
 		// Clear screen
 		window.clear();
@@ -113,29 +121,34 @@ int main() {
 			window.close();
 		}
 
-		camera_movement(camera, *window.keyboard());
-		rotate_camera(window, *window.keyboard(), *window.mouse(), camera);
+		// Handle camera keyboard inputs
+		camera_movement(window, camera, *window.keyboard());
+		// Handle camera mouse inputs
+		rotate_camera(window, camera, *window.mouse());
 
-
-		// Draw font
-		msgothic.set_position({ 0, 0 });
+		// Draw texts
+		// Format FPS, ignore
 		std::stringstream stream; stream << std::setprecision(2) << window.fps();
-		msgothic.set_text("FPS:" + stream.str());
-		scene2d.draw_font(msgothic);
+		scene2d.draw_shape(msgothic.set_text("FPS: " + stream.str()).set_position(0.0f));
+		scene2d.draw_shape(msgothic.set_text("TESTING").set_position({ 0.0f, 24.0f }));
 
-		msgothic.set_position({ 0, 24 });
-		msgothic.set_text("TESTING");
-		scene2d.draw_font(msgothic);
+		// Draw 3D shapes
+		scene3d.draw_mesh(cube);
 
-		scene3d.draw_cube(cube);
-		cube2.position = { 0.0f, 0.0f, -5.0f };
-		scene3d.draw_cube(cube2);
+		// Set position to rotate around first cube
+		scene3d.draw_mesh(
+			cube2.set_position(vecutil::orbitate_y(cube.get_position(), rotation))
+		);
 
-		// scene2d.draw_circle(circle);
-		// scene2d.draw_rectangle(rectangle);
+		// Rotate
+		rotation += rotation_speed;
+		if(rotation >= 360.0f) {
+			rotation = 0.0f; // Wrap around to keep the angle within 0-360 degrees
+		}
 
 		window.swap_buffers();
 	}
+
 
 	// Check for any OpenGL error
 	GLenum err = glGetError();

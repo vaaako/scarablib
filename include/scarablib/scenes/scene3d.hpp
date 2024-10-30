@@ -3,11 +3,13 @@
 #include "scarablib/opengl/shader.hpp"
 #include "scarablib/scenes/camera.hpp"
 #include "scarablib/scenes/scene.hpp"
-#include "scarablib/shapes/3d/cube.hpp"
+#include "scarablib/shapes/shape3d.hpp"
 #include "scarablib/utils/file.hpp"
 
+// Scene object used for managing 3D objects
 class Scene3D : public Scene {
 	public:
+		// Build 3D scene using the window object and a camera object
 		Scene3D(const Window& window, Camera& camera);
 		~Scene3D();
 
@@ -17,7 +19,8 @@ class Scene3D : public Scene {
 		Scene3D(Scene3D&&) = delete;
 		Scene3D& operator=(Scene3D&&) = delete;
 
-		void draw_cube(Cube& cube);
+		// Draw a 3D mesh using a reference of it.
+		void draw_mesh(Shape3D& shape);
 
 		inline void update_viewport(const Window& window) override {
 			this->camera.update_viewport(window);

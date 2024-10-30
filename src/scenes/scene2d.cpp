@@ -63,46 +63,6 @@ void Scene2D::update_viewport(const uint32 width, const uint32 height) {
 	glViewport(0, 0, (GLsizei)width, (GLsizei)height);
 }
 
-
-void Scene2D::draw_font(Font& font) {
-	this->begin_draw();
-
-	font.draw(*this->shader);
-
-	this->end_draw();
-}
-
-void Scene2D::draw_rectangle(Rectangle& rectangle, const DrawMode drawmode) {
-	glPolygonMode(GL_FRONT_AND_BACK, drawmode);
-	this->begin_draw();
-
-	rectangle.draw(*this->shader);
-
-	this->end_draw();
-}
-
-void Scene2D::draw_triangle(Triangle& triangle, const DrawMode drawmode) {
-	glPolygonMode(GL_FRONT_AND_BACK, drawmode);
-	this->begin_draw();
-
-	triangle.draw(*this->shader);
-
-	this->end_draw();
-}
-
-// Min - 0.001
-// Default - 0.0
-// Max - 1.0
-void Scene2D::draw_circle(Circle& circle, const DrawMode drawmode) {
-	glPolygonMode(GL_FRONT_AND_BACK, drawmode);
-	this->begin_draw();
-
-	circle.draw(*this->shader);
-
-	this->end_draw();
-}
-
-// Not proud of this
 void Scene2D::draw_shape(Shape2D& shape, const DrawMode drawmode) {
 	glPolygonMode(GL_FRONT_AND_BACK, drawmode);
 

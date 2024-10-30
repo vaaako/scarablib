@@ -7,6 +7,7 @@
 #include "scarablib/types/texture.hpp"
 
 
+// Struct used to initialize Shape2D
 struct Shape2DConf {
 	const vec2<float> position;
 	const vec2<float> size;
@@ -55,56 +56,64 @@ class Shape2D {
 		// SETTERS //
 
 		// Set a texture to be used
-		inline void set_texture(Texture* texture) {
+		inline Shape2D& set_texture(Texture* texture) {
 			if(texture == nullptr){
 				this->texture = &this->get_deftex();
-				return;
+				return *this;
 			}
 
 			this->texture = texture;
+			return *this;
 		}
 
 		// Removes the shape's texture
-		inline void remove_texture() {
+		inline Shape2D& remove_texture() {
 			this->texture = &this->get_deftex();
+			return *this;
 		}
 
 		// Set a new position using a vector
-		inline void set_position(const vec2<float>& position) {
+		inline Shape2D& set_position(const vec2<float>& position) {
 			this->position = position;
 			this->isdirty = true;
+			return *this;
 		}
 
 		// Set a new size using a vector (X and Y)
-		inline void set_size(const vec2<float>& size) {
+		inline Shape2D& set_size(const vec2<float>& size) {
 			this->size = size;
 			this->isdirty = true;
+			return *this;
 		}
 
 		// Scale the shape using a single value for all axis.
 		// e.g., `size = size.xy * scale`
-		inline void set_scale(const float& scale) {
+		inline Shape2D& set_scale(const float& scale) {
 			this->size * scale;
 			this->isdirty = true;
+			return *this;
 		}
 
 		// Scale the shape using a different value for each axis.
 		// e.g., `size.x = size.x * scale.x` and `size.y = size.y * scale.y`
-		inline void set_scale(const vec2<float>& scale) {
+		inline Shape2D& set_scale(const vec2<float>& scale) {
 			this->size * scale;
 			this->isdirty = true;
+			return *this;
 		}
 
 		// Set a new color
 		// If using a texture and a color at the same time, the texture will be colorized using the color defined
-		inline void set_color(const Color& color) {
+		inline Shape2D& set_color(const Color& color) {
 			this->color = color;
+			return *this;
 		}
 
 		// Set a new rotation angle
-		inline void set_angle(const float angle) {
+		inline Shape2D& set_angle(const float angle) {
 			this->angle = angle;
 			this->isdirty = true;
+			return *this;
 		}
 
 	protected:

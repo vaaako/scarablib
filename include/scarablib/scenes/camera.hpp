@@ -13,8 +13,7 @@ enum class Zoom : bool {
 };
 
 class Camera {
-	friend class Scene3D;
-	friend struct Mesh;
+	friend class Shape3D;
 
 	public:
 		Camera(const Window& window, const float fov = 45.0f, const float sensitivity = 100.0f);

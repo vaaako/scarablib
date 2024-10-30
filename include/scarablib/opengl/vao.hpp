@@ -28,6 +28,21 @@ class VAO {
 			glBindVertexArray(0);
 		}
 
+		inline GLuint get_id() const {
+			return id;
+		}
+
+		// This effectively disables the VAO
+		static inline void unbind(const GLuint id) {
+			glBindVertexArray(id);
+		}
+
+		// Activates the VAO in the OpenGL context using a existing ID.
+		// This enables the configuration stored in the VAO.
+		static inline void bind(const GLuint id) {
+			glBindVertexArray(id);
+		}
+
 	private:
 		GLuint id;
 };

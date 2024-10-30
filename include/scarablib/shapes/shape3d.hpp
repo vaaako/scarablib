@@ -1,16 +1,27 @@
 #pragma once
 
 #include "glm/fwd.hpp"
-#include "scarablib/opengl/shader.hpp"
 #include "scarablib/proper/vector/vec3.hpp"
+#include "scarablib/shapes/3d/mesh.hpp"
 #include "scarablib/types/color.hpp"
 #include "scarablib/types/texture.hpp"
 
-class Shape3D {
-	public:
-		Shape3D(const vec3<float>& position, const vec3<float>& size, const Color& color = Colors::WHITE, const float angle = 0.0f);
+// Struct used to initialize Shape3D
+struct Shape3DConf {
+	const vec3<float> position;
+	const vec3<float> size = 1.0f;
+	Color color = Colors::WHITE;
+	float angle = 0.0f;
+};
 
-		virtual void draw(const Shader& shader) = 0;
+class Shape3D : public Mesh {
+	public:
+		Shape3D(const Shape3DConf& conf, const VAO* vao, const uint32 indices_length = 0);
+		virtual ~Shape3D() = default;
+
+		// Draw current shape.
+		// It needs a camera object and a shader
+		void draw(const Camera& camera, const Shader& shader) override;
 
 		// Get current texture
 		inline Texture get_texture() const {
@@ -40,30 +51,34 @@ class Shape3D {
 		// SETTERS //
 
 		// Set a texture to be used
-		inline void set_texture(Texture* texture) {
+		inline Shape3D& set_texture(Texture* texture) {
 			if(texture == nullptr){
 				this->texture = &this->get_deftex();
-				return;
+				return *this;
 			}
 
 			this->texture = texture;
+			return *this;
 		}
 
 		// Removes the shape's texture
-		inline void remove_texture() {
+		inline Shape3D& remove_texture() {
 			this->texture = &this->get_deftex();
+			return *this;
 		}
 
 		// Set a new position using a vector
-		inline void set_position(const vec3<float>& position) {
+		inline Shape3D& set_position(const vec3<float>& position) {
 			this->position = position;
 			this->isdirty = true;
+			return *this;
 		}
 
-		// Set a new size using a vector (X, Y and Z)
-		inline void set_size(const vec3<float>& size) {
+		// Set a new size using a vector (X and Y)
+		inline Shape3D& set_size(const vec3<float>& size) {
 			this->size = size;
 			this->isdirty = true;
+			return *this;
 		}
 
 		// Scale the shape using a single value for all axis.
@@ -92,6 +107,7 @@ class Shape3D {
 			this->isdirty = true;
 		}
 
+
 	protected:
 		void update_model();
 
@@ -110,8 +126,7 @@ class Shape3D {
 		// Default texture (solid white)
 		inline Texture& get_deftex() const {
 			// I don't like data being statically allocated but whatever
-			static uint8 data[4] = { 255, 255, 255, 255 }; 
-			static Texture def_tex = Texture(data, 1, 1, GL_RGBA);
+			static Texture def_tex = Texture(); // Make solid white texture
 			return def_tex;
 		}
 };

@@ -56,18 +56,21 @@ void Font::update_texture() {
 	SDL_FreeSurface(surface);
 }
 
-void Font::set_text(const std::string& text) {
+Font& Font::set_text(const std::string& text) {
 	this->text = text;
 	this->update_texture();
+	return *this;
 }
 
-void Font::set_color(const Color color) {
+Font& Font::set_color(const Color color) {
 	this->color = color;
 	this->update_texture();
+	return *this;
 }
 
-void Font::set_font_size(const uint16 size) {
+Font& Font::set_font_size(const uint16 size) {
 	this->size = size;
 	this->update_texture();
+	return *this;
 }
 

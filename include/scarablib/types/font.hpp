@@ -17,14 +17,14 @@ struct Font : public Rectangle {
 	}
 
 	// Change the font's text
-	void set_text(const std::string& text);
+	Font& set_text(const std::string& text);
 
 	// Change font's color
-	void set_color(const Color color);
+	Font& set_color(const Color color);
 
 	// Change font's size.
 	// Don't use the method `set_size`, it will not work for fonts
-	void set_font_size(const uint16 size);
+	Font& set_font_size(const uint16 size);
 
 	private:
 		TTF_Font* sdl_font = TTF_OpenFont("", 0); // Init nothing so it can delete without check

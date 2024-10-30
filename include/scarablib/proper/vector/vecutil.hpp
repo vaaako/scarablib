@@ -88,19 +88,19 @@ namespace vecutil {
 
 
 	// Calculate horizontal orbit (around z-axis) around a center position
-	[[nodiscard]] inline vec3<float> orbitate_z(const vec3<float> center_position, const float velocity, const float radius = 10.0f) {
+	[[nodiscard]] inline vec3<float> orbitate_z(const vec3<float> center_position, const float velocity, const float radius = 5.0f) {
 		float angle = MathHelper::radians(velocity);
 		return center_position + vec3<float>(radius * std::cos(angle), 0.0f, radius * std::sin(angle));
 	}
 
 	// Calculate vertical orbit (around x-axis) around a center position
-	[[nodiscard]] inline vec3<float> orbitate_x(const vec3<float> center_position, const float velocity, const float radius = 10.0f) {
+	[[nodiscard]] inline vec3<float> orbitate_x(const vec3<float> center_position, const float velocity, const float radius = 5.0f) {
 		float angle = MathHelper::radians(velocity);
 		return center_position + vec3<float>(0.0f, radius * std::cos(angle), radius * std::sin(angle));
 	}
 
 	// Calculate orbit around the y-axis (xz-plane)
-	[[nodiscard]] inline vec3<float> orbitate_y(const vec3<float> center_position, const float velocity, const float radius = 10.0f) {
+	[[nodiscard]] inline vec3<float> orbitate_y(const vec3<float> center_position, const float velocity, const float radius = 5.0f) {
 		float angle = MathHelper::radians(velocity);
 		return center_position + vec3<float>(radius * std::cos(angle), radius * std::sin(angle), radius * std::sin(angle));
 	}
