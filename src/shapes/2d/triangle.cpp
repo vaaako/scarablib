@@ -10,7 +10,8 @@ void Triangle::draw(const Shader& shader) {
 
 	shader.set_matrix4f("model", this->model);
 	shader.set_vector4f("shapeColor", this->color.to_vec4<float>());
-	glDrawArrays(GL_TRIANGLES, 4, 3);
 
+	this->texture->bind();
+	glDrawArrays(GL_TRIANGLES, 4, 3);
 	this->texture->unbind();
 }

@@ -38,8 +38,12 @@ class Scene {
 		// Remove object from scene using it's index
 		void remove_index(const uint32 index);
 
+		inline void set_drawmode(const DrawMode drawmode) {
+			glPolygonMode(GL_FRONT_AND_BACK, drawmode);
+		}
+
 		// Draw all objects in scene
-		virtual void draw_all(const DrawMode drawmode = DrawMode::FILLMODE) = 0;
+		virtual void draw_all() = 0;
 
 		// Update viewport using window object
 		virtual inline void update_viewport(const Window& window) = 0;

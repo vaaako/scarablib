@@ -5,9 +5,7 @@ Shape2D::Shape2D(const Shape2DConf& conf)
 	  model(glm::mat4(1.0f)), isdirty(true) {}
 
 void Shape2D::update_model() {
-	// Use current texture
 	this->texture->bind();
-
 	// Just update if is dirty
 	if(!this->isdirty) {
 		return;

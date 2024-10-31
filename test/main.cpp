@@ -63,9 +63,19 @@ void rotate_camera(Window& window, Camera& camera, MouseHandler& mouse) {
 // TODO -- memory leak somewhere
 // - Window not unloading correctly?
 // - stbi maybe?
+//
+// RAM usage [Approximated values] (~140mb total in this example):
+// Tested using 16Gb RAM, Xeon E5 2620 v3 and RX450
+// - Window: ~126mb
+//    + OpenGL: ~10mb to ~15mb
+//    + SDL: ~12mb
+//    + "SDL_WINDOW_OPENGL" flag: ~100mb (really, just this flag)
+//
+// This flag also slows the time take to create a window speed
 int main() {
 	// TODO:
 	// - Mouse handle multiple inputs like keyboard
+	// NOTE -- ~113mb here
 	Window window = Window({
 		.width = 800,
 		.height = 600,
@@ -119,7 +129,7 @@ int main() {
 	float rotation_speed = 1.0f;
 	while(window.is_open()) {
 		// Clear screen
-		window.clear();
+		window.clear(); // NOTE -- ~14mb RAM
 		// Get events
 		window.process_events();
 
@@ -130,7 +140,6 @@ int main() {
 
 		// Handle camera keyboard inputs
 		camera_movement(window, camera, window.keyboard());
-		// Handle camera mouse inputs
 		rotate_camera(window, camera, window.mouse());
 
 		// WARNING -- When drawing 3D and 2D shapes together, draw 3D shapes first
@@ -138,12 +147,12 @@ int main() {
 
 		// More optimized
 		scene3d.draw_all({
-			&cube1.set_position(vecutil::orbitate_x(cow.get_position(), rotation, 5.0f)),
-			&cube2.set_position(vecutil::orbitate_y(cow.get_position(), rotation, 5.0f)),
-			&cube3.set_position(vecutil::orbitate_z(cow.get_position(), -rotation, 5.0f))
+			&cube1.set_position(vecutil::orbitate_x(cube1.get_position(), rotation, 5.0f)),
+			&cube2.set_position(vecutil::orbitate_y(cube1.get_position(), rotation, 5.0f)),
+			&cube3.set_position(vecutil::orbitate_z(cube1.get_position(), -rotation, 5.0f))
 		});
 
-		scene3d.draw_mesh(cow);
+		// scene3d.draw_mesh(cow);
 
 		// Draw 2D shapes
 		// Format FPS, ignore
@@ -161,7 +170,7 @@ int main() {
 			rotation = 0.0f; // Wrap around to keep the angle within 0-360 degrees
 		}
 
-		window.swap_buffers();
+		window.swap_buffers(); // NOTE -- ~14mb RAM
 	}
 
 

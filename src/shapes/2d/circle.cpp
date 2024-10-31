@@ -16,7 +16,7 @@ void Circle::draw(const Shader& shader) {
 	circle_shader.set_vector4f("shapeColor", this->color.to_vec4<float>());
 	circle_shader.set_float("blur", this->blur);
 
+	this->texture->bind();
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-
 	this->texture->unbind();
 }

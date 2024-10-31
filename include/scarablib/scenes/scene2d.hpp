@@ -40,10 +40,10 @@ class Scene2D : public Scene<Shape2D> {
 
 		// Draw a 2D mesh using a reference of it.
 		// e.g., `scene2d.draw_shape(rectangle)`
-		void draw_shape(Shape2D& shape, const DrawMode drawmode = DrawMode::FILLMODE);
+		void draw_shape(Shape2D& shape);
 
 		// Draw all objects in scene
-		void draw_all(const DrawMode drawmode = DrawMode::FILLMODE) override;
+		void draw_all() override;
 
 		// Get the number of objects in scene
 		inline uint64 length() {

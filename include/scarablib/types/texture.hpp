@@ -20,7 +20,8 @@ enum class TextureWrap : int {
 };
 
 
-// Texture object used for shapes (2D and 3D)
+// Texture object used for shapes (2D and 3D).
+// It will allocate ~1mb of RAM for each loaded texture
 struct Texture {
 	// This will make a empty solid white texture
 	Texture();
@@ -67,6 +68,10 @@ struct Texture {
 	// Unbind the texture to stop using it in rendering
 	inline void unbind() const {
 		glBindTexture(this->tex_type, 0);
+	}
+
+	inline GLuint get_id() const {
+		return this->id;
 	}
 
 	private:

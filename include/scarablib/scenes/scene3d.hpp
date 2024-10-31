@@ -6,6 +6,12 @@
 #include "scarablib/shapes/mesh.hpp"
 #include "scarablib/utils/file.hpp"
 
+/**
+ * A more optimized draw method would be "draw_start" and "draw_end" where in
+ * draw_start is enabled everything in advance (like depth test)
+ *
+ * */
+
 // Scene object used for managing 3D objects
 class Scene3D : public Scene<Mesh> {
 	public:
@@ -23,11 +29,11 @@ class Scene3D : public Scene<Mesh> {
 		void draw_mesh(Mesh& shape);
 
 		// Draw all objects in scene
-		void draw_all(const DrawMode drawmode = DrawMode::FILLMODE) override;
+		void draw_all() override;
 
 		// Draw all of the same mesh.
 		// Use this to draw the same mesh more optimized
-		void draw_all(const std::vector<Mesh*>& shapes, const DrawMode drawmode = DrawMode::FILLMODE);
+		void draw_all(const std::vector<Mesh*>& shapes);
 
 		inline void update_viewport(const Window& window) override {
 			this->camera.update_viewport(window);

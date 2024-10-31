@@ -33,7 +33,7 @@ class Mesh {
 
 		// Draw current mesh.
 		// It needs a camera object and a shader
-		virtual void draw(const Camera& camera, const Shader& shader);
+		virtual void draw(Camera& camera, const Shader& shader);
 
 		// Get current texture
 		inline Texture get_texture() const {
@@ -111,6 +111,7 @@ class Mesh {
 		// If using a texture and a color at the same time, the texture will be colorized using the color defined
 		inline void set_color(const Color& color) {
 			this->color = color;
+			this->update_color = true;
 		}
 
 		// Set a new rotation angle
@@ -128,13 +129,17 @@ class Mesh {
 		}
 
 	protected:
-		void update_model();
+		// void update_model(Camera& camera, const Shader& shader);
 
-		// Reference to some VAO
-		const VAO* vao;
-		// Not const because when loading external obj, is not possible to explicitly set
-		uint32 indices_length;
+		const VAO* vao; // Reference to some VAO
+		uint32 indices_length; // Not const because when loading external obj, is not possible to explicitly set
 
+		// This need to be intialized on constructor, so the inheritance goes well
+		glm::mat4 model = glm::mat4(1.0f);
+		glm::mat4 view = glm::mat4(1.0f);
+		glm::mat4 proj = glm::mat4(1.0f);
+		bool isdirty; // Change model if changed
+		bool update_color;
 
 		// Shape members //
 
@@ -145,10 +150,7 @@ class Mesh {
 
 		// Texture will always be a "reference" to another existing texture
 		Texture* texture = &this->get_deftex(); // Current texture being used
-
-		// This need to be intialized on constructor, so the inheritance goes well
-		glm::mat4 model;
-		bool isdirty; // Change model if changed
+		GLuint last_tex_id = this->texture->get_id();
 
 		// Inline //
 

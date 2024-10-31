@@ -7,20 +7,19 @@ Scene3D::~Scene3D() {
 }
 
 void Scene3D::draw_mesh(Mesh& shape) {
-	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_DEPTH_TEST); // I couldn't find out why Font gets a background when this is enabled and why 2D shapes draws below 3D shapes when this is disabled (i know how DEPTH TEST works, but i dont know why this is happening here and not on the code pre-revamp)
 
-	shape.get_vao().bind();
 	this->shader->use();
+	shape.get_vao().bind();
 
 	shape.draw(this->camera, *this->shader);
 
 	shape.get_vao().unbind();
+	this->shader->unbind();
 }
 
 
-void Scene3D::draw_all(const DrawMode drawmode) {
-	glPolygonMode(GL_FRONT_AND_BACK, drawmode);
+void Scene3D::draw_all() {
 	glEnable(GL_DEPTH_TEST);
 
 	this->shader->use();
@@ -28,10 +27,11 @@ void Scene3D::draw_all(const DrawMode drawmode) {
 	for(auto& shape : this->scene) {
 		shape->draw(this->camera, *this->shader); // If circle it will use the shader in the circle struct
 	}
+
+	this->shader->unbind();
 }
 
-void Scene3D::draw_all(const std::vector<Mesh*>& shapes, const DrawMode drawmode) {
-	glPolygonMode(GL_FRONT_AND_BACK, drawmode);
+void Scene3D::draw_all(const std::vector<Mesh*>& shapes) {
 	glEnable(GL_DEPTH_TEST);
 
 	// Get shape VAO
@@ -45,4 +45,5 @@ void Scene3D::draw_all(const std::vector<Mesh*>& shapes, const DrawMode drawmode
 	}
 
 	vao.unbind();
+	this->shader->unbind();
 }
