@@ -5,6 +5,8 @@ Currently Scarablib is in early stages of development. You can see the file [`to
 
 See [examples/](examples/) to check some features (not all features have examples yet)
 
+![showcase](medias/showcase.gif)
+
 # Features
 > [!NOTE]
 > Scarablib is in pre-alpha
@@ -37,7 +39,7 @@ This scene was made basically with the code below
 scene3d.draw_all({
 	&cube1,
 	//                  center, angle, radius
-	&cube2.set_position(vecutil::orbitate_y(cube1.get_position(), rotation, 2.0f))
+	&cube2.set_position(ScarabMath::orbitate_y(cube1.get_position(), rotation, 2.0f))
 });
 
 // Draw 2D shapes
