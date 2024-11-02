@@ -24,7 +24,7 @@ void Scene3D::draw_all() {
 
 	this->shader->use();
 
-	for(auto& shape : this->scene) {
+	for(Mesh* shape : this->scene) {
 		shape->draw(this->camera, *this->shader); // If circle it will use the shader in the circle struct
 	}
 

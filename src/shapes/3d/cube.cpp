@@ -1,6 +1,8 @@
 #include "scarablib/shapes/3d/cube.hpp"
 #include "scarablib/opengl/ebo.hpp"
 #include "scarablib/opengl/vbo.hpp"
+#include "scarablib/shapes/mesh.hpp"
+
 
 Cube::Cube(const MeshConf& conf) : Mesh(conf, &this->get_vao()) {
 	std::vector<Vertex> vertices = {
@@ -67,6 +69,8 @@ Cube::Cube(const MeshConf& conf) : Mesh(conf, &this->get_vao()) {
 		20, 21, 22,
 		20, 22, 23
 	};
+
+	this->conf.size = calc_size(vertices);
 
 	const VAO& vao = this->get_vao();
 	vao.bind();

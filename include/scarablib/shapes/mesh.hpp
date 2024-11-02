@@ -11,10 +11,13 @@
 
 // Struct used to initialize a Mesh
 struct MeshConf {
-	const vec3<float> position;
-	const vec3<float> size = 1.0f;
+	vec3<float> position;
+	vec3<float> size = 1.0f; // This will change
+	vec3<float> scale = 1.0f;
 	Color color = Colors::WHITE;
 	float angle = 0.0f;
+	// Axis where the rotation will be applied
+	vec3<bool> axis = { true, false, false };
 };
 
 // An object used for as a base for 3D Shapes
@@ -42,17 +45,17 @@ class Mesh {
 
 		// Get current position
 		inline vec3<float> get_position() const {
-			return this->position;
+			return this->conf.position;
 		}
 
 		// Get current size of each axis
 		inline vec3<float> get_size() const {
-			return this->size;
+			return this->conf.size;
 		}
 
 		// Get current color
 		inline Color get_color() const {
-			return this->color;
+			return this->conf.color;
 		}
 
 		// Get current angle
@@ -81,45 +84,50 @@ class Mesh {
 
 		// Set a new position using a vector
 		inline Mesh& set_position(const vec3<float>& position) {
-			this->position = position;
+			this->conf.position = position;
 			this->isdirty = true;
 			return *this;
 		}
 
 		// Set a new size using a vector (X and Y)
 		inline Mesh& set_size(const vec3<float>& size) {
-			this->size = size;
+			this->conf.size = size;
 			this->isdirty = true;
 			return *this;
 		}
 
 		// Scale the shape using a single value for all axis.
 		// e.g., `size = size.xyz * scale`
-		inline void set_scale(const float& scale) {
-			this->size * scale;
-			this->isdirty = true;
-		}
+		// inline void set_scale(const float& scale) {
+		// 	this->size * scale;
+		// 	this->isdirty = true;
+		// }
 
 		// Scale the shape using a different value for each axis.
 		// e.g., `size.x = size.x * scale.x`, `size.y = size.y * scale.y` and `size.z = size.z * scale.z`
 		inline void set_scale(const vec3<float>& scale) {
-			this->size * scale;
+			this->conf.scale = scale;
 			this->isdirty = true;
 		}
 
 		// Set a new color
-		// If using a texture and a color at the same time, the texture will be colorized using the color defined
+		// If using a texture and a color at the    std::cout << "Cube Size: " << size.x << " x " << size.y << " x " << size.z << std::endl; same time, the texture will be colorized using the color defined
 		inline void set_color(const Color& color) {
-			this->color = color;
-			this->update_color = true;
+			this->conf.color = color;
 		}
 
-		// Set a new rotation angle
-		inline void set_angle(const float angle) {
-			this->angle = angle;
+		// Set a new rotation angle.
+		// Axis is in wich axis the angle will be applied (XYZ)
+		inline void set_angle(const float angle, const vec3<bool> axis) {
+			this->conf.angle = angle;
+			// TODO -- Check to prevent axis to be all 0
+			this->conf.axis = axis;
 			this->isdirty = true;
 		}
 
+		inline Mesh make_instance() {
+			return Mesh(*this);
+		}
 
 		// Get current mesh VAO.
 		// If you are using this in a struct of a object, make it return a static VAO (like in cube.hpp).
@@ -136,17 +144,15 @@ class Mesh {
 
 		// This need to be intialized on constructor, so the inheritance goes well
 		glm::mat4 model = glm::mat4(1.0f);
-		glm::mat4 view = glm::mat4(1.0f);
-		glm::mat4 proj = glm::mat4(1.0f);
 		bool isdirty; // Change model if changed
-		bool update_color;
 
-		// Shape members //
-
-		vec3<float> position = 0.0f;
-		vec3<float> size = 1.0f;
-		Color color = Colors::WHITE;
-		float angle = 0.0f;
+		// Storing config in conf
+		MeshConf conf;
+		// Better access on drawing
+		vec3<float>& position = this->conf.position;
+		vec3<float>& scale = this->conf.scale;
+		Color& color = this->conf.color;
+		float& angle = this->conf.angle;
 
 		// Texture will always be a "reference" to another existing texture
 		Texture* texture = &this->get_deftex(); // Current texture being used
@@ -164,7 +170,9 @@ class Mesh {
 
 
 // Not happy with this here, but whatever
+// TODO -- Put this in some class or namespace
 
 // Load an external object and return it's vertices.
 // Takes a path and a vector of indices to be populate
-std::vector<Vertex> load_obj(const std::string& path, std::vector<uint32>& out_indices);
+std::vector<Vertex> load_obj(const std::string& path, std::vector<uint32>& out_indices, vec3<float>& size);
+vec3<float> calc_size(const std::vector<Vertex>& vertices);

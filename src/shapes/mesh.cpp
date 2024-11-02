@@ -9,12 +9,12 @@
 #include <unordered_map>
 
 Mesh::Mesh(const MeshConf& conf, const VAO* vao, const uint32 indices_length)
-	: vao(vao), indices_length(indices_length), isdirty(true), update_color(true),
-	position(conf.position), size(conf.size), color(conf.color), angle(conf.angle) {}
+	: vao(vao), indices_length(indices_length), isdirty(true),
+	conf(conf) {}
 
 Mesh::Mesh(const char* path) {
 	std::vector<uint32> indices;
-	std::vector<Vertex> vertices = load_obj(path, indices);
+	std::vector<Vertex> vertices = load_obj(path, indices, this->conf.size);
 
 	this->indices_length = static_cast<uint32>(indices.size());
 
@@ -34,21 +34,16 @@ Mesh::Mesh(const char* path) {
 }
 
 void Mesh::draw(Camera& camera, const Shader& shader) {
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
 	if(this->isdirty) {
 		this->model = glm::mat4(1.0f);
 
 		// Model matrix
 		this->model = glm::translate(this->model, glm::vec3(this->position.x, this->position.y, this->position.z));
-		this->model = glm::rotate(this->model, glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		this->model = glm::scale(this->model, glm::vec3(this->size.x, this->size.y, this->size.z)); // Resize
+		this->model = glm::rotate(this->model, glm::radians(this->angle), glm::vec3(this->conf.axis.x, this->conf.axis.y, this->conf.axis.z));
+		this->model = glm::scale(this->model, glm::vec3(this->scale.x, this->scale.y, this->scale.z)); // Resize
 
 		this->isdirty = false;
 	}
-
-
-	// NOTE -- I tried a "is dirty" for the camera but didn't work
 
 	// View matrix
 	glm::mat4 view = glm::lookAt(camera.position, (camera.position + camera.orientation), camera.up);
@@ -57,7 +52,7 @@ void Mesh::draw(Camera& camera, const Shader& shader) {
 	glm::mat4 proj = glm::perspective(glm::radians(camera.fov),
 			(static_cast<float>(camera.get_width()) / static_cast<float>(camera.get_height())), camera.near_plane, camera.far_plane);
 
-	// NOTE -- "is dirty" for color wouldn't work because would set the last color updated for all meshes
+	// NOTE -- "is dirty" for color wouldn't work because would set the last color updated for all meshes (using this later maybe)
 	shader.set_vector4f("shapeColor", this->color.to_vec4<float>());
 	shader.set_matrix4f("mvp", (proj * view) * this->model);
 
@@ -66,8 +61,22 @@ void Mesh::draw(Camera& camera, const Shader& shader) {
 	this->texture->unbind();
 }
 
+
+vec3<float> calc_size(const std::vector<Vertex>& vertices) {
+	glm::vec3 min = glm::vec3(FLT_MAX);
+	glm::vec3 max = glm::vec3(-FLT_MAX);
+
+	for (const Vertex& vertex : vertices) {
+		min = glm::min(min, vertex.position);
+		max = glm::max(max, vertex.position);
+	}
+
+	glm::vec3 result = max - min;
+	return vec3<float>(result.x, result.y, result.z);
+}
+
 // Not happy with this here, but whatever
-std::vector<Vertex> load_obj(const std::string& path, std::vector<uint32>& out_indices) {
+std::vector<Vertex> load_obj(const std::string& path, std::vector<uint32>& out_indices, vec3<float>& size) {
 	if(StringHelper::file_extension(path) != "obj") {
 		throw ScarabError("Only .obj files are supported");
 	}
@@ -76,6 +85,10 @@ std::vector<Vertex> load_obj(const std::string& path, std::vector<uint32>& out_i
 	if(!file.is_open()) {
 		throw ScarabError("File %s was not opened", path.c_str());
 	}
+
+	// Init to largest and smallest values
+	glm::vec3 min = glm::vec3(FLT_MAX);
+	glm::vec3 max = glm::vec3(-FLT_MAX);
 
 	// To build vertices
 	std::vector<glm::vec3> temp_vertices;
@@ -97,6 +110,10 @@ std::vector<Vertex> load_obj(const std::string& path, std::vector<uint32>& out_i
 			glm::vec3 vertex;
 			iss >> vertex.x >> vertex.y >> vertex.z;
 			temp_vertices.push_back(vertex);
+
+			// Update bounding box
+			min = glm::min(min, vertex);
+			max = glm::max(max, vertex);
 		}
 
 		// Case: vt u v
@@ -164,6 +181,10 @@ std::vector<Vertex> load_obj(const std::string& path, std::vector<uint32>& out_i
 	} // end while loop
 
 	file.close();
+
+	// Calc size
+	glm::vec3 result = max - min;
+	size = vec3<float>(result.x, result.y, result.z);
 
 	// Check if have texuvs
 	bool has_texuv = !temp_texuvs.empty();

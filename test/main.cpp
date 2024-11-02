@@ -72,6 +72,8 @@ void rotate_camera(Window& window, Camera& camera, MouseHandler& mouse) {
 //    + "SDL_WINDOW_OPENGL" flag: ~100mb (really, just this flag)
 //
 // This flag also slows the time take to create a window speed
+
+// TODO -- Forget proper vector, back all to glm versions
 int main() {
 	// TODO:
 	// - Mouse handle multiple inputs like keyboard
@@ -101,6 +103,8 @@ int main() {
 	Mesh cow = Mesh("test/assets/objs/cow.obj");
 	cow.set_position({ 0.0f, 0.0f, -5.0f });
 	cow.set_color(Colors::CHIROYELLOW);
+
+	cow.set_angle(90.0f, { false, false, true });
 
 	// Make shapes
 	// Cube position doesnt matter because will change later
@@ -145,14 +149,14 @@ int main() {
 		// WARNING -- When drawing 3D and 2D shapes together, draw 3D shapes first
 		// Until i figure out how to solve this
 
-		// More optimized
-		scene3d.draw_all({
-			&cube1.set_position(vecutil::orbitate_x(cube1.get_position(), rotation, 5.0f)),
-			&cube2.set_position(vecutil::orbitate_y(cube1.get_position(), rotation, 5.0f)),
-			&cube3.set_position(vecutil::orbitate_z(cube1.get_position(), -rotation, 5.0f))
-		});
+		scene3d.draw_mesh(cow);
 
-		// scene3d.draw_mesh(cow);
+		// More optimized drawing for the same shape
+		scene3d.draw_all({
+			&cube1.set_position(vecutil::orbitate_x(cow.get_position(), rotation, 5.0f)),
+			&cube2.set_position(vecutil::orbitate_y(cow.get_position(), rotation, 5.0f)),
+			&cube3.set_position(vecutil::orbitate_z(cow.get_position(), -rotation, 5.0f))
+		});
 
 		// Draw 2D shapes
 		// Format FPS, ignore
