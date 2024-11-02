@@ -9,7 +9,7 @@
 
 // Shape2D init doesn't matter
 Font::Font(const char* path, const uint16 size, const TextureFilter filter)
-	: Shape2D({ 0.0f, 0.0f }), path(path), filter((GLenum)filter), size(size) {
+	: Shape2D({ vec2<float>(0.0f), vec2<float>(size) }), path(path), filter((GLenum)filter), size(size) {
 
 	if(StringHelper::file_extension(path) != "ttf") {
 		TTF_Quit();
@@ -26,8 +26,7 @@ Font::Font(const char* path, const uint16 size, const TextureFilter filter)
 		return;
 	}
 
-	// Config
-	this->set_size(size);
+	// Init font
 	this->update_texture();
 }
 
@@ -63,7 +62,7 @@ void Font::draw(const Shader& shader) {
 	this->update_model();
 
 	shader.set_matrix4f("model", this->model);
-	shader.set_vector4f("shapeColor", this->color.to_vec4<float>());
+	shader.set_color("shapeColor", this->color);
 
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 

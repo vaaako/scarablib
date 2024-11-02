@@ -1,10 +1,7 @@
 #pragma once
 
-#include "glm/ext/vector_float3.hpp"
 #include "glm/geometric.hpp"
 #include "scarablib/input/mouse.hpp"
-#include "scarablib/proper/vector/vec3.hpp"
-#include "scarablib/proper/vector/vecutil.hpp"
 #include "scarablib/window/window.hpp"
 
 enum class Zoom : bool {
@@ -61,6 +58,11 @@ class Camera {
 
 		// Set camera's maximum amount of fov (used for zoom in)
 		void set_max_fov(const float max_fov);
+
+		// Set camera's movement speed
+		void set_speed(const float speed) {
+			this->speed = speed / 10;
+		}
 
 
 		// MOVEMENT
@@ -130,9 +132,9 @@ class Camera {
 		float yaw = -90.0f; // Horizontal rotation
 		float pitch = 0.0f; // Vertical rotation
 		
-		glm::vec3 position    = { 0.0f, 0.0f, 2.0f };
-		glm::vec3 orientation = { 0.0f, 0.0f, -1.0f };
+		vec3<float> position    = { 0.0f, 0.0f, 2.0f };
+		vec3<float> orientation = { 0.0f, 0.0f, -1.0f };
 
-		glm::vec3 up    = { 0.0f, 1.0f, 0.0f };
-		glm::vec3 front = { 0.0f, 0.0f, -1.0f };
+		vec3<float> up    = { 0.0f, 1.0f, 0.0f };
+		vec3<float> front = { 0.0f, 0.0f, -1.0f };
 };

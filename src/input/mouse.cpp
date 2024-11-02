@@ -15,7 +15,7 @@ void MouseHandler::handle_event(const SDL_Event& event) {
 		LOG_INFO("Clicked button: %d", button.button);
 
 		// Click location
-		this->click_pos.set_values(button.x, button.y);
+		this->click_pos = { button.x, button.y };
 
 
 		// this->mousestate[event.button.button] = static_cast<MouseState>(MouseState::PRESSED);
@@ -27,7 +27,7 @@ void MouseHandler::handle_event(const SDL_Event& event) {
 
 		// Clear
 		this->clicks = 0;
-		this->click_pos.clear();
+		this->click_pos = vec3<uint32>(0); // Reset
 
 		// this->mousestate[event.button.button] = static_cast<MouseState>(MouseState::RELEASED);
 	}
@@ -42,8 +42,8 @@ void MouseHandler::handle_event(const SDL_Event& event) {
 		std::printf("Mouse dir: %i : %i\n", event.motion.xrel, event.motion.yrel);
 #endif
 
-		this->motion.set_values(motion.x, motion.y);
-		this->moved_dir.set_values(event.motion.xrel, event.motion.yrel);
+		this->motion = { motion.x, motion.y };
+		this->moved_dir = { event.motion.xrel, event.motion.yrel };
 	}
 
 
@@ -64,5 +64,5 @@ void MouseHandler::set_cursor_position(const Window& window, const uint32 x, con
 
 	// Change position
 	SDL_WarpMouseInWindow(window.get_reference(), int_x, int_y);
-	this->click_pos.set_values(x, y);
+	this->click_pos = { x, y };
 }

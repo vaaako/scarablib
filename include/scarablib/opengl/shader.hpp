@@ -3,8 +3,8 @@
 #include <GL/glew.h>
 #include <glm/ext.hpp>
 #include <glm/mat4x4.hpp>
-#include "scarablib/proper/vector/vec2.hpp"
-#include "scarablib/proper/vector/vec4.hpp"
+#include "scarablib/typedef.hpp"
+#include "scarablib/types/color.hpp"
 
 // OpenGL shader struct
 struct Shader {
@@ -41,6 +41,11 @@ struct Shader {
 		inline void set_vector4f(const char* unif, const vec4<float>& vec) const {
 			GLint loc = glGetUniformLocation(this->id, unif);
 			glUniform4f(loc, vec.x, vec.y, vec.z, vec.w);
+		}
+
+		inline void set_color(const char* unif, const Color& color) const {
+			GLint loc = glGetUniformLocation(this->id, unif);
+			glUniform4f(loc, color.red, color.green, color.blue, color.alpha);
 		}
 
 		// Set value of a vec4f uniform

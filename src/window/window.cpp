@@ -3,8 +3,7 @@
 #include <SDL_mixer.h>
 #include <SDL_ttf.h>
 
-Window::Window(const WindowConf& config)
-	: title(config.title), width(config.width), height(config.height), clear_color(config.clear_color.normalize()), debug_info(config.debug_info) {
+Window::Window(const WindowConf& config) : conf(config) {
 
 	// Init SDL
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -84,7 +83,7 @@ Window::Window(const WindowConf& config)
 
 
 	// Show debug info
-	if(debug_info) {
+	if(config.debug_info) {
 		LOG_INFO("OpengGL Loaded!");
 		LOG_INFO("GL Version: %s", glGetString(GL_VERSION));
 		LOG_INFO("Vendor: %s", glGetString(GL_VENDOR));
@@ -99,7 +98,7 @@ Window::~Window() {
 	// delete this->mouse_handler;
 
 	// Delete window
-	if(this->debug_info) {
+	if(this->conf.debug_info) {
 		LOG_INFO("Window %d destroyed", SDL_GetWindowID(this->window));
 	}
 

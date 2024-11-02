@@ -22,7 +22,6 @@ struct WindowConf {
 	char* title; // char* in c++ goes grrr
 
 	// Optional
-	Color clear_color = Colors::WHITE;
 	bool vsync = true;
 	bool resizable = false;
 	bool debug_info = false;
@@ -85,17 +84,17 @@ class Window {
 
 		// Return the current title of the window as a string.
 		inline std::string get_title() const {
-			return this->title;
+			return this->conf.title;
 		}
 
 		// Return the width of the window in pixels.
 		inline uint32 get_width() const {
-			return this->width;
+			return this->conf.width;
 		}
 
 		// Return the height of the window in pixels.
 		inline uint32 get_height() const {
-			return this->height;
+			return this->conf.height;
 		}
 
 		// Return a pointer to the keyboard handler object.
@@ -115,7 +114,7 @@ class Window {
 
 		// Change the window's title to the provided value.
 		inline void set_title(char* title) {
-			this->title = title; // char*
+			this->conf.title = title; // char*
 			SDL_SetWindowTitle(this->window, title);
 		}
 
@@ -141,8 +140,8 @@ class Window {
 		// Set the window's size using the provided width and height values.
 		// This also adjusts the OpenGL viewport to match the new window size.
 		inline void set_size(const vec2<uint32>& size) {
-			this->width = size.x;
-			this->height = size.y;
+			this->conf.width = size.x;
+			this->conf.height = size.y;
 			SDL_SetWindowSize(this->window, (int)size.x, (int)size.y);
 			glViewport(0, 0, (GLsizei)size.x, (GLsizei)size.y);
 		}
@@ -164,8 +163,8 @@ class Window {
 
 		// Check if the provided X or Y coordinates are outside the window's bounds.
 		inline bool out_of_bounds(const int x, const int y) const {
-			return (x < 0 || x > (int)this->width) ||
-				   (y < 0 || y > (int)this->height);
+			return (x < 0 || x > (int)this->conf.width) ||
+				   (y < 0 || y > (int)this->conf.height);
 		}
 
 
@@ -222,11 +221,8 @@ class Window {
 
 	private:
 		// Window information
-		char* title;
-		uint32 width;
-		uint32 height;
-		vec4<float> clear_color;
-		bool debug_info = false;
+		WindowConf conf;
+		vec4<float> clear_color = vec4<float>(1.0f); // Better access
 		bool window_open = true;
 
 		// Buffer to store all events to be processed each frame

@@ -1,9 +1,7 @@
 #pragma once
 
 #include <SDL2/SDL_events.h>
-#include <vector>
 #include "scarablib/typedef.hpp"
-#include "scarablib/proper/vector/vec2.hpp"
 
 enum class MouseBTN : uint8 {
 	NONE  = 0,

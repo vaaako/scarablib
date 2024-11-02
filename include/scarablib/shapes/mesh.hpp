@@ -12,12 +12,12 @@
 // Struct used to initialize a Mesh
 struct MeshConf {
 	vec3<float> position;
-	vec3<float> size = 1.0f; // This will change
-	vec3<float> scale = 1.0f;
+	vec3<float> size = vec3<float>(1.0f); // This will change
+	vec3<float> scale = vec3<float>(1.0f);
 	Color color = Colors::WHITE;
 	float angle = 0.0f;
 	// Axis where the rotation will be applied
-	vec3<bool> axis = { true, false, false };
+	vec3<float> axis = { 1.0f, 0.0f, 0.0f };
 };
 
 // An object used for as a base for 3D Shapes
@@ -60,7 +60,7 @@ class Mesh {
 
 		// Get current angle
 		inline float get_angle() const {
-			return this->angle;
+			return this->conf.angle;
 		}
 
 		// SETTERS //
@@ -117,11 +117,15 @@ class Mesh {
 		}
 
 		// Set a new rotation angle.
-		// Axis is in wich axis the angle will be applied (XYZ)
+		// Axis is wich axis the angle will be applied (XYZ)
 		inline void set_angle(const float angle, const vec3<bool> axis) {
 			this->conf.angle = angle;
-			// TODO -- Check to prevent axis to be all 0
-			this->conf.axis = axis;
+			// At least one axis need to be true to work
+			if(axis == vec3<bool>(false)) {
+				this->conf.axis = (vec3<float>)axis;
+				return;
+			}
+			this->conf.axis = (vec3<float>)axis;
 			this->isdirty = true;
 		}
 
@@ -137,22 +141,14 @@ class Mesh {
 		}
 
 	protected:
-		// void update_model(Camera& camera, const Shader& shader);
-
 		const VAO* vao; // Reference to some VAO
 		uint32 indices_length; // Not const because when loading external obj, is not possible to explicitly set
 
-		// This need to be intialized on constructor, so the inheritance goes well
 		glm::mat4 model = glm::mat4(1.0f);
-		bool isdirty; // Change model if changed
+		bool isdirty; // Calculate matrix if anything changed (initializing on constructor so inheritance works)
 
-		// Storing config in conf
+		// Storing config
 		MeshConf conf;
-		// Better access on drawing
-		vec3<float>& position = this->conf.position;
-		vec3<float>& scale = this->conf.scale;
-		Color& color = this->conf.color;
-		float& angle = this->conf.angle;
 
 		// Texture will always be a "reference" to another existing texture
 		Texture* texture = &this->get_deftex(); // Current texture being used

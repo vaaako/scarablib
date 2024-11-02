@@ -4,9 +4,11 @@
 #include "scarablib/scenes/scene3d.hpp"
 #include "scarablib/shapes/2d/rectangle.hpp"
 #include "scarablib/shapes/3d/cube.hpp"
+#include "scarablib/typedef.hpp"
 #include "scarablib/types/color.hpp"
 #include "scarablib/proper/log.hpp"
 #include "scarablib/types/font.hpp"
+#include "scarablib/utils/math.hpp"
 #include "scarablib/window/window.hpp"
 #include "scarablib/input/keycode.hpp"
 #include <cstdio>
@@ -72,8 +74,6 @@ void rotate_camera(Window& window, Camera& camera, MouseHandler& mouse) {
 //    + "SDL_WINDOW_OPENGL" flag: ~100mb (really, just this flag)
 //
 // This flag also slows the time take to create a window speed
-
-// TODO -- Forget proper vector, back all to glm versions
 int main() {
 	// TODO:
 	// - Mouse handle multiple inputs like keyboard
@@ -82,10 +82,10 @@ int main() {
 		.width = 800,
 		.height = 600,
 		.title = const_cast<char*>("Something idk"),
-		.clear_color = Colors::PINK,
 		.vsync = true,
 		.debug_info = true
 	});
+	window.set_clear_color(Colors::PINK);
 
 	// Load assets
 	Texture tex1 = Texture("test/assets/images/kuromi.png");
@@ -96,6 +96,9 @@ int main() {
 
 	// Make scenes
 	Camera camera = Camera(window, 75.0f);
+	camera.set_speed(1.5f);
+
+
 	Scene2D scene2d = Scene2D(window);
 	Scene3D scene3d = Scene3D(window, camera);
 
@@ -109,23 +112,23 @@ int main() {
 	// Make shapes
 	// Cube position doesnt matter because will change later
 	Cube cube1 = Cube({
-		.position = 0.0f,
+		.position = vec3<float>(0.0f),
 	});
 	cube1.set_texture(&tex1);
 
 	Cube cube2 = Cube({
-		.position = 0.0f,
+		.position = vec3<float>(0.0f),
 	});
 	cube2.set_texture(&tex2);
 
 	Cube cube3 = Cube({
-		.position = 0.0f,
+		.position = vec3<float>(0.0f),
 	});
 	cube3.set_texture(&tex3);
 
 	Rectangle rectangle = Rectangle({
-		.position = { 400.0f, 300.0f },
-		.size = { 5.0f },
+		.position = vec2<float>(400.0f, 300.0f),
+		.size = vec3<float>(5.0f),
 	});
 
 
@@ -153,15 +156,15 @@ int main() {
 
 		// More optimized drawing for the same shape
 		scene3d.draw_all({
-			&cube1.set_position(vecutil::orbitate_x(cow.get_position(), rotation, 5.0f)),
-			&cube2.set_position(vecutil::orbitate_y(cow.get_position(), rotation, 5.0f)),
-			&cube3.set_position(vecutil::orbitate_z(cow.get_position(), -rotation, 5.0f))
+			&cube1.set_position(ScarabMath::orbitate_x(cow.get_position(), rotation, 5.0f)),
+			&cube2.set_position(ScarabMath::orbitate_y(cow.get_position(), rotation, 5.0f)),
+			&cube3.set_position(ScarabMath::orbitate_z(cow.get_position(), -rotation, 5.0f))
 		});
 
 		// Draw 2D shapes
 		// Format FPS, ignore
 		std::stringstream stream; stream << std::setprecision(2) << window.fps();
-		scene2d.draw_shape(msgothic.set_text("FPS: " + stream.str()).set_position(0.0f));
+		scene2d.draw_shape(msgothic.set_text("FPS: " + stream.str()).set_position(vec3<float>(0.0f)));
 		scene2d.draw_shape(msgothic.set_text("TESTING").set_position({ 0.0f, 24.0f }));
 
 		// Aim

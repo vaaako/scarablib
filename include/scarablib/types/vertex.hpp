@@ -1,13 +1,12 @@
 #pragma once
 
-#include <glm/ext/vector_float2.hpp>
-#include <glm/ext/vector_float3.hpp>
+#include "scarablib/typedef.hpp"
 #include <vector>
 
 // Used for setting coordinates for vertices position, texture and normals
 struct Vertex {
-	glm::vec3 position;
-	glm::vec2 texuv;
+	vec3<float> position;
+	vec2<float> texuv;
 
 	bool operator==(const Vertex& other) const {
 		return this->position == other.position && this->texuv == other.texuv;

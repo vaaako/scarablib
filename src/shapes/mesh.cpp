@@ -38,9 +38,9 @@ void Mesh::draw(Camera& camera, const Shader& shader) {
 		this->model = glm::mat4(1.0f);
 
 		// Model matrix
-		this->model = glm::translate(this->model, glm::vec3(this->position.x, this->position.y, this->position.z));
-		this->model = glm::rotate(this->model, glm::radians(this->angle), glm::vec3(this->conf.axis.x, this->conf.axis.y, this->conf.axis.z));
-		this->model = glm::scale(this->model, glm::vec3(this->scale.x, this->scale.y, this->scale.z)); // Resize
+		this->model = glm::translate(this->model, this->conf.position);
+		this->model = glm::rotate(this->model, glm::radians(this->conf.angle), this->conf.axis);
+		this->model = glm::scale(this->model, this->conf.scale);
 
 		this->isdirty = false;
 	}
@@ -53,7 +53,7 @@ void Mesh::draw(Camera& camera, const Shader& shader) {
 			(static_cast<float>(camera.get_width()) / static_cast<float>(camera.get_height())), camera.near_plane, camera.far_plane);
 
 	// NOTE -- "is dirty" for color wouldn't work because would set the last color updated for all meshes (using this later maybe)
-	shader.set_vector4f("shapeColor", this->color.to_vec4<float>());
+	shader.set_color("shapeColor", this->conf.color);
 	shader.set_matrix4f("mvp", (proj * view) * this->model);
 
 	this->texture->bind();
@@ -63,16 +63,16 @@ void Mesh::draw(Camera& camera, const Shader& shader) {
 
 
 vec3<float> calc_size(const std::vector<Vertex>& vertices) {
-	glm::vec3 min = glm::vec3(FLT_MAX);
-	glm::vec3 max = glm::vec3(-FLT_MAX);
+	// Init with largest and smallest values
+	vec3<float> min = vec3<float>(FLT_MAX);
+	vec3<float> max = vec3<float>(-FLT_MAX);
 
 	for (const Vertex& vertex : vertices) {
 		min = glm::min(min, vertex.position);
 		max = glm::max(max, vertex.position);
 	}
 
-	glm::vec3 result = max - min;
-	return vec3<float>(result.x, result.y, result.z);
+	return max - min;
 }
 
 // Not happy with this here, but whatever
@@ -86,9 +86,9 @@ std::vector<Vertex> load_obj(const std::string& path, std::vector<uint32>& out_i
 		throw ScarabError("File %s was not opened", path.c_str());
 	}
 
-	// Init to largest and smallest values
-	glm::vec3 min = glm::vec3(FLT_MAX);
-	glm::vec3 max = glm::vec3(-FLT_MAX);
+	// Init with largest and smallest values
+	vec3<float> min = vec3<float>(FLT_MAX);
+	vec3<float> max = vec3<float>(-FLT_MAX);
 
 	// To build vertices
 	std::vector<glm::vec3> temp_vertices;
@@ -183,8 +183,7 @@ std::vector<Vertex> load_obj(const std::string& path, std::vector<uint32>& out_i
 	file.close();
 
 	// Calc size
-	glm::vec3 result = max - min;
-	size = vec3<float>(result.x, result.y, result.z);
+	size = max - min;
 
 	// Check if have texuvs
 	bool has_texuv = !temp_texuvs.empty();

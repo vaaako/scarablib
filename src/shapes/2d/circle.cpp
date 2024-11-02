@@ -13,7 +13,7 @@ void Circle::draw(const Shader& shader) {
 	Shader& circle_shader = this->get_circle_shader();
 	circle_shader.use();
 	circle_shader.set_matrix4f("model", this->model);
-	circle_shader.set_vector4f("shapeColor", this->color.to_vec4<float>());
+	shader.set_color("shapeColor", this->conf.color);
 	circle_shader.set_float("blur", this->blur);
 
 	this->texture->bind();

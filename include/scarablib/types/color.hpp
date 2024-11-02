@@ -2,8 +2,6 @@
 
 #include <SDL2/SDL_pixels.h>
 #include "scarablib/typedef.hpp"
-#include "scarablib/proper/vector/vec3.hpp"
-#include "scarablib/proper/vector/vec4.hpp"
 
 enum class Colors : uint {
 	WHITE    = 0xffffff,
@@ -73,9 +71,8 @@ struct Color {
 	}
 
 	// Convert the color to a vec4 of any type T.
-	template <typename T>
-	inline vec4<T> to_vec4() const {
-		return vec4<T>(this->red, this->green, this->blue, this->alpha);
+	inline vec4<float> to_vec4() const {
+		return vec4<float>(this->red, this->green, this->blue, this->alpha);
 	}
 
 	// Convert color component values to a normalized range (0-1) for OpenGL
