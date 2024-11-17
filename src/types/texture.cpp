@@ -1,11 +1,8 @@
 #include "scarablib/types/texture.hpp"
 #include "scarablib/proper/log.hpp"
 #include "scarablib/typedef.hpp"
+#include "scarablib/types/image.hpp"
 #include <SDL2/SDL_render.h>
-
-#define STB_IMAGE_IMPLEMENTATION // Enable STB
-#include <stb/stb_image.h>
-
 
 Texture::Texture() {
 	// Generate and bind texture
@@ -28,19 +25,11 @@ Texture::Texture() {
 }
 
 Texture::Texture(const char* path, const TextureFilter filter, const TextureWrap wrap) {
-	stbi_set_flip_vertically_on_load(true);
-
-	int width, height, nr_channels;
-	uint8* data = stbi_load(path, &width, &height, &nr_channels, 0); // STBI_rgb_alpha to standarlize
-	if(data == NULL) {
-		LOG_ERROR("Failed to load texture %s", path);
-		return;
-	}
+	Image* image = new Image(path, true);
 
 #ifdef SCARAB_DEBUG_TEXTURE
 	LOG_INFO("Texture loaded succesfully! Width: %d, Height: %d", surface->w, surface->h);
 #endif
-
 
 	// Generate and bind texture
 	glGenTextures(1, &this->id); // num of textures, pointer
@@ -57,7 +46,7 @@ Texture::Texture(const char* path, const TextureFilter filter, const TextureWrap
 
 	// Get format
 	GLenum format;
-	switch (nr_channels) {
+	switch (image->nr_channels) {
 		case 1:
 			format = GL_RED;
 			break;
@@ -68,22 +57,20 @@ Texture::Texture(const char* path, const TextureFilter filter, const TextureWrap
 			format = GL_RGBA;
 			break;
 		default:
-			stbi_image_free(data);
-			LOG_ERROR("Failed to load texture (%s). Unsupported format: %d channels", path, nr_channels);
+			LOG_ERROR("Failed to load texture (%s). Unsupported format: %d channels", path, image->nr_channels);
 			return;
 	}
 
 	// Generate
-	glTexImage2D(this->tex_type, 0, static_cast<GLint>(format), width, height, 0, format, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(this->tex_type, 0, static_cast<GLint>(format), image->width, image->height, 0, format, GL_UNSIGNED_BYTE, image->data);
 
 	// Generate mipmap
 	glGenerateMipmap(this->tex_type);
 
-	// Free image
-	stbi_image_free(data);
-
 	// Unbind
 	glBindTexture(this->tex_type, 0);
+
+	delete image;
 }
  
 Texture::Texture(const void* data, const uint32 width, const uint32 height, const GLint internal_format, const GLenum format) {
