@@ -147,11 +147,6 @@ int main() {
 	});
 	cube3.set_texture(&tex3);
 
-	Rectangle rectangle = Rectangle({
-		.position = vec2<float>(400.0f, 300.0f),
-		.size = vec3<float>(5.0f),
-	});
-
 
 	Plane plane = Plane({
 		.position = vec3<float>(-5.0f, 1.0f, -10.0f),
@@ -201,13 +196,10 @@ int main() {
 		scene2d.draw_shape(msgothic.set_text("FPS: " + stream.str()).set_position(vec3<float>(0.0f)));
 
 
-	#ifdef SCARAB_DEBUG_DRAWCALL
-		msgothic.set_position({ 0.0f, 24.0f });
-		scene3d.print_drawcalls(scene2d, msgothic);
-	#endif
-
-		// Aim
-		scene2d.draw_shape(rectangle);
+	// #ifdef SCARAB_DEBUG_DRAWCALL
+	// 	msgothic.set_position({ 0.0f, 24.0f });
+	// 	scene3d.print_drawcalls(scene2d, msgothic);
+	// #endif
 
 
 		// Update rotation
