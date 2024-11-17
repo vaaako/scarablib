@@ -1,15 +1,13 @@
 CXX = clang++
-CXXFLAGS_DEV = -g \
-
-CXXFLAGS = -std=c++20 -O3 -ffast-math \
+CXXFLAGS = -std=c++20 -O3 \
 		   -MMD -MP \
 		   -I./include \
-		   -I./lib/SDL2/include -I./lib/SDL2/include/SDL2 \
-		   -I./lib/SDL2_mixer/include \
-		   -I./lib/SDL2_ttf/include \
-		   -I./lib/glm/include \
-		   -I./lib/GLEW/include \
-		   -I./lib/stb/include \
+		   -I./include/GLEW \
+		   -I./include/glm \
+		   -I./include/SDL2 -I./include/SDL2/SDL2 \
+		   -I./include/SDL2_mixer \
+		   -I./include/SDL2_ttf \
+		   -I./include/stb \
 		   -g \
 		   -fdiagnostics-color=always \
 		   -Wextra \
@@ -27,37 +25,34 @@ CXXFLAGS = -std=c++20 -O3 -ffast-math \
 		   -Wconversion \
 		   -Wunreachable-code
 
-# -I./lib/SDL2_image/include \
-
 LDFLAGS = -L./lib/GLEW \
 		  -L./lib/SDL2 \
 		  -L./lib/SDL2_mixer \
 		  -L./lib/SDL2_ttf \
-		  -lGL -lGLEW -lSDL2 -lSDL2main -lSDL2_mixer -lSDL2_ttf
-
-# -L./lib/SDL2_image \
+		  -L./build \
+		  -lGL -lGLEW -lSDL2 -lSDL2_mixer -lSDL2_ttf -lscarablib
 
 # Dirs
 BUILD_DIR = build
-OBJS_DIR = $(BUILD_DIR)/objs
+TESTOBJS_DIR = $(BUILD_DIR)/testobjs
 
 # Files
-SRC_FILES = $(wildcard src/*.cpp src/*/*/*.cpp src/**/*.cpp)
-OBJS = $(patsubst src/%.cpp, $(OBJS_DIR)/%.o, $(SRC_FILES))
+SRC_FILES = $(wildcard test/*.cpp)
+TESTOBJS = $(patsubst test/%.cpp, $(TESTOBJS_DIR)/%.o, $(SRC_FILES))
 TEST_FILE = test/main.cpp
 
 TARGET = scarablib
 
 all: dev
 
-dev: $(OBJS)
-	$(CXX) $(CXXFLAGS) $^ $(TEST_FILE) -o $(BUILD_DIR)/$(TARGET)_dev $(LDFLAGS)
+dev: $(TESTOBJS)
+	$(CXX) $(CXXFLAGS) $^ -o $(BUILD_DIR)/$(TARGET) $(LDFLAGS)
 
-$(OBJS_DIR)/%.o: src/%.cpp
+$(TESTOBJS_DIR)/%.o: test/%.cpp
 	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -rf $(BUILD_DIR)/$(TARGET) $(OBJS_DIR)
+	rm -rf $(BUILD_DIR)/$(TARGET) $(TESTOBJS_DIR)
 
 .PHONY: all clean dev

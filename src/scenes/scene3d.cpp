@@ -16,6 +16,10 @@ void Scene3D::draw_mesh(Mesh& shape) {
 
 	shape.get_vao().unbind();
 	this->shader->unbind();
+
+#ifdef SCARAB_DEBUG_DRAWCALL
+	this->drawcalls += 1;
+#endif
 }
 
 
@@ -26,6 +30,10 @@ void Scene3D::draw_all() {
 
 	for(Mesh* shape : this->scene) {
 		shape->draw(this->camera, *this->shader); // If circle it will use the shader in the circle struct
+
+	#ifdef SCARAB_DEBUG_DRAWCALL
+		this->drawcalls += 1;
+	#endif
 	}
 
 	this->shader->unbind();
@@ -42,6 +50,10 @@ void Scene3D::draw_all(const std::vector<Mesh*>& shapes) {
 
 	for(auto shape : shapes) {
 		shape->draw(this->camera, *this->shader); // If circle it will use the shader in the circle struct
+
+	#ifdef SCARAB_DEBUG_DRAWCALL
+		this->drawcalls += 1;
+	#endif
 	}
 
 	vao.unbind();

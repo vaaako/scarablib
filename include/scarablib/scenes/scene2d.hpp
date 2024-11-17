@@ -2,8 +2,8 @@
 
 #include "scarablib/opengl/vao.hpp"
 #include "scarablib/scenes/scene.hpp"
-#include "scarablib/shapes/2d/circle.hpp"
-#include "scarablib/shapes/shape2d.hpp"
+#include "scarablib/gfx/2d/circle.hpp"
+#include "scarablib/gfx/shape2d.hpp"
 #include "scarablib/utils/file.hpp"
 #include "scarablib/window/window.hpp"
 

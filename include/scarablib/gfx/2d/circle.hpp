@@ -1,6 +1,6 @@
 #pragma once
 
-#include "scarablib/shapes/shape2d.hpp"
+#include "scarablib/gfx/shape2d.hpp"
 #include "scarablib/utils/file.hpp"
 
 // Circle shape object, used to draw circle

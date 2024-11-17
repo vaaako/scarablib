@@ -1,4 +1,4 @@
-#include "scarablib/shapes/2d/triangle.hpp"
+#include "scarablib/gfx/2d/triangle.hpp"
 
 Triangle::Triangle(const Shape2DConf& conf)
 	: Shape2D(conf) {

@@ -9,28 +9,26 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include_directories(
 	include
-	lib/SDL2/include
-	lib/SDL2/include/SDL2 # SDL2 libraries include as "SDL2.h"
-	lib/SDL2_mixer/include
-	# lib/SDL2_image/include
-	lib/SDL2_ttf/include
 
-	lib/glm/include
-	lib/GLEW/include
+	include/GLEW
 
+	include/SDL2
+	include/SDL2/SDL2 # For SDL2 libraries
+	include/SDL2_mixer
+	include/SDL2_ttf
 
-	lib/stb/include
+	include/glm
+	include/stb
 )
 
 link_directories(
 	lib/GLEW
 	lib/SDL2
 	lib/SDL2_mixer
-	# lib/SDL2_image
 	lib/SDL2_ttf
 )
 
-add_definitions(-DSCARAB_DEBUG_VAO)
+add_definitions(-DSCARAB_DEBUG_VAO -DSCARAB_DEBUG_DRAWCALL)
 file(GLOB_RECURSE SOURCES src/*.cpp src/*/*.cpp src/**/*.cpp)
 add_executable(scarablib_dev ${SOURCES} test/main.cpp)
 target_link_libraries(scarablib_dev GL GLEW SDL2 SDL2main SDL2_mixer SDL2_ttf)

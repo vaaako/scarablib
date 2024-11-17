@@ -1,6 +1,6 @@
 #pragma once
 
-#include "scarablib/shapes/mesh.hpp"
+#include "scarablib/gfx/mesh.hpp"
 #include "scarablib/window/window.hpp"
 
 // Different modes of drawing shapes

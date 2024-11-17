@@ -6,4 +6,8 @@ if [ ! -f $TARGET ]; then
 	exit
 fi
 
-valgrind --leak-check=full --log-file="$FILE" $TARGET
+valgrind --leak-check=full \
+	--show-leak-kinds=all \
+	--track-origins=yes \
+	--verbose \
+	--log-file="$FILE" $TARGET

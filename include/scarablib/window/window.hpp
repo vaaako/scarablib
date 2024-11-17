@@ -69,8 +69,8 @@ class Window {
 		// This should be called at the beginning of each frame to reset the drawing surface.
 		// It clears both the color and depth buffers.
 		inline void clear() const {
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		}
 
 

@@ -3,8 +3,13 @@
 #include "scarablib/opengl/shader.hpp"
 #include "scarablib/scenes/camera.hpp"
 #include "scarablib/scenes/scene.hpp"
-#include "scarablib/shapes/mesh.hpp"
+#include "scarablib/gfx/mesh.hpp"
 #include "scarablib/utils/file.hpp"
+
+#ifdef SCARAB_DEBUG_DRAWCALL
+#include "scarablib/types/font.hpp"
+#include "scarablib/scenes/scene2d.hpp"
+#endif
 
 /**
  * A more optimized draw method would be "draw_start" and "draw_end" where in
@@ -32,7 +37,7 @@ class Scene3D : public Scene<Mesh> {
 		void draw_all() override;
 
 		// Draw all of the same mesh.
-		// Use this to draw the same mesh more optimized
+		// Use this to draw the multiple of the same mesh more optimized
 		void draw_all(const std::vector<Mesh*>& shapes);
 
 		inline void update_viewport(const Window& window) override {
@@ -42,6 +47,16 @@ class Scene3D : public Scene<Mesh> {
 		inline void update_viewport(const uint32 width, const uint32 height) override {
 			this->camera.update_viewport(width, height);
 		}
+
+	#ifdef SCARAB_DEBUG_DRAWCALL
+		int drawcalls = 0;
+
+		inline void print_drawcalls(Scene2D& scene2d, Font& font) {
+			font.set_text("3D Drawcalls: " + std::to_string(this->drawcalls));
+			scene2d.draw_shape(font);
+			this->drawcalls = 0;
+		}
+	#endif
 
 	private:
 		Camera& camera;

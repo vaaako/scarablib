@@ -1,6 +1,6 @@
 #pragma once
 
-#include "scarablib/shapes/shape2d.hpp"
+#include "scarablib/gfx/shape2d.hpp"
 #include "scarablib/typedef.hpp"
 #include "scarablib/types/color.hpp"
 #include "scarablib/types/texture.hpp"

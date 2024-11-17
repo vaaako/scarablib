@@ -15,6 +15,15 @@ struct MeshConf {
 	vec3<float> size = vec3<float>(1.0f); // This will change
 	vec3<float> scale = vec3<float>(1.0f);
 	Color color = Colors::WHITE;
+
+	// Orientation (default angle of the Mesh)
+	
+	// Orientation of the Mesh
+	float orient_angle = 0.0f;
+	// Axis where the orientation angle will be applied
+	vec3<float> orient_axis = { 1.0f, 0.0f, 0.0f };
+
+	// Rotation based on orientation
 	float angle = 0.0f;
 	// Axis where the rotation will be applied
 	vec3<float> axis = { 1.0f, 0.0f, 0.0f };
@@ -26,13 +35,6 @@ class Mesh {
 		// Make a mesh from existing VAO and initial config
 		Mesh(const MeshConf& conf, const VAO* vao, const uint32 indices_length = 0);
 		Mesh(const char* path);
-
-		// Mesh(const VAO* vao, const uint32 indices_length = 0);
-		//
-		// Init mesh using a vector of Vertex and Indices
-		// Mesh(const std::vector<Vertex>& data, const std::vector<uint32>& indices);
-		// Init mesh using a vector of Vertices, Texture Coordinates (optional) and Indices
-		// Mesh(const std::vector<float>& vertices, const std::vector<float>& tex_coords, const std::vector<uint32>& indices);
 
 		// Draw current mesh.
 		// It needs a camera object and a shader
@@ -53,6 +55,11 @@ class Mesh {
 			return this->conf.size;
 		}
 
+		// Get current scale of each axis
+		inline vec3<float> get_scale() const {
+			return this->conf.scale;
+		}
+
 		// Get current color
 		inline Color get_color() const {
 			return this->conf.color;
@@ -66,15 +73,7 @@ class Mesh {
 		// SETTERS //
 
 		// Set a texture to be used
-		inline Mesh& set_texture(Texture* texture) {
-			if(texture == nullptr){
-				this->texture = &this->get_deftex();
-				return *this;
-			}
-
-			this->texture = texture;
-			return *this;
-		}
+		Mesh& set_texture(Texture* texture);
 
 		// Removes the shape's texture
 		inline Mesh& remove_texture() {
@@ -105,38 +104,36 @@ class Mesh {
 
 		// Scale the shape using a different value for each axis.
 		// e.g., `size.x = size.x * scale.x`, `size.y = size.y * scale.y` and `size.z = size.z * scale.z`
-		inline void set_scale(const vec3<float>& scale) {
+		inline Mesh& set_scale(const vec3<float>& scale) {
 			this->conf.scale = scale;
 			this->isdirty = true;
+			return *this;
 		}
 
 		// Set a new color
 		// If using a texture and a color at the    std::cout << "Cube Size: " << size.x << " x " << size.y << " x " << size.z << std::endl; same time, the texture will be colorized using the color defined
-		inline void set_color(const Color& color) {
+		inline Mesh& set_color(const Color& color) {
 			this->conf.color = color;
+			return *this;
 		}
 
-		// Set a new rotation angle.
+		// Set a new rotation angle in degrees.
 		// Axis is wich axis the angle will be applied (XYZ)
-		inline void set_angle(const float angle, const vec3<bool> axis) {
-			this->conf.angle = angle;
-			// At least one axis need to be true to work
-			if(axis == vec3<bool>(false)) {
-				this->conf.axis = (vec3<float>)axis;
-				return;
-			}
-			this->conf.axis = (vec3<float>)axis;
-			this->isdirty = true;
-		}
+		Mesh& set_rotation(const float angle, const vec3<bool> axis);
 
-		inline Mesh make_instance() {
+		// Set a new orientation to the Mesh in degrees.
+		// Orientation is the "default" angle of the Mesh.
+		// The rotation will be applied using the orientation as base
+		Mesh& set_orientation(const float angle, const vec3<bool> axis);
+
+		inline Mesh make_instance() const {
 			return Mesh(*this);
 		}
 
 		// Get current mesh VAO.
 		// If you are using this in a struct of a object, make it return a static VAO (like in cube.hpp).
 		// If not, it will return by default the VAO setted inside the Mesh constructor (used when loading external obj)
-		virtual inline const VAO& get_vao() {
+		virtual inline const VAO& get_vao() const {
 			return *this->vao;
 		}
 
@@ -171,4 +168,5 @@ class Mesh {
 // Load an external object and return it's vertices.
 // Takes a path and a vector of indices to be populate
 std::vector<Vertex> load_obj(const std::string& path, std::vector<uint32>& out_indices, vec3<float>& size);
+// Calculates the size of a shape using it's vertices
 vec3<float> calc_size(const std::vector<Vertex>& vertices);

@@ -1,4 +1,4 @@
-#include "scarablib/shapes/shape2d.hpp"
+#include "scarablib/gfx/shape2d.hpp"
 
 Shape2D::Shape2D(const Shape2DConf& conf)
 	: conf(conf), model(glm::mat4(1.0f)), isdirty(true) {}

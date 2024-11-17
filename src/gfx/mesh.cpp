@@ -1,4 +1,4 @@
-#include "scarablib/shapes/mesh.hpp"
+#include "scarablib/gfx/mesh.hpp"
 #include "scarablib/opengl/ebo.hpp"
 #include "scarablib/opengl/vao.hpp"
 #include "scarablib/opengl/vbo.hpp"
@@ -25,12 +25,46 @@ Mesh::Mesh(const char* path) {
 	VBO vbo = VBO();
 	EBO ebo = EBO(indices); // segfault here idk
 
-	vbo.make_from_vertex(vertices);
+	vbo.make_from_vertex(vertices, 3);
 
 	// Unbind vao
 	this->vao->unbind();
 	vbo.unbind();
 	ebo.unbind();
+}
+
+Mesh& Mesh::set_texture(Texture* texture) {
+	if(texture == nullptr){
+		this->texture = &this->get_deftex();
+		return *this;
+	}
+
+	this->texture = texture;
+	return *this;
+}
+
+Mesh& Mesh::set_rotation(const float angle, const vec3<bool> axis) {
+	this->conf.angle = angle;
+	// At least one axis need to be true to work
+	if(axis == vec3<bool>(false)) {
+		this->conf.axis = (vec3<float>)axis;
+		return *this;
+	}
+	this->conf.axis = (vec3<float>)axis;
+	this->isdirty = true;
+	return *this;
+}
+
+Mesh& Mesh::set_orientation(const float angle, const vec3<bool> axis) {
+	this->conf.orient_angle = angle;
+	// At least one axis need to be true to work
+	if(axis == vec3<bool>(false)) {
+		this->conf.orient_axis = (vec3<float>)axis;
+		return *this;
+	}
+	this->conf.orient_axis = (vec3<float>)axis;
+	this->isdirty = true;
+	return *this;
 }
 
 void Mesh::draw(Camera& camera, const Shader& shader) {
@@ -39,6 +73,7 @@ void Mesh::draw(Camera& camera, const Shader& shader) {
 
 		// Model matrix
 		this->model = glm::translate(this->model, this->conf.position);
+		this->model = glm::rotate(this->model, glm::radians(this->conf.orient_angle), this->conf.orient_axis);
 		this->model = glm::rotate(this->model, glm::radians(this->conf.angle), this->conf.axis);
 		this->model = glm::scale(this->model, this->conf.scale);
 
@@ -46,11 +81,10 @@ void Mesh::draw(Camera& camera, const Shader& shader) {
 	}
 
 	// View matrix
-	glm::mat4 view = glm::lookAt(camera.position, (camera.position + camera.orientation), camera.up);
+	glm::mat4 view = camera.get_view_matrix();
 
 	// Add perspective
-	glm::mat4 proj = glm::perspective(glm::radians(camera.fov),
-			(static_cast<float>(camera.get_width()) / static_cast<float>(camera.get_height())), camera.near_plane, camera.far_plane);
+	glm::mat4 proj = camera.get_proj_matrix();
 
 	// NOTE -- "is dirty" for color wouldn't work because would set the last color updated for all meshes (using this later maybe)
 	shader.set_color("shapeColor", this->conf.color);
@@ -67,7 +101,7 @@ vec3<float> calc_size(const std::vector<Vertex>& vertices) {
 	vec3<float> min = vec3<float>(FLT_MAX);
 	vec3<float> max = vec3<float>(-FLT_MAX);
 
-	for (const Vertex& vertex : vertices) {
+	for(const Vertex& vertex : vertices) {
 		min = glm::min(min, vertex.position);
 		max = glm::max(max, vertex.position);
 	}

@@ -1,4 +1,4 @@
-#include "scarablib/shapes/2d/circle.hpp"
+#include "scarablib/gfx/2d/circle.hpp"
 
 Circle::Circle(const Shape2DConf& conf)
 	: Shape2D(conf) {}

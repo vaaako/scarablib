@@ -1,6 +1,9 @@
 #pragma once
 
+#include "glm/ext/matrix_clip_space.hpp"
+#include "glm/ext/matrix_transform.hpp"
 #include "glm/geometric.hpp"
+#include "glm/trigonometric.hpp"
 #include "scarablib/input/mouse.hpp"
 #include "scarablib/window/window.hpp"
 
@@ -10,8 +13,6 @@ enum class Zoom : bool {
 };
 
 class Camera {
-	friend class Mesh;
-
 	public:
 		Camera(const Window& window, const float fov = 45.0f, const float sensitivity = 100.0f);
 
@@ -29,8 +30,19 @@ class Camera {
 
 		// Get camera position
 		inline vec3<float> get_position() const {
-			// return this->position;
-			return { this->position.x, this->position.y, this->position.z };
+			return this->position;
+		}
+
+		// Get camera view matrix
+		inline glm::mat4 get_view_matrix() const {
+			return glm::lookAt(this->position, this->position + this->orientation, this->up);
+		}
+
+		// Get camera view matrix
+		inline glm::mat4 get_proj_matrix() const {
+			return glm::perspective(glm::radians(this->fov),
+				(static_cast<float>(this->get_width()) / static_cast<float>(this->get_height())),
+				this->near_plane, this->far_plane);
 		}
 
 
@@ -134,7 +146,6 @@ class Camera {
 		
 		vec3<float> position    = { 0.0f, 0.0f, 2.0f };
 		vec3<float> orientation = { 0.0f, 0.0f, -1.0f };
-
-		vec3<float> up    = { 0.0f, 1.0f, 0.0f };
-		vec3<float> front = { 0.0f, 0.0f, -1.0f };
+		vec3<float> up          = { 0.0f, 1.0f, 0.0f };
+		// vec3<float> front = { 0.0f, 0.0f, -1.0f };
 };

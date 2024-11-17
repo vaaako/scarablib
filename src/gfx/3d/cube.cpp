@@ -1,7 +1,7 @@
-#include "scarablib/shapes/3d/cube.hpp"
+#include "scarablib/gfx/3d/cube.hpp"
 #include "scarablib/opengl/ebo.hpp"
 #include "scarablib/opengl/vbo.hpp"
-#include "scarablib/shapes/mesh.hpp"
+#include "scarablib/gfx/mesh.hpp"
 
 
 Cube::Cube(const MeshConf& conf) : Mesh(conf, &this->get_vao()) {
@@ -77,9 +77,9 @@ Cube::Cube(const MeshConf& conf) : Mesh(conf, &this->get_vao()) {
 
 	// Gen VBO and EBO
 	VBO vbo = VBO();
-	EBO ebo = EBO(indices); // segfault here idk
+	EBO ebo = EBO(indices);
 
-	vbo.make_from_vertex(vertices);
+	vbo.make_from_vertex(vertices, 3);
 
 	// Unbind vao
 	vao.unbind();

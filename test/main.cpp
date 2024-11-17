@@ -1,19 +1,18 @@
-#include "scarablib/opengl/ebo.hpp"
+#include "glm/trigonometric.hpp"
 #include "scarablib/scenes/camera.hpp"
 #include "scarablib/scenes/scene2d.hpp"
 #include "scarablib/scenes/scene3d.hpp"
-#include "scarablib/shapes/2d/rectangle.hpp"
-#include "scarablib/shapes/3d/cube.hpp"
-#include "scarablib/typedef.hpp"
+#include "scarablib/gfx/2d/rectangle.hpp"
+#include "scarablib/gfx/3d/cube.hpp"
+#include "scarablib/gfx/3d/plane.hpp"
 #include "scarablib/types/color.hpp"
 #include "scarablib/proper/log.hpp"
 #include "scarablib/types/font.hpp"
+#include "scarablib/types/skybox.hpp"
 #include "scarablib/utils/math.hpp"
 #include "scarablib/window/window.hpp"
 #include "scarablib/input/keycode.hpp"
 #include <cstdio>
-#include <iomanip>
-#include <sstream>
 
 bool can_move = false;
 
@@ -61,6 +60,18 @@ void rotate_camera(Window& window, Camera& camera, MouseHandler& mouse) {
 	}
 }
 
+// Axis: Where the rotation will be applied
+void make_plane_face_camera(Mesh& plane, const vec3<float>& camera_position, const vec3<float> axis = { 0.0f, 1.0f, 0.0f }) {
+	// Plane distance from camera
+	glm::vec3 direction = camera_position - plane.get_position();
+	direction = glm::normalize(direction);
+
+	// Ignore Y
+	float angle = glm::degrees(atan2(direction.x, direction.z));
+
+	// plane.set_rotation(angle, { 0.0f, 1.0f, 0.0f });
+	plane.set_orientation(angle, axis);
+}
 
 // TODO -- memory leak somewhere
 // - Window not unloading correctly?
@@ -91,6 +102,7 @@ int main() {
 	Texture tex1 = Texture("test/assets/images/kuromi.png");
 	Texture tex2 = Texture("test/assets/images/purin.png");
 	Texture tex3 = Texture("test/assets/images/brick.png");
+	Texture snail = Texture("test/assets/images/snail.png");
 
 	Font msgothic = Font("test/assets/fonts/msgothic.ttf", 24);
 
@@ -102,12 +114,21 @@ int main() {
 	Scene2D scene2d = Scene2D(window);
 	Scene3D scene3d = Scene3D(window, camera);
 
+	Skybox skybox = Skybox(camera, {
+		"test/assets/images/skybox/right.jpg",
+		"test/assets/images/skybox/left.jpg",
+		"test/assets/images/skybox/top.jpg",
+		"test/assets/images/skybox/bottom.jpg",
+		"test/assets/images/skybox/front.jpg",
+		"test/assets/images/skybox/back.jpg"
+	});
+
 	// Load mesh
 	Mesh cow = Mesh("test/assets/objs/cow.obj");
 	cow.set_position({ 0.0f, 0.0f, -5.0f });
 	cow.set_color(Colors::CHIROYELLOW);
 
-	cow.set_angle(90.0f, { false, false, true });
+	cow.set_orientation(90.0f, { false, false, true });
 
 	// Make shapes
 	// Cube position doesnt matter because will change later
@@ -132,11 +153,20 @@ int main() {
 	});
 
 
+	Plane plane = Plane({
+		.position = vec3<float>(-5.0f, 1.0f, -10.0f),
+		// Z doens't matter
+		.scale = vec3<float>(2.0f, 2.0f, 0.0f),
+	});
+	plane.set_texture(&snail);
+
+
+
 	float rotation = 0.0f;
 	float rotation_speed = 1.0f;
 	while(window.is_open()) {
 		// Clear screen
-		window.clear(); // NOTE -- ~14mb RAM
+		window.clear(); // NOTE -- ~14mb RAM itself
 		// Get events
 		window.process_events();
 
@@ -152,20 +182,29 @@ int main() {
 		// WARNING -- When drawing 3D and 2D shapes together, draw 3D shapes first
 		// Until i figure out how to solve this
 
-		scene3d.draw_mesh(cow);
+		skybox.draw();
+		scene3d.draw_mesh(cow.set_rotation(rotation, vec3<bool>(true, false, false)));
 
 		// More optimized drawing for the same shape
 		scene3d.draw_all({
-			&cube1.set_position(ScarabMath::orbitate_x(cow.get_position(), rotation, 5.0f)),
+			&cube1.set_position(ScarabMath::orbitate_x(cow.get_position(), -rotation, 5.0f)),
 			&cube2.set_position(ScarabMath::orbitate_y(cow.get_position(), rotation, 5.0f)),
 			&cube3.set_position(ScarabMath::orbitate_z(cow.get_position(), -rotation, 5.0f))
 		});
+
+		make_plane_face_camera(plane, camera.get_position());
+		scene3d.draw_mesh(plane);
 
 		// Draw 2D shapes
 		// Format FPS, ignore
 		std::stringstream stream; stream << std::setprecision(2) << window.fps();
 		scene2d.draw_shape(msgothic.set_text("FPS: " + stream.str()).set_position(vec3<float>(0.0f)));
-		scene2d.draw_shape(msgothic.set_text("TESTING").set_position({ 0.0f, 24.0f }));
+
+
+	#ifdef SCARAB_DEBUG_DRAWCALL
+		msgothic.set_position({ 0.0f, 24.0f });
+		scene3d.print_drawcalls(scene2d, msgothic);
+	#endif
 
 		// Aim
 		scene2d.draw_shape(rectangle);

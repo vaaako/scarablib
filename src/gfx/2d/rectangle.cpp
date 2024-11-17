@@ -1,4 +1,4 @@
-#include "scarablib/shapes/2d/rectangle.hpp"
+#include "scarablib/gfx/2d/rectangle.hpp"
 #include <cstdio>
 
 Rectangle::Rectangle(const Shape2DConf& conf)
