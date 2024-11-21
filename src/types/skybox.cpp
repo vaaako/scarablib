@@ -1,8 +1,13 @@
 #include "scarablib/types/skybox.hpp"
 #include "scarablib/opengl/vbo.hpp"
+#include "scarablib/proper/error.hpp"
 #include "scarablib/types/image.hpp"
 
 Skybox::Skybox(const Camera& camera, const std::vector<const char*>& faces) : camera(camera) {
+	if(faces.size() < 6) {
+		throw ScarabError("Skybox needs 6 faces in the following order: right, left, top, bottom, front and back");
+	}
+
 	std::vector<float> vertices = {
 		-1.0f,  1.0f, -1.0f,
 		-1.0f, -1.0f, -1.0f,

@@ -167,8 +167,11 @@ std::vector<Vertex> load_obj(const std::string& path, std::vector<uint32>& out_i
 
 			// Get all tokens in face (split by space)
 			while(iss >> token) {
+				// printf("token: %s\n", (token).c_str());
 				face_tokens.push_back(token);
 			}
+
+			// token example: 1/1/1 or 1 1 1 or 1/1 etc
 
 			if(face_tokens.size() != 3) {
 				throw ScarabError("Only triangular faces are supported. Try changing model export configuration");

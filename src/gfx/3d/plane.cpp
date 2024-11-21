@@ -47,3 +47,16 @@ Plane::Plane(const MeshConf& conf) : Mesh(conf, &this->get_vao()) {
 
 	this->indices_length = static_cast<uint32>(indices.size());
 }
+
+
+void Plane::face_position(const vec3<float>& position, const vec3<float> axis) {
+	// Plane distance from camera
+	glm::vec3 direction = position - this->get_position();
+	direction = glm::normalize(direction);
+
+	// Ignore Y
+	float angle = glm::degrees(atan2(direction.x, direction.z));
+
+	// plane.set_rotation(angle, { 0.0f, 1.0f, 0.0f });
+	this->set_orientation(angle, axis);
+}

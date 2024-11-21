@@ -60,18 +60,26 @@ void rotate_camera(Window& window, Camera& camera, MouseHandler& mouse) {
 	}
 }
 
-// Axis: Where the rotation will be applied
-void make_plane_face_camera(Mesh& plane, const vec3<float>& camera_position, const vec3<float> axis = { 0.0f, 1.0f, 0.0f }) {
-	// Plane distance from camera
-	glm::vec3 direction = camera_position - plane.get_position();
-	direction = glm::normalize(direction);
 
-	// Ignore Y
-	float angle = glm::degrees(atan2(direction.x, direction.z));
 
-	// plane.set_rotation(angle, { 0.0f, 1.0f, 0.0f });
-	plane.set_orientation(angle, axis);
+bool is_aabb(Mesh& mesh1, Mesh& mesh2) {
+	const vec3<float>& meshmin = mesh1.get_min();
+	const vec3<float>& meshmax = mesh1.get_max();
+
+	const vec3<float>& mesh2min = mesh2.get_min();
+	const vec3<float>& mesh2max = mesh2.get_max();
+
+	return meshmin.x <= mesh2max.x &&
+		meshmax.x >= mesh2min.x &&
+
+		meshmin.y <= mesh2max.y &&
+		meshmax.y >= mesh2min.y &&
+
+		meshmin.z <= mesh2max.z &&
+		meshmax.z >= mesh2min.z;
 }
+
+
 
 // TODO -- memory leak somewhere
 // - Window not unloading correctly?
@@ -85,6 +93,9 @@ void make_plane_face_camera(Mesh& plane, const vec3<float>& camera_position, con
 //    + "SDL_WINDOW_OPENGL" flag: ~100mb (really, just this flag)
 //
 // This flag also slows the time take to create a window speed
+
+// TODO -- Fix 2D and 3D order to any order (DEPTH_TEST problem)
+
 int main() {
 	// TODO:
 	// - Mouse handle multiple inputs like keyboard
@@ -124,7 +135,7 @@ int main() {
 	});
 
 	// Load mesh
-	Mesh cow = Mesh("test/assets/objs/cow.obj");
+	Mesh cow = Mesh("test/assets/objs/cube.obj");
 	cow.set_position({ 0.0f, 0.0f, -5.0f });
 	cow.set_color(Colors::CHIROYELLOW);
 
@@ -148,6 +159,11 @@ int main() {
 	cube3.set_texture(&tex3);
 
 
+	Cube cameracollision = Cube({
+		.position = camera.get_position(),
+	});
+
+
 	Plane plane = Plane({
 		.position = vec3<float>(-5.0f, 1.0f, -10.0f),
 		// Z doens't matter
@@ -159,6 +175,8 @@ int main() {
 
 	float rotation = 0.0f;
 	float rotation_speed = 1.0f;
+
+	bool collision = false;
 	while(window.is_open()) {
 		// Clear screen
 		window.clear(); // NOTE -- ~14mb RAM itself
@@ -174,6 +192,13 @@ int main() {
 		camera_movement(window, camera, window.keyboard());
 		rotate_camera(window, camera, window.mouse());
 
+		collision = false;
+		cameracollision.set_position(camera.get_position());
+		if(is_aabb(cameracollision, plane)) {
+			collision = true;
+		}
+
+
 		// WARNING -- When drawing 3D and 2D shapes together, draw 3D shapes first
 		// Until i figure out how to solve this
 
@@ -187,20 +212,21 @@ int main() {
 			&cube3.set_position(ScarabMath::orbitate_z(cow.get_position(), -rotation, 5.0f))
 		});
 
-		make_plane_face_camera(plane, camera.get_position());
+		plane.face_position(camera.get_position());
 		scene3d.draw_mesh(plane);
+
 
 		// Draw 2D shapes
 		// Format FPS, ignore
 		std::stringstream stream; stream << std::setprecision(2) << window.fps();
 		scene2d.draw_shape(msgothic.set_text("FPS: " + stream.str()).set_position(vec3<float>(0.0f)));
 
-
-	// #ifdef SCARAB_DEBUG_DRAWCALL
-	// 	msgothic.set_position({ 0.0f, 24.0f });
-	// 	scene3d.print_drawcalls(scene2d, msgothic);
-	// #endif
-
+		// scene2d.draw_shape(msgothic.set_text("COLLISION: " + std::to_string(collision)).set_position(vec2<float>(0.0f, 24.0f)));
+		scene2d.draw_shape(msgothic.set_text("POS: "
+					+ std::to_string(camera.get_x()) + ", "
+					+ std::to_string(camera.get_y()) + ", "
+					+ std::to_string(camera.get_z()))
+					.set_position(vec2<float>(0.0f, 24.0f)));
 
 		// Update rotation
 		rotation += rotation_speed;

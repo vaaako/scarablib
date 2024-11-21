@@ -9,4 +9,6 @@ struct Plane : public Mesh {
 		static const VAO vao = VAO();
 		return vao;
 	}
+
+	void face_position(const vec3<float>& position, const vec3<float> axis = { 0.0f, 1.0f, 0.0f });
 };

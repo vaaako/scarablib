@@ -33,6 +33,21 @@ class Camera {
 			return this->position;
 		}
 
+		// Get current X position
+		inline float get_x() const {
+			return this->position.x;
+		}
+
+		// Get current Y position
+		inline float get_y() const {
+			return this->position.y;
+		}
+
+		// Get current Z position
+		inline float get_z() const {
+			return this->position.z;
+		}
+
 		// Get camera view matrix
 		inline glm::mat4 get_view_matrix() const {
 			return glm::lookAt(this->position, this->position + this->orientation, this->up);
@@ -76,6 +91,9 @@ class Camera {
 			this->speed = speed / 10;
 		}
 
+		void set_posiion(const vec3<float>& position) {
+			this->position = position;
+		}
 
 		// MOVEMENT
 

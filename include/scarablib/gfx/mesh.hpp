@@ -45,6 +45,21 @@ class Mesh {
 			return *this->texture;
 		}
 
+		// Get current X position
+		inline float get_x() const {
+			return this->conf.position.x;
+		}
+
+		// Get current Y position
+		inline float get_y() const {
+			return this->conf.position.y;
+		}
+
+		// Get current Z position
+		inline float get_z() const {
+			return this->conf.position.z;
+		}
+
 		// Get current position
 		inline vec3<float> get_position() const {
 			return this->conf.position;
@@ -70,6 +85,25 @@ class Mesh {
 			return this->conf.angle;
 		}
 
+
+		// Get minimum corner of the bounding box (AABB)
+		inline vec3<float> get_min() const {
+			return vec3<float>(
+				this->conf.position.x - this->conf.size.x / 2,
+				this->conf.position.y - this->conf.size.y / 2,
+				this->conf.position.z - this->conf.size.z / 2
+			);
+		}
+
+		// Get maximum corner of the bounding box (AABB)
+		inline vec3<float> get_max() const {
+			return vec3<float>(
+				this->conf.position.x + this->conf.size.x / 2,
+				this->conf.position.y + this->conf.size.y / 2,
+				this->conf.position.z + this->conf.size.z / 2
+			);
+		}
+
 		// SETTERS //
 
 		// Set a texture to be used
@@ -84,6 +118,27 @@ class Mesh {
 		// Set a new position using a vector
 		inline Mesh& set_position(const vec3<float>& position) {
 			this->conf.position = position;
+			this->isdirty = true;
+			return *this;
+		}
+
+		// Set a new X position
+		inline Mesh& set_x(const float newx) {
+			this->conf.position.x = newx;
+			this->isdirty = true;
+			return *this;
+		}
+
+		// Set a new Y position
+		inline Mesh& set_y(const float newy) {
+			this->conf.position.y = newy;
+			this->isdirty = true;
+			return *this;
+		}
+
+		// Set a new Z position
+		inline Mesh& set_z(const float newz) {
+			this->conf.position.z = newz;
 			this->isdirty = true;
 			return *this;
 		}
