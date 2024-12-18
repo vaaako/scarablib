@@ -28,7 +28,9 @@ TARGET = scarablib
 TARGET_STATIC = lib$(TARGET).a
 TARGET_SHARED = lib$(TARGET).so
 
-all: static shared
+all: static
+
+# TODO -- implement shared
 
 static: $(OBJS)
 	@echo "Building static library"
@@ -58,7 +60,9 @@ $(OBJS_DIR)/%.o: src/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 
-dev: $(TARGET)
+# Test with static
+# TODO -- change to shared later
+dev: static
 	make -f Makefile.dev
 
 clean:
