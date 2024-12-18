@@ -38,7 +38,7 @@ class Scene3D : public Scene<Mesh> {
 
 		// Draw all of the same mesh.
 		// Use this to draw the multiple of the same mesh more optimized
-		void draw_all(const std::vector<Mesh*>& shapes);
+		// void draw_all(const std::vector<Mesh*>& shapes);
 
 		inline void update_viewport(const Window& window) override {
 			this->camera.update_viewport(window);
@@ -60,7 +60,6 @@ class Scene3D : public Scene<Mesh> {
 
 	private:
 		Camera& camera;
-
 		Shader* shader = new Shader(
 			FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/3d/vertex.glsl").c_str(),
 			FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/3d/fragment.glsl").c_str()

@@ -8,6 +8,7 @@ Skybox::Skybox(const Camera& camera, const std::vector<const char*>& faces) : ca
 		throw ScarabError("Skybox needs 6 faces in the following order: right, left, top, bottom, front and back");
 	}
 
+	// All cube faces
 	std::vector<float> vertices = {
 		-1.0f,  1.0f, -1.0f,
 		-1.0f, -1.0f, -1.0f,
@@ -88,8 +89,7 @@ Skybox::Skybox(const Camera& camera, const std::vector<const char*>& faces) : ca
 }
 
 void Skybox::draw() {
-	// To draw as the first object in scene
-	glDepthFunc(GL_LEQUAL);
+	glDisable(GL_DEPTH_TEST);
 
 	Shader& shader = this->get_shader();
 
@@ -99,12 +99,13 @@ void Skybox::draw() {
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, this->texid);
 
-	this->get_vao().bind();
+	VAO& vao = this->get_vao();
+	vao.bind();
 	glDrawArrays(GL_TRIANGLES, 0, 36);
-	this->get_vao().unbind();
+	vao.unbind();
 
 	shader.unbind();
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
-	glDepthFunc(GL_LESS);
+	glEnable(GL_DEPTH_TEST);
 }

@@ -1,4 +1,5 @@
 #include "scarablib/window/window.hpp"
+#include "scarablib/opengl/shader.hpp"
 #include "scarablib/proper/error.hpp"
 #include <SDL_mixer.h>
 #include <SDL_ttf.h>
@@ -75,6 +76,13 @@ Window::Window(const WindowConf& config) : conf(config) {
 	// Enable transparency
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // Standard alpha blending
+
+
+	glEnable(GL_DEPTH_TEST);
+	// glEnable(GL_CULL_FACE);
+	// glDepthFunc(GL_LEQUAL);
+
+
 	// glEnable(GL_CULL_FACE); // If enabled font disappear
 
 	// glEnable(GL_DEPTH_TEST); // 2D shapes draw order get opposite because of this

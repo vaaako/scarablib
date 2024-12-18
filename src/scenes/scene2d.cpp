@@ -47,7 +47,7 @@ void Scene2D::update_viewport(const uint32 width, const uint32 height) {
 	this->height = height;
 
 	// Make Projection
-	glm::mat4 projection = glm::ortho(0.0f, (float)width, (float)height, 0.0f);
+	glm::mat4 projection = glm::ortho(0.0f, (float)width, (float)height, 0.0f, -1.0f, 1.0f);
 
 	// Update shaders projection uniform
 	shader->use();
@@ -63,7 +63,7 @@ void Scene2D::update_viewport(const uint32 width, const uint32 height) {
 }
 
 void Scene2D::draw_shape(Shape2D& shape) {
-	glDisable(GL_DEPTH_TEST);
+	// glDisable(GL_DEPTH_TEST);
 
 	this->vao->bind();
 	this->shader->use();
@@ -72,16 +72,16 @@ void Scene2D::draw_shape(Shape2D& shape) {
 }
 
 void Scene2D::draw_all() {
-	glDisable(GL_DEPTH_TEST); // I couldn't find out why Font gets a background when this is enabled and why 2D shapes draws below 3D shapes when this is disabled (i know how DEPTH TEST works, but i dont know why this is happening here and not on the code pre-revamp)
+	// glDisable(GL_DEPTH_TEST); // I couldn't find out why Font gets a background when this is enabled and why 2D shapes draws below 3D shapes when this is disabled (i know how DEPTH TEST works, but i dont know why this is happening here and not on the code pre-revamp)
 
-	this->vao->bind();
-	this->shader->use();
-
-	for(auto& shape : this->scene) {
-		shape->draw(*this->shader); // If circle it will use the shader in the circle struct
-	}
-
-	this->vao->unbind();
+	// this->vao->bind();
+	// this->shader->use();
+	//
+	// for(auto& [_, shape] : this->scene) {
+	// 	shape->draw(*this->shader); // If circle it will use the shader in the circle struct
+	// }
+	//
+	// this->vao->unbind();
 }
 
 

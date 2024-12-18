@@ -16,6 +16,11 @@ struct MeshConf {
 	vec3<float> scale = vec3<float>(1.0f);
 	Color color = Colors::WHITE;
 
+	// min and max corner of the bounding box (AABB)
+	// This will be calculated on constructor
+	vec3<float> min = vec3<float>(0.0f);
+	vec3<float> max = vec3<float>(0.0f);
+
 	// Orientation (default angle of the Mesh)
 	
 	// Orientation of the Mesh
@@ -88,21 +93,15 @@ class Mesh {
 
 		// Get minimum corner of the bounding box (AABB)
 		inline vec3<float> get_min() const {
-			return vec3<float>(
-				this->conf.position.x - this->conf.size.x / 2,
-				this->conf.position.y - this->conf.size.y / 2,
-				this->conf.position.z - this->conf.size.z / 2
-			);
+			return this->conf.min;
 		}
 
 		// Get maximum corner of the bounding box (AABB)
 		inline vec3<float> get_max() const {
-			return vec3<float>(
-				this->conf.position.x + this->conf.size.x / 2,
-				this->conf.position.y + this->conf.size.y / 2,
-				this->conf.position.z + this->conf.size.z / 2
-			);
+			return this->conf.max;
 		}
+
+
 
 		// SETTERS //
 
@@ -118,6 +117,7 @@ class Mesh {
 		// Set a new position using a vector
 		inline Mesh& set_position(const vec3<float>& position) {
 			this->conf.position = position;
+			this->update_min_and_max();
 			this->isdirty = true;
 			return *this;
 		}
@@ -146,21 +146,31 @@ class Mesh {
 		// Set a new size using a vector (X and Y)
 		inline Mesh& set_size(const vec3<float>& size) {
 			this->conf.size = size;
+			this->update_min_and_max();
 			this->isdirty = true;
 			return *this;
 		}
 
-		// Scale the shape using a single value for all axis.
-		// e.g., `size = size.xyz * scale`
-		// inline void set_scale(const float& scale) {
-		// 	this->size * scale;
-		// 	this->isdirty = true;
-		// }
+		// Set a new size using a vector (X and Y)
+		inline Mesh& set_size(const float size) {
+			this->conf.size = { size, size, size };
+			this->update_min_and_max();
+			this->isdirty = true;
+			return *this;
+		}
 
 		// Scale the shape using a different value for each axis.
 		// e.g., `size.x = size.x * scale.x`, `size.y = size.y * scale.y` and `size.z = size.z * scale.z`
 		inline Mesh& set_scale(const vec3<float>& scale) {
 			this->conf.scale = scale;
+			this->isdirty = true;
+			return *this;
+		}
+
+		// Scale the shape using a different value for each axis.
+		// e.g., `size.x = size.x * scale.x`, `size.y = size.y * scale.y` and `size.z = size.z * scale.z`
+		inline Mesh& set_scale(const float scale) {
+			this->conf.scale = { scale, scale, scale };
 			this->isdirty = true;
 			return *this;
 		}
@@ -213,6 +223,21 @@ class Mesh {
 			// I don't like data being statically allocated but whatever
 			static Texture def_tex = Texture(); // Make solid white texture
 			return def_tex;
+		}
+
+		inline void update_min_and_max() {
+			// Scale or Size?
+			this->conf.min = vec3<float>(
+				this->conf.position.x - this->conf.scale.x / 2,
+				this->conf.position.y - this->conf.scale.y / 2,
+				this->conf.position.z - this->conf.scale.z / 2
+			);
+
+			this->conf.max = vec3<float>(
+				this->conf.position.x + this->conf.scale.x / 2,
+				this->conf.position.y + this->conf.scale.y / 2,
+				this->conf.position.z + this->conf.scale.z / 2
+			);
 		}
 };
 

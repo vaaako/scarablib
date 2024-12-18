@@ -10,7 +10,10 @@
 
 Mesh::Mesh(const MeshConf& conf, const VAO* vao, const uint32 indices_length)
 	: vao(vao), indices_length(indices_length), isdirty(true),
-	conf(conf) {}
+	conf(conf) {
+
+	this->update_min_and_max();
+}
 
 Mesh::Mesh(const char* path) {
 	std::vector<uint32> indices;
@@ -79,7 +82,7 @@ void Mesh::draw(Camera& camera, const Shader& shader) {
 
 		this->isdirty = false;
 	}
-
+	
 	// View matrix
 	glm::mat4 view = camera.get_view_matrix();
 
@@ -234,9 +237,13 @@ std::vector<Vertex> load_obj(const std::string& path, std::vector<uint32>& out_i
 			Vertex vertex = {
 				.position = temp_vertices.at(static_cast<uint32>(face.vertex_index.at(i) - 1)),
 
+				// TODO: Build vt if dont has
+				//
 				// Check for case 2 or 3 of face
 				.texuv = (has_texuv && face.texuv_index[i] != 0)
+								// If have
 								? temp_texuvs.at(static_cast<uint32>(face.texuv_index.at(i) - 1))
+								// If dont
 								: glm::vec2(0) 
 				// Do the same for normal map
 			};

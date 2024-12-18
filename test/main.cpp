@@ -1,4 +1,5 @@
 #include "glm/trigonometric.hpp"
+#include "scarablib/opengl/shader.hpp"
 #include "scarablib/scenes/camera.hpp"
 #include "scarablib/scenes/scene2d.hpp"
 #include "scarablib/scenes/scene3d.hpp"
@@ -61,7 +62,7 @@ void rotate_camera(Window& window, Camera& camera, MouseHandler& mouse) {
 }
 
 
-
+// TODO: move to some class/struct
 bool is_aabb(Mesh& mesh1, Mesh& mesh2) {
 	const vec3<float>& meshmin = mesh1.get_min();
 	const vec3<float>& meshmax = mesh1.get_max();
@@ -81,7 +82,7 @@ bool is_aabb(Mesh& mesh1, Mesh& mesh2) {
 
 
 
-// TODO -- memory leak somewhere
+// TODO: memory leak somewhere
 // - Window not unloading correctly?
 // - stbi maybe?
 //
@@ -94,7 +95,8 @@ bool is_aabb(Mesh& mesh1, Mesh& mesh2) {
 //
 // This flag also slows the time take to create a window speed
 
-// TODO -- Fix 2D and 3D order to any order (DEPTH_TEST problem)
+// TODO: Fix 2D and 3D order to any order (DEPTH_TEST problem)
+// - billboarding to GPU
 
 int main() {
 	// TODO:
@@ -125,58 +127,66 @@ int main() {
 	Scene2D scene2d = Scene2D(window);
 	Scene3D scene3d = Scene3D(window, camera);
 
-	Skybox skybox = Skybox(camera, {
-		"test/assets/images/skybox/right.jpg",
-		"test/assets/images/skybox/left.jpg",
-		"test/assets/images/skybox/top.jpg",
-		"test/assets/images/skybox/bottom.jpg",
-		"test/assets/images/skybox/front.jpg",
-		"test/assets/images/skybox/back.jpg"
-	});
-
+	// Skybox skybox = Skybox(camera, {
+	// 	"test/assets/images/skybox/right.jpg",
+	// 	"test/assets/images/skybox/left.jpg",
+	// 	"test/assets/images/skybox/top.jpg",
+	// 	"test/assets/images/skybox/bottom.jpg",
+	// 	"test/assets/images/skybox/front.jpg",
+	// 	"test/assets/images/skybox/back.jpg"
+	// });
+	//
 	// Load mesh
-	Mesh cow = Mesh("test/assets/objs/cube.obj");
+	Mesh cow = Mesh("test/assets/objs/cow.obj");
 	cow.set_position({ 0.0f, 0.0f, -5.0f });
 	cow.set_color(Colors::CHIROYELLOW);
-
 	cow.set_orientation(90.0f, { false, false, true });
+	scene3d.add_to_scene("cow", &cow);
 
 	// Make shapes
 	// Cube position doesnt matter because will change later
+	
 	Cube cube1 = Cube({
 		.position = vec3<float>(0.0f),
 	});
 	cube1.set_texture(&tex1);
 
-	Cube cube2 = Cube({
-		.position = vec3<float>(0.0f),
-	});
-	cube2.set_texture(&tex2);
+	scene3d.add_to_scene("cube1", &cube1);
 
-	Cube cube3 = Cube({
-		.position = vec3<float>(0.0f),
-	});
-	cube3.set_texture(&tex3);
-
-
-	Cube cameracollision = Cube({
-		.position = camera.get_position(),
-	});
-
-
-	Plane plane = Plane({
-		.position = vec3<float>(-5.0f, 1.0f, -10.0f),
-		// Z doens't matter
-		.scale = vec3<float>(2.0f, 2.0f, 0.0f),
-	});
-	plane.set_texture(&snail);
+	// Cube cube2 = Cube({
+	// 	.position = vec3<float>(0.0f),
+	// });
+	// cube2.set_texture(&tex2);
+	// scene3d.add_to_scene("cube2", &cube2);
+	//
+	// Cube cube3 = Cube({
+	// 	.position = vec3<float>(0.0f),
+	// });
+	// cube3.set_texture(&tex3);
+	// scene3d.add_to_scene("cube3", &cube3);
 
 
+	// Cube cameracollision = Cube({
+	// 	.position = camera.get_position(),
+	// });
+	// scene3d.add_to_scene("cameracollision", &cameracollision);
+
+
+	// Plane plane = Plane({
+	// 	.position = vec3<float>(-5.0f, 1.0f, -10.0f),
+	// 	// Z doens't matter
+	// 	.scale = vec3<float>(2.0f, 2.0f, 0.0f),
+	// });
+	// plane.set_texture(&snail);
+	// scene3d.add_to_scene("plane", &plane);
+
+
+	// LOG_INFO("Scene3d length %d", scene3d.length());
 
 	float rotation = 0.0f;
 	float rotation_speed = 1.0f;
 
-	bool collision = false;
+	// bool collision = false;
 	while(window.is_open()) {
 		// Clear screen
 		window.clear(); // NOTE -- ~14mb RAM itself
@@ -192,42 +202,47 @@ int main() {
 		camera_movement(window, camera, window.keyboard());
 		rotate_camera(window, camera, window.mouse());
 
-		collision = false;
-		cameracollision.set_position(camera.get_position());
-		if(is_aabb(cameracollision, plane)) {
-			collision = true;
-		}
+		// collision = false;
+		// cameracollision.set_position(camera.get_position());
+		// if(is_aabb(cameracollision, plane)) {
+		// 	collision = true;
+		// }
 
 
-		// WARNING -- When drawing 3D and 2D shapes together, draw 3D shapes first
-		// Until i figure out how to solve this
+		// WARNING: map.end())When drawing 3D and 2D shapes together, draw 3D shapes first
 
-		skybox.draw();
-		scene3d.draw_mesh(cow.set_rotation(rotation, vec3<bool>(true, false, false)));
+		// skybox.draw();
+// glDepthFunc(GL_LESS);
 
-		// More optimized drawing for the same shape
-		scene3d.draw_all({
-			&cube1.set_position(ScarabMath::orbitate_x(cow.get_position(), -rotation, 5.0f)),
-			&cube2.set_position(ScarabMath::orbitate_y(cow.get_position(), rotation, 5.0f)),
-			&cube3.set_position(ScarabMath::orbitate_z(cow.get_position(), -rotation, 5.0f))
-		});
+		// cow.set_rotation(rotation, vec3<bool>(true, false, false));
 
-		plane.face_position(camera.get_position());
-		scene3d.draw_mesh(plane);
+		vec3<float> cowpos = cow.get_position();
+		cube1.set_position(ScarabMath::orbitate_x(cowpos, -rotation, 5.0f));
+		// cube2.set_positiomap.end())n(ScarabMath::orbitate_y(cowpos, rotation, 5.0f));
+		// cube3.set_position(ScarabMath::orbitate_z(cowpos, -rotation, 5.0f));
+
+		// plane.face_position(camera.get_position());
 
 
-		// Draw 2D shapes
-		// Format FPS, ignore
-		std::stringstream stream; stream << std::setprecision(2) << window.fps();
-		scene2d.draw_shape(msgothic.set_text("FPS: " + stream.str()).set_position(vec3<float>(0.0f)));
 
-		// scene2d.draw_shape(msgothic.set_text("COLLISION: " + std::to_string(collision)).set_position(vec2<float>(0.0f, 24.0f)));
-		scene2d.draw_shape(msgothic.set_text("POS: "
-					+ std::to_string(camera.get_x()) + ", "
-					+ std::to_string(camera.get_y()) + ", "
-					+ std::to_string(camera.get_z()))
-					.set_position(vec2<float>(0.0f, 24.0f)));
 
+		scene3d.draw_all();
+
+
+
+// glDepthFunc(GL_ALWAYS);
+// 		// Draw 2D shapes
+// 		// Format FPS, ignore
+// 		std::stringstream stream; stream << std::setprecision(2) << window.fps();
+// 		scene2d.draw_shape(msgothic.set_text("FPS: " + stream.str()).set_position(vec3<float>(0.0f)));
+//
+// 		// scene2d.draw_shape(msgothic.set_text("COLLISION: " + std::to_string(collision)).set_position(vec2<float>(0.0f, 24.0f)));
+// 		scene2d.draw_shape(msgothic.set_text("POS: "
+// 					+ std::to_string(camera.get_x()) + ", "
+// 					+ std::to_string(camera.get_y()) + ", "
+// 					+ std::to_string(camera.get_z()))
+// 					.set_position(vec2<float>(0.0f, 24.0f)));
+//
 		// Update rotation
 		rotation += rotation_speed;
 		if(rotation >= 360.0f) {

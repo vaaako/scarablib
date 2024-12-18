@@ -9,7 +9,7 @@ uniform mat4 projection;
 out vec2 texCoord;
 
 void main() {
-	gl_Position = projection * model * vec4(aPos.xy, 0.0f, 1.0);
+	gl_Position = projection * model * vec4(aPos.xy, 1.0, 1.0);
 	texCoord    = aTex;
 
 	// texCoord = 0.5 * (aPos.xy + vec(1.0)); // Texture coords

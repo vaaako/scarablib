@@ -57,6 +57,7 @@ I wrote most of the things here very tired, sorry for any english mistake
 	+ [X] Rotation of 3D shape not working
 	+ [X] Shapes custom scale
 	+ [ ] Review [camera movement](https://github.com/swr06/Minecraft/blob/master/Source/Core/Camera.cpp)
+- [ ] Billboarding logic to GPU (shaders)
 - [ ] Chunk mesh native support
 - [ ] Merge `set_angle` and `set_axis` somehow
 - [ ] Sphere

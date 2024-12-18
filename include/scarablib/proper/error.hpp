@@ -1,22 +1,19 @@
 #pragma once
 
+#include <string>
 #include <exception>
 
 class ScarabError : public std::exception {
 	public:
 		// Accepts string and C like formatting
-		ScarabError(const char* fmt, ...);
-		~ScarabError();
-
-		// ScarabError(std::function<void()> callback, const char* fmt, ...) {
-		// 	callback();
-		// }
+		explicit ScarabError(const char* fmt, ...);
+		~ScarabError() = default;
 
 		const char* what() const noexcept override {
-			return this->message;
+			return this->message.c_str();
 		}
 
 	private:
-		char* message;
+		std::string message;
 };
 

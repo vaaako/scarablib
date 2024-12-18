@@ -45,10 +45,6 @@ class Scene2D : public Scene<Shape2D> {
 		// Draw all objects in scene
 		void draw_all() override;
 
-		// Get the number of objects in scene
-		inline uint64 length() {
-			return this->scene.size();
-		}
 
 		// Update scene viewport using window object
 		inline void update_viewport(const Window& window) override {
@@ -62,21 +58,11 @@ class Scene2D : public Scene<Shape2D> {
 		VAO* vao = new VAO();
 
 		// Change to shared_ptr?
-		std::vector<Shape2D*> scene;
+		// std::vector<Shape2D*> scene;
 
 		Shader* shader = new Shader(
 			FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/2d/vertex.glsl").c_str(),
 			FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/2d/fragment.glsl").c_str()
 		);
-
-		inline void begin_draw() {
-			this->shader->use();
-			this->vao->bind();
-		}
-
-		inline void end_draw() {
-			this->vao->unbind();
-			this->shader->unbind();
-		}
 };
 

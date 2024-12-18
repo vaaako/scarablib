@@ -1,7 +1,9 @@
 #pragma once
 
 #include "scarablib/gfx/mesh.hpp"
+#include "scarablib/proper/error.hpp"
 #include "scarablib/window/window.hpp"
+#include <unordered_map>
 
 // Different modes of drawing shapes
 // `OUTLINEMODE` draws the outline of the shape
@@ -27,19 +29,34 @@ class Scene {
 		Scene(const Window& window);
 		virtual ~Scene() = default;
 
+		// TODO: Fix this
 		// Add a shape object to the scene.
 		// WARNING: Shapes added to the scene are not deleted automatically, is recommended to make the shape object and then add to the scene as a pointer
-		void add_to_scene(T* shape);
+		inline void add_to_scene(const std::string& key, T* shape) {
+			// this->scene[key] = shape;
+			this->scene.emplace(key, shape);
+		}
 
-		// Add a vector of shape object to the scene.
-		// WARNING: Shapes added to the scene are not deleted automatically, is recommended to make the shape object and then add to the scene as a pointer
-		void add_to_scene(const std::vector<T*>& shapes);
+		inline T* get(const std::string& key) {
+			auto it = this->scene.find(key);
+			if(it == this->scene.end()) {
+				LOG_ERROR("Object '%s' is not added to the scene", key);
+			}
 
-		// Remove object from scene using it's index
-		void remove_index(const uint32 index);
+			return it.second;
+		}
 
+		// Remove object by key
+		void remove_by_key(const std::string& key);
+
+		// Set drawmode to following shapes
 		inline void set_drawmode(const DrawMode drawmode) {
 			glPolygonMode(GL_FRONT_AND_BACK, drawmode);
+		}
+
+		// Get the number of objects in scene
+		inline uint64 length() {
+			return this->scene.size();
 		}
 
 		// Draw all objects in scene
@@ -56,41 +73,38 @@ class Scene {
 		uint32 width;
 		uint32 height;
 
-		std::vector<T*> scene;
+		// TODO: Change to shared_ptr
+		std::unordered_map<std::string, T*> scene;
 };
 
 template <typename T>
 Scene<T>::Scene(const Window& window)
 	: width(window.get_width()), height(window.get_height()) {}
 
-
 template <typename T>
-void Scene<T>::add_to_scene(T* shape) {
-	this->scene.emplace_back(shape);
+void Scene<T>::remove_by_key(const std::string& key) {
+	auto it = this->scene.find(key);
+	if(it == this->scene.end()) {
+		throw ScarabError("Key '%s' not found", key.c_str());
+	}
+	this->scene.erase(it);
 }
 
-template <typename T>
-void Scene<T>::add_to_scene(const std::vector<T*>& shapes) {
-	for(Shape2D* shape : shapes) {
-		this->scene.emplace_back(shape);
-	}
-}
-
-template <typename T>
-void Scene<T>::remove_index(const uint32 index) {
-	const uint64 last_index = this->scene.size() - 1;
-
-	if(index > last_index) {
-		LOG_ERROR("The index you are trying to remove is higher than the size of the objects in scene (%d)", this->scene.size());
-		return;
-	}
-
-	// Move to last place
-	if(index < last_index) {
-		std::swap(this->scene[index], this->scene[last_index]);
-	}
-
-	// Remove last element
-	this->scene.pop_back();
-}
+// template <typename T>
+// void Scene<T>::remove_index(const uint32 index) {
+// 	const uint64 last_index = this->scene.size() - 1;
+//
+// 	if(index > last_index) {
+// 		LOG_ERROR("The index you are trying to remove is higher than the size of the objects in scene (%d)", this->scene.size());
+// 		return;
+// 	}
+//
+// 	// Move to last place
+// 	if(index < last_index) {
+// 		std::swap(this->scene[index], this->scene[last_index]);
+// 	}
+//
+// 	// Remove last element
+// 	this->scene.pop_back();
+// }
 
