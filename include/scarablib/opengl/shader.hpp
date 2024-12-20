@@ -18,6 +18,11 @@ struct Shader {
 		Shader(Shader&&) = delete;
 		Shader& operator=(Shader&&) = delete;
 
+		// Get shader's ID
+		inline GLuint get_id() const {
+			return this->id;
+		}
+
 		// Enable shader
 		inline void use() const {
 			glUseProgram(this->id);

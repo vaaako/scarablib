@@ -117,7 +117,8 @@ int main() {
 	Texture tex3 = Texture("test/assets/images/brick.png");
 	Texture snail = Texture("test/assets/images/snail.png");
 
-	Font msgothic = Font("test/assets/fonts/msgothic.ttf", 24);
+	// TODO: Make this better
+	// Font msgothic = Font("test/assets/fonts/msgothic.ttf", 24);
 
 	// Make scenes
 	Camera camera = Camera(window, 75.0f);
@@ -127,31 +128,31 @@ int main() {
 	Scene2D scene2d = Scene2D(window);
 	Scene3D scene3d = Scene3D(window, camera);
 
-	// Skybox skybox = Skybox(camera, {
-	// 	"test/assets/images/skybox/right.jpg",
-	// 	"test/assets/images/skybox/left.jpg",
-	// 	"test/assets/images/skybox/top.jpg",
-	// 	"test/assets/images/skybox/bottom.jpg",
-	// 	"test/assets/images/skybox/front.jpg",
-	// 	"test/assets/images/skybox/back.jpg"
-	// });
-	//
+	Skybox skybox = Skybox(camera, {
+		"test/assets/images/skybox/right.jpg",
+		"test/assets/images/skybox/left.jpg",
+		"test/assets/images/skybox/top.jpg",
+		"test/assets/images/skybox/bottom.jpg",
+		"test/assets/images/skybox/front.jpg",
+		"test/assets/images/skybox/back.jpg"
+	});
+
 	// Load mesh
-	Mesh cow = Mesh("test/assets/objs/cow.obj");
-	cow.set_position({ 0.0f, 0.0f, -5.0f });
-	cow.set_color(Colors::CHIROYELLOW);
-	cow.set_orientation(90.0f, { false, false, true });
-	scene3d.add_to_scene("cow", &cow);
+	// Mesh cow = Mesh("test/assets/objs/cow.obj");
+	// cow.set_position({ 0.0f, 0.0f, -5.0f });
+	// cow.set_color(Colors::CHIROYELLOW);
+	// cow.set_orientation(90.0f, { false, false, true });
+	// scene3d.add_to_scene("cow", &cow);
 
 	// Make shapes
 	// Cube position doesnt matter because will change later
 	
-	Cube cube1 = Cube({
-		.position = vec3<float>(0.0f),
-	});
-	cube1.set_texture(&tex1);
-
-	scene3d.add_to_scene("cube1", &cube1);
+	// Cube cube1 = Cube({
+	// 	.position = vec3<float>(0.0f),
+	// });
+	// cube1.set_texture(&tex1);
+	//
+	// scene3d.add_to_scene("cube1", &cube1);
 
 	// Cube cube2 = Cube({
 	// 	.position = vec3<float>(0.0f),
@@ -209,15 +210,15 @@ int main() {
 		// }
 
 
-		// WARNING: map.end())When drawing 3D and 2D shapes together, draw 3D shapes first
+		// WARNING: When drawing 3D and 2D shapes together, draw 3D shapes first
 
 		// skybox.draw();
-// glDepthFunc(GL_LESS);
+
 
 		// cow.set_rotation(rotation, vec3<bool>(true, false, false));
 
-		vec3<float> cowpos = cow.get_position();
-		cube1.set_position(ScarabMath::orbitate_x(cowpos, -rotation, 5.0f));
+		// vec3<float> cowpos = cow.get_position();
+		// cube1.set_position(ScarabMath::orbitate_x(cowpos, -rotation, 5.0f));
 		// cube2.set_positiomap.end())n(ScarabMath::orbitate_y(cowpos, rotation, 5.0f));
 		// cube3.set_position(ScarabMath::orbitate_z(cowpos, -rotation, 5.0f));
 
@@ -226,23 +227,25 @@ int main() {
 
 
 
-		scene3d.draw_all();
+		// scene3d.draw_all();
 
 
 
-// glDepthFunc(GL_ALWAYS);
-// 		// Draw 2D shapes
-// 		// Format FPS, ignore
-// 		std::stringstream stream; stream << std::setprecision(2) << window.fps();
-// 		scene2d.draw_shape(msgothic.set_text("FPS: " + stream.str()).set_position(vec3<float>(0.0f)));
-//
-// 		// scene2d.draw_shape(msgothic.set_text("COLLISION: " + std::to_string(collision)).set_position(vec2<float>(0.0f, 24.0f)));
-// 		scene2d.draw_shape(msgothic.set_text("POS: "
-// 					+ std::to_string(camera.get_x()) + ", "
-// 					+ std::to_string(camera.get_y()) + ", "
-// 					+ std::to_string(camera.get_z()))
-// 					.set_position(vec2<float>(0.0f, 24.0f)));
-//
+		// Draw 2D shapes
+		// Format FPS, ignore
+		// std::stringstream stream; stream << std::setprecision(2) << window.fps();
+		// msgothic.set_text("FPS: " + stream.str()).set_position(vec3<float>(0.0f));
+		// scene2d.draw_font(msgothic);
+		//
+		// // scene2d.draw_shape(msgothic.set_text("COLLISION: " + std::to_string(collision)).set_position(vec2<float>(0.0f, 24.0f)));
+		// msgothic.set_text("POS: "
+		// 		+ std::to_string(camera.get_x()) + ", "
+		// 		+ std::to_string(camera.get_y()) + ", "
+		// 		+ std::to_string(camera.get_z()))
+		// 	.set_position(vec2<float>(0.0f, 24.0f));
+		// scene2d.draw_font(msgothic);
+
+
 		// Update rotation
 		rotation += rotation_speed;
 		if(rotation >= 360.0f) {
@@ -256,6 +259,6 @@ int main() {
 	// Check for any OpenGL error
 	GLenum err = glGetError();
 	if(err != GL_NO_ERROR) {
-		LOG_ERROR("OpenGL error code: %d", err);
+		LOG_ERROR("OpenGL error code: 0x%x", err);
 	}
 }

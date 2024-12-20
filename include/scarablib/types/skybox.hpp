@@ -11,6 +11,7 @@ struct Skybox {
 	// Uses a vector of image paths as faces.
 	// The order must be the following: Right, Left, Top, Bottom, Back and Front
 	Skybox(const Camera& camera, const std::vector<const char*>& faces);
+	~Skybox();
 
 	void draw();
 
@@ -18,18 +19,9 @@ struct Skybox {
 		uint32 texid;
 		const Camera& camera;
 
-		inline VAO& get_vao() const {
-			static VAO vao = VAO();
-			return vao;
-		}
-
-		inline Shader& get_shader() const {
-			static Shader shader = Shader(
-				FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/3d/skybox_vertex.glsl").c_str(),
-				FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/3d/skybox_fragment.glsl").c_str()
-			);
-
-			return shader;
-		}
-
+		VAO* vao = new VAO();
+		Shader shader = Shader(
+			FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/3d/skybox_vertex.glsl").c_str(),
+			FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/3d/skybox_fragment.glsl").c_str()
+		);
 };

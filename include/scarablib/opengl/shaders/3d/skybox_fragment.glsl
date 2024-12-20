@@ -1,4 +1,7 @@
-#version 330
+#version 420
+
+// OpenGL 4.2+
+// layout(binding = 0) uniform samplerCube skybox;
 
 out vec4 FragColor;
 

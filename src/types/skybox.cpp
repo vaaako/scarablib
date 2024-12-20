@@ -55,11 +55,11 @@ Skybox::Skybox(const Camera& camera, const std::vector<const char*>& faces) : ca
 
 	VBO vbo = VBO();
 
-	this->get_vao().bind();
+	this->vao->bind();
 	vbo.bind();
 	vbo.make_from_vertices(vertices, 3);
 
-	this->get_vao().unbind();
+	this->vao->unbind();
 	vbo.unbind();
 
 
@@ -84,28 +84,34 @@ Skybox::Skybox(const Camera& camera, const std::vector<const char*>& faces) : ca
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE); // Z
 
+	// Bind to set uniform
+	this->shader.use();
+	this->shader.set_int("skybox", 0);
+	this->shader.unbind();
+}
 
-	this->get_shader().set_int("skybox", 0);
+Skybox::~Skybox() {
+	delete this->vao;
 }
 
 void Skybox::draw() {
-	glDisable(GL_DEPTH_TEST);
+	// glDisable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
 
-	Shader& shader = this->get_shader();
-
-	shader.use();
-	shader.set_matrix4f("view", glm::mat3(camera.get_view_matrix())); // Remove translation
-	shader.set_matrix4f("proj", camera.get_proj_matrix());
+	this->shader.use();
+	this->shader.set_matrix4f("view", glm::mat3(camera.get_view_matrix())); // Remove translation
+	this->shader.set_matrix4f("proj", camera.get_proj_matrix());
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, this->texid);
 
-	VAO& vao = this->get_vao();
-	vao.bind();
+	this->vao->bind();
 	glDrawArrays(GL_TRIANGLES, 0, 36);
-	vao.unbind();
+	this->vao->unbind();
 
-	shader.unbind();
+	this->shader.unbind();
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
-	glEnable(GL_DEPTH_TEST);
+	// Back to default
+	glDepthFunc(GL_LESS);
+	// glEnable(GL_DEPTH_TEST);
 }
