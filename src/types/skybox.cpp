@@ -95,7 +95,6 @@ Skybox::~Skybox() {
 }
 
 void Skybox::draw() {
-	// glDisable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 
 	this->shader.use();
@@ -113,5 +112,4 @@ void Skybox::draw() {
 
 	// Back to default
 	glDepthFunc(GL_LESS);
-	// glEnable(GL_DEPTH_TEST);
 }
