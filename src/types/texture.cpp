@@ -1,10 +1,12 @@
 #include "scarablib/types/texture.hpp"
-#include "scarablib/proper/log.hpp"
+#include "scarablib/proper/error.hpp"
 #include "scarablib/typedef.hpp"
 #include "scarablib/types/image.hpp"
 #include <SDL2/SDL_render.h>
 
 Texture::Texture() {
+	this->format = GL_RGBA;
+
 	// Generate and bind texture
 	glGenTextures(1, &this->id); // num of textures, pointer
 	glBindTexture(this->tex_type, this->id);
@@ -25,6 +27,7 @@ Texture::Texture() {
 }
 
 Texture::Texture(const char* path, const TextureFilter filter, const TextureWrap wrap) {
+	// STB use
 	Image* image = new Image(path, true);
 
 #ifdef SCARAB_DEBUG_TEXTURE
@@ -57,9 +60,11 @@ Texture::Texture(const char* path, const TextureFilter filter, const TextureWrap
 			format = GL_RGBA;
 			break;
 		default:
-			LOG_ERROR("Failed to load texture (%s). Unsupported format: %d channels", path, image->nr_channels);
-			return;
+			throw ScarabError("Failed to load texture (%s). Unsupported format: %d channels", path, image->nr_channels);
 	}
+	this->format = format;
+	this->width = image->width;
+	this->height = image->height;
 
 	// Generate
 	glTexImage2D(this->tex_type, 0, static_cast<GLint>(format), image->width, image->height, 0, format, GL_UNSIGNED_BYTE, image->data);
@@ -73,7 +78,7 @@ Texture::Texture(const char* path, const TextureFilter filter, const TextureWrap
 	delete image;
 }
  
-Texture::Texture(const void* data, const uint32 width, const uint32 height, const GLint internal_format, const GLenum format) {
+Texture::Texture(const void* data, const uint32 width, const uint32 height, const GLint internal_format, const GLenum format) : format(format), width(static_cast<GLint>(width)), height(static_cast<GLint>(height)) {
 	// Generate and bind texture
 	glGenTextures(1, &this->id); // num of textures, pointer
 	glBindTexture(this->tex_type, this->id);
@@ -83,6 +88,7 @@ Texture::Texture(const void* data, const uint32 width, const uint32 height, cons
 	glTexParameteri(this->tex_type, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	// Generate
+	// glTexImage2D(this->tex_type, 0, static_cast<GLint>(format), static_cast<GLint>(width), static_cast<GLint>(height), 0, format, GL_UNSIGNED_BYTE, data);
 	glTexImage2D(this->tex_type, 0, internal_format, static_cast<GLint>(width), static_cast<GLint>(height), 0, format, GL_UNSIGNED_BYTE, data);
 
 	// Gen mipmap
@@ -97,5 +103,13 @@ Texture::~Texture() {
 	if(this->id != 0) {
 		glDeleteTextures(1, &this->id);
 	}
+}
+
+
+void Texture::update_data(const void* data, const GLenum format) {
+	glBindTexture(this->tex_type, this->id);
+	glTexSubImage2D(this->tex_type, 0, 0, 0, this->width, this->height, format, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(this->tex_type);
+	glBindTexture(this->tex_type, 0);
 }
 

@@ -5,7 +5,8 @@
 
 // Circle shape object, used to draw circle
 struct Circle : public Shape2D {
-	friend class Scene2D; // To update viewport (not making a static variable because only Shape2D needs to access it)
+	// To update viewport (not making a static variable because only Shape2D needs to access it)
+	friend class Scene2D;
 
 	// Initialize current shape using the Shape2DConf struct
 	Circle(const Shape2DConf& conf);
@@ -28,7 +29,7 @@ struct Circle : public Shape2D {
 		float blur = 0.01f;
 
 		// Make static so Scene2D can update viewport
-		static inline Shader& get_circle_shader() {
+		static inline Shader& get_shader() {
 			static Shader shader_circle = Shader(
 				FileHelper::read_file(SOURCE_DIR + "/../../opengl/shaders/2d/vertex.glsl").c_str(),
 				FileHelper::read_file(SOURCE_DIR + "/../../opengl/shaders/2d/circle_fragment.glsl").c_str()

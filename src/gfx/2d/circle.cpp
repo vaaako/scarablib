@@ -10,7 +10,7 @@ void Circle::draw(const Shader& shader) {
 	this->update_model();
 
 	// Bind shader and apply changes
-	Shader& circle_shader = this->get_circle_shader();
+	Shader& circle_shader = this->get_shader();
 	circle_shader.use();
 	circle_shader.set_matrix4f("model", this->model);
 	shader.set_color("shapeColor", this->conf.color);

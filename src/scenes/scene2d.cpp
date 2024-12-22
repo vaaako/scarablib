@@ -1,6 +1,7 @@
 #include "scarablib/scenes/scene2d.hpp"
 #include "scarablib/opengl/vao.hpp"
 #include "scarablib/opengl/vbo.hpp"
+#include "scarablib/types/font.hpp"
 #include "scarablib/types/vertex.hpp"
 #include "scarablib/window/window.hpp"
 #include <cstdio>
@@ -41,48 +42,60 @@ Scene2D::~Scene2D() {
 	delete this->shader;
 }
 
+void Scene2D::add_to_scene(const std::string& key, Shape2D* shape) {
+	if(!shape) {
+		throw ScarabError("Try to add null '%s'", shape);
+	}
+
+	this->scene.emplace(key, shape);
+}
+
+void Scene2D::draw_all() const {
+	glDepthFunc(GL_ALWAYS);
+
+	this->vao->bind();
+	this->shader->use();
+
+	for(const auto& [_, shape] : scene) {
+		shape->draw(*this->shader);
+
+	#ifdef SCARAB_DEBUG_DRAWCALL
+		this->drawcalls += 1;
+	#endif
+	}
+
+	this->vao->unbind();
+	this->shader->unbind();
+}
+
+
 void Scene2D::update_viewport(const uint32 width, const uint32 height) {
 	// Update width and : height
 	this->width = width;
 	this->height = height;
 
 	// Make Projection
-	glm::mat4 projection = glm::ortho(0.0f, (float)width, (float)height, 0.0f, -1.0f, 1.0f);
+	glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f, -1.0f, 1.0f);
 
 	// Update shaders projection uniform
 	shader->use();
 	shader->set_matrix4f("projection", projection);
 
 	// Update circle shader
-	Shader& circle_shader = Circle::get_circle_shader();
+	Shader& circle_shader = Circle::get_shader();
 	circle_shader.use();
 	circle_shader.set_matrix4f("projection", projection);
+
+	// Update Font shader
+	Shader& font_shader = Font::get_shader();
+	font_shader.use();
+	font_shader.set_matrix4f("projection", projection);
+
 
 	// Update viewport in opengl too
 	glViewport(0, 0, (GLsizei)width, (GLsizei)height);
 }
 
-void Scene2D::draw_shape(Shape2D& shape) {
-	// glDisable(GL_DEPTH_TEST);
-
-	this->vao->bind();
-	this->shader->use();
-	shape.draw(*this->shader); // If circle it will use the shader in the circle struct
-	this->vao->unbind();
-}
-
-void Scene2D::draw_all() {
-	// glDisable(GL_DEPTH_TEST); // I couldn't find out why Font gets a background when this is enabled and why 2D shapes draws below 3D shapes when this is disabled (i know how DEPTH TEST works, but i dont know why this is happening here and not on the code pre-revamp)
-
-	// this->vao->bind();
-	// this->shader->use();
-	//
-	// for(auto& [_, shape] : this->scene) {
-	// 	shape->draw(*this->shader); // If circle it will use the shader in the circle struct
-	// }
-	//
-	// this->vao->unbind();
-}
 
 
 // For specifing each point of a triangle

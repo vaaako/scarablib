@@ -3,6 +3,7 @@
 #include "scarablib/gfx/mesh.hpp"
 #include "scarablib/proper/error.hpp"
 #include "scarablib/window/window.hpp"
+#include <memory>
 #include <unordered_map>
 
 // Different modes of drawing shapes
@@ -29,25 +30,37 @@ class Scene {
 		Scene(const Window& window);
 		virtual ~Scene() = default;
 
-		// TODO: Fix this
 		// Add a shape object to the scene.
 		// WARNING: Shapes added to the scene are not deleted automatically, is recommended to make the shape object and then add to the scene as a pointer
-		inline void add_to_scene(const std::string& key, T* shape) {
-			// this->scene[key] = shape;
-			this->scene.emplace(key, shape);
-		}
+		virtual void add_to_scene(const std::string& key, T* mesh) = 0;
 
-		inline T* get(const std::string& key) {
+		// Get a object by key and dynamically convert it
+		template <typename U>
+		U& get_by_key(const std::string& key) {
 			auto it = this->scene.find(key);
 			if(it == this->scene.end()) {
-				LOG_ERROR("Object '%s' is not added to the scene", key);
+				throw ScarabError("Object '%s' is not added to the scene", key);
 			}
 
-			return it.second;
+			auto casted_ptr = std::dynamic_pointer_cast<U>(it->second.get());
+			if(!casted_ptr) {
+				throw ScarabError("Failed to cast object with key '%s' to type");
+			}
+
+			return *casted_ptr;
 		}
 
 		// Remove object by key
 		void remove_by_key(const std::string& key);
+
+		// Draw all objects added to the scene
+		virtual void draw_all() const = 0;
+
+		// Update the scene viewport using the window object
+		virtual inline void update_viewport(const Window& window) = 0;
+
+		// Update the scene viewport using a custom width and height values
+		virtual void update_viewport(const uint32 width, const uint32 height) = 0;
 
 		// Set drawmode to following shapes
 		inline void set_drawmode(const DrawMode drawmode) {
@@ -59,27 +72,19 @@ class Scene {
 			return this->scene.size();
 		}
 
-		// Draw all objects in scene
-		virtual void draw_all() = 0;
-
-		// Update viewport using window object
-		virtual inline void update_viewport(const Window& window) = 0;
-
-		// Update viewport using width and height values
-		virtual void update_viewport(const uint32 width, const uint32 height) = 0;
-
 	protected:
 		// Viewport
 		uint32 width;
 		uint32 height;
 
-		// TODO: Change to shared_ptr
 		std::unordered_map<std::string, T*> scene;
+		std::unordered_map<GLuint, std::vector<T*>> vao_groups;
 };
 
-template <typename T>
+template <typename T> // Return the shared pointer
 Scene<T>::Scene(const Window& window)
 	: width(window.get_width()), height(window.get_height()) {}
+
 
 template <typename T>
 void Scene<T>::remove_by_key(const std::string& key) {

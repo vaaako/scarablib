@@ -8,15 +8,15 @@ VBO::~VBO() {
 	glDeleteBuffers(1, &this->id);
 }
 
-void VBO::alloc_data(const uint64 size, const void* data, const GLenum drawtype) {
+void VBO::alloc_data(const float size, const void* data, const GLenum drawtype) {
 	this->bind();
-	glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(size), data, drawtype);
+	glBufferData(GL_ARRAY_BUFFER, size, data, drawtype);
 	this->unbind();
 }
 
-void VBO::link_attrib(const uint32 index, const uint32 dimension, const int total_byte_size, const uint32 offset) {
+void VBO::link_attrib(const uint32 index, const uint32 size, const float total_byte_size, const uint32 offset) {
 	this->bind();
-	glVertexAttribPointer(index, static_cast<GLint>(dimension), GL_FLOAT, GL_FALSE, total_byte_size, (void*)(offset * sizeof(float)));
+	glVertexAttribPointer(index, static_cast<GLint>(size), GL_FLOAT, GL_FALSE, total_byte_size, (void*)(offset * sizeof(float)));
 	glEnableVertexAttribArray(index);
 	this->unbind();
 }
@@ -30,29 +30,29 @@ void VBO::alloc_data(const std::vector<float>& data, const GLenum drawtype) {
 }
 
 
-void VBO::make_from_vertex(const std::vector<Vertex>& data, const uint32 dimension) {
-	constexpr GLsizei size = sizeof(Vertex);
+void VBO::make_from_vertex(const std::vector<Vertex>& data, const uint32 size) {
+	constexpr GLsizei vertexsize = sizeof(Vertex);
 
 	this->bind();
 
 	glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(data.size() * sizeof(Vertex)), data.data(), GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, static_cast<GLint>(dimension), GL_FLOAT, GL_FALSE, size, (void*)offsetof(Vertex, position));
+	glVertexAttribPointer(0, static_cast<GLint>(size), GL_FLOAT, GL_FALSE, vertexsize, (void*)offsetof(Vertex, position));
 	glEnableVertexAttribArray(0);
 
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, size, (void*)offsetof(Vertex, texuv));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, vertexsize, (void*)offsetof(Vertex, texuv));
 	glEnableVertexAttribArray(1);
 
 	this->unbind();
 }
 
 
-void VBO::make_from_vertices(const std::vector<float>& data, const uint32 dimension) {
+void VBO::make_from_vertices(const std::vector<float>& data, const uint32 size) {
 	this->bind();
 
 	glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(data.size() * sizeof(float)), data.data(), GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, static_cast<GLint>(dimension), GL_FLOAT, GL_FALSE, static_cast<GLsizei>(dimension * sizeof(float)), (void*)0);
+	glVertexAttribPointer(0, static_cast<GLint>(size), GL_FLOAT, GL_FALSE, static_cast<GLsizei>(size * sizeof(float)), (void*)0);
 	glEnableVertexAttribArray(0);
 
 	this->unbind();

@@ -1,89 +1,154 @@
 #include "scarablib/types/font.hpp"
+#include "scarablib/opengl/vbo.hpp"
+#include "scarablib/proper/error.hpp"
 #include "scarablib/proper/log.hpp"
-#include "scarablib/utils/sdl.hpp"
 #include "scarablib/utils/string.hpp"
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_surface.h>
-#include <SDL_ttf.h>
+#include <freetype/ft2build.h>
+#include FT_FREETYPE_H
 
-// Shape2D init doesn't matter
-Font::Font(const char* path, const uint16 size, const TextureFilter filter)
-	: Shape2D({ vec2<float>(0.0f), vec2<float>(size) }), path(path), filter((GLenum)filter), size(size) {
-
+Font::Font(const char* path, const uint16 size) {
 	if(StringHelper::file_extension(path) != "ttf") {
-		TTF_Quit();
-		SDL_Quit();
-		LOG_ERROR("Font format is not supported (%s) \nOnly .ttf format is supported", path);
-		return;
+		throw ScarabError("Font (%s) is not supported. Only .ttf format is supported supported", path);
 	}
 
-	// Check if exist
-	if(TTF_OpenFont(path, size) == NULL) {
-		TTF_Quit();
-		SDL_Quit();
-		LOG_ERROR("Failed to load \"%s\"", path);
-		return;
+	FT_Library ft;
+	if(FT_Init_FreeType(&ft)) {
+		throw ScarabError("Could not initialize FreeType for some reason");
 	}
 
-	// Init font
-	this->update_texture();
+	FT_Face face;
+	if(FT_New_Face(ft, path, 0, &face)) {
+		throw ScarabError("Font '%s' was not found!", path);
+	}
+
+	FT_Set_Pixel_Sizes(face, 0, size);
+
+	// Disable byte-alignment restriction
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+	// NOTE: 128 is the default characters range
+	// - 256: Latin-1 Supplement range
+	for(uint32 c = 0; c < face->num_glyphs; c++){
+		if(FT_Load_Char(face, c, FT_LOAD_RENDER)) {
+			LOG_ERROR("Failed to load glyph '%s'", c);
+			continue;
+		}
+#ifdef SCARAB_DEBUG_GLYPHS_LOADED
+		LOG_INFO("Loaded glyph '%c' with size (%d, %d)", c, face->glyph->bitmap.width, face->glyph->bitmap.rows);
+#endif
+
+		GLuint texture;
+
+		// GLuint texture;
+		glGenTextures(1, &texture);
+		glBindTexture(GL_TEXTURE_2D, texture);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED,
+			face->glyph->bitmap.width, face->glyph->bitmap.rows,
+			0, GL_RED, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		this->chars.insert(std::pair<char, Glyph>(c, Glyph {
+			texture,
+			vec2<uint32>(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+			vec2<uint32>(face->glyph->bitmap_left, face->glyph->bitmap_top),
+			static_cast<GLuint>(face->glyph->advance.x)
+		}));
+	}
+
+	FT_Done_Face(face);
+	FT_Done_FreeType(ft);
+
+	// Configure VAO and VBO
+	this->vbo->bind();
+	this->vao->bind();
+
+	this->vbo->alloc_data(sizeof(float ) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+	this->vbo->link_attrib(0, 4, 4 * sizeof(float), 0);
+
+	this->vbo->unbind();
+	this->vao->unbind();
 }
 
-void Font::update_texture() {
-	// Delete old sdl font (if have)
-	TTF_CloseFont(this->sdl_font);
-
-	// Make surface
-	this->sdl_font = TTF_OpenFont(this->path, this->size);
-	SDL_Surface* ttf_surface = TTF_RenderText_Blended(this->sdl_font, this->text.c_str(), { this->color.red, this->color.green, this->color.blue, this->color.alpha });
-
-	// Correct surface to RGB format
-	SDL_Surface* surface = SDLHelper::base2_surface(ttf_surface);
-	SDLHelper::flip_vertically(surface);
-	SDLHelper::flip_horizontally(surface);
-
-	// Set size
-	this->set_size({ static_cast<float>(surface->w), static_cast<float>(surface->h) });
-
-	// Remove previous font's texture and set a new one
-	delete this->font_texture;
-	this->font_texture = new Texture(surface->pixels, static_cast<uint32>(surface->w), static_cast<uint32>(surface->h), surface->format->BytesPerPixel, GL_BGRA);
-	this->set_texture(this->font_texture);
-
-	// Free surfaces
-	SDL_FreeSurface(ttf_surface);
-	SDL_FreeSurface(surface);
+Font::~Font() {
+	for (auto& pair : this->chars) {
+		glDeleteTextures(1, &pair.second.texture_id);
+	}
+	delete this->vbo;
+	delete this->vao;
 }
 
+// TODO: One drawcall
+void Font::draw_text(const std::string& text, const vec2<uint32> pos, const Color& color, const float scale) {
+	// glDepthFunc(GL_LEQUAL);
 
-void Font::draw(const Shader& shader) {
-	// Apply transformations if needed
-	this->update_model();
+	this->get_shader().use();
+	this->get_shader().set_color("shapeColor", color);
+	this->vao->bind();
 
-	shader.set_matrix4f("model", this->model);
-	shader.set_color("shapeColor", this->color);
+	float cur_x = pos.x;
+	float cur_y = pos.y;
+	for(const char c : text) {
+		// TODO: check if c is on map
+		Glyph& ch = this->chars.at(c);
 
-	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+		const float xpos = cur_x + ch.bearing.x * scale;
+		const float ypos = cur_y - (ch.size.y - ch.bearing.y) * scale;
 
-	this->texture->unbind();
+		const float w = ch.size.x * scale;
+		const float h = ch.size.y * scale;
+
+		// Add quad vertices (position and texture coordinates)
+		float vertices[6][4] = {
+			xpos,     ypos + h,  0.0f, 1.0f,
+			xpos + w, ypos,      1.0f, 0.0f,
+			xpos,     ypos,      0.0f, 0.0f,
+
+			xpos,     ypos + h,  0.0f, 1.0f,
+			xpos + w, ypos + h,  1.0f, 1.0f,
+			xpos + w, ypos,      1.0f, 0.0f
+		};
+
+		glBindTexture(GL_TEXTURE_2D, ch.texture_id);
+		this->vbo->bind();
+		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+
+		cur_x += (ch.advance >> 6) * scale; // The advance is in 1/64th of a pixel
+	}
 }
 
-Font& Font::set_text(const std::string& text) {
-	this->text = text;
-	this->update_texture();
-	return *this;
-}
+std::vector<float> Font::generate_text(const std::string& text, const float x, const float y, const float scale) {
+	std::vector<float> vertices;
+	float cur_x = x;
+	float cur_y = y;
 
-Font& Font::set_color(const Color color) {
-	this->color = color;
-	this->update_texture();
-	return *this;
-}
+	for(const char c : text) {
+		Glyph& ch = this->chars.at(c);
 
-Font& Font::set_font_size(const uint16 size) {
-	this->size = size;
-	this->update_texture();
-	return *this;
-}
+		const float xpos = cur_x + ch.bearing.x * scale;
+		const float ypos = cur_y - (ch.size.y - ch.bearing.y) * scale;
 
+		const float w = ch.size.x * scale;
+		const float h = ch.size.y * scale;
+
+		// Add quad vertices (position and texture coordinates)
+		vertices.insert(vertices.end(), {
+			xpos,     ypos + h,  0.0f, 1.0f,
+			xpos + w, ypos,      1.0f, 0.0f,
+			xpos,     ypos,      0.0f, 0.0f,
+
+			xpos,     ypos + h,  0.0f, 1.0f,
+			xpos + w, ypos + h,  1.0f, 1.0f,
+			xpos + w, ypos,      1.0f, 0.0f
+		});
+
+		cur_x += (ch.advance >> 6) * scale; // The advance is in 1/64th of a pixel
+	}
+
+	return vertices;
+}

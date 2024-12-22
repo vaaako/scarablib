@@ -30,20 +30,18 @@ class Scene3D : public Scene<Mesh> {
 		Scene3D(Scene3D&&) = delete;
 		Scene3D& operator=(Scene3D&&) = delete;
 
-		// Draw a 3D mesh using a reference of it.
-		void draw_mesh(Mesh& shape);
+		// Add a mesh to the scene
+		void add_to_scene(const std::string& key, Mesh* mesh) override;
 
-		// Draw all objects in scene
-		void draw_all() override;
+		// Draw all meshes added to the scene
+		void draw_all() const override;
 
-		// Draw all of the same mesh.
-		// Use this to draw the multiple of the same mesh more optimized
-		// void draw_all(const std::vector<Mesh*>& shapes);
-
+		// Update the scene viewport using the window object
 		inline void update_viewport(const Window& window) override {
 			this->camera.update_viewport(window);
 		}
 
+		// Update the scene viewport using a custom width and height values
 		inline void update_viewport(const uint32 width, const uint32 height) override {
 			this->camera.update_viewport(width, height);
 		}
@@ -64,5 +62,7 @@ class Scene3D : public Scene<Mesh> {
 			FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/3d/vertex.glsl").c_str(),
 			FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/3d/fragment.glsl").c_str()
 		);
+
+		std::unordered_map<GLuint, std::vector<Mesh*>> vao_groups;
 };
 

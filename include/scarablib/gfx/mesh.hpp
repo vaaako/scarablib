@@ -243,7 +243,7 @@ class Mesh {
 
 
 // Not happy with this here, but whatever
-// TODO -- Put this in some class or namespace
+// TODO: Put this in some class or namespace
 
 // Load an external object and return it's vertices.
 // Takes a path and a vector of indices to be populate

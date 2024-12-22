@@ -117,8 +117,8 @@ int main() {
 	Texture tex3 = Texture("test/assets/images/brick.png");
 	Texture snail = Texture("test/assets/images/snail.png");
 
-	// TODO: Make this better
-	// Font msgothic = Font("test/assets/fonts/msgothic.ttf", 24);
+	// TODO: Make it use only one drawcall
+	Font msgothic = Font("test/assets/fonts/msgothic.ttf", 24);
 
 	// Make scenes
 	Camera camera = Camera(window, 75.0f);
@@ -138,21 +138,21 @@ int main() {
 	});
 
 	// Load mesh
-	// Mesh cow = Mesh("test/assets/objs/cow.obj");
-	// cow.set_position({ 0.0f, 0.0f, -5.0f });
-	// cow.set_color(Colors::CHIROYELLOW);
-	// cow.set_orientation(90.0f, { false, false, true });
-	// scene3d.add_to_scene("cow", &cow);
+	Mesh cow = Mesh("test/assets/objs/cow.obj");
+	cow.set_position({ 0.0f, 0.0f, -5.0f });
+	cow.set_color(Colors::CHIROYELLOW);
+	cow.set_orientation(90.0f, { false, false, true });
+	scene3d.add_to_scene("cow", &cow);
 
 	// Make shapes
 	// Cube position doesnt matter because will change later
-	
-	// Cube cube1 = Cube({
-	// 	.position = vec3<float>(0.0f),
-	// });
-	// cube1.set_texture(&tex1);
-	//
-	// scene3d.add_to_scene("cube1", &cube1);
+
+	Cube cube1 = Cube({
+		.position = vec3<float>(0.0f),
+	});
+	cube1.set_texture(&tex1);
+
+	scene3d.add_to_scene("cube1", &cube1);
 
 	// Cube cube2 = Cube({
 	// 	.position = vec3<float>(0.0f),
@@ -187,6 +187,8 @@ int main() {
 	float rotation = 0.0f;
 	float rotation_speed = 1.0f;
 
+	// TODO: Check LearnOpenGL for some solution for disabling depth test to skybox (the current one is not working)
+
 	// bool collision = false;
 	while(window.is_open()) {
 		// Clear screen
@@ -212,7 +214,6 @@ int main() {
 
 		// WARNING: When drawing 3D and 2D shapes together, draw 3D shapes first
 
-		// skybox.draw();
 
 
 		// cow.set_rotation(rotation, vec3<bool>(true, false, false));
@@ -224,19 +225,16 @@ int main() {
 
 		// plane.face_position(camera.get_position());
 
-
-
-
-		// scene3d.draw_all();
+		// skybox.draw();
+		scene3d.draw_all();
 
 
 
 		// Draw 2D shapes
 		// Format FPS, ignore
-		// std::stringstream stream; stream << std::setprecision(2) << window.fps();
-		// msgothic.set_text("FPS: " + stream.str()).set_position(vec3<float>(0.0f));
-		// scene2d.draw_font(msgothic);
-		//
+		std::stringstream stream; stream << std::setprecision(2) << window.fps();
+		msgothic.draw_text("FPS: " + stream.str(), { 0.0f, 0.0f });
+
 		// // scene2d.draw_shape(msgothic.set_text("COLLISION: " + std::to_string(collision)).set_position(vec2<float>(0.0f, 24.0f)));
 		// msgothic.set_text("POS: "
 		// 		+ std::to_string(camera.get_x()) + ", "
@@ -244,6 +242,8 @@ int main() {
 		// 		+ std::to_string(camera.get_z()))
 		// 	.set_position(vec2<float>(0.0f, 24.0f));
 		// scene2d.draw_font(msgothic);
+
+
 
 
 		// Update rotation

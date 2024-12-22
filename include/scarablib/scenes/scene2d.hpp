@@ -10,7 +10,6 @@
 /**
  * I could optimize more the draw method by using "begin_draw" and "end_draw" method like raylib
  * Using these methods, I would use the same VAO bind for all shapes inside of it, which is more optimized
- *
  * I could also make something similar to love2d, where the color is changed using `love.graphics.color`
  * and all shapes drawed after this are colorized using the color defined
  *
@@ -38,27 +37,22 @@ class Scene2D : public Scene<Shape2D> {
 		Scene2D(Scene2D&&) = delete;
 		Scene2D& operator=(Scene2D&&) = delete;
 
-		// Draw a 2D mesh using a reference of it.
-		// e.g., `scene2d.draw_shape(rectangle)`
-		void draw_shape(Shape2D& shape);
+		// Add a shape to the scene
+		void add_to_scene(const std::string& key, Shape2D* shape) override;
 
-		// Draw all objects in scene
-		void draw_all() override;
+		// Draw all objects added to the scene
+		void draw_all() const override;
 
-
-		// Update scene viewport using window object
+		// Update scene viewport using the window object
 		inline void update_viewport(const Window& window) override {
 			this->update_viewport(window.get_width(), window.get_height());
 		}
 
-		// Update scene viewport using width and height values
+		// Update scene viewport using custon width and height values
 		void update_viewport(const uint32 width, const uint32 height) override;
 
 	private:
 		VAO* vao = new VAO();
-
-		// Change to shared_ptr?
-		// std::vector<Shape2D*> scene;
 
 		Shader* shader = new Shader(
 			FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/2d/vertex.glsl").c_str(),
