@@ -1,19 +1,20 @@
 CXX = clang++
 CXXFLAGS = -std=c++20 -O3 \
-		   -MMD -MP \
 		   -I./include \
 		   -I./include/GLEW \
 		   -I./include/glm \
 		   -I./include/SDL2 -I./include/SDL2/SDL2 \
 		   -I./include/SDL2_mixer \
 		   -I./include/SDL2_ttf \
+		   -I./include/freetype \
 		   -I./include/stb
 
 LDFLAGS = -L./lib/GLEW \
 		  -L./lib/SDL2 \
 		  -L./lib/SDL2_mixer \
 		  -L./lib/SDL2_ttf \
-		  -lGL -lGLEW -lSDL2 -lSDL2main -lSDL2_mixer -lSDL2_ttf
+		  -L./lib/freetype
+		  -lGL -lGLEW -lSDL2 -lSDL2main -lSDL2_mixer -lfreetype -lSDL2_ttf
 
 # Dirs
 BUILD_DIR = build
@@ -28,7 +29,7 @@ TARGET = scarablib
 TARGET_STATIC = lib$(TARGET).a
 TARGET_SHARED = lib$(TARGET).so
 
-all: static
+all: shared
 
 # TODO -- implement shared
 

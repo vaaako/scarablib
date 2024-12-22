@@ -7,6 +7,7 @@ CXXFLAGS = -std=c++20 -O3 \
 		   -I./include/SDL2 -I./include/SDL2/SDL2 \
 		   -I./include/SDL2_mixer \
 		   -I./include/SDL2_ttf \
+		   -I./include/freetype \
 		   -I./include/stb \
 		   -g \
 		   -fdiagnostics-color=always \
@@ -25,26 +26,25 @@ CXXFLAGS = -std=c++20 -O3 \
 		   -Wconversion \
 		   -Wunreachable-code
 
-# -static: Force static linking
-# LDFLAGS = -static -L./lib/GLEW \
+# Force static files
+# LDFLAGS = -L./lib/GLEW \
 # 		  -L./lib/SDL2 \
 # 		  -L./lib/SDL2_mixer \
 # 		  -L./lib/SDL2_ttf \
 # 		  -L./build \
-# 		  -lGL -lGLEW -lSDL2 -lSDL2_mixer -lSDL2_ttf -lscarablib
+# 		  ./lib/GLEW/libGLEW.a \
+# 		  ./lib/SDL2/libSDL2.a \
+# 		  ./lib/SDL2_mixer/libSDL2_mixer.a \
+# 		  ./lib/SDL2_ttf/libSDL2_ttf.a \
+# 		  -lGL -lscarablib
 
-
-# Force static files
 LDFLAGS = -L./lib/GLEW \
 		  -L./lib/SDL2 \
 		  -L./lib/SDL2_mixer \
 		  -L./lib/SDL2_ttf \
+		  -L./lib/freetype
 		  -L./build \
-		  ./lib/GLEW/libGLEW.a \
-		  ./lib/SDL2/libSDL2.a \
-		  ./lib/SDL2_mixer/libSDL2_mixer.a \
-		  ./lib/SDL2_ttf/libSDL2_ttf.a \
-		  -lGL -lscarablib
+		  -lGL -lGLEW -lSDL2 -lSDL2main -lSDL2_mixer -lSDL2_ttf -lfreetype -lscarablib
 
 # Dirs
 BUILD_DIR = build

@@ -9,6 +9,7 @@ build/
 *.vim
 
 # Debug
+*.json
 valgrind*.txt*
 *.a
 vgcore*
