@@ -28,6 +28,7 @@ Mesh::Mesh(const char* path) {
 	VBO vbo = VBO();
 	EBO ebo = EBO(indices); // segfault here idk
 
+	vbo.bind();
 	vbo.make_from_vertex(vertices, 3);
 
 	// Unbind vao
@@ -60,12 +61,13 @@ Mesh& Mesh::set_rotation(const float angle, const vec3<bool> axis) {
 
 Mesh& Mesh::set_orientation(const float angle, const vec3<bool> axis) {
 	this->conf.orient_angle = angle;
+	this->conf.orient_axis = (vec3<float>)axis;
+
 	// At least one axis need to be true to work
 	if(axis == vec3<bool>(false)) {
-		this->conf.orient_axis = (vec3<float>)axis;
 		return *this;
 	}
-	this->conf.orient_axis = (vec3<float>)axis;
+
 	this->isdirty = true;
 	return *this;
 }
@@ -89,7 +91,7 @@ void Mesh::draw(Camera& camera, const Shader& shader) {
 	// Add perspective
 	glm::mat4 proj = camera.get_proj_matrix();
 
-	// NOTE -- "is dirty" for color wouldn't work because would set the last color updated for all meshes (using this later maybe)
+	// NOTE: "is dirty" for color wouldn't work because would set the last color updated for all meshes (using this later maybe)
 	shader.set_color("shapeColor", this->conf.color);
 	shader.set_matrix4f("mvp", (proj * view) * this->model);
 

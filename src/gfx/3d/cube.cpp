@@ -79,6 +79,7 @@ Cube::Cube(const MeshConf& conf) : Mesh(conf, &this->get_vao()) {
 	VBO vbo = VBO();
 	EBO ebo = EBO(indices);
 
+	vbo.bind();
 	vbo.make_from_vertex(vertices, 3);
 
 	// Unbind vao

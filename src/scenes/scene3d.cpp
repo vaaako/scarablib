@@ -17,8 +17,6 @@ void Scene3D::add_to_scene(const std::string& key, Mesh* mesh) {
 }
 
 void Scene3D::draw_all() const {
-	glDepthFunc(GL_LESS);
-
 	this->shader->use();
 
 	for(const auto& [vao, meshes] : this->vao_groups) {

@@ -21,6 +21,7 @@ void Camera::rotate(const MouseHandler& mouse) {
 		this->pitch = -89.0f;
 	}
 
+
 	// Update orientation
 	// orientation = front
 	this->orientation = glm::normalize(vec3<float> {
