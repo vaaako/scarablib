@@ -25,12 +25,6 @@ Window::Window(const WindowConf& config) : conf(config) {
 		throw ScarabError("Failed to init SDL_mixer: %s", SDL_GetError());
 	}
 
-	if (TTF_Init() != 0) {
-		Mix_CloseAudio();
-		SDL_Quit();
-		throw ScarabError("Failed to init SDL_ttf: %s", SDL_GetError());
-	}
-
 	// Make window
 	this->window = SDL_CreateWindow(
 		config.title,
@@ -41,7 +35,6 @@ Window::Window(const WindowConf& config) : conf(config) {
 
 	if(!this->window) {
 		Mix_CloseAudio();
-		TTF_Quit();
 		SDL_Quit();
 		throw ScarabError("Failed to create a SDL window: %s", SDL_GetError());
 	}
@@ -62,7 +55,6 @@ Window::Window(const WindowConf& config) : conf(config) {
 		SDL_GL_DeleteContext(this->glContext);
 		SDL_DestroyWindow(this->window);
 		Mix_CloseAudio();
-		TTF_Quit();
 		SDL_CloseAudio();
 		SDL_Quit();
 		throw ScarabError("Failed to init GLEW: %s", glewGetErrorString(err));
@@ -76,16 +68,8 @@ Window::Window(const WindowConf& config) : conf(config) {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // Standard alpha blending
 
-
 	glEnable(GL_DEPTH_TEST);
 	// glEnable(GL_CULL_FACE);
-	// glDepthFunc(GL_LEQUAL);
-
-
-	// glEnable(GL_CULL_FACE); // If enabled font disappear
-
-	// glEnable(GL_DEPTH_TEST); // 2D shapes draw order get opposite because of this
-	// glDepthFunc(GL_LEQUAL);
 
 
 
@@ -97,9 +81,6 @@ Window::Window(const WindowConf& config) : conf(config) {
 		LOG_INFO("Renderer: %s", glGetString(GL_RENDERER));
 		LOG_INFO("Viewport: %dx%d", config.width, config.height);
 	}
-
-	// Initialize arrays
-	ScarabMath::initialize();
 }
 
 Window::~Window() {
@@ -118,7 +99,6 @@ Window::~Window() {
 	// Close all
 	SDL_DestroyWindow(this->window);
 	Mix_CloseAudio();
-	TTF_Quit();
 	SDL_CloseAudio();
 	SDL_Quit();
 }
