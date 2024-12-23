@@ -1,6 +1,7 @@
 #include "scarablib/types/image.hpp"
 #include "scarablib/proper/error.hpp"
 
+// STB entry point
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 

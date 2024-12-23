@@ -1,7 +1,6 @@
 #pragma once
 
 #include "scarablib/typedef.hpp"
- 
 
 // Object used to represent an image
 struct Image {
