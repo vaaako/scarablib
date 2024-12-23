@@ -5,11 +5,37 @@
 
 // Helper namespace with methods related to string manipulation
 namespace ScarabMath {
+	static float angles[360];
+	static float sin_angles[360];
+	static float cos_angles[360];
+
 	constexpr float EPSILON = 1e-6f; // Small tolerance value for floating-point comparison
 
-	// Convert degrees to radians 
-	[[nodiscard]] inline float radians(const float degrees) {
-		return degrees * static_cast<float>(0.01745329251994329576923690768489);
+	// Initialize arrays
+	inline void initialize() noexcept {
+		for(uint32 i = 0; i < 360; i++) {
+			angles[i]     = i * static_cast<float>(0.01745329251994329576923690768489);
+			sin_angles[i] = std::sin(angles[i]);
+			cos_angles[i] = std::cos(angles[i]);
+		}
+	}
+
+	// Convert degrees to radians
+	[[nodiscard]] constexpr inline float radians(const uint32 degrees) noexcept {
+		return (degrees >= 0 && degrees < 360) ? angles[degrees] : 0.0f;
+		// Invalid index fallback
+	}
+
+
+	[[nodiscard]] constexpr inline float sin(const uint32 sin) noexcept {
+		return (sin >= 0 && sin < 360) ? sin_angles[sin] : 0.0f;
+		// Invalid index fallback
+	}
+
+
+	[[nodiscard]] constexpr inline float cos(const uint32 cos) noexcept {
+		return (cos >= 0 && cos < 360) ? cos_angles[cos] : 0.0f;
+		// Invalid index fallback
 	}
 
 	// Returns true if `a` can be considered equal to `b` with optional tolerance

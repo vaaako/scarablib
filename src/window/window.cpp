@@ -1,11 +1,10 @@
 #include "scarablib/window/window.hpp"
-#include "scarablib/opengl/shader.hpp"
 #include "scarablib/proper/error.hpp"
+#include "scarablib/utils/math.hpp"
 #include <SDL_mixer.h>
 #include <SDL_ttf.h>
 
 Window::Window(const WindowConf& config) : conf(config) {
-
 	// Init SDL
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
@@ -98,6 +97,9 @@ Window::Window(const WindowConf& config) : conf(config) {
 		LOG_INFO("Renderer: %s", glGetString(GL_RENDERER));
 		LOG_INFO("Viewport: %dx%d", config.width, config.height);
 	}
+
+	// Initialize arrays
+	ScarabMath::initialize();
 }
 
 Window::~Window() {
