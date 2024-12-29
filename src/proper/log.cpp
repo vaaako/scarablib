@@ -2,6 +2,7 @@
 
 #include <cstdarg>
 #include <ctime>
+#include <mutex>
 #include <sstream>
 #include <vector>
 
@@ -38,44 +39,43 @@ std::string Log::get_date_and_time() {
 	return oss.str();
 }
 
+//
+// void Log::log(const char* level, const char* fmt, ...) {
+// 	va_list args;
+// 	va_start(args, fmt);
+// 	log_impl(fmt, level, nullptr, args);
+// 	va_end(args);
+// }
 
-void Log::log(const char* fmt, ...) {
-	std::vector<char> buffer = std::vector<char>(1024);
+// void Log::log_time(const char* level, const char* fmt, ...) {
+// 	va_list args;
+// 	va_start(args, fmt);
+// 	log_impl(fmt, level, nullptr, args, true);
+// 	va_end(args);
+// }
+
+void Log::log_impl(const char* level, const char* func, bool include_time, const char* fmt, ...) {
 	va_list args;
 	va_start(args, fmt);
-	vsnprintf(buffer.data(), buffer.size(), fmt, args); // Format the string
 
-	std::printf("%s\n", buffer.data());
-	va_end(args);
-}
-
-void Log::log(const char* level, const char* fmt, ...) {
 	std::vector<char> buffer = std::vector<char>(1024);
-	va_list args;
-	va_start(args, fmt);
-	vsnprintf(buffer.data(), buffer.size(), fmt, args);
+	size_t needed = vsnprintf(buffer.data(), buffer.size(), fmt, args);
 
-	std::printf("[%s] %s\n", level, buffer.data());
+	// Resize buffer if the formatted string is too large
+	if (needed >= buffer.size()) {
+		buffer.resize(needed + 1);
+		vsnprintf(buffer.data(), buffer.size(), fmt, args);
+	}
+
+	if(include_time) {
+		std::printf("[%s] [%s] %s\n", get_time().c_str(), level ? level : "", buffer.data());
+	} else if(level) {
+		std::printf("[%s] %s\n", level, buffer.data());
+	} else if(func) {
+		std::printf("[%s] [%s] %s\n", level ? level : "", func, buffer.data());
+	} else {
+		std::printf("%s\n", buffer.data());
+	}
+
 	va_end(args);
 }
-
-void Log::log(const char* level, const char* func, const char* fmt, ...) {
-	std::vector<char> buffer = std::vector<char>(1024);
-	va_list args;
-	va_start(args, fmt);
-	vsnprintf(buffer.data(), buffer.size(), fmt, args);
-
-	std::printf("[%s] [%s] %s\n", level, func, buffer.data());
-	va_end(args);
-}
-
-void Log::log_time(const char* level, const char* fmt, ...) {
-	std::vector<char> buffer = std::vector<char>(1024);
-	va_list args;
-	va_start(args, fmt);
-	vsnprintf(buffer.data(), buffer.size(), fmt, args);
-
-	std::printf("[%s] [%s] %s\n", Log::get_time().c_str(), level, buffer.data());
-	va_end(args);
-}
-
