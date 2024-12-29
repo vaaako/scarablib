@@ -13,7 +13,7 @@ void Scene3D::add_to_scene(const std::string& key, Mesh* mesh) {
 	}
 
 	std::shared_ptr<Mesh> shared_mesh = std::shared_ptr<Mesh>(mesh);
-	// this->scene.emplace(key, shared_mesh);
+	this->scene.emplace(key, shared_mesh); // will not be used here, but is used for get_by_key()
 	this->vao_groups[mesh->get_vao().get_id()].push_back(shared_mesh);
 }
 
@@ -25,9 +25,6 @@ void Scene3D::draw_all() const {
 
 		for(std::shared_ptr<Mesh> mesh : meshes) {
 			mesh->draw(this->camera, *this->shader);
-			#ifdef SCARAB_DEBUG_DRAWCALL
-			this->drawcalls += 1;
-			#endif
 		}
 	}
 	glBindVertexArray(0);

@@ -152,15 +152,9 @@ int main() {
 	// });
 	// cube1.set_texture(&tex1);
 
-	scene3d.add_to_scene("cube1", new Cube({
-		.position = vec3<float>(0.0f),
-
-	}));
-	std::shared_ptr<Cube> cube = scene3d.get_by_key<Cube>("cube1");
-	if(cube == nullptr) {
-		LOG_INFO("cube is nullptr");
-	}
-
+	Cube* cube = new Cube({});
+	scene3d.add_to_scene("cube1", cube);
+	cube->set_texture(&tex1);
 
 	// Cube cube2 = Cube({
 	// 	.position = vec3<float>(0.0f),
@@ -190,16 +184,16 @@ int main() {
 	// scene3d.add_to_scene("plane", &plane);
 
 
-	// Rectangle rectangle = Rectangle({
+	// Rectangle* rectangle = new Rectangle({
 	// 	.position = vec2<uint32>(
 	// 		window.get_half_width()  - 10,
 	// 		window.get_half_height() - 10
 	// 	),
 	// 	.size = vec2<float>(10.0f, 10.0f)
 	// });
-	// scene2d.add_to_scene("rectangle", &rectangle);
+	// scene2d.add_to_scene("rectangle", rectangle);
 
-	// LOG_INFO("Scene3d length %d", scene3d.length());
+	LOG_INFO("Scene3d length %d", scene3d.length());
 
 	float rotation = 0.0f;
 	float rotation_speed = 1.0f;

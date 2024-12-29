@@ -58,10 +58,6 @@ void Scene2D::draw_all() const {
 
 	for(const auto& [_, shape] : scene) {
 		shape->draw(*this->shader);
-
-	#ifdef SCARAB_DEBUG_DRAWCALL
-		this->drawcalls += 1;
-	#endif
 	}
 
 	this->vao->unbind();

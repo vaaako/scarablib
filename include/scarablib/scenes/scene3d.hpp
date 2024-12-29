@@ -46,15 +46,6 @@ class Scene3D : public Scene<Mesh> {
 			this->camera.update_viewport(width, height);
 		}
 
-	#ifdef SCARAB_DEBUG_DRAWCALL
-		int drawcalls = 0;
-
-		inline void print_drawcalls(Scene2D& scene2d, Font& font) {
-			font.set_text("3D Drawcalls: " + std::to_string(this->drawcalls));
-			scene2d.draw_shape(font);
-			this->drawcalls = 0;
-		}
-	#endif
 
 	private:
 		Camera& camera;
