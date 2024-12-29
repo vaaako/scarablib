@@ -48,18 +48,21 @@ Cube cube2 = Cube({
 
 // Set textures
 cube1.set_texture(&tex1);
-cube1.set_texture(&tex2);
+cube2.set_texture(&tex2);
 
 // Add to the scene
-scene3d.add_to_scene(cube);
-scene3d.add_to_scene(cube2);
+scene3d.add_to_scene("cube1", &cube);
+scene3d.add_to_scene("cube2", &cube2);
 
 // Rectangle object
 Rectangle aim = Rectangle({
-	.position = vec2<float>(window.get_half_width(), window.get_half_height())
+	.position = vec2<uint32>(
+		window.get_half_width()  - 5,
+		window.get_half_height() - 5
+	),
+	.size = vec2<float>(10.0f, 10.0f)
 });
-
-scene2d.add_to_scene(aim);
+scene2d.add_to_scene("aim", &aim);
 ```
 
 Inside the main loop:

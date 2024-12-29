@@ -30,6 +30,7 @@ Scene2D::Scene2D(const Window& window) : Scene<Shape2D>(window) {
 	this->vao->bind();
 
 	// Build VBO
+	vbo.bind();
 	vbo.make_from_vertex(vertices, 2);
 
 	// Unbind all
@@ -52,7 +53,6 @@ void Scene2D::add_to_scene(const std::string& key, Shape2D* shape) {
 
 void Scene2D::draw_all() const {
 	glDepthFunc(GL_ALWAYS);
-
 	this->vao->bind();
 	this->shader->use();
 

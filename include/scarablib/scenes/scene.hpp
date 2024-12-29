@@ -36,18 +36,19 @@ class Scene {
 
 		// Get a object by key and dynamically convert it
 		template <typename U>
-		U& get_by_key(const std::string& key) {
+		std::shared_ptr<U> get_by_key(const std::string& key) {
 			auto it = this->scene.find(key);
 			if(it == this->scene.end()) {
-				throw ScarabError("Object '%s' is not added to the scene", key);
+				LOG_ERROR("Object '%s' is not added to the scene", key.c_str());
+				return nullptr;
 			}
 
-			auto casted_ptr = std::dynamic_pointer_cast<U>(it->second.get());
+			auto casted_ptr = std::dynamic_pointer_cast<U>(it->second);
 			if(!casted_ptr) {
-				throw ScarabError("Failed to cast object with key '%s' to type");
+				throw ScarabError("Failed to cast object with key '%s' to type", key.c_str());
 			}
 
-			return *casted_ptr;
+			return casted_ptr;
 		}
 
 		// Remove object by key
@@ -77,8 +78,9 @@ class Scene {
 		uint32 width;
 		uint32 height;
 
-		std::unordered_map<std::string, T*> scene;
-		std::unordered_map<GLuint, std::vector<T*>> vao_groups;
+		std::unordered_map<std::string, std::shared_ptr<T>> scene;
+		// Use VAO as ID to query and batch draw meshes with the same VAO
+		std::unordered_map<GLuint, std::vector<std::shared_ptr<T>>> vao_groups;
 };
 
 template <typename T> // Return the shared pointer

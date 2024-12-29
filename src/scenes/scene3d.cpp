@@ -9,11 +9,12 @@ Scene3D::~Scene3D() {
 
 void Scene3D::add_to_scene(const std::string& key, Mesh* mesh) {
 	if(!mesh) {
-		throw ScarabError("Try to add null object '%s'", mesh);
+		throw ScarabError("Attempted to add a null Mesh to the scene with key '%s'", key.c_str());
 	}
 
-	this->scene.emplace(key, mesh);
-	this->vao_groups[mesh->get_vao().get_id()].push_back(mesh);
+	std::shared_ptr<Mesh> shared_mesh = std::shared_ptr<Mesh>(mesh);
+	// this->scene.emplace(key, shared_mesh);
+	this->vao_groups[mesh->get_vao().get_id()].push_back(shared_mesh);
 }
 
 void Scene3D::draw_all() const {
@@ -22,7 +23,7 @@ void Scene3D::draw_all() const {
 	for(const auto& [vao, meshes] : this->vao_groups) {
 		glBindVertexArray(vao);
 
-		for(Mesh* mesh : meshes) {
+		for(std::shared_ptr<Mesh> mesh : meshes) {
 			mesh->draw(this->camera, *this->shader);
 			#ifdef SCARAB_DEBUG_DRAWCALL
 			this->drawcalls += 1;
