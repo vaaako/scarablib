@@ -138,23 +138,18 @@ int main() {
 	});
 
 	// Load mesh
-	// Mesh cow = Mesh("test/assets/objs/cow.obj");
-	// cow.set_position({ 0.0f, 0.0f, -5.0f });
-	// cow.set_color(Colors::CHIROYELLOW);
-	// cow.set_orientation(90.0f, { false, false, true });
-	// scene3d.add_to_scene("cow", &cow);
+	Mesh* cow = new Mesh("test/assets/objs/cow.obj");
+	cow->set_position({ 0.0f, 0.0f, -5.0f });
+	cow->set_color(Colors::CHIROYELLOW);
+	cow->set_orientation(90.0f, { false, false, true });
+	scene3d.add_to_scene("cow", cow);
 
 	// Make shapes
-	// Cube position doesnt matter because will change later
-
-	// Cube cube1 = Cube({
-	// 	.position = vec3<float>(0.0f),
-	// });
-	// cube1.set_texture(&tex1);
-
+	// Cube position doenst matter because will change later
 	Cube* cube = new Cube({});
 	scene3d.add_to_scene("cube1", cube);
 	cube->set_texture(&tex1);
+	// std::shared_ptr<Cube> cubefrom = scene3d.get_by_key<Cube>("cube1");
 
 	// Cube cube2 = Cube({
 	// 	.position = vec3<float>(0.0f),
@@ -184,14 +179,14 @@ int main() {
 	// scene3d.add_to_scene("plane", &plane);
 
 
-	// Rectangle* rectangle = new Rectangle({
-	// 	.position = vec2<uint32>(
-	// 		window.get_half_width()  - 10,
-	// 		window.get_half_height() - 10
-	// 	),
-	// 	.size = vec2<float>(10.0f, 10.0f)
-	// });
-	// scene2d.add_to_scene("rectangle", rectangle);
+	Rectangle* rectangle = new Rectangle({
+		.position = vec2<uint32>(
+			window.get_half_width()  - 10,
+			window.get_half_height() - 10
+		),
+		.size = vec2<float>(10.0f, 10.0f)
+	});
+	scene2d.add_to_scene("rectangle", rectangle);
 
 	LOG_INFO("Scene3d length %d", scene3d.length());
 
@@ -240,7 +235,6 @@ int main() {
 		scene3d.draw_all();
 
 
-
 		// Draw 2D shapes
 		// Format FPS, ignore
 		std::stringstream stream; stream << std::setprecision(2) << window.fps();
@@ -254,7 +248,7 @@ int main() {
 		// 	.set_position(vec2<float>(0.0f, 24.0f));
 		// scene2d.draw_font(msgothic);
 
-		// scene2d.draw_all();
+		scene2d.draw_all();
 
 		// Update rotation
 		rotation += rotation_speed;

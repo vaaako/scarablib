@@ -52,7 +52,12 @@ void Scene2D::add_to_scene(const std::string& key, Shape2D* shape) {
 }
 
 void Scene2D::draw_all() const {
-	glDepthFunc(GL_ALWAYS);
+	// This is just necessary if doing 2D and 3D
+	#ifdef SCARAB_2D_AND_3D
+		glDepthFunc(GL_ALWAYS);
+		LOG_INFO("Enabled")
+	#endif
+
 	this->vao->bind();
 	this->shader->use();
 
@@ -62,6 +67,10 @@ void Scene2D::draw_all() const {
 
 	this->vao->unbind();
 	this->shader->unbind();
+
+	#ifdef SCARAB_USE_2D_AND_3D
+		glDepthFunc(GL_LESS);
+	#endif
 }
 
 

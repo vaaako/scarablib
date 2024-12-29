@@ -15,6 +15,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wwrite-strings -Wcast-qual -Wswitch-def
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wconversion -Wunreachable-code")
 
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSCARAB_DEBUG_GLYPHS_LOADED")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSCARAB_2D_AND_3D")
 
 # Include directories
 include_directories(
