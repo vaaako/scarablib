@@ -59,9 +59,9 @@ I wrote most of the things here very tired, sorry for any english mistake
 	+ [ ] Review [camera movement](https://github.com/swr06/Minecraft/blob/master/Source/Core/Camera.cpp)
 - [ ] Billboarding logic to GPU (shaders)
 - [ ] Chunk mesh native support
-- [ ] Merge `set_angle` and `set_axis` somehow
+- [x] Merge `set_angle` and `set_axis` somehow
 - [ ] Sphere
-- [ ] Skybox
+- [x] Skybox
 - [ ] Normals / Shading value (both?)
 
 
@@ -80,47 +80,3 @@ I wrote most of the things here very tired, sorry for any english mistake
 - Camera
 - Load tile map support (Tiled)
 
-# Review files
-Review for erros and improvement (header and declaration)
-
-- [ ] input/
-	+ [x] keyboard.hpp
-	+ [x] keycode.hpp
-	+ [ ] mouse.hpp (recheck when implementing 3D space)
-- [x] opengl/
-	+ [x] shaders/
-		* [x] 2d/
-		* [x] 3d/
-	+ [x] ebo.hpp
-	+ [x] shader_program.hpp
-	+ [x] vao.hpp
-	+ [x] vbo.hpp
-- [x] proper/
-	+ [x] vector/
-		* [x] vec2.hpp
-		* [x] vec3.hpp
-		* [x] ...
-	+ [x] color.hpp
-- [x] scenes/
-	+ [x] scene.hpp
-	+ [x] scene2d.hpp
-- [x] shapes/
-	+ [x] shape2d.hpp
-- [x] types/
-	+ [x] audio.hpp
-	+ [x] color.hpp
-	+ [x] font.hpp
-	+ [x] music.hpp (may contain some bug)
-	+ [x] sound.hpp
-	+ [x] texture.hpp (finish when implement fonts)
-	+ [x] vertex.hpp
-- [x] utils/
-	+ [x] file.hpp
-	+ [x] log.hpp
-	+ [x] math.hpp
-	+ [x] sdl.hpp
-	+ [x] string.hpp
-- [x] window/
-	+ [x] events.hpp
-	+ [x] window.hpp
-+ [x] typedef.hpp
