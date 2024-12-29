@@ -1,9 +1,7 @@
 # Scarablib
-Scarablib 🪲 is a C++ library for graphical development.
+Scarablib 🪲 is a C++ library designed to simplify graphical development, offering tools for both 2D and 3D rendering. While still in its early stages, Scarablib is actively being developed as a hobby project. You can track its progress in the [`todo.md`](doc/todo.md) file.
 
-Currently Scarablib is in early stages of development. You can see the file [`todo.md`](doc/todo.md), to follow the development. This is my main project but still slowly being developed as an hobby.
-
-See [examples/](examples/) to check some features (not all features have examples yet)
+<!-- See [examples/](examples/) to check some features (**note:** not all features have examples yet) -->
 
 ![showcase](medias/showcase.gif)
 
@@ -11,45 +9,70 @@ See [examples/](examples/) to check some features (not all features have example
 > [!NOTE]
 > Scarablib is in pre-alpha
 
-- Abstraction
-- Easy 2D and 3D development with multiple features
-- Helpful utility methods included
-- All dependencies are bundled within the library
+- **Abstraction:** Simplifies complex graphical operations
+- **2D and 3D development:** Easy-to-use tools for both 2D and 3D rendering
+- **Built-in Optimization:** Methods like frustum-culling for improved performance.
 
-# Libraries
+# Libraries used
 - [`SDL2`](https://www.libsdl.org/) for window management
-	+ [`SDL2_mixer`](https://www.libsdl.org/projects/mixer/) for sound
-	+ [`SDL2_ttf`](https://wiki.libsdl.org/SDL2_ttf/FrontPage) for fonts
+	+ [`SDL2_mixer`](https://www.libsdl.org/projects/mixer/) for sound handling
+- [`Freetype`](http://freetype.org/) for font loading
 - [`stb`](https://github.com/nothings/stb/tree/master) for image loading
-- [`GLEW`](https://glew.sourceforge.net/) for OpenGL
-- [`glm`](https://github.com/g-truc/glm) for mathematics
-<!-- - [`ENet`](https://github.com/zpl-c/enet) (fork) for networking -->
+- [`GLEW`](https://glew.sourceforge.net/) for OpenGL support
+- [`glm`](https://github.com/g-truc/glm) for mathematical operations
+
+>You can find the licenses for these libraries in the [`licenses/`](licenses/) directory
 
 # Roadmap
-- Load `obj` and `gltf` models
-- Light source
-- Network support
+- **Model loading:** Support for `obj` (alredy supported) and `gltf` models
+- **Lighting:** Implementation of light sources
+- **Networking:** Adding network support for multiplayer or distributed applications
+- **Optimization builtin:** Optimization methods like frustum-culling builtin
 
 # Example
-This scene was made basically with the code below
+The following code snippet demonstrates how to create a simple scene with Scarablib:
 
 ![example.gif](medias/example.gif)
+
+Outside main loop:
+```cpp
+// Two Cube objects
+Cube cube = Cube({
+	// Required arg (will change later so can set it to 0.0)
+	.position = vec3<float>(0.0f),
+});
+
+Cube cube2 = Cube({
+	.position = vec3<float>(0.0f),
+});
+
+// Set textures
+cube1.set_texture(&tex1);
+cube1.set_texture(&tex2);
+
+// Add to the scene
+scene3d.add_to_scene(cube);
+scene3d.add_to_scene(cube2);
+
+// Rectangle object
+Rectangle aim = Rectangle({
+	.position = vec2<float>(window.get_half_width(), window.get_half_height())
+});
+
+scene2d.add_to_scene(aim);
+```
+
+Inside the main loop:
 ```cpp
 // Draw 3D shapes
-scene3d.draw_all({
-	&cube1,
-	//                  center, angle, radius
-	&cube2.set_position(ScarabMath::orbitate_y(cube1.get_position(), rotation, 2.0f))
-});
+//                                        center,               angle, radius
+cube2.set_position(ScarabMath::orbitate_y(cube1.get_position(), rotation, 2.0f));
+scene3d.draw_all();
 
 // Draw 2D shapes
 // Draw font
-scene2d.draw_shape(
-	msgothic.set_text("FPS: " + std::to_string(window.fps()))
-);
-
-// Aim
-scene2d.draw_shape(rectangle);
+msgothic.draw_text("FPS: " + std::to_string(window.fps()), { 0.0f, 0.0f });
+scene2d.draw_all();
 
 // Update rotation
 rotation += rotation_speed;
@@ -61,45 +84,47 @@ if(rotation >= 360.0f) {
 
 
 # Building and run
-You can use both `CMake` and `Makefile` to build the library and run tests.
-- Use **Makefile** for building the library and running tests.
-- Use **CMake** primarily for testing.
-
-No futher installation needed
+Scarablib can be built using either `CMake` or `Makefile`. Both methods are supported, but they serve slightly different purposes:
 
 ## CMake
-You can compile `test/main.cpp` using `CMake`, which is the file used for testing the library
+Use CMake for testing the library:
 ```sh
-cmake -S . -B build    # Config
+cmake -S . -B build    # Configure
 cmake --build build    # Compile
 ./build/scarablib_dev  # Run
 ```
 
+This will compile the file `test/main.cpp`, which is the file used for testing the library
+
 ## Makefile
-## Static library
-With `Make` you can compile the library to a static library to use on your own project
+With `Make` you can compile the library to a shared and static library to use on your own projects:
 ```
 make
 ```
 
-This will generate a static library under `build/`
+This will generate a shared library in the `build/` directory
 
->The generated library is kinda big, but this is `SDL_ttf` fault
+For static library, use:
+```
+make static
+```
 
-## Dev
-You can can compile `test/main.cpp`, wich is the file used for testing the library
+## Development
+To compile and run the test file (`test/main.cpp`):
 ```sh
 make dev              # Compile
 ./build/scarablib_dev # Run
 ```
 
+Unlike CMake, this will compile the library as a shared file and then link to it
+
 # Windows Support
-Currently the library does not provide a windows support, but you can try to compile it yourself
+Currently, Scarablib does not officially support Windows. However, you can attempt to compile it yourself
 
 ## Scripts
-- `compile_and_run.sh`: Uses `make` to compile and run
+<!-- - `compile_and_run.sh`: Uses `make` to compile and run -->
 - `debug.sh`: Debug using valgrind
-- `build_compile_commands.sh`: Uses [bear](https://github.com/rizsotto/Bear) to generate `compile_commands.json` file (Used for LSP)
+- `build_compile_commands.sh`: Uses [bear](https://github.com/rizsotto/Bear) to generate `compile_commands.json` file for LSP integration
 
 
 <!-- # Inspirations -->
