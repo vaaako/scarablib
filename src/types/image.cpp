@@ -10,7 +10,7 @@ Image::Image(const char* path, const bool flip) {
 
 	this->data = stbi_load(path, &this->width, &this->height, &nr_channels, 0); // STBI_rgb_alpha to standarlize
 	if(data == NULL) {
-		throw ScarabError("Failed to load image %s", path);
+		throw ScarabError("Image [%s] was not found", path);
 	}
 }
 
