@@ -14,7 +14,7 @@ struct Glyph {
 	GLuint texture_id;
 	vec2<uint32> size;
 	vec2<uint32> bearing; // Offset from baseline to the left/top
-	GLuint advance; // Horizontal offset to next glyph
+	uint32 advance; // Horizontal offset to next glyph
 };
 
 // Font object used to draw text on the screen
@@ -49,4 +49,5 @@ class Font {
 			return shader_circle;
 		}
 };
+
 

@@ -3,7 +3,7 @@
 #include "scarablib/utils/math.hpp"
 #include <SDL2/SDL_mixer.h>
 
-Window::Window(const WindowConf& config) : conf(config) {
+Window::Window(const WindowConf& config) : conf(config), half_width(config.width / 2), half_height(config.height / 2) {
 	// Init SDL
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);

@@ -8,4 +8,4 @@ if [ ! -d src ]; then
 	exit
 fi
 
-bear --output build/compile_commands.json -- make dev
+bear --output build/compile_commands.json -- make

@@ -97,6 +97,16 @@ class Window {
 			return this->conf.height;
 		}
 
+		// Return the half width of the window in pixels.
+		inline uint32 get_half_width() const {
+			return this->half_width;
+		}
+
+		// Return the half height of the window in pixels.
+		inline uint32 get_half_height() const {
+			return this->half_height;
+		}
+
 		// Return a pointer to the keyboard handler object.
 		// This allows access to input handling for the keyboard.
 		inline KeyboardHandler& keyboard() {
@@ -142,6 +152,9 @@ class Window {
 		inline void set_size(const vec2<uint32>& size) {
 			this->conf.width = size.x;
 			this->conf.height = size.y;
+
+			this->half_width = size.x / 2;
+			this->half_height = size.y / 2;
 			SDL_SetWindowSize(this->window, (int)size.x, (int)size.y);
 			glViewport(0, 0, (GLsizei)size.x, (GLsizei)size.y);
 		}
@@ -224,6 +237,8 @@ class Window {
 		WindowConf conf;
 		vec4<float> clear_color = vec4<float>(1.0f); // Better access
 		bool window_open = true;
+		uint32 half_width = 0;
+		uint32 half_height = 0;
 
 		// Buffer to store all events to be processed each frame
 		std::unordered_set<uint32> frame_events; // unordered_set is faster for look-up

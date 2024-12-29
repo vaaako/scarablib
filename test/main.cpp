@@ -118,7 +118,7 @@ int main() {
 	Texture snail = Texture("test/assets/images/snail.png");
 
 	// TODO: Make it use only one drawcall
-	Font msgothic = Font("test/assets/fonts/msgothic.ttf", 24);
+	Font msgothic = Font("test/assets/fonts/Ubuntu-R.ttf", 24);
 
 	// Make scenes
 	Camera camera = Camera(window, 75.0f);
@@ -138,21 +138,29 @@ int main() {
 	});
 
 	// Load mesh
-	Mesh cow = Mesh("test/assets/objs/cow.obj");
-	cow.set_position({ 0.0f, 0.0f, -5.0f });
-	cow.set_color(Colors::CHIROYELLOW);
-	cow.set_orientation(90.0f, { false, false, true });
-	scene3d.add_to_scene("cow", &cow);
+	// Mesh cow = Mesh("test/assets/objs/cow.obj");
+	// cow.set_position({ 0.0f, 0.0f, -5.0f });
+	// cow.set_color(Colors::CHIROYELLOW);
+	// cow.set_orientation(90.0f, { false, false, true });
+	// scene3d.add_to_scene("cow", &cow);
 
 	// Make shapes
 	// Cube position doesnt matter because will change later
 
-	Cube cube1 = Cube({
-		.position = vec3<float>(0.0f),
-	});
-	cube1.set_texture(&tex1);
+	// Cube cube1 = Cube({
+	// 	.position = vec3<float>(0.0f),
+	// });
+	// cube1.set_texture(&tex1);
 
-	scene3d.add_to_scene("cube1", &cube1);
+	scene3d.add_to_scene("cube1", new Cube({
+		.position = vec3<float>(0.0f),
+
+	}));
+	std::shared_ptr<Cube> cube = scene3d.get_by_key<Cube>("cube1");
+	if(cube == nullptr) {
+		LOG_INFO("cube is nullptr");
+	}
+
 
 	// Cube cube2 = Cube({
 	// 	.position = vec3<float>(0.0f),
@@ -181,6 +189,15 @@ int main() {
 	// plane.set_texture(&snail);
 	// scene3d.add_to_scene("plane", &plane);
 
+
+	// Rectangle rectangle = Rectangle({
+	// 	.position = vec2<uint32>(
+	// 		window.get_half_width()  - 10,
+	// 		window.get_half_height() - 10
+	// 	),
+	// 	.size = vec2<float>(10.0f, 10.0f)
+	// });
+	// scene2d.add_to_scene("rectangle", &rectangle);
 
 	// LOG_INFO("Scene3d length %d", scene3d.length());
 
@@ -225,7 +242,7 @@ int main() {
 
 		// plane.face_position(camera.get_position());
 
-		// skybox.draw();
+		skybox.draw();
 		scene3d.draw_all();
 
 
@@ -233,7 +250,7 @@ int main() {
 		// Draw 2D shapes
 		// Format FPS, ignore
 		std::stringstream stream; stream << std::setprecision(2) << window.fps();
-		msgothic.draw_text("é FPS: " + stream.str(), { 0.0f, 0.0f });
+		msgothic.draw_text("FPS: " + stream.str(), { 0.0f, 0.0f });
 
 		// // scene2d.draw_shape(msgothic.set_text("COLLISION: " + std::to_string(collision)).set_position(vec2<float>(0.0f, 24.0f)));
 		// msgothic.set_text("POS: "
@@ -243,8 +260,7 @@ int main() {
 		// 	.set_position(vec2<float>(0.0f, 24.0f));
 		// scene2d.draw_font(msgothic);
 
-
-
+		// scene2d.draw_all();
 
 		// Update rotation
 		rotation += rotation_speed;

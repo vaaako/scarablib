@@ -15,9 +15,11 @@ vec4 normalized_color(vec4 color) {
 
 void main() {
 	// Extracts the red channel which stores the glyph's alpha value
+	float alpha = texture(texSampler, texCoord).r;
 	// vec4(1.0, 1.0, 1.0, alpha): Creates a white color with the sampled alpha
-	vec4 sampled = vec4(1.0, 1.0, 1.0, texture(texSampler, texCoord).r);
-	FragColor = vec4(normalized_color(shapeColor)) * sampled;
+	vec4 sampled = vec4(1.0, 1.0, 1.0, alpha);
+	// Apply text color
+	FragColor = normalized_color(shapeColor) * sampled;
 }
 
 

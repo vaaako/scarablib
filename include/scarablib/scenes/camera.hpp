@@ -157,7 +157,7 @@ class Camera {
 		float far_plane  = 100.0f;
 
 		// Movement
-		bool firstclick = true;
+		// bool firstclick = true;
 		// -90 in yaw prevents camera from jumping on the first click
 		float yaw = -90.0f; // Horizontal rotation
 		float pitch = 0.0f; // Vertical rotation

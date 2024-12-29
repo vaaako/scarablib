@@ -9,7 +9,7 @@
 
 Font::Font(const char* path, const uint16 size) {
 	if(StringHelper::file_extension(path) != "ttf") {
-		throw ScarabError("Font (%s) is not supported. Only .ttf format is supported supported", path);
+		throw ScarabError("Font [%s] is not supported. Only .ttf format is supported supported", path);
 	}
 
 	FT_Library ft;
@@ -19,7 +19,7 @@ Font::Font(const char* path, const uint16 size) {
 
 	FT_Face face;
 	if(FT_New_Face(ft, path, 0, &face)) {
-		throw ScarabError("Font '%s' was not found!", path);
+		throw ScarabError("Font [%s] was not found!", path);
 	}
 
 
@@ -96,7 +96,6 @@ void Font::draw_text(const std::string& text, const vec2<uint32> pos, const Colo
 	float cur_x = pos.x;
 	float cur_y = pos.y;
 	for(const char c : text) {
-		// TODO: check if c is on map
 		Glyph& ch = this->chars.at(c);
 
 		const float xpos = cur_x + ch.bearing.x * scale;
@@ -107,13 +106,13 @@ void Font::draw_text(const std::string& text, const vec2<uint32> pos, const Colo
 
 		// Add quad vertices (position and texture coordinates)
 		float vertices[6][4] = {
-			xpos,     ypos + h,  0.0f, 1.0f,
-			xpos + w, ypos,      1.0f, 0.0f,
-			xpos,     ypos,      0.0f, 0.0f,
+			{ xpos,     ypos + h,  0.0f, 1.0f },
+			{ xpos + w, ypos,      1.0f, 0.0f },
+			{ xpos,     ypos,      0.0f, 0.0f },
 
-			xpos,     ypos + h,  0.0f, 1.0f,
-			xpos + w, ypos + h,  1.0f, 1.0f,
-			xpos + w, ypos,      1.0f, 0.0f
+			{ xpos,     ypos + h,  0.0f, 1.0f },
+			{ xpos + w, ypos + h,  1.0f, 1.0f },
+			{ xpos + w, ypos,      1.0f, 0.0f }
 		};
 
 		glBindTexture(GL_TEXTURE_2D, ch.texture_id);
@@ -124,3 +123,4 @@ void Font::draw_text(const std::string& text, const vec2<uint32> pos, const Colo
 		cur_x += (ch.advance >> 6) * scale; // The advance is in 1/64th of a pixel
 	}
 }
+
