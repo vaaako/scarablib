@@ -1,72 +1,55 @@
 CXX = clang++
-CXXFLAGS = -std=c++20 -O3 \
-		   -MMD -MP \
-		   -I./include \
-		   -I./include/GLEW \
-		   -I./include/glm \
-		   -I./include/SDL2 -I./include/SDL2/SDL2 \
-		   -I./include/SDL2_mixer \
-		   -I./include/SDL2_ttf \
-		   -I./include/freetype \
-		   -I./include/stb \
-		   -g \
-		   -fdiagnostics-color=always \
-		   -Wextra \
-		   -Wall \
-		   -Wuninitialized \
-		   -Winit-self \
-		   -Wfloat-equal \
-		   -Wundef \
-		   -Wpointer-arith \
-		   -Wcast-align \
-		   -Wstrict-overflow=5 \
-		   -Wwrite-strings \
-		   -Wcast-qual \
-		   -Wswitch-default \
-		   -Wconversion \
+CXXFLAGS = -std=c++20 -O3 -g -fdiagnostics-color=always \
+		   -Wall -Wextra -Wuninitialized -Winit-self -Wfloat-equal \
+		   -Wundef -Wpointer-arith -Wcast-align -Wstrict-overflow=5 \
+		   -Wwrite-strings -Wcast-qual -Wswitch-default -Wconversion \
 		   -Wunreachable-code
-
-# Force static files
-# LDFLAGS = -L./lib/GLEW \
-# 		  -L./lib/SDL2 \
-# 		  -L./lib/SDL2_mixer \
-# 		  -L./lib/SDL2_ttf \
-# 		  -L./build \
-# 		  ./lib/GLEW/libGLEW.a \
-# 		  ./lib/SDL2/libSDL2.a \
-# 		  ./lib/SDL2_mixer/libSDL2_mixer.a \
-# 		  ./lib/SDL2_ttf/libSDL2_ttf.a \
-# 		  -lGL -lscarablib
-
+INCLUDE_FLAGS = -I./include -I./include/external -I./include/external/freetype
 LDFLAGS = -L./lib/GLEW \
 		  -L./lib/SDL2 \
 		  -L./lib/SDL2_mixer \
 		  -L./lib/SDL2_ttf \
-		  -L./lib/freetype
 		  -L./build \
-		  -lGL -lGLEW -lSDL2 -lSDL2main -lSDL2_mixer -lSDL2_ttf -lfreetype -lscarablib
+		  -lGL -lGLEW -lSDL2 -lSDL2main -lSDL2_mixer -lfreetype -lscarablib
+		  # -Wl,-rpath,'$ORIGIN'
 
-# Dirs
+# Directories
 BUILD_DIR = build
 TESTOBJS_DIR = $(BUILD_DIR)/testobjs
+DEPS_DIR = $(BUILD_DIR)/deps
 
 # Files
 SRC_FILES = $(wildcard test/*.cpp)
 TESTOBJS = $(patsubst test/%.cpp, $(TESTOBJS_DIR)/%.o, $(SRC_FILES))
-TEST_FILE = test/main.cpp
+DEPS = $(patsubst test/%.cpp, $(DEPS_DIR)/%.d, $(SRC_FILES))
 
-TARGET = scarablib
+TARGET = $(BUILD_DIR)/scarablib_dev
 
 all: dev
 
-dev: $(TESTOBJS)
-	$(CXX) $(CXXFLAGS) $^ -o $(BUILD_DIR)/$(TARGET) $(LDFLAGS)
+# Build the test executable
+dev: $(TARGET)
+
+$(TARGET): $(TESTOBJS)
+	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
 
 $(TESTOBJS_DIR)/%.o: test/%.cpp
 	@mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(INCLUDE_FLAGS) -c $< -o $@
 
+# Generate dependencies
+$(DEPS_DIR)/%.d: test/%.cpp
+	@mkdir -p $(dir $@)
+	@$(CXX) $(CXXFLAGS) $(INCLUDE_FLAGS) -MM $< > $@.$$$$; \
+	sed 's,\($*\)\.o[ :]*,$(TESTOBJS_DIR)/\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
+
+# Include dependencies
+-include $(DEPS)
+
+# Clean build artifacts
 clean:
-	rm -rf $(BUILD_DIR)/$(TARGET) $(TESTOBJS_DIR)
+	rm -rf $(BUILD_DIR)/$(TARGET) $(TESTOBJS_DIR) $(DEPS_DIR)
 
+# Phony targets
 .PHONY: all clean dev

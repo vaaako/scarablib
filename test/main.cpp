@@ -233,7 +233,7 @@ int main() {
 		// Draw 2D shapes
 		// Format FPS, ignore
 		std::stringstream stream; stream << std::setprecision(2) << window.fps();
-		msgothic.draw_text("FPS: " + stream.str(), { 0.0f, 0.0f });
+		msgothic.draw_text("é FPS: " + stream.str(), { 0.0f, 0.0f });
 
 		// // scene2d.draw_shape(msgothic.set_text("COLLISION: " + std::to_string(collision)).set_position(vec2<float>(0.0f, 24.0f)));
 		// msgothic.set_text("POS: "

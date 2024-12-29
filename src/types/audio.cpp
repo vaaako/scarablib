@@ -2,7 +2,6 @@
 #include "scarablib/utils/string.hpp"
 #include "scarablib/proper/error.hpp"
 #include <SDL2/SDL.h>
-#include <SDL_mixer.h>
 
 Audio::Audio(const char* path) {
 	// Check if extension is supported

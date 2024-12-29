@@ -1,8 +1,7 @@
 #include "scarablib/window/window.hpp"
 #include "scarablib/proper/error.hpp"
 #include "scarablib/utils/math.hpp"
-#include <SDL_mixer.h>
-#include <SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
 
 Window::Window(const WindowConf& config) : conf(config) {
 	// Init SDL

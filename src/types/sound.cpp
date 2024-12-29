@@ -1,7 +1,6 @@
 #include "scarablib/types/sound.hpp"
 #include "scarablib/proper/error.hpp"
 #include <SDL2/SDL.h>
-#include <SDL_mixer.h>
 
 Sound::Sound(const char* path) : Audio(path) {
 	// Load audio

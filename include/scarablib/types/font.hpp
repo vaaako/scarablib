@@ -8,7 +8,6 @@
 #include "scarablib/utils/file.hpp"
 #include <unordered_map>
 #include <string>
-#include <vector>
 #include <GL/glew.h>
 
 struct Glyph {
@@ -16,7 +15,6 @@ struct Glyph {
 	vec2<uint32> size;
 	vec2<uint32> bearing; // Offset from baseline to the left/top
 	GLuint advance; // Horizontal offset to next glyph
-	vec4<float> tex_coords;
 };
 
 // Font object used to draw text on the screen
@@ -35,16 +33,12 @@ class Font {
 
 	private:
 		// OpenGL
-		GLuint texture_id;
 		VAO* vao = new VAO();
 		VBO* vbo = new VBO();
 
 		// Font
 		const char* path;
 		std::unordered_map<char, Glyph> chars;
-
-		// Update text
-		std::vector<float> generate_text(const std::string& text, const float x, const float y, const float scale);
 
 		static inline Shader& get_shader() {
 			static Shader shader_circle = Shader(

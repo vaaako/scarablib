@@ -22,14 +22,17 @@ Font::Font(const char* path, const uint16 size) {
 		throw ScarabError("Font '%s' was not found!", path);
 	}
 
+
 	FT_Set_Pixel_Sizes(face, 0, size);
+	FT_Select_Charmap(face, FT_ENCODING_UNICODE);
 
 	// Disable byte-alignment restriction
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 	// NOTE: 128 is the default characters range
 	// - 256: Latin-1 Supplement range
-	for(uint32 c = 0; c < face->num_glyphs; c++){
+	for(wchar_t c = 0; c < face->num_glyphs; c++){
+		// wchar_t wchar = *c;
 		if(FT_Load_Char(face, c, FT_LOAD_RENDER)) {
 			LOG_ERROR("Failed to load glyph '%s'", c);
 			continue;
@@ -120,35 +123,4 @@ void Font::draw_text(const std::string& text, const vec2<uint32> pos, const Colo
 
 		cur_x += (ch.advance >> 6) * scale; // The advance is in 1/64th of a pixel
 	}
-}
-
-std::vector<float> Font::generate_text(const std::string& text, const float x, const float y, const float scale) {
-	std::vector<float> vertices;
-	float cur_x = x;
-	float cur_y = y;
-
-	for(const char c : text) {
-		Glyph& ch = this->chars.at(c);
-
-		const float xpos = cur_x + ch.bearing.x * scale;
-		const float ypos = cur_y - (ch.size.y - ch.bearing.y) * scale;
-
-		const float w = ch.size.x * scale;
-		const float h = ch.size.y * scale;
-
-		// Add quad vertices (position and texture coordinates)
-		vertices.insert(vertices.end(), {
-			xpos,     ypos + h,  0.0f, 1.0f,
-			xpos + w, ypos,      1.0f, 0.0f,
-			xpos,     ypos,      0.0f, 0.0f,
-
-			xpos,     ypos + h,  0.0f, 1.0f,
-			xpos + w, ypos + h,  1.0f, 1.0f,
-			xpos + w, ypos,      1.0f, 0.0f
-		});
-
-		cur_x += (ch.advance >> 6) * scale; // The advance is in 1/64th of a pixel
-	}
-
-	return vertices;
 }

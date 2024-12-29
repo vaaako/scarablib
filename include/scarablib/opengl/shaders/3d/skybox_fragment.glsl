@@ -1,4 +1,4 @@
-#version 420
+#version 330
 
 // OpenGL 4.2+
 // layout(binding = 0) uniform samplerCube skybox;

@@ -20,3 +20,4 @@ void main() {
 	FragColor = vec4(normalized_color(shapeColor)) * sampled;
 }
 
+
