@@ -1,4 +1,5 @@
 #include "scarablib/window/window.hpp"
+#include "SDL2/SDL_timer.h"
 #include "SDL2/SDL_video.h"
 #include "scarablib/proper/error.hpp"
 #include "scarablib/utils/math.hpp"
@@ -105,25 +106,63 @@ Window::~Window() {
 
 
 
-float Window::fps() {
-	uint32 current_time = SDL_GetTicks();
+double Window::fps() {
+	const uint32 current = SDL_GetTicks();
+	double elapsed = current - this->start_time;
 
 	// Update every second
-	if(current_time - start_time >= 1000) {
-		// Calc FPS
-		this->FPS = static_cast<float>(frame_count) / (static_cast<float>(current_time - start_time) / 1000.0f);
+	if(elapsed >= 1000) {
+		// Avoid division by zero
+		if(elapsed == 0.0f) {
+			elapsed = 0.01f;
+		}
+
+		// Calculate FPS
+		this->FPS = this->frame_count / (elapsed / 1000.0);
 
 		// Reset
 		this->frame_count = 0;
-		this->start_time = current_time; // Update timer
+		this->start_time = current; // Update timer
 	}
 
 	return this->FPS;
 }
 
+double Window::dt() const {
+	const uint32 current = SDL_GetTicks();
+	const uint32 elapsed = current - this->last_update;
+	// if(this->frame_count < desired_fps) {
+	// 	return;
+	// }
+
+	// Handle wrap-around (around 49 days)
+	// if(elapsed > 0x7FFFFFFF) {
+	// 	elapsed = 0.01f; // Reset or handle appropriately
+	// 	// Make 0.01 to avoid division by 0
+	// }
+
+	// Convert milliseconds to seconds
+	return static_cast<double>(elapsed) / 1000.0;
+}
+
+#include <iostream>
+void Window::frame_capping(const uint32 fps) const {
+	const double desired = 1.0 / fps; // ~0.0133 seconds per frame
+	const double actual = this->dt();
+
+	// If not synchronized
+	if(actual < desired) {
+		// Delay to make it synchronized
+		uint32 remaining = static_cast<Uint32>((desired - actual) * 1000);
+		SDL_Delay(remaining);
+		// Simulate 60 FPS if remaining is less than 10ms
+		// (remaining > 10) ? 5 : remaining
+	}
+	// If actual >= desired, the frame is already running slower than desired, so no delay is needed
+}
+
 
 void Window::process_events() {
-	this->last_update = SDL_GetTicks();
 	this->frame_count++;
 
 	SDL_Event event;

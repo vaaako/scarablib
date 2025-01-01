@@ -14,6 +14,7 @@
 #include "scarablib/window/window.hpp"
 #include "scarablib/input/keycode.hpp"
 #include <cstdio>
+#include <iostream>
 
 bool can_move = false;
 
@@ -41,6 +42,8 @@ void camera_movement(Window& window, Camera& camera, KeyboardHandler& keyboard) 
 		can_move = false;
 		window.hide_cursor(false);
 	}
+
+	// Update camera dt
 }
 
 void rotate_camera(Window& window, Camera& camera, MouseHandler& mouse) {
@@ -49,7 +52,7 @@ void rotate_camera(Window& window, Camera& camera, MouseHandler& mouse) {
 	if(mouse.isclick(MouseBTN::LMB) && !can_move) {
 		LOG_INFO("Clicked");
 		can_move = true;
-		mouse.set_cursor_position(window, window.get_width() / 2, window.get_height() / 2); // Prevent cursor from exiting the screen
+		mouse.set_cursor_position(window, window.get_half_width(), window.get_half_height()); // Prevent cursor from exiting the screen
 		window.hide_cursor(true);
 		return; // Prevent camera from look where the cursor clicked
 	}
@@ -99,6 +102,7 @@ bool is_aabb(Mesh& mesh1, Mesh& mesh2) {
 // - billboarding to GPU
 
 int main() {
+
 	// TODO:
 	// - Mouse handle multiple inputs like keyboard
 	// NOTE -- ~113mb here
@@ -106,7 +110,7 @@ int main() {
 		.width = 800,
 		.height = 600,
 		.title = const_cast<char*>("Something idk"),
-		.vsync = true,
+		.vsync = false,
 		.debug_info = true
 	});
 	window.set_clear_color(Colors::PINK);
@@ -179,23 +183,20 @@ int main() {
 	// scene3d.add_to_scene("plane", &plane);
 
 
-	Rectangle* rectangle = new Rectangle({
-		.position = vec2<uint32>(
-			window.get_half_width()  - 10,
-			window.get_half_height() - 10
-		),
-		.size = vec2<float>(10.0f, 10.0f)
-	});
-	scene2d.add_to_scene("rectangle", rectangle);
+	// Rectangle* rectangle = new Rectangle({
+	// 	.position = vec2<uint32>(
+	// 		window.get_half_width()  - 10,
+	// 		window.get_half_height() - 10
+	// 	),
+	// 	.size = vec2<float>(10.0f, 10.0f)
+	// });
+	// scene2d.add_to_scene("rectangle", rectangle);
 
 	LOG_INFO("Scene3d length %d", scene3d.length());
 
 	float rotation = 0.0f;
-	float rotation_speed = 1.0f;
-
-	// TODO: Check LearnOpenGL for some solution for disabling depth test to skybox (the current one is not working)
-
-	// bool collision = false;
+	float rotation_speed = 1.0f * 100.0f;
+	uint32 timer = 2000; // Start showing (this should be window.timenow() in real code)
 	while(window.is_open()) {
 		// Clear screen
 		window.clear(); // NOTE -- ~14mb RAM itself
@@ -231,14 +232,15 @@ int main() {
 
 		// plane.face_position(camera.get_position());
 
+		cow->set_rotation(rotation, { true, true, true });
 		skybox.draw();
 		scene3d.draw_all();
 
 
 		// Draw 2D shapes
-		// Format FPS, ignore
-		std::stringstream stream; stream << std::setprecision(2) << window.fps();
-		msgothic.draw_text("FPS: " + stream.str(), { 0.0f, 0.0f });
+
+		msgothic.draw_text("FPS: " + std::to_string(window.fps()), { 0.0f, 0.0f });
+		// msgothic.draw_text("Lorem ipsum \nLorem ipsum", { 24.0f, 50.0f });
 
 		// // scene2d.draw_shape(msgothic.set_text("COLLISION: " + std::to_string(collision)).set_position(vec2<float>(0.0f, 24.0f)));
 		// msgothic.set_text("POS: "
@@ -248,14 +250,28 @@ int main() {
 		// 	.set_position(vec2<float>(0.0f, 24.0f));
 		// scene2d.draw_font(msgothic);
 
-		scene2d.draw_all();
+		// scene2d.draw_all();
+
+		// Elapsed 1 second
+		uint32 current = window.timenow();
+		if(current - timer >= 1000) {
+			timer = current; // Reset timer
+			std::cout << "FPS: " << window.fps() << std::endl;
+			// Format FPS, ignore
+			// std::stringstream stream; stream << std::setprecision(2) << window.fps();
+			// msgothic.draw_text("FPS: " + stream.str(), { 0.0f, 0.0f });
+		}
+
+		// TODO: dt camera movement (multiply by speed)
 
 		// Update rotation
-		rotation += rotation_speed;
+		rotation += (float)(rotation_speed * window.dt());
+		// std::cout << window.dt() << std::endl;
 		if(rotation >= 360.0f) {
 			rotation = 0.0f; // Wrap around to keep the angle within 0-360 degrees
 		}
 
+		// window.frame_capping(75);
 		window.swap_buffers(); // NOTE -- ~14mb RAM
 	}
 
@@ -263,6 +279,6 @@ int main() {
 	// Check for any OpenGL error
 	GLenum err = glGetError();
 	if(err != GL_NO_ERROR) {
-		LOG_ERROR("OpenGL error code: 0x%x", err);
+		LOG_ERROR("OpenGL error code: %x", err);
 	}
 }

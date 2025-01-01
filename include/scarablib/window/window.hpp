@@ -61,6 +61,8 @@ class Window {
 				}
 			#endif
 
+			// Make operations that need to happen at the end of each frame
+			this->last_update = SDL_GetTicks();
 			this->frame_events.clear(); // Clear events
 			SDL_GL_SwapWindow(this->window);
 		}
@@ -197,21 +199,22 @@ class Window {
 
 		// TIMER //
 
-		// Automatically calculates FPS.
-		float fps();
+		// Window FPS per second
+		double fps();
 
+		// Get the time elapsed between the current and last frame, in seconds.
+		double dt() const;
+
+		// Stabilize the FPS and tries to limit the frame rate
+		void frame_capping(const uint32 fps) const;
+
+		// Optional `time` parameter adjusts the time scale (default: 1000.0 for seconds).
 		// Get the number of milliseconds that have passed since the SDL library was initialized.
 		// Note: The value wraps after approximately 49 days of continuous program execution.
-		inline uint32 time() const {
+		inline uint32 timenow() const {
 			return SDL_GetTicks();
 		}
 
-		// Get the time elapsed between the current and last frame, in seconds.
-		// Optional `time` parameter adjusts the time scale (default: 1000.0 for seconds).
-		inline double dt(const float time = 1000.0f) const {
-			// CURRENT - LAST / to seconds
-			return static_cast<double>(SDL_GetTicks() - this->last_update) / time;
-		}
 
 
 		// STATIC //
@@ -251,7 +254,7 @@ class Window {
 		uint32 start_time = SDL_GetTicks();
 		uint32 last_update = 0;
 		uint32 frame_count = 0;
-		float FPS = 0.0f;
+		double FPS = 0.0f;
 
 		// KEYS
 		KeyboardHandler keyboard_handler = KeyboardHandler();
