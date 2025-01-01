@@ -42,6 +42,7 @@ I wrote most of the things here very tired, sorry for any english mistake
 # TODO Shapes
 - [ ] Custom shapes support
 - [ ] Color matrix support
+- [ ] Use one shader for 2D and 3D shapes
 
 # TODO 2D
 - [x] Unify shader and `shader_texture` somehow
