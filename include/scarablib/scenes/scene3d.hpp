@@ -2,7 +2,7 @@
 
 #include "scarablib/opengl/shader.hpp"
 #include "scarablib/scenes/camera.hpp"
-#include "scarablib/scenes/scene.hpp"
+#include "scarablib/scenes/Iscene.hpp"
 #include "scarablib/gfx/mesh.hpp"
 #include "scarablib/utils/file.hpp"
 
@@ -18,7 +18,7 @@
  * */
 
 // Scene object used for managing 3D objects
-class Scene3D : public Scene<Mesh> {
+class Scene3D : public IScene<Mesh> {
 	public:
 		// Build 3D scene using the window object and a camera object
 		Scene3D(const Window& window, Camera& camera);

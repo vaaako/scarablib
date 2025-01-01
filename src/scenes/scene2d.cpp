@@ -6,7 +6,7 @@
 #include "scarablib/window/window.hpp"
 #include <cstdio>
 
-Scene2D::Scene2D(const Window& window) : Scene<Shape2D>(window) {
+Scene2D::Scene2D(const Window& window) : IScene<Shape2D>(window) {
 	// Set projection
 	this->update_viewport(window.get_width(), window.get_height());
 
@@ -55,7 +55,6 @@ void Scene2D::draw_all() const {
 	// This is just necessary if doing 2D and 3D
 	#ifdef SCARAB_2D_AND_3D
 		glDepthFunc(GL_ALWAYS);
-		LOG_INFO("Enabled")
 	#endif
 
 	this->vao->bind();

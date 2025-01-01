@@ -20,15 +20,15 @@ class Shape3D;
 
 // Virtual class used to make Scene2D and Scene3D
 template <typename T>
-class Scene {
+class IScene {
 	// Only Shape2D and Shape3D are accepted
 	static_assert(std::is_same<T, Shape2D>::value || std::is_same<T, Mesh>::value,
 			"Scene can only be instantiated with Shape2D or Mesh");
 
 	public:
 		// Build scene object using the window object for viewport
-		Scene(const Window& window);
-		virtual ~Scene() = default;
+		IScene(const Window& window);
+		virtual ~IScene() = default;
 
 		// Add a shape object to the scene.
 		// WARNING: Shapes added to the scene are not deleted automatically, is recommended to make the shape object and then add to the scene as a pointer
@@ -74,6 +74,10 @@ class Scene {
 		}
 
 	protected:
+		// TODO: This will be useful later
+		const Window& window;
+
+		// TODO: Remove this when implementing window resize
 		// Viewport
 		uint32 width;
 		uint32 height;
@@ -84,12 +88,12 @@ class Scene {
 };
 
 template <typename T> // Return the shared pointer
-Scene<T>::Scene(const Window& window)
-	: width(window.get_width()), height(window.get_height()) {}
+IScene<T>::IScene(const Window& window)
+	: window(window), width(window.get_width()), height(window.get_height()) {}
 
 
 template <typename T>
-void Scene<T>::remove_by_key(const std::string& key) {
+void IScene<T>::remove_by_key(const std::string& key) {
 	auto it = this->scene.find(key);
 	if(it == this->scene.end()) {
 		throw ScarabError("Key '%s' not found", key.c_str());

@@ -1,7 +1,7 @@
 #include "scarablib/scenes/scene3d.hpp"
 #include <GL/glew.h>
 
-Scene3D::Scene3D(const Window& window, Camera& camera) : Scene(window), camera(camera) {}
+Scene3D::Scene3D(const Window& window, Camera& camera) : IScene(window), camera(camera) {}
 
 Scene3D::~Scene3D() {
 	delete this->shader;

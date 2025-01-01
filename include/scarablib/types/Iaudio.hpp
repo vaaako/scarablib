@@ -4,7 +4,7 @@
 #include "scarablib/typedef.hpp"
 
 // This is a interface class and should not be used by itself
-struct Audio {
+struct IAudio {
 	// Path loaded
 	const char* path;
 	// Max volume possible
@@ -13,7 +13,7 @@ struct Audio {
 	uint8 volume = MIX_MAX_VOLUME;
 
 	// This is a interface class and should not be used by itself
-	Audio(const char* path);
+	IAudio(const char* path);
 	// virtual ~Audio() = 0;
 
 	virtual inline void play(const int8 loops = 0) const = 0;

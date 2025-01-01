@@ -1,7 +1,7 @@
 #pragma once
 
 #include "scarablib/opengl/vao.hpp"
-#include "scarablib/scenes/scene.hpp"
+#include "scarablib/scenes/Iscene.hpp"
 #include "scarablib/gfx/2d/circle.hpp"
 #include "scarablib/gfx/shape2d.hpp"
 #include "scarablib/utils/file.hpp"
@@ -25,7 +25,7 @@
 // (i know how depth test works, but i dont know why this is happening here and not on the code pre-revamp)
 
 // Scene object used for managing 2D objects
-class Scene2D : public Scene<Shape2D> {
+class Scene2D : public IScene<Shape2D> {
 	public:
 		// Build the Scene using the window object
 		Scene2D(const Window& window);
