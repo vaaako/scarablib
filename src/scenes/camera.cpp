@@ -10,6 +10,8 @@ void Camera::rotate(const MouseHandler& mouse) {
 	// Calculate move relative to the screen middle
 	float xoffset = this->sensitivity * (static_cast<float>(mouse.motion.x) - static_cast<float>(this->width) / 2) / static_cast<float>(this->width);
 	float yoffset = this->sensitivity * (static_cast<float>(mouse.motion.y) - static_cast<float>(this->height) / 2) / static_cast<float>(this->height);
+	// float xoffset = this->sensitivity * (static_cast<float>(mouse.motion.x) - window.get_half_width() / width);
+	// float yoffset = this->sensitivity * (static_cast<float>(mouse.motion.y) - window.get_half_height() / height);
 
 	this->yaw += xoffset;
 	this->pitch -= yoffset;

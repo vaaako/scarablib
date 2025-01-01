@@ -1,4 +1,5 @@
 #include "scarablib/window/window.hpp"
+#include "SDL2/SDL_video.h"
 #include "scarablib/proper/error.hpp"
 #include "scarablib/utils/math.hpp"
 #include <SDL2/SDL_mixer.h>
@@ -61,7 +62,6 @@ Window::Window(const WindowConf& config) : conf(config), half_width(config.width
 
 	// Config opengl
 	glViewport(0, 0, (GLsizei)config.width, (GLsizei)config.height);
-
 
 	// Enable transparency
 	glEnable(GL_BLEND);
@@ -147,23 +147,26 @@ void Window::process_events() {
 				this->mouse_handler.handle_event(event);
 				break;
 
-			/*
 			case SDL_WINDOWEVENT: {
 				switch (event.window.event) {
-					// Focus lost
-					case SDL_WINDOWEVENT_FOCUS_LOST:
+					// // Focus lost
+					// case SDL_WINDOWEVENT_FOCUS_LOST:
+					// 	break;
+					//
+					// // Mouse leave window
+					// case SDL_WINDOWEVENT_LEAVE:
+					// 	break;
+
+					case SDL_WINDOWEVENT_RESIZED:
+						this->set_viewport(vec2<uint32>(event.window.data1, event.window.data2));
 						break;
 
-					// Mouse leave window
-					case SDL_WINDOWEVENT_LEAVE:
-						break;
 
 					default:
 						break;
 				}
 				break;
 			}
-			*/
 			default:
 				break;
 		}

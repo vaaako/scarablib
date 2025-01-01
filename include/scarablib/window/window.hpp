@@ -256,4 +256,15 @@ class Window {
 		// KEYS
 		KeyboardHandler keyboard_handler = KeyboardHandler();
 		MouseHandler mouse_handler = MouseHandler(); // To not have the same name as the "mouse" function
+
+		// Set the viewport to the provided size.
+		// This won't change the window's size
+		inline void set_viewport(const vec2<uint32>& size) {
+			this->conf.width = size.x;
+			this->conf.height = size.y;
+
+			this->half_width = size.x / 2;
+			this->half_height = size.y / 2;
+			glViewport(0, 0, (GLsizei)size.x, (GLsizei)size.y);
+		}
 };
