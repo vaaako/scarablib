@@ -2,7 +2,7 @@
 #include "scarablib/proper/error.hpp"
 #include <SDL2/SDL.h>
 
-Sound::Sound(const char* path) : Audio(path) {
+Sound::Sound(const char* path) : IAudio(path) {
 	// Load audio
 	this->sound = Mix_LoadWAV(path);
 	if (this->sound == NULL) {

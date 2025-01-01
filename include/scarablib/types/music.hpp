@@ -1,7 +1,7 @@
 #pragma once
 
 #include <SDL2/SDL_mixer.h>
-#include "scarablib/types/audio.hpp"
+#include "scarablib/types/Iaudio.hpp"
 
 enum FadingStatus {
 	NOT_FADING,
@@ -10,7 +10,7 @@ enum FadingStatus {
 };
 
 // Music object
-struct Music : public Audio {
+struct Music : public IAudio {
 	// Find out the format of a mixer music.  
 	Mix_MusicType type;
 	// Music duration in seconds

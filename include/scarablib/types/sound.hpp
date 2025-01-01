@@ -2,10 +2,10 @@
 
 #include <SDL2/SDL_mixer.h>
 #include "scarablib/typedef.hpp"
-#include "scarablib/types/audio.hpp"
+#include "scarablib/types/Iaudio.hpp"
 
 // SFX object
-struct Sound : public Audio {
+struct Sound : public IAudio {
 	// Makes a sound object, used for sfx
 	Sound(const char* path);
 	~Sound();

@@ -1,7 +1,7 @@
 #include "scarablib/types/music.hpp"
 #include "scarablib/proper/error.hpp"
 
-Music::Music(const char* path) : Audio(path) {
+Music::Music(const char* path) : IAudio(path) {
 	// Load audio
 	this->music = Mix_LoadMUS(path);
 	if (this->music == NULL) {
