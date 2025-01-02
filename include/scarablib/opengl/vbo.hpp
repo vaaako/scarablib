@@ -32,7 +32,7 @@ class VBO {
 		// Allocate and initialize the data store for the VBO.
 		// `size` is the total size of the data (in bytes) to allocate, and `data` is a pointer to the data.
 		// If `data` is nullptr, the buffer is allocated but left uninitialized.
-		void alloc_data(const float size, const void* data, const GLenum drawtype = GL_STATIC_DRAW);
+		void alloc_data(const uint32 size, const void* data, const GLenum drawtype = GL_STATIC_DRAW);
 
 		// Allocate and initialize the data store for the VBO using a vector of float
 		void alloc_data(const std::vector<float>& data, const GLenum drawtype = GL_STATIC_DRAW);
@@ -45,7 +45,7 @@ class VBO {
 		// `size` is the number of components per vertex attribute (e.g., 3 for vec3, 2 for vec2).
 		// `total_byte_size` is the total size of a single vertex (e.g., sum of all sizes times `sizeof(flaot)`).
 		// `offset` is the byte offset of the attribute in a vertex (e.g., texture offset of a 3D mesh is is `3 * sizeof(float)`, since position has 3 float values and texture comes after it)
-		void link_attrib(const uint32 index, const uint32 size, const float total_byte_size, const uint32 offset);
+		void link_attrib(const uint32 index, const uint32 size, const uint32 total_byte_size, const uint32 offset);
 
 		// Automatically make the VBO from a vector of Vertex.
 		// Don't use this with any other creation method

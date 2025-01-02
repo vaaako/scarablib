@@ -10,13 +10,6 @@
 #include <string>
 #include <GL/glew.h>
 
-struct Glyph {
-	GLuint texture_id;
-	vec2<uint32> size;
-	vec2<uint32> bearing; // Offset from baseline to the left/top
-	uint32 advance; // Horizontal offset to next glyph
-};
-
 // Font object used to draw text on the screen
 class Font {
 	// To update viewport
@@ -29,16 +22,28 @@ class Font {
 		~Font();
 
 		// Draw font using a shader object
-		void draw_text(const std::string& text, const vec2<uint32> pos, const Color& color = Colors::WHITE, const float scale = 1.0f);
+		void draw_text(const std::string& text, const vec2<uint32>& pos, const Color& color = Colors::WHITE, float scale = 1.0f);
 
 	private:
+		struct Glyph {
+			GLuint texture_id; // Index of the glyph in the texture map
+			vec2<uint32> size;
+			vec2<uint32> bearing; // Offset from baseline to the left/top
+			uint32 advance; // Horizontal offset to next glyph
+		};
+
 		// OpenGL
+		GLuint texture_array;
 		VAO* vao = new VAO();
 		VBO* vbo = new VBO();
 
 		// Font
 		const char* path;
 		std::unordered_map<char, Glyph> chars;
+
+		// Texture
+		// std::vector<glm::mat4> models;
+		// std::vector<int> glyph_map;
 
 		static inline Shader& get_shader() {
 			static Shader shader_circle = Shader(

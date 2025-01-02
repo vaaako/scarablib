@@ -84,16 +84,19 @@ void Scene2D::update_viewport(const uint32 width, const uint32 height) {
 	// Update shaders projection uniform
 	shader->use();
 	shader->set_matrix4f("projection", projection);
+	shader->unbind();
 
 	// Update circle shader
 	Shader& circle_shader = Circle::get_shader();
 	circle_shader.use();
 	circle_shader.set_matrix4f("projection", projection);
+	circle_shader.unbind();
 
 	// Update Font shader
 	Shader& font_shader = Font::get_shader();
 	font_shader.use();
 	font_shader.set_matrix4f("projection", projection);
+	font_shader.unbind();
 
 
 	// Update viewport in opengl too

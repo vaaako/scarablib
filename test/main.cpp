@@ -100,6 +100,7 @@ bool is_aabb(Mesh& mesh1, Mesh& mesh2) {
 
 // TODO: Fix 2D and 3D order to any order (DEPTH_TEST problem)
 // - billboarding to GPU
+// - bind VBO too
 
 int main() {
 
@@ -110,7 +111,7 @@ int main() {
 		.width = 800,
 		.height = 600,
 		.title = const_cast<char*>("Something idk"),
-		.vsync = false,
+		.vsync = true,
 		.debug_info = true
 	});
 	window.set_clear_color(Colors::PINK);
@@ -150,9 +151,11 @@ int main() {
 
 	// Make shapes
 	// Cube position doenst matter because will change later
+	
 	Cube* cube = new Cube({});
 	scene3d.add_to_scene("cube1", cube);
 	cube->set_texture(&tex1);
+
 	// std::shared_ptr<Cube> cubefrom = scene3d.get_by_key<Cube>("cube1");
 
 	// Cube cube2 = Cube({
@@ -238,9 +241,7 @@ int main() {
 
 
 		// Draw 2D shapes
-
 		msgothic.draw_text("FPS: " + std::to_string(window.fps()), { 0.0f, 0.0f });
-		// msgothic.draw_text("Lorem ipsum \nLorem ipsum", { 24.0f, 50.0f });
 
 		// // scene2d.draw_shape(msgothic.set_text("COLLISION: " + std::to_string(collision)).set_position(vec2<float>(0.0f, 24.0f)));
 		// msgothic.set_text("POS: "
@@ -253,14 +254,11 @@ int main() {
 		// scene2d.draw_all();
 
 		// Elapsed 1 second
-		uint32 current = window.timenow();
-		if(current - timer >= 1000) {
-			timer = current; // Reset timer
-			std::cout << "FPS: " << window.fps() << std::endl;
-			// Format FPS, ignore
-			// std::stringstream stream; stream << std::setprecision(2) << window.fps();
-			// msgothic.draw_text("FPS: " + stream.str(), { 0.0f, 0.0f });
-		}
+		// uint32 current = window.timenow();
+		// if(current - timer >= 1000) {
+		// 	timer = current; // Reset timer
+		// 	// Format FPS, ignore
+		// }
 
 		// TODO: dt camera movement (multiply by speed)
 

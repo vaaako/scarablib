@@ -3,6 +3,7 @@
 #include <GL/glew.h>
 #include <glm/ext.hpp>
 #include <glm/mat4x4.hpp>
+#include <vector>
 #include "scarablib/typedef.hpp"
 #include "scarablib/types/color.hpp"
 
@@ -37,38 +38,37 @@ struct Shader {
 		// UNIFORMS //
 
 		// Set value of a matrix4f uniform
-		inline void set_matrix4f(const char* unif, const glm::mat4& mat) const {
-			GLint loc = glGetUniformLocation(this->id, unif);
-			glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(mat));
+		inline void set_matrix4f(const char* unif, const glm::mat4& mat, const uint32 index = 1) const {
+			glUniformMatrix4fv(glGetUniformLocation(this->id, unif), static_cast<GLsizei>(index), GL_FALSE, glm::value_ptr(mat));
+		}
+
+		// Set value of a ivec uniform
+		inline void set_ivec(const char* unif, const std::vector<int>& vec, const uint32 index = 1) const {
+			glUniform1iv(glGetUniformLocation(this->id, unif), static_cast<GLsizei>(index), &vec[0]);
 		}
 
 		// Set value of a vec2f uniform
 		inline void set_vector4f(const char* unif, const vec4<float>& vec) const {
-			GLint loc = glGetUniformLocation(this->id, unif);
-			glUniform4f(loc, vec.x, vec.y, vec.z, vec.w);
+			glUniform4f(glGetUniformLocation(this->id, unif), vec.x, vec.y, vec.z, vec.w);
 		}
 
 		inline void set_color(const char* unif, const Color& color) const {
-			GLint loc = glGetUniformLocation(this->id, unif);
-			glUniform4f(loc, color.red, color.green, color.blue, color.alpha);
+			glUniform4f(glGetUniformLocation(this->id, unif), color.red, color.green, color.blue, color.alpha);
 		}
 
 		// Set value of a vec4f uniform
 		inline void set_vector2f(const char* unif, const vec2<float>& vec) const {
-			GLint loc = glGetUniformLocation(this->id, unif);
-			glUniform2f(loc, vec.x, vec.y);
+			glUniform2f(glGetUniformLocation(this->id, unif), vec.x, vec.y);
 		}
 
 		// Set value of a int uniform
 		inline void set_int(const char* unif, const GLint val) const {
-			GLint loc = glGetUniformLocation(this->id, unif);
-			glUniform1i(loc, val);
+			glUniform1i(glGetUniformLocation(this->id, unif), val);
 		}
 
 		// Set value of a float uniform
 		inline void set_float(const char* unif, const GLfloat val) const {
-			GLint loc = glGetUniformLocation(this->id, unif);
-			glUniform1f(loc, val);
+			glUniform1f(glGetUniformLocation(this->id, unif), val);
 		}
 	private:
 		GLuint id;

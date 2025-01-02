@@ -1,4 +1,5 @@
 #include "scarablib/types/font.hpp"
+#include "glm/ext/matrix_transform.hpp"
 #include "scarablib/opengl/vbo.hpp"
 #include "scarablib/proper/error.hpp"
 #include "scarablib/proper/log.hpp"
@@ -6,6 +7,8 @@
 
 #include <freetype/ft2build.h>
 #include FT_FREETYPE_H
+
+// NOTE: I wouldn't get to this point without the help of https://www.youtube.com/@WhateversRightStudios
 
 Font::Font(const char* path, const uint16 size) {
 	if(StringHelper::file_extension(path) != "ttf") {
@@ -42,8 +45,6 @@ Font::Font(const char* path, const uint16 size) {
 #endif
 
 		GLuint texture;
-
-		// GLuint texture;
 		glGenTextures(1, &texture);
 		glBindTexture(GL_TEXTURE_2D, texture);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED,
@@ -66,12 +67,19 @@ Font::Font(const char* path, const uint16 size) {
 	FT_Done_Face(face);
 	FT_Done_FreeType(ft);
 
+	float vertex_data[] = {
+		0.0f, 1.0f,
+		0.0f, 0.0f,
+		1.0f, 1.0f,
+		1.0f, 0.0f
+	};
+
 	// Configure VAO and VBO
 	this->vbo->bind();
 	this->vao->bind();
 
-	this->vbo->alloc_data(sizeof(float ) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
-	this->vbo->link_attrib(0, 4, 4 * sizeof(float), 0);
+	this->vbo->alloc_data(sizeof(vertex_data), vertex_data, GL_STATIC_DRAW);
+	this->vbo->link_attrib(0, 2, 0, 0);
 
 	this->vbo->unbind();
 	this->vao->unbind();
@@ -83,44 +91,52 @@ Font::~Font() {
 	}
 	delete this->vbo;
 	delete this->vao;
-}
+};
 
 // TODO: One drawcall
-void Font::draw_text(const std::string& text, const vec2<uint32> pos, const Color& color, const float scale) {
+void Font::draw_text(const std::string& text, const vec2<uint32>& pos, const Color& color, const float scale) {
 	// glDepthFunc(GL_LEQUAL);
 
-	this->get_shader().use();
-	this->get_shader().set_color("shapeColor", color);
+	Shader& shader = this->get_shader();
+	shader.use();
+	shader.set_color("shapeColor", color);
 	this->vao->bind();
 
-	float cur_x = pos.x;
-	float cur_y = pos.y;
+	float cur_x  = static_cast<float>(pos.x);
+	float cur_y  = static_cast<float>(pos.y);
+	float init_x = static_cast<float>(pos.x);
+
 	for(const char c : text) {
 		Glyph& ch = this->chars.at(c);
 
-		const float xpos = cur_x + ch.bearing.x * scale;
-		const float ypos = cur_y - (ch.size.y - ch.bearing.y) * scale;
+		// Down one line
+		if(c == '\n') {
+			cur_x = init_x; // Reset x
+			// Move down (spacing: 1.3)
+			cur_y -= static_cast<float>((ch.size.y) * 1.3) * scale;
+			continue;
 
-		const float w = ch.size.x * scale;
-		const float h = ch.size.y * scale;
+		// Ignore space
+		} else if(c == ' ') {
+			cur_x += static_cast<float>(ch.advance >> 6) * scale;
+			continue;
+		}
 
-		// Add quad vertices (position and texture coordinates)
-		float vertices[6][4] = {
-			{ xpos,     ypos + h,  0.0f, 1.0f },
-			{ xpos + w, ypos,      1.0f, 0.0f },
-			{ xpos,     ypos,      0.0f, 0.0f },
+		const float xpos = cur_x + static_cast<float>(ch.bearing.x) * scale;
+		const float ypos = cur_y - static_cast<float>((ch.size.y - ch.bearing.y)) * scale;
 
-			{ xpos,     ypos + h,  0.0f, 1.0f },
-			{ xpos + w, ypos + h,  1.0f, 1.0f },
-			{ xpos + w, ypos,      1.0f, 0.0f }
-		};
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(xpos, ypos, 0))
+			* glm::scale(model, glm::vec3(static_cast<float>(ch.size.x) * scale, static_cast<float>(ch.size.y) * scale, 0));
+		shader.set_matrix4f("model", model);
 
 		glBindTexture(GL_TEXTURE_2D, ch.texture_id);
 		this->vbo->bind();
-		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 1); // 1 instance of 4 vertices
 
-		cur_x += (ch.advance >> 6) * scale; // The advance is in 1/64th of a pixel
+		cur_x += static_cast<float>(ch.advance >> 6) * scale; // The advance is in 1/64th of a pixel
 	}
+
+	this->vbo->unbind();
 }
 

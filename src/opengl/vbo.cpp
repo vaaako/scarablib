@@ -8,12 +8,12 @@ VBO::~VBO() {
 	glDeleteBuffers(1, &this->id);
 }
 
-void VBO::alloc_data(const float size, const void* data, const GLenum drawtype) {
-	glBufferData(GL_ARRAY_BUFFER, size, data, drawtype);
+void VBO::alloc_data(const uint32 size, const void* data, const GLenum drawtype) {
+	glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizei>(size), data, drawtype);
 }
 
-void VBO::link_attrib(const uint32 index, const uint32 size, const float total_byte_size, const uint32 offset) {
-	glVertexAttribPointer(index, static_cast<GLint>(size), GL_FLOAT, GL_FALSE, total_byte_size, (void*)(offset * sizeof(float)));
+void VBO::link_attrib(const uint32 index, const uint32 size, const uint32 total_byte_size, const uint32 offset) {
+	glVertexAttribPointer(index, static_cast<GLint>(size), GL_FLOAT, GL_FALSE, static_cast<GLsizei>(total_byte_size), (void*)(offset * sizeof(float)));
 	glEnableVertexAttribArray(index);
 }
 

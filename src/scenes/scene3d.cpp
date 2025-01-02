@@ -27,8 +27,8 @@ void Scene3D::draw_all() const {
 			mesh->draw(this->camera, *this->shader);
 		}
 	}
-	glBindVertexArray(0);
 
+	glBindVertexArray(0);
 	this->shader->unbind();
 }
 
