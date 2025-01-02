@@ -77,10 +77,10 @@ void Mesh::draw(Camera& camera, const Shader& shader) {
 		this->model = glm::mat4(1.0f);
 
 		// Model matrix
-		this->model = glm::translate(this->model, this->conf.position);
-		this->model = glm::rotate(this->model, glm::radians(this->conf.orient_angle), this->conf.orient_axis);
-		this->model = glm::rotate(this->model, glm::radians(this->conf.angle), this->conf.axis);
-		this->model = glm::scale(this->model, this->conf.scale);
+		this->model = glm::translate(this->model, this->conf.position)
+					* glm::rotate(this->model, glm::radians(this->conf.orient_angle), this->conf.orient_axis)
+					* glm::rotate(this->model, glm::radians(this->conf.angle), this->conf.axis)
+					* glm::scale(this->model, this->conf.scale);
 
 		this->isdirty = false;
 	}

@@ -3,6 +3,7 @@
 #include <GL/glew.h>
 #include "scarablib/opengl/shader.hpp"
 #include "scarablib/opengl/vao.hpp"
+#include "scarablib/opengl/vbo.hpp"
 #include "scarablib/scenes/camera.hpp"
 #include "scarablib/typedef.hpp"
 #include "scarablib/types/texture.hpp"
@@ -204,6 +205,7 @@ class Mesh {
 
 	protected:
 		const VAO* vao; // Reference to some VAO
+		// const VBO* vbo;
 		uint32 indices_length; // Not const because when loading external obj, is not possible to explicitly set
 
 		glm::mat4 model = glm::mat4(1.0f);
