@@ -3,7 +3,7 @@
 #include "scarablib/opengl/shader.hpp"
 #include "scarablib/scenes/camera.hpp"
 #include "scarablib/scenes/Iscene.hpp"
-#include "scarablib/gfx/mesh.hpp"
+#include "scarablib/gfx/model.hpp"
 #include "scarablib/utils/file.hpp"
 
 #ifdef SCARAB_DEBUG_DRAWCALL
@@ -18,7 +18,7 @@
  * */
 
 // Scene object used for managing 3D objects
-class Scene3D : public IScene<Mesh> {
+class Scene3D : public IScene<Model> {
 	public:
 		// Build 3D scene using the window object and a camera object
 		Scene3D(const Window& window, Camera& camera);
@@ -30,10 +30,11 @@ class Scene3D : public IScene<Mesh> {
 		Scene3D(Scene3D&&) = delete;
 		Scene3D& operator=(Scene3D&&) = delete;
 
-		// Add a mesh to the scene
-		void add_to_scene(const std::string& key, Mesh* mesh) override;
+		// Add a model to the scene.
+		// Do not pass a pointer of a non allocated model
+		void add_to_scene(const std::string& key, Model* model) override;
 
-		// Draw all meshes added to the scene
+		// Draw all models added to the scene
 		void draw_all() const override;
 
 		// Update the scene viewport using the window object

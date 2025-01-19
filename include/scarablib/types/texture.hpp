@@ -20,14 +20,6 @@ enum class TextureWrap : int {
 };
 
 
-// TODO: use this later
-struct TextureConf {
-	TextureFilter filter = TextureFilter::LINEAR;
-	TextureWrap wrap = TextureWrap::REPEAT;
-	GLenum format = GL_RGBA;
-	GLuint type = GL_TEXTURE_2D;
-};
-
 // Texture object used for shapes (2D and 3D).
 // It will allocate ~1mb of RAM for each loaded texture
 struct Texture {
@@ -37,6 +29,7 @@ struct Texture {
 	// Constructor to create a texture from a file path
 	// Optionally sets the filtering and wrapping methods
 	Texture(const char* path, const TextureFilter filter = TextureFilter::LINEAR, const TextureWrap wrap = TextureWrap::REPEAT);
+	// Texture(const TextureConf& conf);
 
 	// Uses pre-defined data to make a texture
 	// Texture(const void* data, const uint32 width, const uint32 height, const GLenum format);
@@ -76,15 +69,6 @@ struct Texture {
 	// Updates texture (this does not changes size and pixel format)
 	void update_data(const void* data, const GLenum format);
 
-	// Texture's width
-	inline uint32 get_width() const {
-		return this->width;
-	}
-
-	// Texture's height
-	inline uint32 get_height() const {
-		return this->width;
-	}
 
 	// Bind the texture for use in rendering
 	inline void bind() const {
@@ -103,8 +87,8 @@ struct Texture {
 	private:
 		GLuint id;
 		GLenum format;
-		GLint width;
-		GLint height;
+		uint32 width;
+		uint32 height;
 		GLuint tex_type = GL_TEXTURE_2D; // Type of texture (2D by default)
 
 		// Texture atlas

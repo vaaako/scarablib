@@ -21,7 +21,6 @@ struct Skybox {
 		const Camera& camera;
 
 		VAO* vao = new VAO();
-		VBO* vbo = new VBO();
 		Shader shader = Shader(
 			FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/3d/skybox_vertex.glsl").c_str(),
 			FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/3d/skybox_fragment.glsl").c_str()

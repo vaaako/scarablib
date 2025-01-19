@@ -31,7 +31,7 @@ Scene2D::Scene2D(const Window& window) : IScene<Shape2D>(window) {
 
 	// Build VBO
 	vbo.bind();
-	vbo.make_from_vertex(vertices, 2);
+	vbo.make_from_vertex(vertices, 2, GL_STATIC_DRAW);
 
 	// Unbind all
 	this->vao->unbind();

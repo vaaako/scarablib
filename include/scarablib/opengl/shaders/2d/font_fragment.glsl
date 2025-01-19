@@ -1,11 +1,11 @@
 #version 330 core
 
-in vec2 texCoord;
 out vec4 FragColor;
+
+in vec2 texCoord;
 
 uniform sampler2D texSampler;
 uniform vec4 shapeColor;
-
 
 // Multiplying by 0.004 gives an approximated result as dividing by 255
 // NOTE: Modified to not return alpha

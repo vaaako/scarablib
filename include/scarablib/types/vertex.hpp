@@ -1,40 +1,54 @@
 #pragma once
 
 #include "scarablib/typedef.hpp"
-#include <vector>
+#include <vector> // For hash
 
 // Used for setting coordinates for vertices position, texture and normals
 struct Vertex {
 	vec3<float> position;
+	// vec3<float> normal;
 	vec2<float> texuv;
 
 	bool operator==(const Vertex& other) const {
-		return this->position == other.position && this->texuv == other.texuv;
+		return this->position == other.position
+			&& this->texuv == other.texuv;
+			// && this->normal == other.normal;
 	}
 };
 
-// Used for loading models
-struct Face {
-	// Init 3 spaces with zero
-	std::vector<int> vertex_index = std::vector<int>(3);
-	std::vector<int> texuv_index  = std::vector<int>(3);
-};
+// // Used for loading models
+// struct Face {
+// 	// Init 3 spaces with zero
+// 	std::vector<int> vertex_index = std::vector<int>(3);
+// 	std::vector<int> texuv_index  = std::vector<int>(3);
+// };
 
 
 // Be able to use Vertex as key in unordered_map
 namespace std {
 	template<> struct hash<Vertex> {
 		size_t operator()(const Vertex& vertex) const {
-			size_t h1 = hash<float>()(vertex.position.x) ^
-						(hash<float>()(vertex.position.y) << 1) ^
-						(hash<float>()(vertex.position.z) << 1);
-			size_t h2 = hash<float>()(vertex.texuv.x) ^
-						(hash<float>()(vertex.texuv.y) << 1);
-			// size_t h3 = hash<float>()(vertex.normal.x) ^
-			// 			(hash<float>()(vertex.normal.y) << 1) ^
-			// 			(hash<float>()(vertex.normal.z) << 1);
-			// return h1 ^ (h2 << 1) ^ (h3 << 1);
-			return h1 ^ (h2 << 1);
+			size_t seed = 0;
+
+			// Hash position
+			auto hash_combine = [&seed](const auto& value) {
+				// Use golden ration to mix the hash
+				seed ^= hash<decay_t<decltype(value)>>{}(value) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+			};
+
+			hash_combine(vertex.position.x);
+			hash_combine(vertex.position.y);
+			hash_combine(vertex.position.z);
+
+			// Hash texture coordinates
+			hash_combine(vertex.texuv.x);
+			hash_combine(vertex.texuv.y);
+
+			// hash_combine(vertex.normal.x);
+			// hash_combine(vertex.normal.y);
+			// hash_combine(vertex.normal.z);
+
+			return seed;
 		}
 	};
 }

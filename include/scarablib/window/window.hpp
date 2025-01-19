@@ -177,25 +177,25 @@ class Window {
 		}
 
 		// Check if the provided X or Y coordinates are outside the window's bounds.
-		inline bool out_of_bounds(const int x, const int y) const {
-			return (x < 0 || x > (int)this->conf.width) ||
-				   (y < 0 || y > (int)this->conf.height);
+		inline bool out_of_bounds(const uint32 x, const uint32 y) const {
+			return ((int)x < 0 || x > this->conf.width) ||
+				   ((int)y < 0 || y > this->conf.height);
 		}
 
 
 		// FUNCTIONALITIES //
 
-		// Lock the cursor to the center of the window.
-		// This prevents the cursor from leaving the window when the game is in focus.
+		// Lock the cursor inside the window.
+		// This prevents the cursor from leaving the window when on focus.
 		inline void grab_cursor(const bool grab) const {
-			SDL_SetRelativeMouseMode(static_cast<SDL_bool>(grab));
+			SDL_SetWindowGrab(this->window, static_cast<SDL_bool>(grab));
+			// SDL_SetRelativeMouseMode(static_cast<SDL_bool>(grab));
 		}
 
 		// Hide the cursor when it is inside the window.
 		inline void hide_cursor(const bool hide) const {
 			SDL_ShowCursor(!hide);
 		}
-
 
 		// TIMER //
 

@@ -32,7 +32,7 @@ I wrote most of the things here very tired, sorry for any english mistake
 
 # TODO Features
 - [ ] More texture options
-	+ [ ] Different texture for each face
+	+ [ ] Different texture for each face (the other method that is not cubemap)
 	+ [ ] Texture overlay
 	+ [ ] Texture atlas support
 	+ [ ] Opacity
@@ -40,9 +40,13 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [x] Use the same font object for different texts
 
 # TODO Shapes
-- [ ] Custom shapes support
+- [x] Custom shapes support (kinda, i think)
 - [ ] Color matrix support
 - [ ] Use one shader for 2D and 3D shapes
+- [ ] Collider class (for 3D and 2D)
+	+ Like [Windfield](https://github.com/a327ex/windfield). Show collider and easy setting
+	+ Rigid body
+- [ ] Physics (dont know how)
 
 # TODO 2D
 - [x] Unify shader and `shader_texture` somehow
@@ -64,6 +68,7 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [ ] Sphere
 - [x] Skybox
 - [ ] Normals / Shading value (both?)
+- [x] Model and Mesh
 
 
 # Features for later

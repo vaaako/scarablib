@@ -63,8 +63,8 @@ Texture::Texture(const char* path, const TextureFilter filter, const TextureWrap
 			throw ScarabError("Failed to load texture (%s). Unsupported format: %d channels", path, image->nr_channels);
 	}
 	this->format = format;
-	this->width = image->width;
-	this->height = image->height;
+	this->width  = static_cast<uint32>(image->width);
+	this->height = static_cast<uint32>(image->height);
 
 	// Generate
 	glTexImage2D(this->tex_type, 0, static_cast<GLint>(format), image->width, image->height, 0, format, GL_UNSIGNED_BYTE, image->data);
@@ -78,7 +78,9 @@ Texture::Texture(const char* path, const TextureFilter filter, const TextureWrap
 	delete image;
 }
  
-Texture::Texture(const void* data, const uint32 width, const uint32 height, const GLint internal_format, const GLenum format) : format(format), width(static_cast<GLint>(width)), height(static_cast<GLint>(height)) {
+Texture::Texture(const void* data, const uint32 width, const uint32 height, const GLint internal_format, const GLenum format) 
+	: format(format), width(width), height(height) {
+
 	// Generate and bind texture
 	glGenTextures(1, &this->id); // num of textures, pointer
 	glBindTexture(this->tex_type, this->id);
@@ -108,7 +110,7 @@ Texture::~Texture() {
 
 void Texture::update_data(const void* data, const GLenum format) {
 	glBindTexture(this->tex_type, this->id);
-	glTexSubImage2D(this->tex_type, 0, 0, 0, this->width, this->height, format, GL_UNSIGNED_BYTE, data);
+	glTexSubImage2D(this->tex_type, 0, 0, 0, static_cast<GLsizei>(this->width), static_cast<GLsizei>(this->height), format, GL_UNSIGNED_BYTE, data);
 	glGenerateMipmap(this->tex_type);
 	glBindTexture(this->tex_type, 0);
 }

@@ -34,16 +34,13 @@ class Font {
 
 		// OpenGL
 		GLuint texture_array;
-		VAO* vao = new VAO();
-		VBO* vbo = new VBO();
+		GLuint vao;
+		GLuint vbo;
 
 		// Font
 		const char* path;
-		std::unordered_map<char, Glyph> chars;
-
-		// Texture
-		// std::vector<glm::mat4> models;
-		// std::vector<int> glyph_map;
+		std::vector<Glyph> chars;
+		uint64 char_max;
 
 		static inline Shader& get_shader() {
 			static Shader shader_circle = Shader(

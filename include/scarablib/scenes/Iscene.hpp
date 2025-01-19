@@ -1,6 +1,6 @@
 #pragma once
 
-#include "scarablib/gfx/mesh.hpp"
+#include "scarablib/gfx/model.hpp"
 #include "scarablib/proper/error.hpp"
 #include "scarablib/window/window.hpp"
 #include <memory>
@@ -22,7 +22,7 @@ class Shape3D;
 template <typename T>
 class IScene {
 	// Only Shape2D and Shape3D are accepted
-	static_assert(std::is_same<T, Shape2D>::value || std::is_same<T, Mesh>::value,
+	static_assert(std::is_same<T, Shape2D>::value || std::is_same<T, Model>::value,
 			"Scene can only be instantiated with Shape2D or Mesh");
 
 	public:

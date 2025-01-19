@@ -146,7 +146,6 @@ double Window::dt() const {
 	return static_cast<double>(elapsed) / 1000.0;
 }
 
-#include <iostream>
 void Window::frame_capping(const uint32 fps) const {
 	const double desired = 1.0 / fps; // ~0.0133 seconds per frame
 	const double actual = this->dt();

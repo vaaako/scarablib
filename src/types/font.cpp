@@ -25,6 +25,8 @@ Font::Font(const char* path, const uint16 size) {
 		throw ScarabError("Font [%s] was not found!", path);
 	}
 
+	this->char_max = face->num_glyphs;
+
 
 	FT_Set_Pixel_Sizes(face, 0, size);
 	FT_Select_Charmap(face, FT_ENCODING_UNICODE);
@@ -56,12 +58,12 @@ Font::Font(const char* path, const uint16 size) {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-		this->chars.insert(std::pair<char, Glyph>(c, Glyph {
+		this->chars.push_back(Glyph {
 			texture,
 			vec2<uint32>(face->glyph->bitmap.width, face->glyph->bitmap.rows),
 			vec2<uint32>(face->glyph->bitmap_left, face->glyph->bitmap_top),
 			static_cast<GLuint>(face->glyph->advance.x)
-		}));
+		});
 	}
 
 	FT_Done_Face(face);
@@ -75,22 +77,26 @@ Font::Font(const char* path, const uint16 size) {
 	};
 
 	// Configure VAO and VBO
-	this->vbo->bind();
-	this->vao->bind();
+	glGenVertexArrays(1, &this->vao);
+	glGenBuffers(1, &this->vbo);
 
-	this->vbo->alloc_data(sizeof(vertex_data), vertex_data, GL_STATIC_DRAW);
-	this->vbo->link_attrib(0, 2, 0, 0);
+	glBindVertexArray(this->vao);
+	glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
 
-	this->vbo->unbind();
-	this->vao->unbind();
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE,0, 0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 }
 
 Font::~Font() {
-	for (auto& pair : this->chars) {
-		glDeleteTextures(1, &pair.second.texture_id);
+	for (Glyph& glyph : this->chars) {
+		glDeleteTextures(1, &glyph.texture_id);
 	}
-	delete this->vbo;
-	delete this->vao;
+	glDeleteVertexArrays(1, &this->vao);
+	glDeleteBuffers(1, &this->vbo);
 };
 
 // TODO: One drawcall
@@ -100,30 +106,35 @@ void Font::draw_text(const std::string& text, const vec2<uint32>& pos, const Col
 	Shader& shader = this->get_shader();
 	shader.use();
 	shader.set_color("shapeColor", color);
-	this->vao->bind();
+	glBindVertexArray(this->vao);
 
-	float cur_x  = static_cast<float>(pos.x);
-	float cur_y  = static_cast<float>(pos.y);
-	float init_x = static_cast<float>(pos.x);
+	float x  = static_cast<float>(pos.x);
+	float y  = static_cast<float>(pos.y);
+	float init_x = x;
 
-	for(const char c : text) {
+	for(const wchar_t c : text) {
+		// Jump characters not avaible
+		// if(c > this->char_max) {
+		// 	continue;
+		// }
+
 		Glyph& ch = this->chars.at(c);
 
 		// Down one line
 		if(c == '\n') {
-			cur_x = init_x; // Reset x
+			x = init_x; // Reset x
 			// Move down (spacing: 1.3)
-			cur_y -= static_cast<float>((ch.size.y) * 1.3) * scale;
+			y -= static_cast<float>((ch.size.y) * 1.3) * scale;
 			continue;
 
 		// Ignore space
 		} else if(c == ' ') {
-			cur_x += static_cast<float>(ch.advance >> 6) * scale;
+			x += static_cast<float>(ch.advance >> 6) * scale;
 			continue;
 		}
 
-		const float xpos = cur_x + static_cast<float>(ch.bearing.x) * scale;
-		const float ypos = cur_y - static_cast<float>((ch.size.y - ch.bearing.y)) * scale;
+		const float xpos = x + static_cast<float>(ch.bearing.x) * scale;
+		const float ypos = y - static_cast<float>((ch.size.y - ch.bearing.y)) * scale;
 
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(xpos, ypos, 0))
@@ -131,12 +142,13 @@ void Font::draw_text(const std::string& text, const vec2<uint32>& pos, const Col
 		shader.set_matrix4f("model", model);
 
 		glBindTexture(GL_TEXTURE_2D, ch.texture_id);
-		this->vbo->bind();
+		glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
 		glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 1); // 1 instance of 4 vertices
 
-		cur_x += static_cast<float>(ch.advance >> 6) * scale; // The advance is in 1/64th of a pixel
+		x += static_cast<float>(ch.advance >> 6) * scale; // The advance is in 1/64th of a pixel
 	}
 
-	this->vbo->unbind();
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 }
 

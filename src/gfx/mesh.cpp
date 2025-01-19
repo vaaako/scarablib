@@ -1,121 +1,182 @@
 #include "scarablib/gfx/mesh.hpp"
-#include "scarablib/opengl/ebo.hpp"
-#include "scarablib/opengl/vao.hpp"
-#include "scarablib/opengl/vbo.hpp"
 #include "scarablib/proper/error.hpp"
-#include "scarablib/utils/string.hpp"
-#include <fstream>
-#include <sstream>
 #include <unordered_map>
 
-Mesh::Mesh(const MeshConf& conf, const VAO* vao, const uint32 indices_length)
-	: vao(vao), indices_length(indices_length), isdirty(true),
-	conf(conf) {
+#define TINYOBJLOADER_IMPLEMENTATION
+#include <tinyobjloader/tiny_obj_loader.h>
 
-	this->update_min_and_max();
+Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices)
+	: indices_length(static_cast<uint32>(indices.size())) {
+
+	this->make_buffers(vertices, indices);
+}
+
+Mesh::Mesh(const GLuint& vao_id, const std::vector<Vertex>& vertices, const std::vector<uint32>& indices)
+	: indices_length(static_cast<uint32>(indices.size())) {
+
+	this->make_buffers(vao_id, vertices, indices);
 }
 
 Mesh::Mesh(const char* path) {
+	// Data containers
+	tinyobj::attrib_t attrib; // Mesh information
+	std::vector<tinyobj::shape_t> shapes; // Mesh shapes
+	std::vector<tinyobj::material_t> materials; // Mesh materials
+
+	// Load obj
+	std::string err;
+	bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, path);
+
+	if(!err.empty()) {
+		throw ScarabError("Error loading obj (%s): %s", path, err.c_str());
+	}
+
+	if(!ret) {
+		throw ScarabError("Failed to load/parse (%s) file", path);
+	}
+
+	// Make and Reserve space
 	std::vector<uint32> indices;
-	std::vector<Vertex> vertices = load_obj(path, indices, this->conf.size);
+	size_t total_indices = 0;
+	for(const tinyobj::shape_t& shape : shapes) {
+		total_indices += shape.mesh.indices.size();
+	}
 
-	this->indices_length = static_cast<uint32>(indices.size());
+	this->vertices.reserve(total_indices);
+	indices.reserve(total_indices);
 
-	this->vao = new VAO();
-	this->vao->bind();
+	// Decompress
+	std::unordered_map<Vertex, uint32_t> uniq_vertices;
+	for(const tinyobj::shape_t& shape : shapes) {
+		for(const tinyobj::index_t& index : shape.mesh.indices) {
+			// Check if vertex is not negative and is not out of bounds
+			if(index.vertex_index < 0 || static_cast<size_t>(index.vertex_index * 3 + 2) >= attrib.vertices.size()) {
+				throw ScarabError("Invalid vertex index (%d)", index.vertex_index);
+			}
 
-	// Gen VBO and EBO
-	VBO vbo = VBO();
-	EBO ebo = EBO(indices); // segfault here idk
+			// WARNING: Dont push normal by now
 
-	vbo.bind();
-	vbo.make_from_vertex(vertices, 3);
+			// vec3<float> normal;
+			// if(index.normal_index > 0) {
+			// 	normal = {
+			// 		attrib.normals[static_cast<size_t>(index.normal_index * 3)],
+			// 		attrib.normals[static_cast<size_t>(index.normal_index * 3 + 1)],
+			// 		attrib.normals[static_cast<size_t>(index.normal_index * 3 + 2)]
+			// 	};
+			// }
 
-	// Unbind vao
-	this->vao->unbind();
-	vbo.unbind();
-	ebo.unbind();
+			vec2<float> texuv = { 0.0f, 0.0f };
+			// Check if is valid and inside range
+			if(index.texcoord_index >= 0 && static_cast<size_t>(index.texcoord_index * 2 + 1) < attrib.texcoords.size()) {
+				texuv = {
+					attrib.texcoords[static_cast<size_t>(index.texcoord_index * 2)],
+					attrib.texcoords[static_cast<size_t>(index.texcoord_index * 2 + 1)],
+				};
+			}
+
+			Vertex vertex = {
+				.position = {
+					attrib.vertices[static_cast<size_t>(index.vertex_index * 3)],
+					attrib.vertices[static_cast<size_t>(index.vertex_index * 3 + 1)],
+					attrib.vertices[static_cast<size_t>(index.vertex_index * 3 + 2)],
+				},
+
+				.texuv = texuv,
+				// .normal = normal
+			};
+
+			// Push unique vertices only
+			if(uniq_vertices.find(vertex) == uniq_vertices.end()) {
+				uniq_vertices[vertex] = static_cast<uint32_t>(vertices.size());
+				this->vertices.push_back(vertex);
+			}
+			indices.push_back(uniq_vertices[vertex]);
+		}
+	}
+
+	this->indices_length = indices.size();
+	this->make_buffers(this->vertices, indices);
 }
 
-Mesh& Mesh::set_texture(Texture* texture) {
+
+Mesh::~Mesh() {
+	delete this->vao;
+	glDeleteBuffers(1, &this->vbo_id);
+	glDeleteBuffers(1, &this->ebo_id);
+}
+
+
+void Mesh::set_texture(Texture* texture) {
 	if(texture == nullptr){
 		this->texture = &this->get_deftex();
-		return *this;
+		return;
 	}
 
 	this->texture = texture;
-	return *this;
 }
 
-Mesh& Mesh::set_rotation(const float angle, const vec3<bool> axis) {
-	this->conf.angle = angle;
-	// At least one axis need to be true to work
-	if(axis == vec3<bool>(false)) {
-		this->conf.axis = (vec3<float>)axis;
-		return *this;
-	}
-	this->conf.axis = (vec3<float>)axis;
-	this->isdirty = true;
-	return *this;
+void Mesh::make_buffers(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) {
+	this->get_vao().bind();
+
+	// Gen and bind EBO
+	glGenBuffers(1, &this->ebo_id);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ebo_id);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizei>(indices.size() * sizeof(uint32)), indices.data(), GL_STATIC_DRAW);
+
+	// Gen and bind VBO
+	glGenBuffers(1, &this->vbo_id);
+	glBindBuffer(GL_ARRAY_BUFFER, this->vbo_id);
+	glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(vertices.size() * sizeof(Vertex)), vertices.data(), GL_STATIC_DRAW);
+	// Position
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
+	glEnableVertexAttribArray(0);
+	// Normal
+	// glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+	// glEnableVertexAttribArray(1);
+	// TexUV
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texuv));
+	glEnableVertexAttribArray(1);
+
+	// Unbind all
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-Mesh& Mesh::set_orientation(const float angle, const vec3<bool> axis) {
-	this->conf.orient_angle = angle;
-	this->conf.orient_axis = (vec3<float>)axis;
+void Mesh::make_buffers(const GLuint& vao_id, const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) {
+	// Gen and bind VAO
+	glBindVertexArray(vao_id);
 
-	// At least one axis need to be true to work
-	if(axis == vec3<bool>(false)) {
-		return *this;
-	}
+	// Gen and bind EBO
+	glGenBuffers(1, &this->ebo_id);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ebo_id);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizei>(indices.size() * sizeof(uint32)), indices.data(), GL_STATIC_DRAW);
 
-	this->isdirty = true;
-	return *this;
-}
+	// Gen and bind VBO
+	glGenBuffers(1, &this->vbo_id);
+	glBindBuffer(GL_ARRAY_BUFFER, this->vbo_id);
+	glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(vertices.size() * sizeof(Vertex)), vertices.data(), GL_STATIC_DRAW);
+	// Position
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
+	glEnableVertexAttribArray(0);
+	// Normal
+	// glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+	// glEnableVertexAttribArray(1);
+	// TexUV
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texuv));
+	glEnableVertexAttribArray(1);
 
-void Mesh::draw(Camera& camera, const Shader& shader) {
-	if(this->isdirty) {
-		this->model = glm::mat4(1.0f);
-
-		// Model matrix
-		this->model = glm::translate(this->model, this->conf.position)
-					* glm::rotate(this->model, glm::radians(this->conf.orient_angle), this->conf.orient_axis)
-					* glm::rotate(this->model, glm::radians(this->conf.angle), this->conf.axis)
-					* glm::scale(this->model, this->conf.scale);
-
-		this->isdirty = false;
-	}
-	
-	// View matrix
-	glm::mat4 view = camera.get_view_matrix();
-
-	// Add perspective
-	glm::mat4 proj = camera.get_proj_matrix();
-
-	// NOTE: "is dirty" for color wouldn't work because would set the last color updated for all meshes (using this later maybe)
-	shader.set_color("shapeColor", this->conf.color);
-	shader.set_matrix4f("mvp", (proj * view) * this->model);
-
-	this->texture->bind();
-	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(this->indices_length), GL_UNSIGNED_INT, (void*)0);
-	this->texture->unbind();
+	// Unbind all
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 
-vec3<float> calc_size(const std::vector<Vertex>& vertices) {
-	// Init with largest and smallest values
-	vec3<float> min = vec3<float>(FLT_MAX);
-	vec3<float> max = vec3<float>(-FLT_MAX);
 
-	for(const Vertex& vertex : vertices) {
-		min = glm::min(min, vertex.position);
-		max = glm::max(max, vertex.position);
-	}
-
-	return max - min;
-}
-
+/*
 // Not happy with this here, but whatever
-std::vector<Vertex> load_obj(const std::string& path, std::vector<uint32>& out_indices, vec3<float>& size) {
+std::vector<Vertex> Mesh::load_obj(const std::string& path, std::vector<uint32>& out_indices, vec3<float>& size) {
 	if(StringHelper::file_extension(path) != "obj") {
 		throw ScarabError("Only .obj files are supported");
 	}
@@ -182,12 +243,11 @@ std::vector<Vertex> load_obj(const std::string& path, std::vector<uint32>& out_i
 				throw ScarabError("Only triangular faces are supported. Try changing model export configuration");
 			}
 
-			/*
-			* Cases:
-			* 1: f v/vt/vn v/vt/vn v/vt/vn
-			* 2: f v/vt v/vt v/vt
-			* 3: f v//vn v//vn v//vn
-			*/
+
+			// Cases:
+			// 1: f v/vt/vn v/vt/vn v/vt/vn
+			// 2: f v/vt v/vt v/vt
+			// 3: f v//vn v//vn v//vn
 			Face face;
 			if(face_tokens.at(0).find('/') != std::string::npos) {
 				for(size_t i = 0; i < face_tokens.size(); i++) {
@@ -243,10 +303,10 @@ std::vector<Vertex> load_obj(const std::string& path, std::vector<uint32>& out_i
 				//
 				// Check for case 2 or 3 of face
 				.texuv = (has_texuv && face.texuv_index[i] != 0)
-								// If have
-								? temp_texuvs.at(static_cast<uint32>(face.texuv_index.at(i) - 1))
-								// If dont
-								: glm::vec2(0) 
+					// If have
+					? temp_texuvs.at(static_cast<uint32>(face.texuv_index.at(i) - 1))
+					// If dont
+					: glm::vec2(0) 
 				// Do the same for normal map
 			};
 
@@ -274,3 +334,4 @@ std::vector<Vertex> load_obj(const std::string& path, std::vector<uint32>& out_i
 
 	return out_vertices;
 }
+*/
