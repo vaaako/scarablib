@@ -24,22 +24,20 @@ Scene2D::Scene2D(const Window& window) : IScene<Shape2D>(window) {
 	};
 
 	// Indices are not necessary for simple shapes
-	VBO vbo = VBO();
-
-	// Make VAO
 	this->vao->bind();
 
 	// Build VBO
-	vbo.bind();
-	vbo.make_from_vertex(vertices, 2, GL_STATIC_DRAW);
+	this->vbo->bind();
+	this->vbo->make_from_vertex(vertices, 2, GL_STATIC_DRAW);
 
 	// Unbind all
 	this->vao->unbind();
-	vbo.unbind();
+	this->vbo->unbind();
 }
 
 Scene2D::~Scene2D() {
 	delete this->vao;
+	delete this->vbo;
 	delete this->shader;
 }
 

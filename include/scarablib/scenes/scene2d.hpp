@@ -1,6 +1,7 @@
 #pragma once
 
 #include "scarablib/opengl/vao.hpp"
+#include "scarablib/opengl/vbo.hpp"
 #include "scarablib/scenes/Iscene.hpp"
 #include "scarablib/gfx/2d/circle.hpp"
 #include "scarablib/gfx/shape2d.hpp"
@@ -52,7 +53,9 @@ class Scene2D : public IScene<Shape2D> {
 		void update_viewport(const uint32 width, const uint32 height) override;
 
 	private:
+		// TODO: Make struct to store these tree? (add a method to bind, unbind etc)
 		VAO* vao = new VAO();
+		VBO* vbo = new VBO();
 
 		Shader* shader = new Shader(
 			FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/2d/vertex.glsl").c_str(),

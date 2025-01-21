@@ -54,13 +54,12 @@ Skybox::Skybox(const Camera& camera, const std::vector<const char*>& faces) : ca
 	};
 
 	this->vao->bind();
-	VBO vbo = VBO();
 
-	vbo.bind();
-	vbo.make_from_vertices(vertices, 3, GL_STATIC_DRAW);
+	this->vbo->bind();
+	this->vbo->make_from_vertices(vertices, 3, GL_STATIC_DRAW);
 
 	this->vao->unbind();
-	vbo.unbind();
+	this->vbo->unbind();
 
 
 	// Gen texture cube map
@@ -92,6 +91,7 @@ Skybox::Skybox(const Camera& camera, const std::vector<const char*>& faces) : ca
 
 Skybox::~Skybox() {
 	delete this->vao;
+	delete this->vbo;
 }
 
 void Skybox::draw() {

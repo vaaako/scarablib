@@ -17,9 +17,15 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [ ] All graphics logic possible to glsl *(GPU)*
 - [ ] Replace `enum class` to `enum` in some cases where there are multiple conversions
 - [ ] Discord RPC support
+- [ ] Better custom VAO and Shader support for 2D and 3D shapes
+	+ Currently is very clunky and not dinamic
+- [ ] Use noexcept keyword
+- [ ] Better color struct
+- [ ] Mouse "GRABBED" enum (or similar)
 
 # TODO Bug
 - [ ] Memory leak somewhere (i don't know if is in my code or in some library, but is not dangerous)
+	+ Maybe: Model, Mesh, Cube or SDL_Video
 - [X] Fix FPS drop when movement is enabled
 
 # TODO Window
@@ -47,6 +53,7 @@ I wrote most of the things here very tired, sorry for any english mistake
 	+ Like [Windfield](https://github.com/a327ex/windfield). Show collider and easy setting
 	+ Rigid body
 - [ ] Physics (dont know how)
+- [ ] Batch rendering for textures too
 
 # TODO 2D
 - [x] Unify shader and `shader_texture` somehow
@@ -69,7 +76,8 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [x] Skybox
 - [ ] Normals / Shading value (both?)
 - [x] Model and Mesh
-
+- [ ] Better solution to AABB
+- [ ] Camera optimized movement
 
 # Features for later
 - Sprite atlas

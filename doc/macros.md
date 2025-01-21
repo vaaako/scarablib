@@ -1,8 +1,13 @@
 # Macros
+## Enable 2D support
+```cpp
+#define SCARAB_2D_AND_3D
+```
+
 ## Enable window debug
 Print all events in a frame (if has)
 ```cpp
-#define SCRLIB_DEBUG_EVENT_COUNT
+#define SCARAB_DEBUG_EVENT_COUNT
 ```
 
 ## Enable mouse debug
