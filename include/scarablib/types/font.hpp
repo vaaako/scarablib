@@ -19,10 +19,10 @@ class Font {
 		// Build a font object passing a path to a .ttf file.
 		// Also pass font's text, size and color
 		Font(const char* path, const uint16 size = 24);
-		~Font();
+		~Font() noexcept;
 
 		// Draw font using a shader object
-		void draw_text(const std::string& text, const vec2<uint32>& pos, const Color& color = Colors::WHITE, float scale = 1.0f);
+		void draw_text(const std::string& text, const vec2<uint32>& pos, const Color& color = Colors::WHITE, float scale = 1.0f) noexcept;
 
 	private:
 		struct Glyph {

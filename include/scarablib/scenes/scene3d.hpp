@@ -21,8 +21,8 @@
 class Scene3D : public IScene<Model> {
 	public:
 		// Build 3D scene using the window object and a camera object
-		Scene3D(const Window& window, Camera& camera);
-		~Scene3D();
+		Scene3D(const Window& window, Camera& camera) noexcept;
+		~Scene3D() noexcept;
 
 		// Disable copy and moving
 		Scene3D(const Scene3D&) = delete;
@@ -35,15 +35,15 @@ class Scene3D : public IScene<Model> {
 		void add_to_scene(const std::string& key, Model* model) override;
 
 		// Draw all models added to the scene
-		void draw_all() const override;
+		void draw_all() const noexcept override;
 
 		// Update the scene viewport using the window object
-		inline void update_viewport(const Window& window) override {
+		inline void update_viewport(const Window& window) noexcept override {
 			this->camera.update_viewport(window);
 		}
 
 		// Update the scene viewport using a custom width and height values
-		inline void update_viewport(const uint32 width, const uint32 height) override {
+		inline void update_viewport(const uint32 width, const uint32 height) noexcept override {
 			this->camera.update_viewport(width, height);
 		}
 

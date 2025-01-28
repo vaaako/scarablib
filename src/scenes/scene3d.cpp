@@ -1,9 +1,9 @@
 #include "scarablib/scenes/scene3d.hpp"
 #include <GL/glew.h>
 
-Scene3D::Scene3D(const Window& window, Camera& camera) : IScene(window), camera(camera) {}
+Scene3D::Scene3D(const Window& window, Camera& camera) noexcept : IScene(window), camera(camera) {}
 
-Scene3D::~Scene3D() {
+Scene3D::~Scene3D() noexcept {
 	delete this->shader;
 }
 
@@ -17,7 +17,7 @@ void Scene3D::add_to_scene(const std::string& key, Model* mesh) {
 	this->vao_groups[mesh->get_vao().get_id()].push_back(shared_mesh);
 }
 
-void Scene3D::draw_all() const {
+void Scene3D::draw_all() const noexcept {
 	this->shader->use();
 
 	for(const auto& [vao, meshes] : this->vao_groups) {

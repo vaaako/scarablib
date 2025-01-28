@@ -9,11 +9,11 @@ struct Circle : public Shape2D {
 	friend class Scene2D;
 
 	// Initialize current shape using the Shape2DConf struct
-	Circle(const Shape2DConf& conf);
+	Circle(const Shape2DConf& conf) noexcept;
 
 	// Draw the circle using the circle shader.
 	// No shader is needed here, since Circle has a different shader stored in the struct. This method is a virtual method from Shape2D.
-	void draw(const Shader& shader) override;
+	void draw(const Shader& shader) noexcept override;
 
 	// Get the current blur value
 	inline float get_blur() {

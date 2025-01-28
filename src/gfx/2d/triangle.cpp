@@ -1,10 +1,10 @@
 #include "scarablib/gfx/2d/triangle.hpp"
 
-Triangle::Triangle(const Shape2DConf& conf)
+Triangle::Triangle(const Shape2DConf& conf) noexcept
 	: Shape2D(conf) {
 }
 
-void Triangle::draw(const Shader& shader) {
+void Triangle::draw(const Shader& shader) noexcept {
 	// Apply transformations if needed
 	this->update_model();
 

@@ -29,8 +29,8 @@
 class Scene2D : public IScene<Shape2D> {
 	public:
 		// Build the Scene using the window object
-		Scene2D(const Window& window);
-		~Scene2D();
+		Scene2D(const Window& window) noexcept;
+		~Scene2D() noexcept;
 
 		// Disable copy and moving
 		Scene2D(const Scene2D&) = delete;
@@ -42,15 +42,15 @@ class Scene2D : public IScene<Shape2D> {
 		void add_to_scene(const std::string& key, Shape2D* shape) override;
 
 		// Draw all objects added to the scene
-		void draw_all() const override;
+		void draw_all() const noexcept override;
 
 		// Update scene viewport using the window object
-		inline void update_viewport(const Window& window) override {
+		inline void update_viewport(const Window& window) noexcept override {
 			this->update_viewport(window.get_width(), window.get_height());
 		}
 
 		// Update scene viewport using custon width and height values
-		void update_viewport(const uint32 width, const uint32 height) override;
+		void update_viewport(const uint32 width, const uint32 height) noexcept override;
 
 	private:
 		// TODO: Make struct to store these tree? (add a method to bind, unbind etc)

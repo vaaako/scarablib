@@ -58,7 +58,7 @@ Shader::Shader(const char* vertex_source, const char* fragment_source) {
 	glDeleteShader(vertex_shader);
 	glDeleteShader(fragment_shader);
 }
-Shader::~Shader() {
+Shader::~Shader() noexcept {
 	glDeleteProgram(this->id);
 }
 

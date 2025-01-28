@@ -84,7 +84,7 @@ Window::Window(const WindowConf& config) : conf(config), half_width(config.width
 	}
 }
 
-Window::~Window() {
+Window::~Window() noexcept {
 	// Delete handlers
 	// delete this->keyboard_handler;
 	// delete this->mouse_handler;
@@ -107,7 +107,7 @@ Window::~Window() {
 
 
 
-double Window::fps() {
+double Window::fps() noexcept {
 	const uint32 current = SDL_GetTicks();
 	double elapsed = current - this->start_time;
 
@@ -129,7 +129,7 @@ double Window::fps() {
 	return this->FPS;
 }
 
-double Window::dt() const {
+double Window::dt() const noexcept {
 	const uint32 current = SDL_GetTicks();
 	const uint32 elapsed = current - this->last_update;
 	// if(this->frame_count < desired_fps) {
@@ -146,7 +146,7 @@ double Window::dt() const {
 	return static_cast<double>(elapsed) / 1000.0;
 }
 
-void Window::frame_capping(const uint32 fps) const {
+void Window::frame_capping(const uint32 fps) const noexcept {
 	const double desired = 1.0 / fps; // ~0.0133 seconds per frame
 	const double actual = this->dt();
 
@@ -155,14 +155,12 @@ void Window::frame_capping(const uint32 fps) const {
 		// Delay to make it synchronized
 		uint32 remaining = static_cast<Uint32>((desired - actual) * 1000);
 		SDL_Delay(remaining);
-		// Simulate 60 FPS if remaining is less than 10ms
-		// (remaining > 10) ? 5 : remaining
 	}
 	// If actual >= desired, the frame is already running slower than desired, so no delay is needed
 }
 
 
-void Window::process_events() {
+void Window::process_events() noexcept {
 	this->frame_count++;
 
 	SDL_Event event;

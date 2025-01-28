@@ -11,7 +11,7 @@ namespace FileHelper {
 	std::string read_file(const std::string& path);
 
 	// Get the current file static path
-	inline std::filesystem::path current_path() {
+	inline std::filesystem::path current_path() noexcept {
 		return std::filesystem::current_path();
 	}
 };

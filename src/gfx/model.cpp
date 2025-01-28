@@ -1,17 +1,17 @@
 #include "scarablib/gfx/model.hpp"
 
-Model::Model(const ModelConf& conf, const GLuint& vao_id, const std::vector<Vertex>& vertices, const std::vector<uint32>& indices)
+Model::Model(const ModelConf& conf, const GLuint& vao_id, const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept
 	: Mesh(vao_id, vertices, indices), conf(conf) {
 	this->conf.size = this->calc_size(this->vertices);
 	this->update_min_and_max();
 }
 
-Model::Model(const char* path) : Mesh(path) {
+Model::Model(const char* path) noexcept : Mesh(path) {
 	this->conf.size = this->calc_size(this->vertices);
 	this->update_min_and_max();
 }
 
-Model& Model::set_rotation(const float angle, const vec3<bool> axis) {
+Model& Model::set_rotation(const float angle, const vec3<bool> axis) noexcept {
 	this->conf.angle = angle;
 	// At least one axis need to be true to work
 	if(axis == vec3<bool>(false)) {
@@ -23,7 +23,7 @@ Model& Model::set_rotation(const float angle, const vec3<bool> axis) {
 	return *this;
 }
 
-Model& Model::set_orientation(const float angle, const vec3<bool> axis) {
+Model& Model::set_orientation(const float angle, const vec3<bool> axis) noexcept {
 	this->conf.orient_angle = angle;
 	this->conf.orient_axis = (vec3<float>)axis;
 
@@ -36,7 +36,7 @@ Model& Model::set_orientation(const float angle, const vec3<bool> axis) {
 	return *this;
 }
 
-void Model::draw(Camera& camera, const Shader& shader) {
+void Model::draw(Camera& camera, const Shader& shader) noexcept {
 	if(this->isdirty) {
 		this->model = glm::mat4(1.0f);
 
@@ -65,7 +65,7 @@ void Model::draw(Camera& camera, const Shader& shader) {
 }
 
 
-vec3<float> Model::calc_size(const std::vector<Vertex>& vertices) {
+vec3<float> Model::calc_size(const std::vector<Vertex>& vertices) noexcept {
 	// Init with largest and smallest values
 	vec3<float> min = vec3<float>(FLT_MAX);
 	vec3<float> max = vec3<float>(-FLT_MAX);

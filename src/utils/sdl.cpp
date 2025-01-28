@@ -1,7 +1,7 @@
 #include "scarablib/utils/sdl.hpp"
 
 
-void SDLHelper::flip_vertically(SDL_Surface* surface) {
+void SDLHelper::flip_vertically(SDL_Surface* surface) noexcept {
 	SDL_LockSurface(surface);
 
 	int pitch = surface->pitch; // Row size
@@ -25,7 +25,7 @@ void SDLHelper::flip_vertically(SDL_Surface* surface) {
 	SDL_UnlockSurface(surface);
 }
 
-void SDLHelper::flip_horizontally(SDL_Surface* surface) {
+void SDLHelper::flip_horizontally(SDL_Surface* surface) noexcept {
 	SDL_LockSurface(surface);
 
 	int pitch = surface->pitch; // Row size
@@ -57,7 +57,7 @@ void SDLHelper::flip_horizontally(SDL_Surface* surface) {
 }
 
 
-uint32 SDLHelper::power_two_floor(uint32 value) {
+uint32 SDLHelper::power_two_floor(uint32 value) noexcept {
 	uint32 power = 2;
 	uint32 next_val = power * 2;
 
@@ -70,7 +70,7 @@ uint32 SDLHelper::power_two_floor(uint32 value) {
 
 
 // Create a surface to the correct size in RGB format, and copy the old image
-SDL_Surface* SDLHelper::base2_surface(SDL_Surface* surface) {
+SDL_Surface* SDLHelper::base2_surface(SDL_Surface* surface) noexcept {
 	int w = (int)(SDLHelper::power_two_floor((uint32)(surface->w)) * 2);
 	int h = (int)(SDLHelper::power_two_floor((uint32)(surface->h)) * 2);
 

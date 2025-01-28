@@ -10,7 +10,7 @@ Sound::Sound(const char* path) : IAudio(path) {
 	}
 }
 
-Sound::~Sound() {
+Sound::~Sound() noexcept {
 	Mix_FreeChunk(this->sound);
 	Mix_CloseAudio();
 }

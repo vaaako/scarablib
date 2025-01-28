@@ -27,7 +27,7 @@ class IScene {
 
 	public:
 		// Build scene object using the window object for viewport
-		IScene(const Window& window);
+		IScene(const Window& window) noexcept;
 		virtual ~IScene() = default;
 
 		// Add a shape object to the scene.
@@ -36,7 +36,7 @@ class IScene {
 
 		// Get a object by key and dynamically convert it
 		template <typename U>
-		std::shared_ptr<U> get_by_key(const std::string& key) {
+		std::shared_ptr<U> get_by_key(const std::string& key) noexcept {
 			auto it = this->scene.find(key);
 			if(it == this->scene.end()) {
 				LOG_ERROR("Object '%s' is not added to the scene", key.c_str());
@@ -52,24 +52,24 @@ class IScene {
 		}
 
 		// Remove object by key
-		void remove_by_key(const std::string& key);
+		void remove_by_key(const std::string& key) noexcept;
 
 		// Draw all objects added to the scene
-		virtual void draw_all() const = 0;
+		virtual void draw_all() const noexcept = 0;
 
 		// Update the scene viewport using the window object
-		virtual inline void update_viewport(const Window& window) = 0;
+		virtual inline void update_viewport(const Window& window) noexcept = 0;
 
 		// Update the scene viewport using a custom width and height values
-		virtual void update_viewport(const uint32 width, const uint32 height) = 0;
+		virtual void update_viewport(const uint32 width, const uint32 height) noexcept = 0;
 
 		// Set drawmode to following shapes
-		inline void set_drawmode(const DrawMode drawmode) {
+		inline void set_drawmode(const DrawMode drawmode) noexcept {
 			glPolygonMode(GL_FRONT_AND_BACK, drawmode);
 		}
 
 		// Get the number of objects in scene
-		inline uint64 length() {
+		inline uint64 length() noexcept {
 			return this->scene.size();
 		}
 
@@ -88,12 +88,12 @@ class IScene {
 };
 
 template <typename T> // Return the shared pointer
-IScene<T>::IScene(const Window& window)
+IScene<T>::IScene(const Window& window) noexcept
 	: window(window), width(window.get_width()), height(window.get_height()) {}
 
 
 template <typename T>
-void IScene<T>::remove_by_key(const std::string& key) {
+void IScene<T>::remove_by_key(const std::string& key) noexcept {
 	auto it = this->scene.find(key);
 	if(it == this->scene.end()) {
 		throw ScarabError("Key '%s' not found", key.c_str());

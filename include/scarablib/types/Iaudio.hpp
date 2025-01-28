@@ -16,12 +16,12 @@ struct IAudio {
 	IAudio(const char* path);
 	// virtual ~Audio() = 0;
 
-	virtual inline void play(const int8 loops = 0) const = 0;
-	virtual inline void set_volume(const uint8 volume) = 0;
+	virtual inline void play(const int8 loops = 0) const noexcept = 0;
+	virtual inline void set_volume(const uint8 volume) noexcept = 0;
 
-	virtual inline bool isplaying() const = 0;
-	virtual inline bool ispaused() const = 0;
-	virtual inline void pause() const = 0;
-	virtual inline void resume() const = 0;
+	virtual inline bool isplaying() const noexcept = 0;
+	virtual inline bool ispaused() const noexcept = 0;
+	virtual inline void pause() const noexcept = 0;
+	virtual inline void resume() const noexcept = 0;
 };
 

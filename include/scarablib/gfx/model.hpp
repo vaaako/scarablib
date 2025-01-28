@@ -38,63 +38,63 @@ class Model : public Mesh {
 	public:
 		// Init model using custom config and pre-defined VAO.
 		// Vertices and Indices will be used to gerate VBO and EBO in this VAO
-		Model(const ModelConf& conf, const GLuint& vao_id, const std::vector<Vertex>& vertices, const std::vector<uint32>& indices);
+		Model(const ModelConf& conf, const GLuint& vao_id, const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept;
 		// Make a model using a wavefront .obj file
-		Model(const char* path);
+		Model(const char* path) noexcept;
 		~Model() = default;
 
 		// Draw current Model.
 		// It needs a camera object and a shader
-		virtual void draw(Camera& camera, const Shader& shader);
+		virtual void draw(Camera& camera, const Shader& shader) noexcept;
 
 		// Get current X position
-		inline float get_x() const {
+		inline float get_x() const noexcept {
 			return this->conf.position.x;
 		}
 
 		// Get current Y position
-		inline float get_y() const {
+		inline float get_y() const noexcept {
 			return this->conf.position.y;
 		}
 
 		// Get current Z position
-		inline float get_z() const {
+		inline float get_z() const noexcept {
 			return this->conf.position.z;
 		}
 
 		// Get current position
-		inline vec3<float> get_position() const {
+		inline vec3<float> get_position() const noexcept {
 			return this->conf.position;
 		}
 
 		// Get current size of each axis
-		inline vec3<float> get_size() const {
+		inline vec3<float> get_size() const noexcept {
 			return this->conf.size;
 		}
 
 		// Get current scale of each axis
-		inline vec3<float> get_scale() const {
+		inline vec3<float> get_scale() const noexcept {
 			return this->conf.scale;
 		}
 
 		// Get current color
-		inline Color get_color() const {
+		inline Color get_color() const noexcept {
 			return this->conf.color;
 		}
 
 		// Get current angle
-		inline float get_angle() const {
+		inline float get_angle() const noexcept {
 			return this->conf.angle;
 		}
 
 
 		// Get minimum corner of the bounding box (AABB)
-		inline vec3<float> get_min() const {
+		inline vec3<float> get_min() const noexcept {
 			return this->conf.min;
 		}
 
 		// Get maximum corner of the bounding box (AABB)
-		inline vec3<float> get_max() const {
+		inline vec3<float> get_max() const noexcept {
 			return this->conf.max;
 		}
 
@@ -102,7 +102,7 @@ class Model : public Mesh {
 		// SETTERS //
 
 		// Set a new position using a vector
-		inline Model& set_position(const vec3<float>& position) {
+		inline Model& set_position(const vec3<float>& position) noexcept {
 			this->conf.position = position;
 			this->update_min_and_max();
 			this->isdirty = true;
@@ -110,28 +110,28 @@ class Model : public Mesh {
 		}
 
 		// Set a new X position
-		inline Model& set_x(const float newx) {
+		inline Model& set_x(const float newx) noexcept {
 			this->conf.position.x = newx;
 			this->isdirty = true;
 			return *this;
 		}
 
 		// Set a new Y position
-		inline Model& set_y(const float newy) {
+		inline Model& set_y(const float newy) noexcept {
 			this->conf.position.y = newy;
 			this->isdirty = true;
 			return *this;
 		}
 
 		// Set a new Z position
-		inline Model& set_z(const float newz) {
+		inline Model& set_z(const float newz) noexcept {
 			this->conf.position.z = newz;
 			this->isdirty = true;
 			return *this;
 		}
 
 		// Set a new size using a vector (X and Y)
-		inline Model& set_size(const vec3<float>& size) {
+		inline Model& set_size(const vec3<float>& size) noexcept {
 			this->conf.size = size;
 			this->update_min_and_max();
 			this->isdirty = true;
@@ -139,7 +139,7 @@ class Model : public Mesh {
 		}
 
 		// Set a new size using a vector (X and Y)
-		inline Model& set_size(const float size) {
+		inline Model& set_size(const float size) noexcept {
 			this->conf.size = { size, size, size };
 			this->update_min_and_max();
 			this->isdirty = true;
@@ -148,7 +148,7 @@ class Model : public Mesh {
 
 		// Scale the shape using a different value for each axis.
 		// e.g., `size.x = size.x * scale.x`, `size.y = size.y * scale.y` and `size.z = size.z * scale.z`
-		inline Model& set_scale(const vec3<float>& scale) {
+		inline Model& set_scale(const vec3<float>& scale) noexcept {
 			this->conf.scale = scale;
 			this->isdirty = true;
 			return *this;
@@ -156,7 +156,7 @@ class Model : public Mesh {
 
 		// Scale the shape using a different value for each axis.
 		// e.g., `size.x = size.x * scale.x`, `size.y = size.y * scale.y` and `size.z = size.z * scale.z`
-		inline Model& set_scale(const float scale) {
+		inline Model& set_scale(const float scale) noexcept {
 			this->conf.scale = { scale, scale, scale };
 			this->isdirty = true;
 			return *this;
@@ -164,22 +164,22 @@ class Model : public Mesh {
 
 		// Set a new color
 		// If using a texture and a color at the same time, the texture will be colorized using the color defined
-		inline Model& set_color(const Color& color) {
+		inline Model& set_color(const Color& color) noexcept {
 			this->conf.color = color;
 			return *this;
 		}
 
 		// Set a new rotation angle in degrees.
 		// Axis is wich axis the angle will be applied (XYZ)
-		Model& set_rotation(const float angle, const vec3<bool> axis);
+		Model& set_rotation(const float angle, const vec3<bool> axis) noexcept;
 
 		// Set a new orientation to the Model in degrees.
 		// Orientation is the "default" angle of the Model.
 		// The rotation will be applied using the orientation as base
-		Model& set_orientation(const float angle, const vec3<bool> axis);
+		Model& set_orientation(const float angle, const vec3<bool> axis) noexcept;
 
 		// Make a copy of this model
-		inline Model make_instance() const {
+		inline Model make_instance() const noexcept {
 			return Model(*this);
 		}
 
@@ -191,11 +191,11 @@ class Model : public Mesh {
 		ModelConf conf;
 
 		// Calculates the size of a shape using it's vertices
-		vec3<float> calc_size(const std::vector<Vertex>& vertices);
+		vec3<float> calc_size(const std::vector<Vertex>& vertices) noexcept;
 
 		// Inline //
 
-		inline void update_min_and_max() {
+		inline void update_min_and_max() noexcept {
 			// Scale or Size?
 			this->conf.min = vec3<float>(
 				this->conf.position.x - this->conf.scale.x / 2,

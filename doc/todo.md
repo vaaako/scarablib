@@ -22,6 +22,7 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [ ] Use noexcept keyword
 - [ ] Better color struct
 - [ ] Mouse "GRABBED" enum (or similar)
+- [ ] Use a Model Factory
 
 # TODO Bug
 - [ ] Memory leak somewhere (i don't know if is in my code or in some library, but is not dangerous)

@@ -6,7 +6,7 @@
 #include <sstream>
 #include <vector>
 
-std::string Log::get_date() {
+std::string Log::get_date() noexcept {
 	std::time_t now = std::time(nullptr);
 	std::tm* localTime = std::localtime(&now);
 	std::ostringstream oss;
@@ -16,7 +16,7 @@ std::string Log::get_date() {
 	return oss.str();
 }
 
-std::string Log::get_time() {
+std::string Log::get_time() noexcept {
 	std::time_t now = std::time(nullptr);
 	std::tm* localTime = std::localtime(&now);
 	std::ostringstream oss;
@@ -26,7 +26,7 @@ std::string Log::get_time() {
 	return oss.str();
 }
 
-std::string Log::get_date_and_time() {
+std::string Log::get_date_and_time() noexcept {
 	std::time_t now = std::time(nullptr);
 	std::tm* localTime = std::localtime(&now);
 	std::ostringstream oss;
@@ -54,7 +54,7 @@ std::string Log::get_date_and_time() {
 // 	va_end(args);
 // }
 
-void Log::log_impl(const char* level, const char* func, bool include_time, const char* fmt, ...) {
+void Log::log_impl(const char* level, const char* func, bool include_time, const char* fmt, ...) noexcept {
 	va_list args;
 	va_start(args, fmt);
 

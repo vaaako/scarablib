@@ -1,10 +1,10 @@
 #include "scarablib/gfx/2d/rectangle.hpp"
 #include <cstdio>
 
-Rectangle::Rectangle(const Shape2DConf& conf)
+Rectangle::Rectangle(const Shape2DConf& conf) noexcept
 	: Shape2D(conf) {}
 
-void Rectangle::draw(const Shader& shader) {
+void Rectangle::draw(const Shader& shader) noexcept {
 	// Apply transformations if needed
 	this->update_model();
 

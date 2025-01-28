@@ -1,9 +1,9 @@
 #include "scarablib/gfx/2d/circle.hpp"
 
-Circle::Circle(const Shape2DConf& conf)
+Circle::Circle(const Shape2DConf& conf) noexcept
 	: Shape2D(conf) {}
 
-void Circle::draw(const Shader& shader) {
+void Circle::draw(const Shader& shader) noexcept {
 	shader.unbind();
 
 	// Apply transformations if needed

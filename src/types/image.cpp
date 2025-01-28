@@ -14,7 +14,7 @@ Image::Image(const char* path, const bool flip) {
 	}
 }
 
-Image::~Image() {
+Image::~Image() noexcept {
 	if(this->data != nullptr) {
 		stbi_image_free(this->data);
 	}

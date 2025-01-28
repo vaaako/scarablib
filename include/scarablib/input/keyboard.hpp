@@ -25,26 +25,26 @@ struct KeyboardHandler {
 	friend Window;
 
 	// Check if a key was pressed, true just one time, even if still holding
-	bool ispressed(const Keycode key);
+	bool ispressed(const Keycode key) noexcept;
 
 	// Check if a key is being pressed
-	inline bool isdown(const Keycode key) const {
+	inline bool isdown(const Keycode key) const noexcept {
 		return (this->keystate.at(static_cast<uint32>(key)) == Keystate::DOWN);
 	}
 
 	// Check if a key is released
-	inline bool isup(const Keycode key) const {
+	inline bool isup(const Keycode key) const noexcept {
 		return (this->keystate.at(static_cast<uint32>(key)) == Keystate::RELEASED);
 	}
 
 
 	// Get the state of a key
-	inline Keystate get_keystate(const Keycode key) const {
+	inline Keystate get_keystate(const Keycode key) const noexcept {
 		return this->keystate[static_cast<uint32>(key)];
 	}
 
 	// Change the state of a key
-	inline void set_keystate(const Keycode key, const Keystate state) {
+	inline void set_keystate(const Keycode key, const Keystate state) noexcept {
 		this->keystate[static_cast<uint32>(key)] = state;
 	}
 
@@ -54,5 +54,5 @@ struct KeyboardHandler {
 		std::vector<Keystate> keystate = std::vector<Keystate>((uint32)Keycode::NUM_SCANCODES, Keystate::RELEASED);
 
 		// Handle all keyboard events (used on window class only)
-		void handle_event(const SDL_Event& event);
+		void handle_event(const SDL_Event& event) noexcept;
 };

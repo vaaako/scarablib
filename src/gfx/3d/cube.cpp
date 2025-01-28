@@ -1,7 +1,7 @@
 #include "scarablib/gfx/3d/cube.hpp"
 #include "scarablib/gfx/model.hpp"
 
-Cube::Cube(const ModelConf& conf) : Model(conf, this->get_vao().get_id(), {
+Cube::Cube(const ModelConf& conf) noexcept : Model(conf, this->get_vao().get_id(), {
 		// Vertices: 24
 		// Front face
 		Vertex { .position = glm::vec3(-0.5f, -0.5f, 0.5f), .texuv = glm::vec2(0.0f, 0.0f) }, // Bottom left vertex

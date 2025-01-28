@@ -46,15 +46,15 @@ struct MouseHandler {
 	vec2<int16> moved_dir;
 
 	// Change cursor position in window
-	void set_cursor_position(const Window& window, const uint32 x, const uint32 y);
+	void set_cursor_position(const Window& window, const uint32 x, const uint32 y) noexcept;
 
 	// Check if button is clicking
-	inline bool isclick(const MouseBTN button) const {
+	inline bool isclick(const MouseBTN button) const noexcept {
 		return this->down == button;
 	}
 
 	// Check if button is up
-	inline bool isup(const MouseBTN button) const {
+	inline bool isup(const MouseBTN button) const noexcept {
 		return this->up == button;
 	}
 
@@ -76,5 +76,5 @@ struct MouseHandler {
 		// std::vector<MouseState> mousestate = std::vector<MouseState>(6, MouseState::RELEASED);
 
 		// Handle all mouse events (used on window class only)
-		void handle_event(const SDL_Event& event);
+		void handle_event(const SDL_Event& event) noexcept;
 };

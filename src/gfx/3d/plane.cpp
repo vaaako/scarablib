@@ -1,7 +1,7 @@
 #include "scarablib/gfx/3d/plane.hpp"
 #include "scarablib/gfx/model.hpp"
 
-Plane::Plane(const ModelConf& conf) : Model(conf, this->get_vao().get_id(), {
+Plane::Plane(const ModelConf& conf) noexcept : Model(conf, this->get_vao().get_id(), {
 		// Front face
 		Vertex { .position = glm::vec3(-0.5f, -0.5f, 0.0f), .texuv = glm::vec2(0.0f, 0.0f) }, // Bottom left vertex
 		Vertex { .position = glm::vec3( 0.5f, -0.5f, 0.0f), .texuv = glm::vec2(1.0f, 0.0f) }, // Bottom right vertex
@@ -25,7 +25,7 @@ Plane::Plane(const ModelConf& conf) : Model(conf, this->get_vao().get_id(), {
 	}) {}
 
 
-void Plane::face_position(const vec3<float>& position, const vec3<float> axis) {
+void Plane::face_position(const vec3<float>& position, const vec3<float> axis) noexcept {
 	// Distance from camera
 	glm::vec3 direction = position - this->get_position();
 	direction = glm::normalize(direction);

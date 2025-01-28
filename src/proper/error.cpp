@@ -1,12 +1,10 @@
 #include "scarablib/proper/error.hpp"
-#include "scarablib/typedef.hpp"
 
 #include <cstdarg>
 #include <cstdio>
 #include <cstring>
 #include <stdexcept>
 #include <vector>
-
 
 ScarabError::ScarabError(const char* fmt, ...) {
 	va_list args;

@@ -31,24 +31,24 @@ struct WindowConf {
 class Window {
 	public:
 		Window(const WindowConf& windowconf);
-		~Window();
+		~Window() noexcept;
 
 		// Handle any events or inputs (e.g., keyboard, mouse) that occurred during the frame.
 		// This function should be called once at the beginning of each frame to process input events.
-		void process_events();
+		void process_events() noexcept;
 
 
 		// WINDOW PROCESS //
 
 		// True while the window is open
-		inline bool is_open() const {
+		inline bool is_open() const noexcept {
 			return this->window_open;
 		}
 
 		// Swap the front and back buffers at the end of each frame.
 		// This should be called at the end of each frame
 		// to display the newly rendered frame to the screen
-		inline void swap_buffers() {
+		inline void swap_buffers() noexcept {
 			#ifdef SCARAB_DEBUG_EVENT_COUNT
 				if(frame_events.size() > 0) {
 					std::printf("Events in this frame: %zu\n", frame_events.size());
@@ -70,7 +70,7 @@ class Window {
 		// Clear the screen by setting the background color and clearing the buffer.
 		// This should be called at the beginning of each frame to reset the drawing surface.
 		// It clears both the color and depth buffers.
-		inline void clear() const {
+		inline void clear() const noexcept {
 			glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		}
@@ -80,44 +80,44 @@ class Window {
 
 		// Return a pointer to the SDL_Window object.
 		// This can be used to directly manipulate or access SDL window properties.
-		inline SDL_Window* get_reference() const {
+		inline SDL_Window* get_reference() const noexcept {
 			return this->window;
 		}
 
 		// Return the current title of the window as a string.
-		inline std::string get_title() const {
+		inline std::string get_title() const noexcept {
 			return this->conf.title;
 		}
 
 		// Return the width of the window in pixels.
-		inline uint32 get_width() const {
+		inline uint32 get_width() const noexcept {
 			return this->conf.width;
 		}
 
 		// Return the height of the window in pixels.
-		inline uint32 get_height() const {
+		inline uint32 get_height() const noexcept {
 			return this->conf.height;
 		}
 
 		// Return the half width of the window in pixels.
-		inline uint32 get_half_width() const {
+		inline uint32 get_half_width() const noexcept {
 			return this->half_width;
 		}
 
 		// Return the half height of the window in pixels.
-		inline uint32 get_half_height() const {
+		inline uint32 get_half_height() const noexcept {
 			return this->half_height;
 		}
 
 		// Return a pointer to the keyboard handler object.
 		// This allows access to input handling for the keyboard.
-		inline KeyboardHandler& keyboard() {
+		inline KeyboardHandler& keyboard() noexcept {
 			return this->keyboard_handler;
 		}
 
 		// Return a pointer to the mouse handler object.
 		// This allows access to input handling for the mouse.
-		inline MouseHandler& mouse() {
+		inline MouseHandler& mouse() noexcept {
 			return this->mouse_handler;
 		}
 
@@ -125,25 +125,25 @@ class Window {
 		// SETTERS
 
 		// Change the window's title to the provided value.
-		inline void set_title(char* title) {
+		inline void set_title(char* title) noexcept {
 			this->conf.title = title; // char*
 			SDL_SetWindowTitle(this->window, title);
 		}
 
 		// Set the window's clear color (background color) using the provided Color object.
-		inline void set_clear_color(const Color& clear_color) {
+		inline void set_clear_color(const Color& clear_color) noexcept {
 			this->clear_color = clear_color.normalize();
 		}
 
 		// Enable or disable the window's resizable property.
-		inline void set_resizable(const bool enable) {
+		inline void set_resizable(const bool enable) noexcept  {
 			SDL_SetWindowResizable(this->window, static_cast<SDL_bool>(enable));
 		}
 
 		// Enable or disable vertical sync (VSync).
 		// VSync synchronizes the frame rate with monitor's refresh rate.
 		// Disable it for potentially higher frame rates.
-		inline void set_vsync(const bool state) {
+		inline void set_vsync(const bool state) noexcept {
 			if(SDL_GL_SetSwapInterval(state) < 0) {
 				LOG_ERROR("Failed to enable vsync: %s", SDL_GetError());
 			}
@@ -151,7 +151,7 @@ class Window {
 
 		// Set the window's size using the provided width and height values.
 		// This also adjusts the OpenGL viewport to match the new window size.
-		inline void set_size(const vec2<uint32>& size) {
+		inline void set_size(const vec2<uint32>& size) noexcept {
 			this->conf.width = size.x;
 			this->conf.height = size.y;
 
@@ -166,18 +166,18 @@ class Window {
 
 		// Close the window by setting the `window_open` flag to false.
 		// This flag can be checked in the main loop to terminate or pause rendering.
-		inline void close() {
+		inline void close() noexcept {
 			this->window_open = false;
 		}
 
 		// Check if a given event is present in the current frame's event buffer.
 		// If the event exists in the buffer, it is considered "activated".
-		inline bool on_event(Event event) const {
+		inline bool on_event(Event event) const noexcept {
 			return this->frame_events.find(static_cast<uint32>(event)) != this->frame_events.end();
 		}
 
 		// Check if the provided X or Y coordinates are outside the window's bounds.
-		inline bool out_of_bounds(const uint32 x, const uint32 y) const {
+		inline bool out_of_bounds(const uint32 x, const uint32 y) const noexcept {
 			return ((int)x < 0 || x > this->conf.width) ||
 				   ((int)y < 0 || y > this->conf.height);
 		}
@@ -187,31 +187,31 @@ class Window {
 
 		// Lock the cursor inside the window.
 		// This prevents the cursor from leaving the window when on focus.
-		inline void grab_cursor(const bool grab) const {
+		inline void grab_cursor(const bool grab) const noexcept {
 			SDL_SetWindowGrab(this->window, static_cast<SDL_bool>(grab));
 			// SDL_SetRelativeMouseMode(static_cast<SDL_bool>(grab));
 		}
 
 		// Hide the cursor when it is inside the window.
-		inline void hide_cursor(const bool hide) const {
+		inline void hide_cursor(const bool hide) const noexcept {
 			SDL_ShowCursor(!hide);
 		}
 
 		// TIMER //
 
 		// Window FPS per second
-		double fps();
+		double fps() noexcept;
 
 		// Get the time elapsed between the current and last frame, in seconds.
-		double dt() const;
+		double dt() const noexcept;
 
 		// Stabilize the FPS and tries to limit the frame rate
-		void frame_capping(const uint32 fps) const;
+		void frame_capping(const uint32 fps) const noexcept;
 
 		// Optional `time` parameter adjusts the time scale (default: 1000.0 for seconds).
 		// Get the number of milliseconds that have passed since the SDL library was initialized.
 		// Note: The value wraps after approximately 49 days of continuous program execution.
-		inline uint32 timenow() const {
+		inline uint32 timenow() const noexcept {
 			return SDL_GetTicks();
 		}
 
@@ -221,7 +221,7 @@ class Window {
 
 		// Get the current width of the window (static method).
 		// This retrieves the window size for the active OpenGL context.
-		static inline int static_width() {
+		static inline int static_width() noexcept {
 			int width;
 			SDL_GetWindowSize(SDL_GL_GetCurrentWindow(), &width, NULL);
 			return width;
@@ -229,7 +229,7 @@ class Window {
 
 		// Get the current height of the window (static method).
 		// This retrieves the window size for the active OpenGL context.
-		static inline int static_height() {
+		static inline int static_height() noexcept {
 			int height;
 			SDL_GetWindowSize(SDL_GL_GetCurrentWindow(), NULL, &height);
 			return height;
@@ -262,7 +262,7 @@ class Window {
 
 		// Set the viewport to the provided size.
 		// This won't change the window's size
-		inline void set_viewport(const vec2<uint32>& size) {
+		inline void set_viewport(const vec2<uint32>& size) noexcept {
 			this->conf.width = size.x;
 			this->conf.height = size.y;
 

@@ -9,7 +9,7 @@ struct Vertex {
 	// vec3<float> normal;
 	vec2<float> texuv;
 
-	bool operator==(const Vertex& other) const {
+	bool operator==(const Vertex& other) const noexcept {
 		return this->position == other.position
 			&& this->texuv == other.texuv;
 			// && this->normal == other.normal;

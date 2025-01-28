@@ -4,7 +4,7 @@
 #include "scarablib/types/image.hpp"
 #include <SDL2/SDL_render.h>
 
-Texture::Texture() {
+Texture::Texture() noexcept {
 	this->format = GL_RGBA;
 
 	// Generate and bind texture
@@ -81,6 +81,10 @@ Texture::Texture(const char* path, const TextureFilter filter, const TextureWrap
 Texture::Texture(const void* data, const uint32 width, const uint32 height, const GLint internal_format, const GLenum format) 
 	: format(format), width(width), height(height) {
 
+	if(data == NULL) {
+		throw ScarabError("Texture data is null");
+	}
+
 	// Generate and bind texture
 	glGenTextures(1, &this->id); // num of textures, pointer
 	glBindTexture(this->tex_type, this->id);
@@ -100,7 +104,7 @@ Texture::Texture(const void* data, const uint32 width, const uint32 height, cons
 	glBindTexture(this->tex_type, 0);
 }
 
-Texture::~Texture() {
+Texture::~Texture() noexcept {
 	// Just in case
 	if(this->id != 0) {
 		glDeleteTextures(1, &this->id);
@@ -109,6 +113,10 @@ Texture::~Texture() {
 
 
 void Texture::update_data(const void* data, const GLenum format) {
+	if(data == NULL) {
+		throw ScarabError("Texture data is null");
+	}
+
 	glBindTexture(this->tex_type, this->id);
 	glTexSubImage2D(this->tex_type, 0, 0, 0, static_cast<GLsizei>(this->width), static_cast<GLsizei>(this->height), format, GL_UNSIGNED_BYTE, data);
 	glGenerateMipmap(this->tex_type);

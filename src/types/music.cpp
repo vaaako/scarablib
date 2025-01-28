@@ -12,7 +12,7 @@ Music::Music(const char* path) : IAudio(path) {
 	this->duration = Mix_MusicDuration(this->music);
 }
 
-Music::~Music() {
+Music::~Music() noexcept {
 	Mix_FreeMusic(this->music);
 	Mix_CloseAudio();
 }

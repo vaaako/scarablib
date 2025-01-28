@@ -1,12 +1,12 @@
 #include "scarablib/scenes/camera.hpp"
 #include "scarablib/window/window.hpp"
 
-Camera::Camera(const Window& window, const float fov, const float sensitivity)
+Camera::Camera(const Window& window, const float fov, const float sensitivity) noexcept
 	: width(window.get_width()), height(window.get_height()), sensitivity(sensitivity), fov(fov), max_fov(fov) {}
 
 
 
-void Camera::rotate(const MouseHandler& mouse) {
+void Camera::rotate(const MouseHandler& mouse) noexcept {
 	// Calculate move relative to the screen middle
 	float xoffset = this->sensitivity * (static_cast<float>(mouse.motion.x) - static_cast<float>(this->width) / 2) / static_cast<float>(this->width);
 	float yoffset = this->sensitivity * (static_cast<float>(mouse.motion.y) - static_cast<float>(this->height) / 2) / static_cast<float>(this->height);
@@ -36,7 +36,7 @@ void Camera::rotate(const MouseHandler& mouse) {
 
 
 
-void Camera::set_near_plane(const float near_plane) {
+void Camera::set_near_plane(const float near_plane) noexcept {
 	if(near_plane > this->far_plane) {
 		LOG_ERROR("new \"near plane\" value can't be higher than \"far plane\" current value");
 		return;
@@ -45,7 +45,7 @@ void Camera::set_near_plane(const float near_plane) {
 	this->near_plane = near_plane;
 }
 
-void Camera::set_far_plane(const float far_plane) {
+void Camera::set_far_plane(const float far_plane) noexcept {
 	if(far_plane < this->near_plane) {
 		LOG_ERROR("new \"far plane\" value can't be lower than \"near plane\" current value");
 		return;
@@ -54,7 +54,7 @@ void Camera::set_far_plane(const float far_plane) {
 	this->far_plane = far_plane;
 }
 
-void Camera::set_fov(const float fov) {
+void Camera::set_fov(const float fov) noexcept {
 	if(fov < this->near_plane || fov > this->far_plane) {
 		LOG_ERROR("new \"fov\" value must be between \"near plane\" and \"far plane\" current values");
 		return;
@@ -63,7 +63,7 @@ void Camera::set_fov(const float fov) {
 	this->fov = fov;
 }
 
-void Camera::set_min_fov(const float min_fov) {
+void Camera::set_min_fov(const float min_fov) noexcept {
 	if(min_fov < this->max_fov) {
 		LOG_ERROR("new \"min fov\" value can't be higher than \"max fov\" current value");
 		return;
@@ -72,7 +72,7 @@ void Camera::set_min_fov(const float min_fov) {
 	this->min_fov = min_fov;
 }
 
-void Camera::set_max_fov(const float max_fov) {
+void Camera::set_max_fov(const float max_fov) noexcept {
 	if(max_fov < this->min_fov) {
 		LOG_ERROR("new \"max fov\" value can't be lower than \"min fov\" current value");
 		return;
@@ -81,7 +81,7 @@ void Camera::set_max_fov(const float max_fov) {
 	this->max_fov = max_fov;
 }
 
-void Camera::zoom(const float speed, const Zoom zoom_dir) {
+void Camera::zoom(const float speed, const Zoom zoom_dir) noexcept {
 	if(zoom_dir == Zoom::IN) {
 		this->fov = std::max(this->fov - speed, this->min_fov);
 	} else {

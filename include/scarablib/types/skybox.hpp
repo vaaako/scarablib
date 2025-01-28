@@ -12,9 +12,9 @@ struct Skybox {
 	// Uses a vector of image paths as faces.
 	// The order must be the following: Right, Left, Top, Bottom, Back and Front
 	Skybox(const Camera& camera, const std::vector<const char*>& faces);
-	~Skybox();
+	~Skybox() noexcept;
 
-	void draw();
+	void draw() noexcept;
 
 	private:
 		uint32 texid;

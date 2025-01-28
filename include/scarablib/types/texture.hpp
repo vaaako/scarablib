@@ -24,7 +24,7 @@ enum class TextureWrap : int {
 // It will allocate ~1mb of RAM for each loaded texture
 struct Texture {
 	// This will make a empty solid white texture
-	Texture();
+	Texture() noexcept;
 
 	// Constructor to create a texture from a file path
 	// Optionally sets the filtering and wrapping methods
@@ -36,8 +36,8 @@ struct Texture {
 	Texture(const void* data, const uint32 width, const uint32 height, const GLint internal_format, const GLenum format);
 
 	// Default copy
-	Texture(const Texture&) = default;
-	Texture& operator=(const Texture& other) = default;
+	Texture(const Texture&) noexcept = default;
+	Texture& operator=(const Texture& other) noexcept = default;
 
 	// NOTE: I am not using default keyword just because of OpenGL ID, to avoid double deletion or any trouble with it 
 
@@ -64,23 +64,23 @@ struct Texture {
 		return *this;
 	}
 
-	~Texture();
+	~Texture() noexcept;
 
 	// Updates texture (this does not changes size and pixel format)
 	void update_data(const void* data, const GLenum format);
 
 
 	// Bind the texture for use in rendering
-	inline void bind() const {
+	inline void bind() const noexcept {
 		glBindTexture(this->tex_type, this->id);
 	}
 
 	// Unbind the texture to stop using it in rendering
-	inline void unbind() const {
+	inline void unbind() const noexcept {
 		glBindTexture(this->tex_type, 0);
 	}
 
-	inline GLuint get_id() const {
+	inline GLuint get_id() const noexcept {
 		return this->id;
 	}
 

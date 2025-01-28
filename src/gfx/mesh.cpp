@@ -5,13 +5,13 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tinyobjloader/tiny_obj_loader.h>
 
-Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices)
+Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept
 	: indices_length(static_cast<uint32>(indices.size())) {
 
 	this->make_buffers(vertices, indices);
 }
 
-Mesh::Mesh(const GLuint& vao_id, const std::vector<Vertex>& vertices, const std::vector<uint32>& indices)
+Mesh::Mesh(const GLuint& vao_id, const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept
 	: indices_length(static_cast<uint32>(indices.size())) {
 
 	this->make_buffers(vao_id, vertices, indices);
@@ -99,14 +99,14 @@ Mesh::Mesh(const char* path) {
 }
 
 
-Mesh::~Mesh() {
+Mesh::~Mesh() noexcept {
 	delete this->vao;
 	glDeleteBuffers(1, &this->vbo_id);
 	glDeleteBuffers(1, &this->ebo_id);
 }
 
 
-void Mesh::set_texture(Texture* texture) {
+void Mesh::set_texture(Texture* texture) noexcept {
 	if(texture == nullptr){
 		this->texture = &this->get_deftex();
 		return;
@@ -115,7 +115,7 @@ void Mesh::set_texture(Texture* texture) {
 	this->texture = texture;
 }
 
-void Mesh::make_buffers(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) {
+void Mesh::make_buffers(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept {
 	this->get_vao().bind();
 
 	// Gen and bind EBO
@@ -143,7 +143,7 @@ void Mesh::make_buffers(const std::vector<Vertex>& vertices, const std::vector<u
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void Mesh::make_buffers(const GLuint& vao_id, const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) {
+void Mesh::make_buffers(const GLuint& vao_id, const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept {
 	// Gen and bind VAO
 	glBindVertexArray(vao_id);
 

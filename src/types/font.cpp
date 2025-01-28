@@ -91,7 +91,7 @@ Font::Font(const char* path, const uint16 size) {
 	glBindVertexArray(0);
 }
 
-Font::~Font() {
+Font::~Font() noexcept {
 	for (Glyph& glyph : this->chars) {
 		glDeleteTextures(1, &glyph.texture_id);
 	}
@@ -100,7 +100,7 @@ Font::~Font() {
 };
 
 // TODO: One drawcall
-void Font::draw_text(const std::string& text, const vec2<uint32>& pos, const Color& color, const float scale) {
+void Font::draw_text(const std::string& text, const vec2<uint32>& pos, const Color& color, const float scale) noexcept {
 	// glDepthFunc(GL_LEQUAL);
 
 	Shader& shader = this->get_shader();

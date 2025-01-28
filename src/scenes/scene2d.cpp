@@ -6,7 +6,7 @@
 #include "scarablib/window/window.hpp"
 #include <cstdio>
 
-Scene2D::Scene2D(const Window& window) : IScene<Shape2D>(window) {
+Scene2D::Scene2D(const Window& window) noexcept : IScene<Shape2D>(window) {
 	// Set projection
 	this->update_viewport(window.get_width(), window.get_height());
 
@@ -35,7 +35,7 @@ Scene2D::Scene2D(const Window& window) : IScene<Shape2D>(window) {
 	this->vbo->unbind();
 }
 
-Scene2D::~Scene2D() {
+Scene2D::~Scene2D() noexcept {
 	delete this->vao;
 	delete this->vbo;
 	delete this->shader;
@@ -49,7 +49,7 @@ void Scene2D::add_to_scene(const std::string& key, Shape2D* shape) {
 	this->scene.emplace(key, shape);
 }
 
-void Scene2D::draw_all() const {
+void Scene2D::draw_all() const noexcept {
 	// This is just necessary if doing 2D and 3D
 	#ifdef SCARAB_2D_AND_3D
 		glDepthFunc(GL_ALWAYS);
@@ -71,7 +71,7 @@ void Scene2D::draw_all() const {
 }
 
 
-void Scene2D::update_viewport(const uint32 width, const uint32 height) {
+void Scene2D::update_viewport(const uint32 width, const uint32 height) noexcept {
 	// Update width and : height
 	this->width = width;
 	this->height = height;

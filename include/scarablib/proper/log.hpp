@@ -4,9 +4,9 @@
 
 // Namespace with methods used for logging
 namespace Log {
-	std::string get_date();
-	std::string get_time();
-	std::string get_date_and_time();
+	std::string get_date() noexcept;
+	std::string get_time() noexcept;
+	std::string get_date_and_time() noexcept;
 
 	// Simplest log, just print a message
 	// void log(const char* fmt, ...);
@@ -21,7 +21,7 @@ namespace Log {
 	// void log_time(const char* level, const char* fmt, ...);
 
 	// Implementation
-	void log_impl(const char* level, const char* func, bool include_time, const char* fmt, ...);
+	void log_impl(const char* level, const char* func, bool include_time, const char* fmt, ...) noexcept;
 };
 
 

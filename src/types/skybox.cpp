@@ -89,12 +89,12 @@ Skybox::Skybox(const Camera& camera, const std::vector<const char*>& faces) : ca
 	this->shader.unbind();
 }
 
-Skybox::~Skybox() {
+Skybox::~Skybox() noexcept {
 	delete this->vao;
 	delete this->vbo;
 }
 
-void Skybox::draw() {
+void Skybox::draw() noexcept {
 	glDepthFunc(GL_LEQUAL);
 
 	this->shader.use();

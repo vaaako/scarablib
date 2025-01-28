@@ -3,7 +3,7 @@
 #include "scarablib/typedef.hpp"
 #include <algorithm>
 
-std::string StringHelper::file_extension(const std::string& filename) {
+std::string StringHelper::file_extension(const std::string& filename) noexcept {
 	// Find the last position of '.' in filename
 	size_t dot_position = filename.find_last_of(".");
 	std::string ext = (dot_position != std::string::npos)

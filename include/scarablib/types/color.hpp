@@ -39,11 +39,11 @@ struct Color {
 	uint8 alpha = 255;
 
 	// Default constructor initializes the color to white (255, 255, 255, 255)
-	Color() = default;
+	Color() noexcept = default;
 
 	// Initializes the color using an enum value from Colors.
 	// e.g., `Color color = Colors::MAGENTA;`
-	Color(const Colors);
+	Color(const Colors) noexcept;
 
 	// Initializes the color using a hex value.
 	// The hex value should be in the format 0xRRGGBB or 0xAARRGGBB
@@ -51,32 +51,32 @@ struct Color {
 	// Example:
 	// Color color1 = Color(0xFF5733);   // RGB (255, 87, 51) with alpha set to 255 .
 	// Color color2 = Color(0x80FF5733); // RGBA (128, 255, 87, 51) with alpha set to 128
-	explicit Color(const uint32 hex_value);
+	explicit Color(const uint32 hex_value) noexcept;
 
 	// Initializes the color with specific RGBA values
-	Color(const uint8 red, const uint8 green, const uint8 blue, const uint8 alpha = 255);
+	Color(const uint8 red, const uint8 green, const uint8 blue, const uint8 alpha = 255) noexcept;
 
 	// Copy constructor that initializes the color from another Color instance
 	// e.g., `Color color = Color({ 202, 23, 115 });`
-	Color(const Color&) = default;
-	Color& operator=(const Color&) = default;
+	Color(const Color&) noexcept = default;
+	Color& operator=(const Color&) noexcept = default;
 
 	// Move
-	Color(Color&&) = default;
-	Color& operator=(Color&&) = default;
+	Color(Color&&) noexcept = default;
+	Color& operator=(Color&&) noexcept = default;
 
 	// Check if all color components are equal to 0
-	inline constexpr bool isempty() const {
+	inline constexpr bool isempty() const noexcept {
 		return (this->red + this->green + this->blue + this->alpha) == 0;
 	}
 
 	// Convert the color to a vec4 of any type T.
-	inline vec4<float> to_vec4() const {
+	inline vec4<float> to_vec4() const noexcept {
 		return vec4<float>(this->red, this->green, this->blue, this->alpha);
 	}
 
 	// Convert color component values to a normalized range (0-1) for OpenGL
-	inline const vec4<float> normalize() const {
+	inline const vec4<float> normalize() const noexcept {
 		// This is not optimized and i have no idea of how to make this optmized
 
 		// Multiplying by 0.004 gives an approximated result as dividing by 255
