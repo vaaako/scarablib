@@ -13,20 +13,18 @@ I wrote most of the things here very tired, sorry for any english mistake
 	+ [x] Try again to merge all static libraries
 	+ [x] Edit Makefile to use the libraries of `libs/` and header of `include/`
 - [x] **[DISCARTED]** Assets path relative to file instead of executable
+- [x] Use noexcept keyword
 
 - [ ] All graphics logic possible to glsl *(GPU)*
 - [ ] Replace `enum class` to `enum` in some cases where there are multiple conversions
 - [ ] Discord RPC support
-- [ ] Better custom VAO and Shader support for 2D and 3D shapes
 	+ Currently is very clunky and not dinamic
-- [ ] Use noexcept keyword
 - [ ] Better color struct
 - [ ] Mouse "GRABBED" enum (or similar)
-- [ ] Use a Model Factory
 
 # TODO Bug
 - [ ] Memory leak somewhere (i don't know if is in my code or in some library, but is not dangerous)
-	+ Maybe: Model, Mesh, Cube or SDL_Video
+	+ It appears to be related to SDL2 and its dependencies (e.g., X11, PulseAudio, etc.) 
 - [X] Fix FPS drop when movement is enabled
 
 # TODO Window
@@ -55,12 +53,16 @@ I wrote most of the things here very tired, sorry for any english mistake
 	+ Rigid body
 - [ ] Physics (dont know how)
 - [ ] Batch rendering for textures too
+- [ ] Better Shader support for 2D and 3D shapes
+- [ ] Make a Model Factory instead of static `get vao` and a struct for each model
+- [ ] Remove `ModelConf`
 
 # TODO 2D
 - [x] Unify shader and `shader_texture` somehow
 	+ Use a blank texture as default (texture made in code)
 	+ Add to vertex attrib 2 on shape VBO and check if is to use on shape instance
 	+ This could be done by making a custom shape (e.g. `new Cube(custom_color)`), then all variants of this shape with custom color would have this color
+- [ ] Change obsolete VAO and VBO management
 
 # TODO 3D
 - [x] Camera
@@ -79,6 +81,7 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [x] Model and Mesh
 - [ ] Better solution to AABB
 - [ ] Camera optimized movement
+- [ ] Model size is box size
 
 # Features for later
 - Sprite atlas
