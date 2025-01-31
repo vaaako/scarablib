@@ -16,6 +16,7 @@ vgcore*
 # Valgrind
 memcheck.log
 valgrind.supp
+valgrind_output.txt.core.*
 
 # clangd
 .cache/

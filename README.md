@@ -1,5 +1,5 @@
 # Scarablib
-Scarablib 🪲 is a C++ library designed to simplify graphical development, offering tools for both 2D and 3D rendering. While still in its early stages, Scarablib is actively being developed as a hobby project. You can track its progress in the [`todo.md`](doc/todo.md) file.
+Scarablib 🪲 is a C++ library designed to simplify graphical development, offering tools for both 2D and 3D rendering. While still in its early stages, Scarablib is being developed as a hobby project. You can track its progress in the [`todo.md`](doc/todo.md) file.
 
 <!-- See [examples/](examples/) to check some features (**note:** not all features have examples yet) -->
 
@@ -20,14 +20,15 @@ Scarablib 🪲 is a C++ library designed to simplify graphical development, offe
 - [`stb`](https://github.com/nothings/stb/tree/master) for image loading
 - [`GLEW`](https://glew.sourceforge.net/) for OpenGL support
 - [`glm`](https://github.com/g-truc/glm) for mathematical operations
+- [`tinyobjloader`](https://github.com/tinyobjloader/tinyobjloader) for wavefront obj loader
 
 >You can find the licenses for these libraries in the [`licenses/`](licenses/) directory
 
 # Roadmap
-- **Model loading:** Support for `obj` (alredy supported) and `gltf` models
 - **Lighting:** Implementation of light sources
 - **Networking:** Adding network support for multiplayer or distributed applications
-- **Optimization builtin:** Optimization methods like frustum-culling builtin
+- **Beginner-Friendly API:** Designed with simplicity in mind, it is easy to learn for new developers while remaining powerful enough for advanced users
+- **Extensible Architecture:** Built to support future enhancements, ensuring scalability for any project type
 
 # Example
 The following code snippet demonstrates how to create a simple scene with Scarablib:
@@ -128,6 +129,12 @@ Currently, Scarablib does not officially support Windows. However, you can attem
 - `debug.sh`: Debug using valgrind
 - `build_compile_commands.sh`: Uses [bear](https://github.com/rizsotto/Bear) to generate `compile_commands.json` file for LSP integration
 
+
+# Contributing
+Scarablib is a hobby project, and contributions are welcome! If you’d like to contribute, please open an issue or submit a pull request
+
+# LICENSE
+This project is licensed under a modified version of the zlib License. See the [LICENSE](LICENSE) file for details
 
 <!-- # Inspirations -->
 <!-- gunslinger -->
