@@ -11,7 +11,8 @@ Scarablib 🪲 is a C++ library designed to simplify graphical development, offe
 
 - **Abstraction:** Simplifies complex graphical operations
 - **2D and 3D development:** Easy-to-use tools for both 2D and 3D rendering
-- **Built-in Optimization:** Methods like frustum-culling for improved performance.
+- **Beginner-Friendly API:** Designed with simplicity in mind, it is easy to learn for new developers while remaining powerful enough for advanced users
+- **Extensible Architecture:** Built to support future enhancements, ensuring scalability for any project type
 
 # Libraries used
 - [`SDL2`](https://www.libsdl.org/) for window management
@@ -27,8 +28,7 @@ Scarablib 🪲 is a C++ library designed to simplify graphical development, offe
 # Roadmap
 - **Lighting:** Implementation of light sources
 - **Networking:** Adding network support for multiplayer or distributed applications
-- **Beginner-Friendly API:** Designed with simplicity in mind, it is easy to learn for new developers while remaining powerful enough for advanced users
-- **Extensible Architecture:** Built to support future enhancements, ensuring scalability for any project type
+- **Built-in Optimization:** Methods for frustum-culling, terrain generation and etc, for improved performance.
 
 # Example
 The following code snippet demonstrates how to create a simple scene with Scarablib:
