@@ -1,59 +1,57 @@
 #include "scarablib/window/window.hpp"
-#include "SDL2/SDL_timer.h"
-#include "SDL2/SDL_video.h"
+#include "scarablib/opengl/vao_manager.hpp"
 #include "scarablib/proper/error.hpp"
-#include "scarablib/utils/math.hpp"
+#include <SDL2/SDL_timer.h>
+#include <SDL2/SDL_video.h>
 #include <SDL2/SDL_mixer.h>
 
 Window::Window(const WindowConf& config) : conf(config), half_width(config.width / 2), half_height(config.height / 2) {
-	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+	// Initialize SDL (video and audio)
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) { // NOTE: Memory leak happening here
 		throw ScarabError("Failed to init SDL: %s", SDL_GetError());
 	}
 
-	if (SDL_Init(SDL_INIT_AUDIO) != 0) {
-		throw ScarabError("Failed to init audio: %s", SDL_GetError());
-	}
-
-	// Init SDL_mixer
+	// Initialize SDL_mixer
 	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) != 0) {
 		Mix_CloseAudio();
+		SDL_CloseAudio();
 		SDL_Quit();
 		throw ScarabError("Failed to init SDL_mixer: %s", SDL_GetError());
 	}
 
-	// Make window
+	// Create SDL window
 	this->window = SDL_CreateWindow(
-		config.title,
-		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-		(int)config.width, (int)config.height,
-		SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE
-	);
+			config.title,
+			SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+			(int)config.width, (int)config.height,
+			SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE
+			);
 
-	if(!this->window) {
+	if (!this->window) {
 		Mix_CloseAudio();
+		SDL_CloseAudio();
 		SDL_Quit();
 		throw ScarabError("Failed to create a SDL window: %s", SDL_GetError());
 	}
 
-
-	// Init SDL OpenGL
+	// Initialize OpenGL context
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 
-	// Load OpenGL
 	this->glContext = SDL_GL_CreateContext(window);
-
-	// Configurations
-	SDL_SetWindowResizable(this->window, (SDL_bool)config.resizable);
-	if(SDL_GL_SetSwapInterval(config.vsync) < 0) {
-		LOG_ERROR("Failed to enable vsync: %s", SDL_GetError());
+	if (!this->glContext) {
+		SDL_DestroyWindow(this->window);
+		Mix_CloseAudio();
+		SDL_CloseAudio();
+		SDL_Quit();
+		throw ScarabError("Failed to create OpenGL context: %s", SDL_GetError());
 	}
 
 	// Initialize GLEW
-	// glewExperimental = GL_TRUE;
+	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
-	if(err != GLEW_OK) {
+	if (err != GLEW_OK) {
 		SDL_GL_DeleteContext(this->glContext);
 		SDL_DestroyWindow(this->window);
 		Mix_CloseAudio();
@@ -62,21 +60,15 @@ Window::Window(const WindowConf& config) : conf(config), half_width(config.width
 		throw ScarabError("Failed to init GLEW: %s", glewGetErrorString(err));
 	}
 
-	// Config opengl
+	// Configure OpenGL
 	glViewport(0, 0, (GLsizei)config.width, (GLsizei)config.height);
-
-	// Enable transparency
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // Standard alpha blending
-
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_DEPTH_TEST);
-	// glEnable(GL_CULL_FACE);
 
-
-
-	// Show debug info
-	if(config.debug_info) {
-		LOG_INFO("OpengGL Loaded!");
+	// Debug info
+	if (config.debug_info) {
+		LOG_INFO("OpenGL Loaded!");
 		LOG_INFO("GL Version: %s", glGetString(GL_VERSION));
 		LOG_INFO("Vendor: %s", glGetString(GL_VENDOR));
 		LOG_INFO("Renderer: %s", glGetString(GL_RENDERER));
@@ -85,23 +77,24 @@ Window::Window(const WindowConf& config) : conf(config), half_width(config.width
 }
 
 Window::~Window() noexcept {
-	// Delete handlers
-	// delete this->keyboard_handler;
-	// delete this->mouse_handler;
-
-	// Delete window
-	if(this->conf.debug_info) {
+	if (this->conf.debug_info) {
 		LOG_INFO("Window %d destroyed", SDL_GetWindowID(this->window));
 	}
 
-	// Close OpenGL
+	// Clean up OpenGL context
 	SDL_GL_DeleteContext(this->glContext);
 
-	// Close all
+	// Destroy SDL window
 	SDL_DestroyWindow(this->window);
+
+	// Close SDL_mixer
 	Mix_CloseAudio();
-	SDL_CloseAudio();
+
+	// Quit SDL
 	SDL_Quit();
+
+	// Clean up VAO
+	VAOManager::get_instance().cleanup();
 }
 
 

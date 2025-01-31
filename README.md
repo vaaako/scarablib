@@ -36,21 +36,20 @@ The following code snippet demonstrates how to create a simple scene with Scarab
 
 Outside main loop:
 ```cpp
-// Two Cube objects
-Cube* cube1 = new Cube({
+Cube* cube = ModelFactory::create_cube({
 	// This is a required arg (will change later so can set it to 0.0)
 	.position = vec3<float>(0.0f),
 });
 
 // Above is the same as passing nothing
-Cube* cube2 = new Cube({});
+Cube* cube2 = ModelFactory::create_cube({});
 
 // Set textures
 cube1->set_texture(&tex1);
 cube2->set_texture(&tex2);
 
 // Add to the scene
-scene3d.add_to_scene("cube1", cube);
+scene3d.add_to_scene("cube1", cube); // Models added to scene must be pointers (this will be automatically deleted)
 scene3d.add_to_scene("cube2", cube2);
 
 // Rectangle object
@@ -66,14 +65,15 @@ scene2d.add_to_scene("aim", aim);
 
 Inside the main loop:
 ```cpp
-// Draw 3D shapes
+// Modify cube
 //                                        center,               angle, radius
 cube2.set_position(ScarabMath::orbitate_y(cube1.get_position(), rotation, 2.0f));
+// Draw 3D shapes
 scene3d.draw_all();
 
-// Draw 2D shapes
 // Draw font
 msgothic.draw_text("FPS: " + std::to_string(window.fps()), { 0.0f, 0.0f });
+// Draw 2D shapes
 scene2d.draw_all();
 
 // Update rotation

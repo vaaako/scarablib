@@ -24,6 +24,14 @@ struct KeyboardHandler {
 	// To use handle_events in window
 	friend Window;
 
+	KeyboardHandler() noexcept = default;
+
+	// Delete move and copy
+	KeyboardHandler(const KeyboardHandler&) noexcept = delete;
+	KeyboardHandler& operator=(const KeyboardHandler&) noexcept = delete;
+	KeyboardHandler(KeyboardHandler&&) noexcept = delete;
+	KeyboardHandler& operator=(KeyboardHandler&&) noexcept = delete;
+
 	// Check if a key was pressed, true just one time, even if still holding
 	bool ispressed(const Keycode key) noexcept;
 

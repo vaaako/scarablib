@@ -57,6 +57,9 @@ class Scene2D : public IScene<Shape2D> {
 		VAO* vao = new VAO();
 		VBO* vbo = new VBO();
 
+		uint32 width;
+		uint32 height;
+
 		Shader* shader = new Shader(
 			FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/2d/vertex.glsl").c_str(),
 			FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/2d/fragment.glsl").c_str()

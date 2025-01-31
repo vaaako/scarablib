@@ -10,9 +10,12 @@ build/
 
 # Debug
 *.json
-valgrind*.txt*
 *.a
 vgcore*
+
+# Valgrind
+memcheck.log
+valgrind.supp
 
 # clangd
 .cache/

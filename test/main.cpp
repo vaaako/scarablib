@@ -6,6 +6,7 @@
 #include "scarablib/gfx/2d/rectangle.hpp"
 #include "scarablib/gfx/3d/cube.hpp"
 #include "scarablib/gfx/3d/plane.hpp"
+#include "scarablib/gfx/model_factory.hpp"
 #include "scarablib/types/color.hpp"
 #include "scarablib/proper/log.hpp"
 #include "scarablib/types/font.hpp"
@@ -67,6 +68,7 @@ void rotate_camera(Window& window, Camera& camera, MouseHandler& mouse) {
 
 
 // TODO: move to some class/struct
+// Not finished yet, just for tests
 bool is_aabb(Model& model1, Model& model2) {
 	const vec3<float>& modelmin = model1.get_min();
 	const vec3<float>& modelmax = model1.get_max();
@@ -86,9 +88,6 @@ bool is_aabb(Model& model1, Model& model2) {
 
 
 
-// TODO: memory leak somewhere
-// - Window not unloading correctly?
-//
 // RAM usage [Approximated values] (~140mb total in this example):
 // Tested using 16Gb RAM, Xeon E5 2620 v3 and RX450
 // - Window: ~126mb
@@ -97,9 +96,6 @@ bool is_aabb(Model& model1, Model& model2) {
 //    + "SDL_WINDOW_OPENGL" flag: ~100mb (really, just this flag)
 //
 // This flag also slows the time take to create a window speed
-
-// TODO: Fix 2D and 3D order to any order (DEPTH_TEST problem)
-// - billboarding to GPU
 
 int main() {
 
@@ -150,27 +146,27 @@ int main() {
 
 	// Make shapes
 	// Cube position doenst matter because will change later
-	Cube* cube = new Cube({});
+	Cube* cube = ModelFactory::create_cube({});
 	scene3d.add_to_scene("cube1", cube);
 	cube->set_texture(&tex1);
 	// std::shared_ptr<Cube> cubefrom = scene3d.get_by_key<Cube>("cube1");
 
-	Cube* cube2 = new Cube({});
+	Cube* cube2 = ModelFactory::create_cube({});
 	cube2->set_texture(&tex2);
 	scene3d.add_to_scene("cube2", cube2);
 
-	Cube* cube3 = new Cube({});
+	Cube* cube3 = ModelFactory::create_cube({});
 	cube3->set_texture(&tex3);
 	scene3d.add_to_scene("cube3", cube3);
 
-	// Cube* camera_hitbox = new Cube({
+	// Cube* camera_hitbox = ModelFactory::create_cube({
 	// 	.position = vec3<float>(-10.0f, 1.0f, -10.0f)
 	// });
 	// Dont add to scene to not draw it
 	// scene3d.add_to_scene("cameracollision", camera_hitbox);
 
 
-	Plane* plane = new Plane({
+	Plane* plane = ModelFactory::create_plane({
 		.position = vec3<float>(-5.0f, 1.0f, -10.0f),
 		// Z doens't matter
 		.scale = vec3<float>(2.0f, 2.0f, 0.0f),
@@ -191,7 +187,7 @@ int main() {
 	LOG_INFO("Scene3d length %d", scene3d.length());
 
 	float rotation = 0.0f;
-	float rotation_speed = 1.0f * 100.0f;
+	float rotation_speed = 1.0f * 100.0f; // Multipling by 100 because of delta
 	// uint32 timer = 2000; // Start showing (this should be window.timenow() in real code)
 	while(window.is_open()) {
 		// Clear screen

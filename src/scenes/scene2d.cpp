@@ -6,7 +6,9 @@
 #include "scarablib/window/window.hpp"
 #include <cstdio>
 
+// No need to set width and height here, since it will be set in update_viewport
 Scene2D::Scene2D(const Window& window) noexcept : IScene<Shape2D>(window) {
+
 	// Set projection
 	this->update_viewport(window.get_width(), window.get_height());
 
@@ -46,7 +48,8 @@ void Scene2D::add_to_scene(const std::string& key, Shape2D* shape) {
 		throw ScarabError("Try to add null '%s'", shape);
 	}
 
-	this->scene.emplace(key, shape);
+	std::shared_ptr<Shape2D> shared_shape = std::shared_ptr<Shape2D>(shape);
+	this->scene.emplace(key, shared_shape);
 }
 
 void Scene2D::draw_all() const noexcept {
@@ -95,7 +98,6 @@ void Scene2D::update_viewport(const uint32 width, const uint32 height) noexcept 
 	font_shader.use();
 	font_shader.set_matrix4f("projection", projection);
 	font_shader.unbind();
-
 
 	// Update viewport in opengl too
 	glViewport(0, 0, (GLsizei)width, (GLsizei)height);

@@ -38,7 +38,7 @@ class Model : public Mesh {
 	public:
 		// Init model using custom config and pre-defined VAO.
 		// Vertices and Indices will be used to gerate VBO and EBO in this VAO
-		Model(const ModelConf& conf, const GLuint& vao_id, const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept;
+		Model(const ModelConf& conf, const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept;
 		// Make a model using a wavefront .obj file
 		Model(const char* path) noexcept;
 		~Model() = default;
@@ -162,7 +162,7 @@ class Model : public Mesh {
 			return *this;
 		}
 
-		// Set a new color
+		// Set a new color.
 		// If using a texture and a color at the same time, the texture will be colorized using the color defined
 		inline Model& set_color(const Color& color) noexcept {
 			this->conf.color = color;

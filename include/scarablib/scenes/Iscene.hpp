@@ -74,22 +74,23 @@ class IScene {
 		}
 
 	protected:
-		// TODO: This will be useful later
+		// TODO: This will be useful for window resize
 		const Window& window;
 
 		// TODO: Remove this when implementing window resize
 		// Viewport
-		uint32 width;
-		uint32 height;
+		// uint32 width;
+		// uint32 height;
 
+		// Objects added to the scene
 		std::unordered_map<std::string, std::shared_ptr<T>> scene;
-		// Use VAO as ID to query and batch draw meshes with the same VAO
+		// Use VAO as ID to track and batch draw meshes with the same VAO
 		std::unordered_map<GLuint, std::vector<std::shared_ptr<T>>> vao_groups;
 };
 
 template <typename T> // Return the shared pointer
 IScene<T>::IScene(const Window& window) noexcept
-	: window(window), width(window.get_width()), height(window.get_height()) {}
+	: window(window) {}
 
 
 template <typename T>
@@ -100,22 +101,4 @@ void IScene<T>::remove_by_key(const std::string& key) noexcept {
 	}
 	this->scene.erase(it);
 }
-
-// template <typename T>
-// void Scene<T>::remove_index(const uint32 index) {
-// 	const uint64 last_index = this->scene.size() - 1;
-//
-// 	if(index > last_index) {
-// 		LOG_ERROR("The index you are trying to remove is higher than the size of the objects in scene (%d)", this->scene.size());
-// 		return;
-// 	}
-//
-// 	// Move to last place
-// 	if(index < last_index) {
-// 		std::swap(this->scene[index], this->scene[last_index]);
-// 	}
-//
-// 	// Remove last element
-// 	this->scene.pop_back();
-// }
 

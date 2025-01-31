@@ -1,13 +1,10 @@
 #pragma once
 
 #include "scarablib/gfx/model.hpp"
-#include "scarablib/opengl/vao.hpp"
 
+// This is a class to make a cube model
+// WARNING: Do not use this class directly, use ModelFactory::create_cube(const ModelConf& conf)
 struct Cube : public Model {
-	Cube(const ModelConf& conf) noexcept;
-
-	inline const VAO& get_vao() const noexcept override {
-		static const VAO vao = VAO();
-		return vao;
-	}
+	// WARNING: Do not use this class directly, use ModelFactory::create_cube(const ModelConf& conf)
+	Cube(const ModelConf& conf, const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept;
 };

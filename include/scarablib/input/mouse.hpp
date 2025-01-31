@@ -31,6 +31,14 @@ struct MouseHandler {
 	// To use handle_events in window
 	friend Window;
 
+	MouseHandler() noexcept = default;
+
+	// Delete move and copy
+	MouseHandler(const MouseHandler&) noexcept = delete;
+	MouseHandler& operator=(const MouseHandler&) noexcept = delete;
+	MouseHandler(MouseHandler&&) noexcept = delete;
+	MouseHandler& operator=(MouseHandler&&) noexcept = delete;
+
 	// Clicks made
 	uint32 clicks = 0;
 	// Scroll direction

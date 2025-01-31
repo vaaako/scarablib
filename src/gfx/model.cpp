@@ -1,7 +1,7 @@
 #include "scarablib/gfx/model.hpp"
 
-Model::Model(const ModelConf& conf, const GLuint& vao_id, const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept
-	: Mesh(vao_id, vertices, indices), conf(conf) {
+Model::Model(const ModelConf& conf, const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept
+	: Mesh(vertices, indices), conf(conf) {
 	this->conf.size = this->calc_size(this->vertices);
 	this->update_min_and_max();
 }

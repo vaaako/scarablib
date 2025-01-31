@@ -3,12 +3,7 @@
 #include "scarablib/gfx/model.hpp"
 
 struct Plane : public Model {
-	Plane(const ModelConf& conf) noexcept;
-
-	inline const VAO& get_vao() const noexcept override {
-		static const VAO vao = VAO();
-		return vao;
-	}
+	Plane(const ModelConf& conf, const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept;
 
 	// Rotates the plane front face to the camera.
 	// position: Camera's position
