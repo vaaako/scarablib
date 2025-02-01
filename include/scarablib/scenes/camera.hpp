@@ -7,26 +7,16 @@
 #include "scarablib/input/mouse.hpp"
 #include "scarablib/window/window.hpp"
 
-enum class Zoom : bool {
-	OUT = 0,
-	IN = 1
-};
-
 class Camera {
+	enum class Zoom : bool {
+		OUT = 0,
+		IN = 1
+	};
+
 	public:
 		Camera(const Window& window, const float fov = 45.0f, const float sensitivity = 100.0f) noexcept;
 
 		// GETTERS
-
-		// Get camera's viewport width
-		inline uint32 get_width() const noexcept {
-			return this->width;
-		}
-
-		// Get camera's viewport height
-		inline uint32 get_height() const noexcept {
-			return this->height;
-		}
 
 		// Get camera position
 		inline vec3<float> get_position() const noexcept {
@@ -56,7 +46,7 @@ class Camera {
 		// Get camera view matrix
 		inline glm::mat4 get_proj_matrix() const noexcept {
 			return glm::perspective(glm::radians(this->fov),
-				(static_cast<float>(this->get_width()) / static_cast<float>(this->get_height())),
+				(static_cast<float>(this->width) / static_cast<float>(this->height)),
 				this->near_plane, this->far_plane);
 		}
 
@@ -72,72 +62,118 @@ class Camera {
 		}
 
 		// Set camera's near plane. How near to render
-		void set_near_plane(const float near_plane) noexcept;
+		inline void set_near_plane(const float near_plane) noexcept {
+			if(near_plane > this->far_plane) {
+				LOG_ERROR("new \"near plane\" value can't be higher than \"far plane\" current value");
+				return;
+			}
+
+			this->near_plane = near_plane;
+		}
 
 		// Set camera's far plane. How far to render
-		void set_far_plane(const float far_plane) noexcept;
+		inline void set_far_plane(const float far_plane) noexcept {
+			if(far_plane < this->near_plane) {
+				LOG_ERROR("new \"far plane\" value can't be lower than \"near plane\" current value");
+				return;
+			}
+
+			this->far_plane = far_plane;
+		}
 
 		// Set camera's fov
-		void set_fov(const float fov) noexcept;
+		inline void set_fov(const float fov) noexcept {
+			if(fov < this->near_plane || fov > this->far_plane) {
+				LOG_ERROR("new \"fov\" value must be between \"near plane\" and \"far plane\" current values");
+				return;
+			}
+
+			this->fov = fov;
+		}
 
 		// Set camera's minimum amount of fov (used for zoom out)
-		void set_min_fov(const float min_fov) noexcept;
+		inline void set_min_fov(const float min_fov) noexcept {
+			if(min_fov < this->max_fov) {
+				LOG_ERROR("new \"min fov\" value can't be higher than \"max fov\" current value");
+				return;
+			}
+
+			this->min_fov = min_fov;
+		}
 
 		// Set camera's maximum amount of fov (used for zoom in)
-		void set_max_fov(const float max_fov) noexcept;
+		inline void set_max_fov(const float max_fov) noexcept {
+			if(max_fov < this->min_fov) {
+				LOG_ERROR("new \"max fov\" value can't be lower than \"min fov\" current value");
+				return;
+			}
+
+			this->max_fov = max_fov;
+		}
+
+		// Zoom in or out the camera using an speed value
+		// Use Camera::Zoom::IN or Camera::Zoom::OUT
+		inline void zoom(const float speed, const Camera::Zoom zoom_dir) noexcept {
+			this->fov = (zoom_dir == Zoom::IN)
+				? std::max(fov - speed, min_fov)
+				: std::min(fov + speed, max_fov);
+		}
 
 		// Set camera's movement speed
-		void set_speed(const float speed) noexcept {
-			this->speed = speed / 10;
+		inline void set_speed(const float speed) noexcept {
+			this->speed = speed / 10.0f;
 		}
 
-		void set_posiion(const vec3<float>& position) noexcept {
+		inline void set_posiion(const vec3<float>& position) noexcept {
 			this->position = position;
 		}
+
 
 		// MOVEMENT
 
 		// Moves foward to the axis the camera is looking
-		inline void move_foward() noexcept {
-			this->position += this->orientation * this->speed;
+		inline void move_foward(const float dt) noexcept {
+			this->position += (this->orientation * this->speed) * dt;
 		}
 
 		// Moves backward to the axis the camera is looking
-		inline void move_backward() noexcept {
-			this->position -= this->orientation * this->speed;
+		inline void move_backward(const float dt) noexcept {
+			this->position -= (this->orientation * this->speed) * dt;
 		}
 
-		// Moves foward to all axis except Y axis
-		inline void move_front() noexcept {
-			this->position += glm::normalize(glm::vec3(this->orientation.x, 0.0f, this->orientation.z)) * this->speed;
+		// Moves foward relative to the ground, ignoring Y axis
+		inline void move_front(const float dt) noexcept {
+			this->position +=
+				(glm::normalize(glm::vec3(this->orientation.x, 0.0f, this->orientation.z)) * this->speed) * dt;
 		}
 
-		// Moves backward to all axis except Y axis
-		inline void move_back() noexcept {
-			this->position -= glm::normalize(glm::vec3(this->orientation.x, 0.0f, this->orientation.z)) * this->speed;
+		// Moves backward  relative to the ground, ignoring Y axis
+		inline void move_back(const float dt) noexcept {
+			this->position -=
+				(glm::normalize(glm::vec3(this->orientation.x, 0.0f, this->orientation.z)) * this->speed) * dt;
 		}
 
 		// Moves right on X and Z axis
-		inline void move_right() noexcept {
-			this->position += glm::normalize(glm::cross(this->orientation, this->up)) * this->speed ;
+		inline void move_right(const float dt) noexcept {
+			this->position +=
+				(glm::normalize(glm::cross(this->orientation, this->up)) * this->speed) * dt;
 		}
 
 		// Moves left on X and Z axis
-		inline void move_left() noexcept {
-			this->position -= glm::normalize(glm::cross(this->orientation, this->up)) * this->speed;
+		inline void move_left(const float dt) noexcept {
+			this->position -=
+				(glm::normalize(glm::cross(this->orientation, this->up)) * this->speed) * dt;
 		}
 
-		// Fly
-		inline void fly_up() noexcept {
-			this->position += this->up * this->speed;
+		// Fly up
+		inline void fly_up(const float dt) noexcept {
+			this->position += (this->up * this->speed) * dt;
 		}
 
-		inline void fly_down() noexcept {
-			this->position -= this->up * this->speed;
+		// Fly down
+		inline void fly_down(const float dt) noexcept {
+			this->position -= (this->up * this->speed) * dt;
 		}
-
-		// Zoom in or out the camera using an speed value
-		void zoom(const float speed, const Zoom zoom_dir) noexcept;
 
 		// Use the mouse to rotate the camera view
 		void rotate(const MouseHandler& mouse) noexcept;
@@ -145,6 +181,9 @@ class Camera {
 	private:
 		uint32 width;
 		uint32 height;
+		// Pre-calculated used in rotate
+		uint32 half_width;
+		uint32 half_height;
 
 		float sensitivity;
 		float speed = 0.1f;
@@ -165,5 +204,4 @@ class Camera {
 		vec3<float> position    = { 0.0f, 0.0f, 2.0f };
 		vec3<float> orientation = { 0.0f, 0.0f, -1.0f };
 		vec3<float> up          = { 0.0f, 1.0f, 0.0f };
-		// vec3<float> front = { 0.0f, 0.0f, -1.0f };
 };

@@ -20,22 +20,24 @@
 bool can_move = false;
 
 void camera_movement(Window& window, Camera& camera, KeyboardHandler& keyboard) {
+	const float dt = window.dt();
+
 	if(keyboard.isdown(Keycode::W)) {
-		camera.move_front();
+		camera.move_front(dt);
 	} else if (keyboard.isdown(Keycode::S)) {
-		camera.move_back();
+		camera.move_back(dt);
 	}
 
 	if(keyboard.isdown(Keycode::A)) {
-		camera.move_left();
+		camera.move_left(dt);
 	} else if (keyboard.isdown(Keycode::D)) {
-		camera.move_right();
+		camera.move_right(dt);
 	}
 
 	if(keyboard.isdown(Keycode::SPACE)) {
-		camera.fly_up();
+		camera.fly_up(dt);
 	} else if(keyboard.isdown(Keycode::LSHIFT)) {
-		camera.fly_down();
+		camera.fly_down(dt);
 	}
 
 	// Press TAB to not rotate anymore
@@ -43,8 +45,6 @@ void camera_movement(Window& window, Camera& camera, KeyboardHandler& keyboard) 
 		can_move = false;
 		window.hide_cursor(false);
 	}
-
-	// Update camera dt
 }
 
 void rotate_camera(Window& window, Camera& camera, MouseHandler& mouse) {
@@ -98,6 +98,7 @@ bool is_aabb(Model& model1, Model& model2) {
 // This flag also slows the time take to create a window speed
 
 int main() {
+	constexpr float DT_MODIFIER = 100.0f; // Multipling by 100 because of delta (since it's in ms)
 
 	// TODO:
 	// - Mouse handle multiple inputs like keyboard
@@ -106,7 +107,7 @@ int main() {
 		.width = 800,
 		.height = 600,
 		.title = const_cast<char*>("Something idk"),
-		.vsync = true,
+		.vsync = false,
 		.debug_info = true
 	});
 	window.set_clear_color(Colors::PINK);
@@ -122,7 +123,7 @@ int main() {
 
 	// Make scenes
 	Camera camera = Camera(window, 75.0f);
-	camera.set_speed(1.5f);
+	camera.set_speed(1.0f * DT_MODIFIER);
 
 
 	Scene2D scene2d = Scene2D(window);
@@ -186,11 +187,13 @@ int main() {
 
 	LOG_INFO("Scene3d length %d", scene3d.length());
 
+	bool debug_mode = false;
+	uint32 timer = window.timenow(); // Start showing (because will decrease itself at start)
+
 	float rotation = 0.0f;
-	float rotation_speed = 1.0f * 100.0f; // Multipling by 100 because of delta
-	// uint32 timer = 2000; // Start showing (this should be window.timenow() in real code)
+	float rotation_speed = 1.0f * DT_MODIFIER;
+	
 	while(window.is_open()) {
-		// Clear screen
 		window.clear(); // NOTE -- ~14mb RAM itself
 		// Get events
 		window.process_events();
@@ -229,29 +232,34 @@ int main() {
 		scene3d.draw_all();
 
 
-		// Draw 2D shapes
-		msgothic.draw_text("FPS: " + std::to_string(window.fps()), { 0.0f, 0.0f }, Colors::WHITE, 1.0f);
 
+		// Toggle debug mode
+		if (window.keyboard().ispressed(Keycode::F3)) {
+			debug_mode = !debug_mode;
+		}
+
+		if(debug_mode) {
+			msgothic.draw_text("FPS: " + std::to_string(window.fps()), { 0.0f, 0.0f }, Colors::WHITE, 1.0f);
+
+			// Elapsed 1 second
+			uint32 current = window.timenow();
+			if(current - timer >= 1000) {
+				timer = current; // Reset timer
+				std::cout << window.dt() << std::endl;
+			}
+		}
+
+
+		// Draw 2D shapes
 		// msgothic.draw_text("COLLISION: " + std::to_string(collision), { 0.0f, 24.0f });
 		// msgothic.draw_text("X: " + std::to_string(camera.get_x()) + ", "
 		// 		+ "Y: " + std::to_string(camera.get_y()) + ", "
 		// 		+ "Z: " + std::to_string(camera.get_z()), { 0.0f, 24.0f });
 		// scene2d.draw_all();
 
-		// Elapsed 1 second
-		// uint32 current = window.timenow();
-		// if(current - timer >= 1000) {
-		// 	timer = current; // Reset timer
-		// 	std::cout << window.dt() << std::endl;
-		// }
-
-		// TODO: dt camera movement (multiply by speed)
-
 		// Update rotation
-		rotation += (float)(rotation_speed * window.dt());
-		if(rotation >= 360.0f) {
-			rotation = 0.0f; // Wrap around to keep the angle within 0-360 degrees
-		}
+		rotation += rotation_speed * window.dt();
+		rotation = std::fmod(rotation, 360.0f); // Wrap around (if goes above 360.0f change to 0.0f) (if goes above 360.0f change to 0.0f)
 
 		// window.frame_capping(75);
 		window.swap_buffers(); // NOTE -- ~14mb RAM

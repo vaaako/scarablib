@@ -122,21 +122,13 @@ double Window::fps() noexcept {
 	return this->FPS;
 }
 
-double Window::dt() const noexcept {
+float Window::dt() const noexcept {
 	const uint32 current = SDL_GetTicks();
 	const uint32 elapsed = current - this->last_update;
-	// if(this->frame_count < desired_fps) {
-	// 	return;
-	// }
-
-	// Handle wrap-around (around 49 days)
-	// if(elapsed > 0x7FFFFFFF) {
-	// 	elapsed = 0.01f; // Reset or handle appropriately
-	// 	// Make 0.01 to avoid division by 0
-	// }
+	// protection for 45 days
 
 	// Convert milliseconds to seconds
-	return static_cast<double>(elapsed) / 1000.0;
+	return static_cast<float>(elapsed) / 1000.0f;
 }
 
 void Window::frame_capping(const uint32 fps) const noexcept {

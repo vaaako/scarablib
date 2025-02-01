@@ -203,7 +203,7 @@ class Window {
 		double fps() noexcept;
 
 		// Get the time elapsed between the current and last frame, in seconds.
-		double dt() const noexcept;
+		float dt() const noexcept;
 
 		// Stabilize the FPS and tries to limit the frame rate
 		void frame_capping(const uint32 fps) const noexcept;
@@ -252,9 +252,10 @@ class Window {
 
 		// FPS
 		uint32 start_time = SDL_GetTicks();
-		uint32 last_update = 0;
 		uint32 frame_count = 0;
 		double FPS = 0.0f;
+		// DT
+		uint32 last_update = 0; // Updated on swap_buffers (frame end)
 
 		// KEYS
 		KeyboardHandler keyboard_handler = KeyboardHandler();
