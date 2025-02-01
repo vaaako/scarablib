@@ -23,8 +23,8 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [ ] Mouse "GRABBED" enum (or similar)
 
 # TODO Bug
-- [ ] Memory leak somewhere (i don't know if is in my code or in some library, but is not dangerous)
-	+ It appears to be related to SDL2 and its dependencies (e.g., X11, PulseAudio, etc.) 
+- [x] Memory leak somewhere (i don't know if is in my code or in some library, but is not dangerous)
+	+ It appears to be related to SDL2 and its dependencies (X11, PulseAudio, etc.) 
 - [X] Fix FPS drop when movement is enabled
 
 # TODO Window
@@ -54,7 +54,7 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [ ] Physics (dont know how)
 - [ ] Batch rendering for textures too
 - [ ] Better Shader support for 2D and 3D shapes
-- [ ] Make a Model Factory instead of static `get vao` and a struct for each model
+- [x] Make a Model Factory instead of static `get vao` and a struct for each model
 - [ ] Remove `ModelConf`
 
 # TODO 2D
@@ -80,7 +80,7 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [ ] Normals / Shading value (both?)
 - [x] Model and Mesh
 - [ ] Better solution to AABB
-- [ ] Camera optimized movement
+- [x] Camera optimized movement
 - [ ] Model size is box size
 
 # Features for later
