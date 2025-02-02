@@ -1,13 +1,12 @@
 #pragma once
 
-
-// Used for building a window object
 #include "scarablib/input/keyboard.hpp"
 #include "scarablib/input/mouse.hpp"
 #include "scarablib/proper/log.hpp"
 #include "scarablib/typedef.hpp"
 #include "scarablib/types/color.hpp"
 #include "scarablib/window/events.hpp"
+#include "scarablib/proper/log.hpp"
 
 #include <GL/glew.h>
 #include <SDL2/SDL_video.h>
@@ -15,22 +14,22 @@
 #include <string>
 #include <unordered_set>
 
-struct WindowConf {
-	// Required values
-	uint32 width;
-	uint32 height;
-	char* title; // char* in c++ goes grrr
-
-	// Optional
-	bool vsync = true;
-	bool resizable = false;
-	bool debug_info = false;
-};
-
 // Main object of the library, used for making and managing a window and events
 class Window {
 	public:
-		Window(const WindowConf& windowconf);
+		struct Config {
+			// Required values
+			uint32 width;
+			uint32 height;
+			std::string title; // char* in c++ goes grrr
+
+			// Optional
+			bool vsync = true;
+			bool resizable = false;
+			bool debug_info = false;
+		};
+
+		Window(const Window::Config& windowconf);
 		~Window() noexcept;
 
 		// Handle any events or inputs (e.g., keyboard, mouse) that occurred during the frame.
@@ -49,16 +48,16 @@ class Window {
 		// This should be called at the end of each frame
 		// to display the newly rendered frame to the screen
 		inline void swap_buffers() noexcept {
-			#ifdef SCARAB_DEBUG_EVENT_COUNT
-				if(frame_events.size() > 0) {
-					std::printf("Events in this frame: %zu\n", frame_events.size());
-					if(frame_events.size() > 5) {
-						for(uint32 event : frame_events) {
-							std::printf("+ event: %u\n", event);
-						}
-					
+			#ifdef SCARAB_DEBUG_EVENTCOUNT
+			if(frame_events.size() > 0) {
+				LOG_DEBUG("Events in this frame: %zu\n", frame_events.size());
+				if(frame_events.size() > 5) {
+					for(uint32 event : frame_events) {
+						LOG_DEBUG("+ event: %u\n", event);
 					}
+				
 				}
+			}
 			#endif
 
 			// Make operations that need to happen at the end of each frame
@@ -125,9 +124,9 @@ class Window {
 		// SETTERS
 
 		// Change the window's title to the provided value.
-		inline void set_title(char* title) noexcept {
-			this->conf.title = title; // char*
-			SDL_SetWindowTitle(this->window, title);
+		inline void set_title(const std::string& title) noexcept {
+			this->conf.title = title;
+			SDL_SetWindowTitle(this->window, title.c_str());
 		}
 
 		// Set the window's clear color (background color) using the provided Color object.
@@ -237,8 +236,8 @@ class Window {
 
 	private:
 		// Window information
-		WindowConf conf;
-		vec4<float> clear_color = vec4<float>(1.0f); // Better access
+		Window::Config conf;
+		vec4<float> clear_color = vec4<float>(1.0f); // Outside conf for better access
 		bool window_open = true;
 		uint32 half_width = 0;
 		uint32 half_height = 0;

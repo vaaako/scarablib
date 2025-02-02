@@ -32,7 +32,7 @@ I wrote most of the things here very tired, sorry for any english mistake
 	+ [X] Custom event enums
 	+ [X] Multiple events support
 	+ [ ] Resizing support (Is added but need to change viewport)
-	+ [ ] Mouse handle clicks and motion like keyboard
+	+ [x] Mouse handle clicks and motion like keyboard
 - [x] Custom keyboard enums
 
 # TODO Features

@@ -1,87 +1,105 @@
 #pragma once
 
 #include <SDL2/SDL_events.h>
+#include <vector>
 #include "scarablib/typedef.hpp"
-
-enum class MouseBTN : uint8 {
-	NONE  = 0,
-	LMB   = 1,
-	MMB   = 2,
-	RMB   = 3,
-	SIDE1 = 4,
-	SIDE2 = 5
-};
-
-enum class MouseState : uint8 {
-	RELEASED,
-	PRESSED
-};
-
-enum class Scroll : uint8 {
-	NONE,
-	UP,
-	DOWN
-};
 
 // Avoid foward declaration
 class Window;
 
-// TODO -- Vector for events so is possible to click and move in the same frame
-struct MouseHandler {
+class MouseHandler {
 	// To use handle_events in window
 	friend Window;
 
-	MouseHandler() noexcept = default;
+	public:
+		enum class Button : uint8 {
+			NONE  = 0,
+			LMB   = 1,
+			MMB   = 2,
+			RMB   = 3,
+			SIDE1 = 4,
+			SIDE2 = 5
+		};
 
-	// Delete move and copy
-	MouseHandler(const MouseHandler&) noexcept = delete;
-	MouseHandler& operator=(const MouseHandler&) noexcept = delete;
-	MouseHandler(MouseHandler&&) noexcept = delete;
-	MouseHandler& operator=(MouseHandler&&) noexcept = delete;
+		enum class State : uint8 {
+			RELEASED,
+			PRESSED
+		};
 
-	// Clicks made
-	uint32 clicks = 0;
-	// Scroll direction
-	Scroll scroll = Scroll::NONE;
+		enum class Scroll : uint8 {
+			NONE,
+			UP,
+			DOWN
+		};
 
-	// Store all actions in frame to handle later
+		MouseHandler() noexcept = default;
 
-	// Click position  (X: 0 - width / Y: 0 - height)
-	vec2<uint32> click_pos;
-	// Motion position (X: 0 - width / Y: 0 - height)
-	vec2<uint32> motion;
-	// Direction moved (Ex.: -1, 0)
-	vec2<int16> moved_dir;
+		// Delete move and copy
+		MouseHandler(const MouseHandler&) noexcept = delete;
+		MouseHandler& operator=(const MouseHandler&) noexcept = delete;
+		MouseHandler(MouseHandler&&) noexcept = delete;
+		MouseHandler& operator=(MouseHandler&&) noexcept = delete;
 
-	// Change cursor position in window
-	void set_cursor_position(const Window& window, const uint32 x, const uint32 y) noexcept;
 
-	// Check if button is clicking
-	inline bool isclick(const MouseBTN button) const noexcept {
-		return this->down == button;
-	}
+		// Get mouse last motion
+		inline vec2<uint32> get_motion() const noexcept {
+			return this->motion;
+		}
 
-	// Check if button is up
-	inline bool isup(const MouseBTN button) const noexcept {
-		return this->up == button;
-	}
+		// Get mouse last click position
+		inline vec2<uint32> get_click_pos() const noexcept {
+			return this->click_pos;
+		}
 
-	// // Get the state of a key
-	// inline MouseState get_keystate(const MouseBTN key) const {
-	// 	return this->mousestate[static_cast<uint32>(key)];
-	// }
-	//
-	// // Change the state of a key
-	// inline void set_keystate(const MouseBTN key, const MouseState state) {
-	// 	this->mousestate[static_cast<uint32>(key)] = state;
-	// }
+		// Get mouse last moved direction (e.g. -1, 1 = Left Down)
+		inline vec2<uint32> get_moved_dir() const noexcept {
+			return this->moved_dir;
+		}
+
+		// Check if button is clicking
+		inline bool isclick(const MouseHandler::Button button) const noexcept {
+			return this->buttonstate[static_cast<uint32>(button)] == MouseHandler::State::PRESSED;
+		}
+
+		// Check if button is up
+		inline bool isup(const MouseHandler::Button button) const noexcept {
+			return this->buttonstate[static_cast<uint32>(button)] == State::RELEASED;
+		}
+
+		// Get the state of a key
+		inline MouseHandler::State get_keystate(const MouseHandler::Button button) const {
+			return this->buttonstate[static_cast<uint32>(button)];
+		}
+
+		// Change the state of a key
+		inline void set_keystate(const MouseHandler::Button button, const MouseHandler::State state) noexcept {
+			this->buttonstate[static_cast<uint32>(button)] = state;
+		}
+
+		// Change cursor position in window
+		void set_cursor_position(const Window& window, const uint32 x, const uint32 y) noexcept;
 
 	private:
 		// Last button up and down
-		MouseBTN up = MouseBTN::NONE;
-		MouseBTN down = MouseBTN::NONE;
+		MouseHandler::Button up = MouseHandler::Button::NONE;
+		MouseHandler::Button down = MouseHandler::Button::NONE;
 
-		// std::vector<MouseState> mousestate = std::vector<MouseState>(6, MouseState::RELEASED);
+		// Store the state of all mouse buttons (LMB, MMB, RMB, SIDE1, SIDE2)
+		std::vector<MouseHandler::State> buttonstate = std::vector<MouseHandler::State>(6, MouseHandler::State::RELEASED);
+
+		// Clicks made
+		uint32 clicks = 0;
+		// Scroll direction
+		Scroll scroll = Scroll::NONE;
+
+		// Store all actions in frame to handle later
+		//
+		// Click position  (X: 0 -> width / Y: 0 -> height)
+		vec2<uint32> click_pos;
+		// Motion position (X: 0 -> width / Y: 0 -> height)
+		vec2<uint32> motion;
+		// Direction moved (Ex.: -1, 0 = Left)
+		vec2<int16> moved_dir;
 
 		// Handle all mouse events (used on window class only)
 		void handle_event(const SDL_Event& event) noexcept;

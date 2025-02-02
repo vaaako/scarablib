@@ -50,7 +50,7 @@ void camera_movement(Window& window, Camera& camera, KeyboardHandler& keyboard) 
 void rotate_camera(Window& window, Camera& camera, MouseHandler& mouse) {
 	// ROTATION //
 	// Only rotate when click on screen
-	if(mouse.isclick(MouseBTN::LMB) && !can_move) {
+	if(mouse.isclick(MouseHandler::Button::LMB) && !can_move) {
 		LOG_INFO("Clicked");
 		can_move = true;
 		// Prevent initial jump
@@ -100,14 +100,12 @@ bool is_aabb(Model& model1, Model& model2) {
 int main() {
 	constexpr float DT_MODIFIER = 100.0f; // Multipling by 100 because of delta (since it's in ms)
 
-	// TODO:
-	// - Mouse handle multiple inputs like keyboard
-	// NOTE -- ~113mb here
+	// NOTE -- ~113mb RAM here
 	Window window = Window({
 		.width = 800,
 		.height = 600,
-		.title = const_cast<char*>("Something idk"),
-		.vsync = false,
+		.title = "Something idk",
+		.vsync = false, // TODO: Not working, fix later
 		.debug_info = true
 	});
 	window.set_clear_color(Colors::PINK);
@@ -122,7 +120,7 @@ int main() {
 	Font msgothic = Font("test/assets/fonts/Ubuntu-R.ttf", 24);
 
 	// Make scenes
-	Camera camera = Camera(window, 75.0f);
+	Camera camera = Camera(window, 75.0f, 80.0f);
 	camera.set_speed(1.0f * DT_MODIFIER);
 
 
@@ -249,6 +247,7 @@ int main() {
 			}
 		}
 
+		window.set_title("FPS: " + std::to_string(window.fps()));
 
 		// Draw 2D shapes
 		// msgothic.draw_text("COLLISION: " + std::to_string(collision), { 0.0f, 24.0f });

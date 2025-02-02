@@ -1,27 +1,30 @@
 #include "scarablib/input/keyboard.hpp"
-#include <cstdio>
+#include "scarablib/proper/log.hpp"
 
 void KeyboardHandler::handle_event(const SDL_Event& event) noexcept {
-	uint32 scancode = event.key.keysym.scancode;
+	const uint32 scancode = event.key.keysym.scancode;
 
-#ifdef SCARAB_DEBUG_KEYBOARD
-	std::printf("Key event: %i - %i\n", scancode, event.key.state);
-#endif
+	#ifdef SCARAB_DEBUG_KEYBOARD
+	LOG_DEBUG("Key event: Key %d of state %d", scancode, event.key.state);
+	#endif
 
 	// If key is pressed, don't change until is released (avoid changing to down)
-	if(event.key.state != 0 && this->keystate[scancode] == Keystate::PRESSED) {
+	if(event.key.state != 0 && this->keystate[scancode] == KeyboardHandler::State::PRESSED) {
 		return;
 	}
 
-	this->keystate[scancode] = static_cast<Keystate>(event.key.state);
+	this->keystate[scancode] = static_cast<KeyboardHandler::State>(event.key.state);
 }
 
 bool KeyboardHandler::ispressed(const Keycode key) noexcept {
 	uint32 scancode = static_cast<uint32>(key);
+	if (scancode >= keystate.size()) {
+		return false;
+	}
 
 	// If is down, change state to "pressed"
-	if(this->keystate.at(scancode) == Keystate::DOWN) {
-		this->keystate[scancode] = Keystate::PRESSED;
+	if(this->keystate[scancode] == KeyboardHandler::State::DOWN) {
+		this->keystate[scancode] = KeyboardHandler::State::PRESSED;
 		return true;
 	}
 

@@ -7,9 +7,13 @@ Camera::Camera(const Window& window, const float fov, const float sensitivity) n
 	  sensitivity(sensitivity), fov(fov), max_fov(fov) {}
 
 void Camera::rotate(const MouseHandler& mouse) noexcept {
+	// dt is not necessary here
+
+	const vec2<uint32> mousemotion = mouse.get_motion();
+
 	// Calculate move relative to the screen middle
-	float xoffset = this->sensitivity * (static_cast<float>(mouse.motion.x) - static_cast<float>(this->half_width)) / static_cast<float>(this->width);
-	float yoffset = this->sensitivity * (static_cast<float>(mouse.motion.y) - static_cast<float>(this->half_height)) / static_cast<float>(this->height);
+	float xoffset = this->sensitivity * (static_cast<float>(mousemotion.x) - static_cast<float>(this->half_width)) / static_cast<float>(this->width);
+	float yoffset = this->sensitivity * (static_cast<float>(mousemotion.y) - static_cast<float>(this->half_height)) / static_cast<float>(this->height);
 
 	this->yaw += xoffset;
 	this->pitch -= yoffset;
