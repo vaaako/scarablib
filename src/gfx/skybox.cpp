@@ -1,4 +1,4 @@
-#include "scarablib/types/skybox.hpp"
+#include "scarablib/gfx/skybox.hpp"
 #include "scarablib/opengl/vbo.hpp"
 #include "scarablib/proper/error.hpp"
 #include "scarablib/types/image.hpp"
@@ -105,8 +105,8 @@ void Skybox::draw() noexcept {
 
 	this->vao->bind();
 	glDrawArrays(GL_TRIANGLES, 0, 36);
-
 	this->vao->unbind();
+
 	this->shader.unbind();
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 

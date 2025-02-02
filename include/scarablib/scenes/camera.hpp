@@ -8,12 +8,12 @@
 #include "scarablib/window/window.hpp"
 
 class Camera {
-	enum class Zoom : bool {
-		OUT = 0,
-		IN = 1
-	};
-
 	public:
+		enum class Zoom : bool {
+			OUT = 0,
+			IN = 1
+		};
+
 		Camera(const Window& window, const float fov = 45.0f, const float sensitivity = 100.0f) noexcept;
 
 		// GETTERS

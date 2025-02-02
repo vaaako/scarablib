@@ -10,7 +10,7 @@
 #include "scarablib/types/color.hpp"
 #include "scarablib/proper/log.hpp"
 #include "scarablib/types/font.hpp"
-#include "scarablib/types/skybox.hpp"
+#include "scarablib/gfx/skybox.hpp"
 #include "scarablib/utils/math.hpp"
 #include "scarablib/window/window.hpp"
 #include "scarablib/input/keycode.hpp"

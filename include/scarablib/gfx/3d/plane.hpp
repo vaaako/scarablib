@@ -2,8 +2,11 @@
 
 #include "scarablib/gfx/model.hpp"
 
+// This is a class to make a plane model
+// WARNING: Do not use this class directly, use ModelFactory::create_cube(const ModelConf& conf)
 struct Plane : public Model {
-	Plane(const ModelConf& conf, const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept;
+	// WARNING: Do not use this class directly, use ModelFactory::create_cube(const ModelConf& conf)
+	Plane(const Model::Config& conf, const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept;
 
 	// Rotates the plane front face to the camera.
 	// position: Camera's position

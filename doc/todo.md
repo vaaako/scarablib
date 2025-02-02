@@ -14,12 +14,12 @@ I wrote most of the things here very tired, sorry for any english mistake
 	+ [x] Edit Makefile to use the libraries of `libs/` and header of `include/`
 - [x] **[DISCARTED]** Assets path relative to file instead of executable
 - [x] Use noexcept keyword
+- [x] Better color struct
 
 - [ ] All graphics logic possible to glsl *(GPU)*
 - [ ] Replace `enum class` to `enum` in some cases where there are multiple conversions
 - [ ] Discord RPC support
 	+ Currently is very clunky and not dinamic
-- [ ] Better color struct
 - [ ] Mouse "GRABBED" enum (or similar)
 
 # TODO Bug
@@ -45,6 +45,7 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [x] Use the same font object for different texts
 
 # TODO Shapes
+- [x] Make a Model Factory instead of static `get vao` and a struct for each model
 - [x] Custom shapes support (kinda, i think)
 - [ ] Color matrix support
 - [ ] Use one shader for 2D and 3D shapes
@@ -54,7 +55,6 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [ ] Physics (dont know how)
 - [ ] Batch rendering for textures too
 - [ ] Better Shader support for 2D and 3D shapes
-- [x] Make a Model Factory instead of static `get vao` and a struct for each model
 - [ ] Remove `ModelConf`
 
 # TODO 2D

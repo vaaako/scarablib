@@ -6,5 +6,5 @@
 // WARNING: Do not use this class directly, use ModelFactory::create_cube(const ModelConf& conf)
 struct Cube : public Model {
 	// WARNING: Do not use this class directly, use ModelFactory::create_cube(const ModelConf& conf)
-	Cube(const ModelConf& conf, const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept;
+	Cube(const Model::Config& conf, const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept;
 };

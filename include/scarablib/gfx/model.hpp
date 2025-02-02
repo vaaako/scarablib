@@ -8,37 +8,31 @@
 #include "scarablib/types/vertex.hpp"
 
 
-// Struct used to initialize a Model
-struct ModelConf {
-	vec3<float> position;
-	vec3<float> size = vec3<float>(1.0f); // This will change
-	vec3<float> scale = vec3<float>(1.0f);
-	Color color = Colors::WHITE;
-
-	// min and max corner of the bounding box (AABB)
-	// This will be calculated on constructor
-	vec3<float> min = vec3<float>(0.0f);
-	vec3<float> max = vec3<float>(0.0f);
-
-	// Orientation (default angle of the Model)
-	
-	// Orientation of the Model
-	float orient_angle = 0.0f;
-	// Axis where the orientation angle will be applied
-	vec3<float> orient_axis = { 1.0f, 0.0f, 0.0f };
-
-	// Rotation based on orientation
-	float angle = 0.0f;
-	// Axis where the rotation will be applied
-	vec3<float> axis = { 1.0f, 0.0f, 0.0f };
-};
-
 // An object used for as a base for 3D Shapes
 class Model : public Mesh {
 	public:
+		// Struct used to initialize a Model
+		struct Config {
+			vec3<float> position;
+			vec3<float> size = vec3<float>(1.0f); // This will change
+			vec3<float> scale = vec3<float>(1.0f);
+			Color color = Colors::WHITE;
+
+			// Orientation (default angle of the Model)
+			// Orientation of the Model
+			float orient_angle = 0.0f;
+			// Axis where the orientation angle will be applied
+			vec3<float> orient_axis = { 1.0f, 0.0f, 0.0f };
+
+			// Rotation based on orientation
+			float angle = 0.0f;
+			// Axis where the rotation will be applied
+			vec3<float> axis = { 1.0f, 0.0f, 0.0f };
+		};
+
 		// Init model using custom config and pre-defined VAO.
 		// Vertices and Indices will be used to gerate VBO and EBO in this VAO
-		Model(const ModelConf& conf, const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept;
+		Model(const Model::Config& conf, const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept;
 		// Make a model using a wavefront .obj file
 		Model(const char* path) noexcept;
 		~Model() = default;
@@ -90,12 +84,12 @@ class Model : public Mesh {
 
 		// Get minimum corner of the bounding box (AABB)
 		inline vec3<float> get_min() const noexcept {
-			return this->conf.min;
+			return this->min;
 		}
 
 		// Get maximum corner of the bounding box (AABB)
 		inline vec3<float> get_max() const noexcept {
-			return this->conf.max;
+			return this->max;
 		}
 
 
@@ -188,7 +182,12 @@ class Model : public Mesh {
 		bool isdirty; // Calculate matrix if anything changed (initializing on constructor so inheritance works)
 
 		// Storing config
-		ModelConf conf;
+		Model::Config conf;
+
+		// min and max corner of the bounding box (AABB)
+		// This will be calculated on constructor
+		vec3<float> min = vec3<float>(0.0f);
+		vec3<float> max = vec3<float>(0.0f);
 
 		// Calculates the size of a shape using it's vertices
 		vec3<float> calc_size(const std::vector<Vertex>& vertices) noexcept;
@@ -197,13 +196,13 @@ class Model : public Mesh {
 
 		inline void update_min_and_max() noexcept {
 			// Scale or Size?
-			this->conf.min = vec3<float>(
+			this->min = vec3<float>(
 				this->conf.position.x - this->conf.scale.x / 2,
 				this->conf.position.y - this->conf.scale.y / 2,
 				this->conf.position.z - this->conf.scale.z / 2
 			);
 
-			this->conf.max = vec3<float>(
+			this->max = vec3<float>(
 				this->conf.position.x + this->conf.scale.x / 2,
 				this->conf.position.y + this->conf.scale.y / 2,
 				this->conf.position.z + this->conf.scale.z / 2

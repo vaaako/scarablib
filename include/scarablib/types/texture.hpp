@@ -71,7 +71,8 @@ struct Texture {
 
 
 	// Bind the texture for use in rendering
-	inline void bind() const noexcept {
+	inline void bind(const uint32 tex_id = 0) const noexcept {
+		glActiveTexture(GL_TEXTURE0 + tex_id);
 		glBindTexture(this->tex_type, this->id);
 	}
 

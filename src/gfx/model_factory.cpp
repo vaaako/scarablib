@@ -1,7 +1,7 @@
 #include "scarablib/gfx/model_factory.hpp"
 #include "scarablib/opengl/vao_manager.hpp"
 
-Cube* ModelFactory::create_cube(const ModelConf& conf) noexcept {
+Cube* ModelFactory::create_cube(const Model::Config& conf) noexcept {
 	static std::vector<Vertex> vertices = {
 		// Vertices: 24
 		// Front face
@@ -68,11 +68,11 @@ Cube* ModelFactory::create_cube(const ModelConf& conf) noexcept {
 	};
 
 	// Make VAO and return created Cube
-	static GLuint vao_id = VAOManager::get_instance().make_vao(vertices, indices);
+	VAOManager::get_instance().make_vao(vertices, indices);
 	return new Cube(conf, vertices, indices);
 }
 
-Plane* ModelFactory::create_plane(const ModelConf& conf) noexcept {
+Plane* ModelFactory::create_plane(const Model::Config& conf) noexcept {
 	static std::vector<Vertex> vertices = {
 		// Front face
 		Vertex { .position = glm::vec3(-0.5f, -0.5f, 0.0f), .texuv = glm::vec2(0.0f, 0.0f) }, // Bottom left vertex

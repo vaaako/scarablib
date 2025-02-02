@@ -43,7 +43,15 @@ struct Color {
 
 	// Initializes the color using an enum value from Colors.
 	// e.g., `Color color = Colors::MAGENTA;`
-	constexpr Color(const Colors) noexcept;
+	constexpr Color(const Colors color) noexcept : Color() {
+		int hex_value = static_cast<int>(color);
+
+		this->red = static_cast<uint8>((hex_value >> 16) & 0xFF);  // Extract red (bits 24-31)
+		this->green = static_cast<uint8>((hex_value >> 8) & 0xFF); // Extract green (bits 16-23)
+		this->blue = static_cast<uint8>(hex_value & 0xFF);         // Extract blue (bits 8-15)
+
+		this->alpha = 255;
+	}
 
 	// Initializes the color using a hex value.
 	// The hex value should be in the format 0xRRGGBB or 0xAARRGGBB
@@ -51,7 +59,19 @@ struct Color {
 	// Example:
 	// Color color1 = Color(0xFF5733);   // RGB (255, 87, 51) with alpha set to 255 .
 	// Color color2 = Color(0x80FF5733); // RGBA (128, 255, 87, 51) with alpha set to 128
-	explicit constexpr Color(const uint32 hex_value) noexcept;
+	explicit constexpr Color(const uint32 hex_value) noexcept {
+		this->red = static_cast<uint8>((hex_value >> 16) & 0xFF);  // Extract red (bits 24-31)
+		this->green = static_cast<uint8>((hex_value >> 8) & 0xFF); // Extract green (bits 16-23)
+		this->blue = static_cast<uint8>(hex_value & 0xFF);         // Extract blue (bits 8-15)
+
+		this->alpha = 255; // Default alpha to 255
+
+		// Check includes alpha
+		if ((hex_value >> 24) & 0xFF) {
+			this->alpha = static_cast<uint8>((hex_value >> 24) & 0xFF); // Extract alpha (bits 32-39)
+		}
+	}
+
 
 	// Initializes the color with specific RGBA values
 	inline constexpr Color(const uint8 red, const uint8 green, const uint8 blue, const uint8 alpha) noexcept
