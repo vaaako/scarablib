@@ -1,3 +1,5 @@
+#pragma once
+
 #include "scarablib/gfx/3d/cube.hpp"
 #include "scarablib/gfx/3d/plane.hpp"
  
