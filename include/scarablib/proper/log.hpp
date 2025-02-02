@@ -41,6 +41,7 @@ namespace Log {
 #define LOG_INFO(fmt, ...)         Log::log_impl("INFO",    nullptr, false, fmt, ##__VA_ARGS__)
 #define LOG_WARNING(fmt, ...)      Log::log_impl("WARNING", nullptr, false, fmt, ##__VA_ARGS__)
 #define LOG_ERROR(fmt, ...)        Log::log_impl("ERROR",   nullptr, false, fmt, ##__VA_ARGS__)
+#define LOG_DEBUG(fmt, ...)        Log::log_impl("DEBUG",   nullptr, false, fmt, ##__VA_ARGS__)
 
 // Log with predefined levels and time
 #define LOG_INFO_TIME(fmt, ...)    Log::log_impl("INFO",    nullptr, true, fmt ##__VA_ARGS__)
