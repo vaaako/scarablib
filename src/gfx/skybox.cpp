@@ -61,7 +61,6 @@ Skybox::Skybox(const Camera& camera, const std::vector<const char*>& faces) : ca
 	this->vao->unbind();
 	this->vbo->unbind();
 
-
 	// Gen texture cube map
 	glGenTextures(1, &this->texid);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, this->texid);
@@ -101,7 +100,6 @@ void Skybox::draw() noexcept {
 	glBindTexture(GL_TEXTURE_CUBE_MAP, this->texid);
 	this->shader.set_matrix4f("view", glm::mat3(camera.get_view_matrix())); // Conversion: Remove translation
 	this->shader.set_matrix4f("proj", camera.get_proj_matrix());
-
 
 	this->vao->bind();
 	glDrawArrays(GL_TRIANGLES, 0, 36);

@@ -5,7 +5,7 @@
 #include <SDL2/SDL_video.h>
 #include <SDL2/SDL_mixer.h>
 
-Window::Window(const WindowConf& config) : conf(config), half_width(config.width / 2), half_height(config.height / 2) {
+Window::Window(const Window::Config& config) : conf(config), half_width(config.width / 2), half_height(config.height / 2) {
 	// Initialize SDL (video and audio)
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) { // NOTE: Memory leak happening here
 		throw ScarabError("Failed to init SDL: %s", SDL_GetError());
@@ -21,17 +21,23 @@ Window::Window(const WindowConf& config) : conf(config), half_width(config.width
 
 	// Create SDL window
 	this->window = SDL_CreateWindow(
-			config.title,
-			SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-			(int)config.width, (int)config.height,
-			SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE
-			);
+		config.title.c_str(),
+		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+		(int)config.width, (int)config.height,
+		SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE
+	);
 
 	if (!this->window) {
 		Mix_CloseAudio();
 		SDL_CloseAudio();
 		SDL_Quit();
 		throw ScarabError("Failed to create a SDL window: %s", SDL_GetError());
+	}
+
+	// SDL Configurations
+	SDL_SetWindowResizable(this->window, (SDL_bool)config.resizable);
+	if(SDL_GL_SetSwapInterval(config.vsync) < 0) {
+		LOG_ERROR("Failed to enable vsync: %s", SDL_GetError());
 	}
 
 	// Initialize OpenGL context
@@ -124,8 +130,8 @@ double Window::fps() noexcept {
 
 float Window::dt() const noexcept {
 	const uint32 current = SDL_GetTicks();
-	const uint32 elapsed = current - this->last_update;
-	// protection for 45 days
+	const uint32 elapsed = current - this->last_update; // last update is updated at the end of the frame
+	// later maybe: protection for 45 days
 
 	// Convert milliseconds to seconds
 	return static_cast<float>(elapsed) / 1000.0f;
