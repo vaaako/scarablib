@@ -124,8 +124,13 @@ class Camera {
 			this->speed = speed / 10.0f;
 		}
 
+		// Set camera's position
 		inline void set_posiion(const vec3<float>& position) noexcept {
 			this->position = position;
+		}
+
+		inline void set_sensitivity(const float sensitivity) noexcept {
+			this->sensitivity = sensitivity;
 		}
 
 
@@ -182,8 +187,8 @@ class Camera {
 		uint32 width;
 		uint32 height;
 		// Pre-calculated used in rotate
-		uint32 half_width;
-		uint32 half_height;
+		float half_width;
+		float half_height;
 
 		float sensitivity;
 		float speed = 0.1f;
@@ -201,7 +206,7 @@ class Camera {
 		float yaw = -90.0f; // Horizontal rotation
 		float pitch = 0.0f; // Vertical rotation
 		
-		vec3<float> position    = { 0.0f, 0.0f, 2.0f };
+		vec3<float> position    = { 0.0f, 0.0f, 2.0f }; // Real camera's position
 		vec3<float> orientation = { 0.0f, 0.0f, -1.0f };
 		vec3<float> up          = { 0.0f, 1.0f, 0.0f };
 };

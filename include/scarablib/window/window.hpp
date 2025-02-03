@@ -61,7 +61,6 @@ class Window {
 			#endif
 
 			// Make operations that need to happen at the end of each frame
-			this->last_update = SDL_GetTicks();
 			this->frame_events.clear(); // Clear events
 			SDL_GL_SwapWindow(this->window);
 		}
@@ -81,6 +80,11 @@ class Window {
 		// This can be used to directly manipulate or access SDL window properties.
 		inline SDL_Window* get_reference() const noexcept {
 			return this->window;
+		}
+
+		// Return the OpenGL context object
+		inline SDL_GLContext get_gl_context() const noexcept {
+			return this->glContext;
 		}
 
 		// Return the current title of the window as a string.
@@ -202,7 +206,9 @@ class Window {
 		double fps() noexcept;
 
 		// Get the time elapsed between the current and last frame, in seconds.
-		float dt() const noexcept;
+		constexpr inline float dt() const noexcept {
+			return this->delta_time;
+		}
 
 		// Stabilize the FPS and tries to limit the frame rate
 		void frame_capping(const uint32 fps) const noexcept;
@@ -254,11 +260,15 @@ class Window {
 		uint32 frame_count = 0;
 		double FPS = 0.0f;
 		// DT
-		uint32 last_update = 0; // Updated on swap_buffers (frame end)
+		float delta_time = 1.0f;
+		uint64 last_update = 0; // Updated on swap_buffers (frame end)
 
 		// KEYS
 		KeyboardHandler keyboard_handler = KeyboardHandler();
 		MouseHandler mouse_handler = MouseHandler(); // To not have the same name as the "mouse" function
+
+		// Called at the beggining of the frame
+		void calc_dt() noexcept;
 
 		// Set the viewport to the provided size.
 		// This won't change the window's size

@@ -11,13 +11,14 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -fdiagnostics-color=always")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -MM -MD -fdiagnostics-color=always")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra -Wall -Wuninitialized -Winit-self -Wfloat-equal")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wundef -Wpointer-arith -Wcast-align -Wstrict-overflow=5")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wwrite-strings -Wcast-qual -Wswitch-default")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wconversion -Wunreachable-code")
 
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSCARAB_DEBUG_GLYPHS_LOADED")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSCARAB_2D_AND_3D")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSCARAB_2D_AND_3D -DSCARAB_IMGUI")
 
 
 # Include directories
@@ -25,6 +26,9 @@ include_directories(
 	include
 	include/external
 	include/external/freetype # Freetype needs
+
+	include test/imgui
+	include/external/SDL2 # For imgui
 )
 
 # Link directories
@@ -36,7 +40,15 @@ link_directories(
 )
 
 # Source files
-file(GLOB_RECURSE SOURCES src/*.cpp src/*/*.cpp src/**/*.cpp)
+file(GLOB_RECURSE SOURCES src/*.cpp src/*/*.cpp src/**/*.cpp
+	test/imgui/imgui.cpp
+	test/imgui/imgui_draw.cpp
+	test/imgui/imgui_tables.cpp
+	test/imgui/imgui_widgets.cpp
+	test/imgui/backends/imgui_impl_sdl2.cpp
+	test/imgui/backends/imgui_impl_opengl3.cpp
+)
+
 add_executable(${PROJECT_NAME} ${SOURCES} test/main.cpp)
 
 # Define the paths to static libraries

@@ -17,6 +17,11 @@
 #include <cstdio>
 #include <iostream>
 
+#ifdef SCARAB_IMGUI
+#include "backends/imgui_impl_opengl3.h"
+#include "backends/imgui_impl_sdl2.h"
+#endif
+
 bool can_move = false;
 
 void camera_movement(Window& window, Camera& camera, KeyboardHandler& keyboard) {
@@ -48,7 +53,14 @@ void camera_movement(Window& window, Camera& camera, KeyboardHandler& keyboard) 
 }
 
 void rotate_camera(Window& window, Camera& camera, MouseHandler& mouse) {
-	// ROTATION //
+	#ifdef SCARAB_IMGUI
+	// Ignore if mouse event was in imgui window
+	if (ImGui::GetIO().WantCaptureMouse) {
+		return;
+	}
+	#endif
+
+	// ROTATION LOGIC //
 	// Only rotate when click on screen
 	if(mouse.isclick(MouseHandler::Button::LMB) && !can_move) {
 		LOG_INFO("Clicked");
@@ -62,30 +74,10 @@ void rotate_camera(Window& window, Camera& camera, MouseHandler& mouse) {
 	// Rotate camera
 	if(can_move) {
 		camera.rotate(mouse);
-		mouse.set_cursor_position(window, window.get_half_width(), window.get_half_height()); // Prevent cursor from exiting the screen
+		// Prevent cursor from exiting the screen
+		mouse.set_cursor_position(window, window.get_half_width(), window.get_half_height());
 	}
 }
-
-
-// TODO: move to some class/struct
-// Not finished yet, just for tests
-bool is_aabb(Model& model1, Model& model2) {
-	const vec3<float>& modelmin = model1.get_min();
-	const vec3<float>& modelmax = model1.get_max();
-
-	const vec3<float>& model2min = model2.get_min();
-	const vec3<float>& model2max = model2.get_max();
-
-	return modelmin.x <= model2max.x &&
-		modelmax.x >= model2min.x &&
-
-		modelmin.y <= model2max.y &&
-		modelmax.y >= model2min.y &&
-
-		modelmin.z <= model2max.z &&
-		modelmax.z >= model2min.z;
-}
-
 
 
 // RAM usage [Approximated values] (~140mb total in this example):
@@ -98,14 +90,14 @@ bool is_aabb(Model& model1, Model& model2) {
 // This flag also slows the time take to create a window speed
 
 int main() {
-	constexpr float DT_MODIFIER = 100.0f; // Multipling by 100 because of delta (since it's in ms)
+	constexpr float DELTATIME_MODIFIER = 100.0f; // Multipling by 100 because of delta (since it's in ms)
 
 	// NOTE -- ~113mb RAM here
 	Window window = Window({
 		.width = 800,
 		.height = 600,
-		.title = "Something idk",
-		.vsync = false, // TODO: Not working, fix later
+		.title = "FPS: 0",
+		.vsync = true,
 		.debug_info = true
 	});
 	window.set_clear_color(Colors::PINK);
@@ -121,20 +113,31 @@ int main() {
 
 	// Make scenes
 	Camera camera = Camera(window, 75.0f, 80.0f);
-	camera.set_speed(1.0f * DT_MODIFIER);
+	camera.set_speed(1.0f * DELTATIME_MODIFIER);
 
 
 	Scene2D scene2d = Scene2D(window);
 	Scene3D scene3d = Scene3D(window, camera);
+	scene3d.show_bounding_box(true);
+
+	// Skybox skybox = Skybox(camera, {
+	// 	"test/assets/images/skybox/right.jpg",
+	// 	"test/assets/images/skybox/left.jpg",
+	// 	"test/assets/images/skybox/top.jpg",
+	// 	"test/assets/images/skybox/bottom.jpg",
+	// 	"test/assets/images/skybox/front.jpg",
+	// 	"test/assets/images/skybox/back.jpg"
+	// });
 
 	Skybox skybox = Skybox(camera, {
-		"test/assets/images/skybox/right.jpg",
-		"test/assets/images/skybox/left.jpg",
-		"test/assets/images/skybox/top.jpg",
-		"test/assets/images/skybox/bottom.jpg",
-		"test/assets/images/skybox/front.jpg",
-		"test/assets/images/skybox/back.jpg"
+		"test/assets/images/skybox2/right.bmp",
+		"test/assets/images/skybox2/left.bmp",
+		"test/assets/images/skybox2/top.bmp",
+		"test/assets/images/skybox2/bottom.bmp",
+		"test/assets/images/skybox2/front.bmp",
+		"test/assets/images/skybox2/back.bmp"
 	});
+
 
 	// Load mesh
 	Model* cow = new Model("test/assets/objs/cow.obj");
@@ -186,24 +189,33 @@ int main() {
 	LOG_INFO("Scene3d length %d", scene3d.length());
 
 	bool debug_mode = false;
+	bool envsync = true;
 	uint32 timer = window.timenow(); // Start showing (because will decrease itself at start)
 
 	float rotation = 0.0f;
-	float rotation_speed = 1.0f * DT_MODIFIER;
-	
+	float rotation_speed = 1.0f * DELTATIME_MODIFIER;
+
+	// TODO: BoundingBox color not working
+	// - Different shaders per model support
+	// - Billboarding not working
+	// - New billboarding approach
+
 	while(window.is_open()) {
 		window.clear(); // NOTE -- ~14mb RAM itself
 		// Get events
 		window.process_events();
+
 
 		// Handle input
 		if((!can_move && window.keyboard().ispressed(Keycode::ESCAPE)) || window.on_event(Event::QUIT)) {
 			window.close();
 		}
 
+
 		// Handle camera keyboard inputs
 		camera_movement(window, camera, window.keyboard());
 		rotate_camera(window, camera, window.mouse());
+
 
 		// Just works with cubes and planes yet
 		// collision = false;
@@ -229,25 +241,36 @@ int main() {
 		skybox.draw();
 		scene3d.draw_all();
 
-
-
 		// Toggle debug mode
 		if (window.keyboard().ispressed(Keycode::F3)) {
 			debug_mode = !debug_mode;
 		}
 
+		if(window.keyboard().ispressed(Keycode::V)) {
+			envsync = !envsync;
+			LOG_INFO("VSync: %d", envsync);
+			window.set_vsync(envsync);
+		}
+
 		if(debug_mode) {
-			msgothic.draw_text("FPS: " + std::to_string(window.fps()), { 0.0f, 0.0f }, Colors::WHITE, 1.0f);
+			// msgothic.draw_text("FPS: " + std::to_string(window.fps()), { 0.0f, 0.0f }, Colors::WHITE, 1.0f);
 
 			// Elapsed 1 second
 			uint32 current = window.timenow();
 			if(current - timer >= 1000) {
 				timer = current; // Reset timer
-				std::cout << window.dt() << std::endl;
+				LOG_INFO("Camera position: %f, %f, %f", camera.get_x(), camera.get_y(), camera.get_z());
+				LOG_DEBUG("Delta time: %f", window.dt());
 			}
 		}
 
-		window.set_title("FPS: " + std::to_string(window.fps()));
+		// Elapsed 1 second
+		uint32 current = window.timenow();
+		if(current - timer >= 1000) {
+			timer = current; // Reset timer
+			window.set_title("FPS: " + std::to_string(window.fps()));
+		}
+
 
 		// Draw 2D shapes
 		// msgothic.draw_text("COLLISION: " + std::to_string(collision), { 0.0f, 24.0f });
@@ -255,6 +278,26 @@ int main() {
 		// 		+ "Y: " + std::to_string(camera.get_y()) + ", "
 		// 		+ "Z: " + std::to_string(camera.get_z()), { 0.0f, 24.0f });
 		// scene2d.draw_all();
+
+		#ifdef SCARAB_IMGUI
+		// ImGui_ImplOpenGL3_NewFrame();
+		// ImGui_ImplSDL2_NewFrame();
+		// ImGui::NewFrame();
+		//
+		// // Create a simple ImGui window
+		// ImGui::Begin("Hello, ImGui!");
+		// ImGui::Text("This is a simple ImGui window.");
+		// if (ImGui::Button("Click Me")) {
+		// 	printf("Button clicked!\n");
+		// }
+		// ImGui::End();
+		// #endif
+		//
+		// #ifdef SCARAB_IMGUI
+		// // Render ImGui
+		// ImGui::Render();
+		// ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		#endif
 
 		// Update rotation
 		rotation += rotation_speed * window.dt();

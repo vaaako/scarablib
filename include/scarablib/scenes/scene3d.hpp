@@ -37,6 +37,16 @@ class Scene3D : public IScene<Model> {
 		// Draw all models added to the scene
 		void draw_all() const noexcept override;
 
+		inline Shader& get_shader() {
+			return *this->shader;
+		}
+
+		// If enabled it will show the bounding box of every model.
+		// You can also enable for invidual models
+		inline void show_bounding_box(bool show) noexcept {
+			this->show_box = show;
+		}
+
 		// Update the scene viewport using the window object
 		inline void update_viewport(const Window& window) noexcept override {
 			this->camera.update_viewport(window);
@@ -49,6 +59,8 @@ class Scene3D : public IScene<Model> {
 
 
 	private:
+		bool show_box = false;
+
 		Camera& camera;
 		Shader* shader = new Shader(
 			FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/3d/vertex.glsl").c_str(),

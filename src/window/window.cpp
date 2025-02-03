@@ -5,6 +5,12 @@
 #include <SDL2/SDL_video.h>
 #include <SDL2/SDL_mixer.h>
 
+#ifdef SCARAB_IMGUI
+#include "imgui.h"
+#include "backends/imgui_impl_sdl2.h"
+#include "backends/imgui_impl_opengl3.h"
+#endif
+
 Window::Window(const Window::Config& config) : conf(config), half_width(config.width / 2), half_height(config.height / 2) {
 	// Initialize SDL (video and audio)
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) { // NOTE: Memory leak happening here
@@ -32,12 +38,6 @@ Window::Window(const Window::Config& config) : conf(config), half_width(config.w
 		SDL_CloseAudio();
 		SDL_Quit();
 		throw ScarabError("Failed to create a SDL window: %s", SDL_GetError());
-	}
-
-	// SDL Configurations
-	SDL_SetWindowResizable(this->window, (SDL_bool)config.resizable);
-	if(SDL_GL_SetSwapInterval(config.vsync) < 0) {
-		LOG_ERROR("Failed to enable vsync: %s", SDL_GetError());
 	}
 
 	// Initialize OpenGL context
@@ -72,6 +72,12 @@ Window::Window(const Window::Config& config) : conf(config), half_width(config.w
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_DEPTH_TEST);
 
+	// SDL Configurations
+	SDL_SetWindowResizable(this->window, (SDL_bool)config.resizable);
+	if(SDL_GL_SetSwapInterval(config.vsync) < 0) {
+		LOG_ERROR("Failed to enable vsync: %s", SDL_GetError());
+	}
+
 	// Debug info
 	if (config.debug_info) {
 		LOG_INFO("OpenGL Loaded!");
@@ -80,6 +86,20 @@ Window::Window(const Window::Config& config) : conf(config), half_width(config.w
 		LOG_INFO("Renderer: %s", glGetString(GL_RENDERER));
 		LOG_INFO("Viewport: %dx%d", config.width, config.height);
 	}
+
+
+	#ifdef SCARAB_IMGUI
+	// After initializing SDL and OpenGL, initialize ImGui
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+	// Set up style
+	ImGui::StyleColorsDark();
+	// Backend
+	ImGui_ImplSDL2_InitForOpenGL(this->window, this->glContext);
+	ImGui_ImplOpenGL3_Init("#version 330");
+	#endif
 }
 
 Window::~Window() noexcept {
@@ -87,18 +107,20 @@ Window::~Window() noexcept {
 		LOG_INFO("Window %d destroyed", SDL_GetWindowID(this->window));
 	}
 
+	#ifdef SCARAB_IMGUI
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplSDL2_Shutdown();
+	ImGui::DestroyContext();
+	#endif
+
 	// Clean up OpenGL context
 	SDL_GL_DeleteContext(this->glContext);
-
 	// Destroy SDL window
 	SDL_DestroyWindow(this->window);
-
 	// Close SDL_mixer
 	Mix_CloseAudio();
-
 	// Quit SDL
 	SDL_Quit();
-
 	// Clean up VAO
 	VAOManager::get_instance().cleanup();
 }
@@ -128,13 +150,12 @@ double Window::fps() noexcept {
 	return this->FPS;
 }
 
-float Window::dt() const noexcept {
-	const uint32 current = SDL_GetTicks();
-	const uint32 elapsed = current - this->last_update; // last update is updated at the end of the frame
-	// later maybe: protection for 45 days
-
-	// Convert milliseconds to seconds
-	return static_cast<float>(elapsed) / 1000.0f;
+void Window::calc_dt() noexcept {
+	const uint64 now = SDL_GetPerformanceCounter();
+	const uint64 elapsed = now - this->last_update; // Elapsed time
+	this->last_update = now;
+	this->delta_time = static_cast<float>(elapsed) / static_cast<float>(SDL_GetPerformanceFrequency());
+	// note: elapsed may be multiplied by 1000.0f to get milliseconds
 }
 
 void Window::frame_capping(const uint32 fps) const noexcept {
@@ -152,10 +173,16 @@ void Window::frame_capping(const uint32 fps) const noexcept {
 
 
 void Window::process_events() noexcept {
+	// Frame beggining calculations
+	this->calc_dt();
 	this->frame_count++;
 
 	SDL_Event event;
 	while(SDL_PollEvent(&event)) {
+		#ifdef SCARAB_IMGUI
+		ImGui_ImplSDL2_ProcessEvent(&event);
+		#endif
+
 		// Store all events in this frame
 		this->frame_events.emplace(event.type);
 

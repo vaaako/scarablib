@@ -25,6 +25,15 @@ void Scene3D::draw_all() const noexcept {
 
 		for(std::shared_ptr<Model> model : models) {
 			model->draw(this->camera, *this->shader);
+
+			if(this->show_box) {
+				model->bounding.draw(this->camera, *this->shader, model->model);
+				glBindVertexArray(vao); // Rebind the model's VAO (since bounding box unbind VAO)
+			}
+
+			// if(model->show_bounding_box()) {
+			// 	model->bounding.draw(this->camera, *this->shader, model->model);
+			// }
 		}
 	}
 

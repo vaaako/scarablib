@@ -82,6 +82,7 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [ ] Better solution to AABB
 - [x] Camera optimized movement
 - [ ] Model size is box size
+- [ ] Camera movement not working properly with VSync disabled
 
 # Features for later
 - Sprite atlas

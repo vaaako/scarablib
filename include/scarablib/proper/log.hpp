@@ -49,7 +49,7 @@ namespace Log {
 #define LOG_ERROR_TIME(fmt, ...)   Log::log_impl("ERROR",   nullptr, true, fmt ##__VA_ARGS__)
 
 // Log with predefined levels and function name
-#define LOG_INFO_FN(fmt, ...)      Log::log_impl("INFO",    nullptr, __func__, ##__VA_ARGS__)
-#define LOG_WARNING_FN(fmt, ...)   Log::log_impl("WARNING", nullptr, __func__, ##__VA_ARGS__)
-#define LOG_ERROR_FN(fmt, ...)     Log::log_impl("ERROR",   nullptr, __func__, ##__VA_ARGS__)
+#define LOG_INFO_FN(fmt, ...)      Log::log_impl("INFO",    __func__, false, fmt, ##__VA_ARGS__)
+#define LOG_WARNING_FN(fmt, ...)   Log::log_impl("WARNING", __func__, false, fmt, ##__VA_ARGS__)
+#define LOG_ERROR_FN(fmt, ...)     Log::log_impl("ERROR",   __func__, false, fmt, ##__VA_ARGS__)
 
