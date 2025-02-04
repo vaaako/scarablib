@@ -4,7 +4,7 @@
 #include "scarablib/types/image.hpp"
 
 Skybox::Skybox(const Camera& camera, const std::vector<const char*>& faces) : camera(camera) {
-	if(faces.size() < 6) {
+	if(faces.size() != 6) {
 		throw ScarabError("Skybox needs 6 faces in the following order: right, left, top, bottom, front and back");
 	}
 
@@ -83,29 +83,30 @@ Skybox::Skybox(const Camera& camera, const std::vector<const char*>& faces) : ca
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE); // Z
 
 	// Bind to set uniform
-	this->shader.use();
-	this->shader.set_int("skybox", 0);
-	this->shader.unbind();
+	this->shader->use();
+	this->shader->set_int("skybox", 0);
+	this->shader->unbind();
 }
 
 Skybox::~Skybox() noexcept {
 	delete this->vao;
 	delete this->vbo;
+	delete this->shader;
 }
 
 void Skybox::draw() noexcept {
 	glDepthFunc(GL_LEQUAL);
 
-	this->shader.use();
+	this->shader->use();
 	glBindTexture(GL_TEXTURE_CUBE_MAP, this->texid);
-	this->shader.set_matrix4f("view", glm::mat3(camera.get_view_matrix())); // Conversion: Remove translation
-	this->shader.set_matrix4f("proj", camera.get_proj_matrix());
+	this->shader->set_matrix4f("view", glm::mat3(camera.get_view_matrix())); // Conversion: Remove translation
+	this->shader->set_matrix4f("proj", camera.get_proj_matrix());
 
 	this->vao->bind();
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	this->vao->unbind();
 
-	this->shader.unbind();
+	this->shader->unbind();
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
 	// Back to default

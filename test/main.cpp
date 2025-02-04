@@ -103,10 +103,10 @@ int main() {
 	window.set_clear_color(Colors::PINK);
 
 	// Load assets
-	Texture tex1 = Texture("test/assets/images/kuromi.png");
-	Texture tex2 = Texture("test/assets/images/purin.png");
-	Texture tex3 = Texture("test/assets/images/brick.png");
-	Texture snail = Texture("test/assets/images/snail.png");
+	Texture tex1  = Texture({ .path = "test/assets/images/kuromi.png" });
+	Texture tex2  = Texture({ "test/assets/images/purin.png" });
+	Texture tex3  = Texture({ "test/assets/images/brick.png" });
+	Texture snail = Texture({ "test/assets/images/snail.png" });
 
 	// TODO: Make it use only one drawcall
 	Font msgothic = Font("test/assets/fonts/Ubuntu-R.ttf", 24);
@@ -118,33 +118,23 @@ int main() {
 
 	Scene2D scene2d = Scene2D(window);
 	Scene3D scene3d = Scene3D(window, camera);
-	scene3d.show_bounding_box(true);
-
-	// Skybox skybox = Skybox(camera, {
-	// 	"test/assets/images/skybox/right.jpg",
-	// 	"test/assets/images/skybox/left.jpg",
-	// 	"test/assets/images/skybox/top.jpg",
-	// 	"test/assets/images/skybox/bottom.jpg",
-	// 	"test/assets/images/skybox/front.jpg",
-	// 	"test/assets/images/skybox/back.jpg"
-	// });
+	// scene3d.show_bounding_box(true);
 
 	Skybox skybox = Skybox(camera, {
-		"test/assets/images/skybox2/right.bmp",
-		"test/assets/images/skybox2/left.bmp",
-		"test/assets/images/skybox2/top.bmp",
-		"test/assets/images/skybox2/bottom.bmp",
-		"test/assets/images/skybox2/front.bmp",
-		"test/assets/images/skybox2/back.bmp"
+		"test/assets/images/skybox/right.jpg",
+		"test/assets/images/skybox/left.jpg",
+		"test/assets/images/skybox/top.jpg",
+		"test/assets/images/skybox/bottom.jpg",
+		"test/assets/images/skybox/front.jpg",
+		"test/assets/images/skybox/back.jpg"
 	});
-
 
 	// Load mesh
 	Model* cow = new Model("test/assets/objs/cow.obj");
 	cow->set_position({ 0.0f, 0.0f, -5.0f });
 	cow->set_color(Colors::CHIROYELLOW);
 	cow->set_orientation(90.0f, { false, false, true });
-	scene3d.add_to_scene("cow", cow);
+	// scene3d.add_to_scene("cow", cow);
 
 	// Make shapes
 	// Cube position doenst matter because will change later
@@ -167,15 +157,25 @@ int main() {
 	// Dont add to scene to not draw it
 	// scene3d.add_to_scene("cameracollision", camera_hitbox);
 
-
 	Plane* plane = ModelFactory::create_plane({
 		.position = vec3<float>(-5.0f, 1.0f, -10.0f),
-		// Z doens't matter
-		.scale = vec3<float>(2.0f, 2.0f, 0.0f),
+		.scale = vec3<float>(4.0f),
 	});
-	plane->set_texture(&snail);
-	scene3d.add_to_scene("plane", plane);
 
+	// Front-right and Right are unecessary since they are the same texture but flipped
+	plane->set_angle_textures({
+		{ "test/assets/images/directions/0front.png",      false },
+		// Flip and use in the opposite direction (7)
+		{ "test/assets/images/directions/1frontright.png", true  },
+		// Flip and use in the opposite direction (6)
+		{ "test/assets/images/directions/2right.png",      true  },
+		// Flip and use in the opposite direction (5)
+		{ "test/assets/images/directions/3backleft.png",   true  },
+		{ "test/assets/images/directions/4back.png",       false }
+	});
+
+	plane->show_bounding_box(true);
+	scene3d.add_to_scene("plane", plane);
 
 	// Rectangle* rectangle = new Rectangle({
 	// 	.position = vec2<uint32>(
@@ -229,13 +229,30 @@ int main() {
 
 		// Rotate models
 		vec3<float> cowpos = cow->get_position();
-		cow->set_rotation(rotation, { true, true, true });
+		// cow->set_rotation(rotation, { true, true, true });
 		cube->set_position(ScarabMath::orbitate_x(cowpos, -rotation, 5.0f));
 		cube2->set_position(ScarabMath::orbitate_y(cowpos, rotation, 5.0f));
 		cube3->set_position(ScarabMath::orbitate_z(cowpos, -rotation, 5.0f));
 
+
+		// TODO: Optimize rotate directions methods (four and eight)
+		//
 		// Rotate plane
 		plane->face_position(camera.get_position());
+		plane->rotate_eight_directions(camera.get_position());
+
+
+		// // Calculate the direction from the plane to the camera, focusing on X and Z axes only
+		// vec3<float> direction = glm::normalize(camera.get_position() - plane->get_position());
+		// // direction.y = 0; // Ignore the Y component for rotation
+		//
+		// // Calculate the angle between the current forward direction of the plane (assumed to be along the Z-axis)
+		// float angle = glm::degrees(atan2(direction.x, direction.z));
+		//
+		// LOG_DEBUG("Angle: %f", angle);
+		// plane->set_orientation(angle, { false, true, false });
+
+
 
 		// Draw
 		skybox.draw();

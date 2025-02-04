@@ -15,7 +15,7 @@ class Mesh {
 		// Build Mesh using a wavefront .obj file
 		Mesh(const char* path);
 
-		~Mesh() noexcept;
+		virtual ~Mesh() noexcept;
 
 		// Set a new texture to the mesh
 		void set_texture(Texture* texture) noexcept;

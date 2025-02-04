@@ -79,22 +79,13 @@ Plane* ModelFactory::create_plane(const Model::Config& conf) noexcept {
 		Vertex { .position = glm::vec3( 0.5f, -0.5f, 0.0f), .texuv = glm::vec2(1.0f, 0.0f) }, // Bottom right vertex
 		Vertex { .position = glm::vec3( 0.5f,  0.5f, 0.0f), .texuv = glm::vec2(1.0f, 1.0f) }, // Top right vertex
 		Vertex { .position = glm::vec3(-0.5f,  0.5f, 0.0f), .texuv = glm::vec2(0.0f, 1.0f) }, // Top left vertex
-
-		// Back face
-		// Vertex { .position = glm::vec3(-0.5f, -0.5f, 0.0f), .texuv = glm::vec2(1.0f, 0.0f) }, // 4
-		// Vertex { .position = glm::vec3(-0.5f,  0.5f, 0.0f), .texuv = glm::vec2(1.0f, 1.0f) }, // 5
-		// Vertex { .position = glm::vec3( 0.5f,  0.5f, 0.0f), .texuv = glm::vec2(0.0f, 1.0f) }, // 6
-		// Vertex { .position = glm::vec3( 0.5f, -0.5f, 0.0f), .texuv = glm::vec2(0.0f, 0.0f) }, // 7
 	};
 
+	// Flipped winding order
 	static std::vector<uint32> indices = {
 		// Front face
-		0, 1, 2,
-		0, 2, 3,
-
-		// Back face
-		// 4, 5, 6,
-		// 4, 6, 7,
+		0, 2, 1,
+		0, 3, 2,
 	};
 
 	// Make VAO and return created Plane

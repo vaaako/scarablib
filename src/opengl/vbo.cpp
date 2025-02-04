@@ -8,7 +8,7 @@ VBO::~VBO() noexcept {
 	glDeleteBuffers(1, &this->id);
 }
 
-void VBO::alloc_data(const uint32 size, const void* data, const GLenum usage) const noexcept {
+void VBO::alloc_data(const uint64 size, const void* data, const GLenum usage) const noexcept {
 	glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizei>(size), data, usage);
 }
 
@@ -23,8 +23,8 @@ void VBO::alloc_data(const std::vector<float>& data, const GLenum usage) const n
 }
 
 
-void VBO::update_data(const uint32 size, const void* data, GLenum usage) const noexcept {
-	glBufferData(GL_ARRAY_BUFFER, size, data, usage);
+void VBO::update_data(const uint64 size, const void* data, GLenum usage) const noexcept {
+	glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(size), data, usage);
 }
 
 void VBO::make_from_vertex(const std::vector<Vertex>& data, const uint32 size, const GLenum usage) const noexcept {

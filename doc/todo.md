@@ -40,7 +40,10 @@ I wrote most of the things here very tired, sorry for any english mistake
 	+ [ ] Different texture for each face (the other method that is not cubemap)
 	+ [ ] Texture overlay
 	+ [ ] Texture atlas support
+		* For reference: [anim8](https://github.com/kikito/anim8)
 	+ [ ] Opacity
+- [ ] Animation support
+	+ For reference: [raycast](https://github.com/vaaako/Raycast/blob/main/src/sprite.lua#L46)
 - [x] Batch rendering
 - [x] Use the same font object for different texts
 
@@ -54,8 +57,10 @@ I wrote most of the things here very tired, sorry for any english mistake
 	+ Rigid body
 - [ ] Physics (dont know how)
 - [ ] Batch rendering for textures too
+	+ Would have to make another map, its worth it?
 - [ ] Better Shader support for 2D and 3D shapes
-- [ ] Remove `ModelConf`
+- [x] Remove `ModelConf`
+	+ kinda?
 
 # TODO 2D
 - [x] Unify shader and `shader_texture` somehow
@@ -83,6 +88,13 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [x] Camera optimized movement
 - [ ] Model size is box size
 - [ ] Camera movement not working properly with VSync disabled
+- [ ] Currently bounding box is always created, make it optional
+- [ ] Make a billboard model
+	+ Changing texture reference: [raycast](https://github.com/vaaako/Raycast/blob/main/src/sprite.lua#L46)
+	+ Rotate logic to shader
+	+ It will have to be a overrided draw method and other shader
+	+ Update model matrix in a method (like 2D shapes)
+	+ In scene3d check if model has a shader, if have, use it just for that model
 
 # Features for later
 - Sprite atlas

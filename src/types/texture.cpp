@@ -26,13 +26,13 @@ Texture::Texture() noexcept {
 	glBindTexture(this->tex_type, 0);
 }
 
-Texture::Texture(const char* path, const TextureFilter filter, const TextureWrap wrap) {
+Texture::Texture(const Texture::Config& conf) {
 	// STB use
-	Image* image = new Image(path, true);
+	Image* image = new Image(conf.path, !conf.flip_vertically, conf.flip_horizontally);
 
-#ifdef SCARAB_DEBUG_TEXTURE
+	#ifdef SCARAB_DEBUG_TEXTURE
 	LOG_INFO("Texture loaded succesfully! Width: %d, Height: %d", surface->w, surface->h);
-#endif
+	#endif
 
 	// Generate and bind texture
 	glGenTextures(1, &this->id); // num of textures, pointer
@@ -40,12 +40,12 @@ Texture::Texture(const char* path, const TextureFilter filter, const TextureWrap
 
 	// Set filter parameters
 	// Nearest: Pixelate / Linear: Blur
-	glTexParameteri(this->tex_type, GL_TEXTURE_MIN_FILTER, (GLint)filter);
-	glTexParameteri(this->tex_type, GL_TEXTURE_MAG_FILTER, (GLint)filter);
+	glTexParameteri(this->tex_type, GL_TEXTURE_MIN_FILTER, (GLint)conf.filter);
+	glTexParameteri(this->tex_type, GL_TEXTURE_MAG_FILTER, (GLint)conf.filter);
 
 	// Repeat, Mirrored Repeat, Clamp to Edge, Clamp to Border (then use array of RGBA to color the border)
-	glTexParameteri(this->tex_type, GL_TEXTURE_WRAP_S, (GLint)wrap);
-	glTexParameteri(this->tex_type, GL_TEXTURE_WRAP_T, (GLint)wrap);
+	glTexParameteri(this->tex_type, GL_TEXTURE_WRAP_S, (GLint)conf.wrap);
+	glTexParameteri(this->tex_type, GL_TEXTURE_WRAP_T, (GLint)conf.wrap);
 
 	// Get format
 	GLenum format;
@@ -60,7 +60,7 @@ Texture::Texture(const char* path, const TextureFilter filter, const TextureWrap
 			format = GL_RGBA;
 			break;
 		default:
-			throw ScarabError("Failed to load texture (%s). Unsupported format: %d channels", path, image->nr_channels);
+			throw ScarabError("Failed to load texture (%s). Unsupported format: %d channels", conf.path, image->nr_channels);
 	}
 	this->format = format;
 	this->width  = static_cast<uint32>(image->width);
@@ -77,7 +77,7 @@ Texture::Texture(const char* path, const TextureFilter filter, const TextureWrap
 
 	delete image;
 }
- 
+
 Texture::Texture(const void* data, const uint32 width, const uint32 height, const GLint internal_format, const GLenum format) 
 	: format(format), width(width), height(height) {
 

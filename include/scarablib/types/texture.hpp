@@ -7,28 +7,36 @@
 // Size needs to be multiple of 2
 // 16x16, 32x32, 64x64, 128x128, 256x256 etc
 
-enum class TextureFilter : int {
-	NEAREST =  GL_NEAREST,
-	LINEAR = GL_LINEAR 
-};
-
-enum class TextureWrap : int {
-	REPEAT = GL_REPEAT,
-	MIRRORED = GL_MIRRORED_REPEAT,
-	CLAMP_TO_EDGE = GL_CLAMP_TO_EDGE,
-	// CLAMP_TO_BORDER = GL_CLAMP_TO_BORDER
-};
-
 
 // Texture object used for shapes (2D and 3D).
 // It will allocate ~1mb of RAM for each loaded texture
 struct Texture {
+	enum class Filter : int {
+		NEAREST =  GL_NEAREST,
+		LINEAR = GL_LINEAR 
+	};
+
+	enum class Wrap : int {
+		REPEAT = GL_REPEAT,
+		MIRRORED = GL_MIRRORED_REPEAT,
+		CLAMP_TO_EDGE = GL_CLAMP_TO_EDGE,
+		// CLAMP_TO_BORDER = GL_CLAMP_TO_BORDER
+	};
+
+	struct Config {
+		const char* path;
+		Texture::Filter filter = Texture::Filter::NEAREST;
+		Texture::Wrap wrap = Texture::Wrap::REPEAT;
+		bool flip_horizontally = false;
+		bool flip_vertically = false;
+	};
+
 	// This will make a empty solid white texture
 	Texture() noexcept;
 
 	// Constructor to create a texture from a file path
 	// Optionally sets the filtering and wrapping methods
-	Texture(const char* path, const TextureFilter filter = TextureFilter::LINEAR, const TextureWrap wrap = TextureWrap::REPEAT);
+	Texture(const Texture::Config& conf);
 	// Texture(const TextureConf& conf);
 
 	// Uses pre-defined data to make a texture

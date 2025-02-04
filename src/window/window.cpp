@@ -68,8 +68,9 @@ Window::Window(const Window::Config& config) : conf(config), half_width(config.w
 
 	// Configure OpenGL
 	glViewport(0, 0, (GLsizei)config.width, (GLsizei)config.height);
-	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 
 	// SDL Configurations

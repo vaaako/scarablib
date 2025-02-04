@@ -32,7 +32,7 @@ class VBO {
 		// Allocate and initialize the data store for the VBO.
 		// `size` is the total size of the data (in bytes) to allocate, and `data` is a pointer to the data.
 		// If `data` is nullptr, the buffer is allocated but left uninitialized.
-		void alloc_data(const uint32 size, const void* data, const GLenum usage) const noexcept;
+		void alloc_data(const uint64 size, const void* data, const GLenum usage) const noexcept;
 
 		// Allocate and initialize the data store for the VBO using a vector of float
 		void alloc_data(const std::vector<float>& data, const GLenum usage) const noexcept;
@@ -56,7 +56,7 @@ class VBO {
 		void make_from_vertices(const std::vector<float>& data, const uint32 size, const GLenum usatge) const noexcept;
 
 		// Updates the the data of the VBO
-		void update_data(const uint32 size, const void* data, const GLenum usage) const noexcept;
+		void update_data(const uint64 size, const void* data, const GLenum usage) const noexcept;
 
 		// Automatically make the VBO from a vector of 2D Vertex.
 		// Don't use this with `alloc_data` or `link_attrib`

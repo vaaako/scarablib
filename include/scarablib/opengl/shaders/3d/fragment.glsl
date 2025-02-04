@@ -8,9 +8,14 @@ uniform vec4 shapeColor; // Color is defined by user later
 
 // Multiplying by 0.004 gives an approximated result as dividing by 255
 vec4 normalized_color(vec4 color) {
-	return vec4(color.r * 0.004, color.g * 0.004, color.b * 0.004, color.a * 0.004);
+	return vec4(color.rgb * 0.004, color.a * 0.004);
 }
 
 void main() {
-	FragColor = texture(texSampler, texCoord) * normalized_color(shapeColor.rgba);
+	vec4 tex = texture(texSampler, texCoord);
+	// if(tex.a == 0.0) {
+	// 	discard;
+	// }
+
+	FragColor =  tex * normalized_color(shapeColor.rgba);
 }

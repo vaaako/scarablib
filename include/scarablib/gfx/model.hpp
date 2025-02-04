@@ -1,20 +1,24 @@
 #pragma once
 
 #include <GL/glew.h>
+#include "scarablib/gfx/3d/boundingbox.hpp"
 #include "scarablib/gfx/mesh.hpp"
 #include "scarablib/opengl/shader.hpp"
 #include "scarablib/scenes/camera.hpp"
 #include "scarablib/typedef.hpp"
 #include "scarablib/types/vertex.hpp"
 
+class Scene3D;
 
 // An object used for as a base for 3D Shapes
 class Model : public Mesh {
+	// Access bounding object and model matrix
+	friend Scene3D;
+
 	public:
 		// Struct used to initialize a Model
 		struct Config {
 			vec3<float> position;
-			vec3<float> size = vec3<float>(1.0f); // This will change
 			vec3<float> scale = vec3<float>(1.0f);
 			Color color = Colors::WHITE;
 
@@ -27,7 +31,7 @@ class Model : public Mesh {
 			// Rotation based on orientation
 			float angle = 0.0f;
 			// Axis where the rotation will be applied
-			vec3<float> axis = { 1.0f, 0.0f, 0.0f };
+			vec3<float> axis = { 1.0f, 0.0f, 0.0f }; // Need to have at least one axis to work, even if angle is 0.0
 		};
 
 		// Init model using custom config and pre-defined VAO.
@@ -35,61 +39,83 @@ class Model : public Mesh {
 		Model(const Model::Config& conf, const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept;
 		// Make a model using a wavefront .obj file
 		Model(const char* path) noexcept;
-		~Model() = default;
+		~Model() noexcept = default;
 
 		// Draw current Model.
 		// It needs a camera object and a shader
-		virtual void draw(Camera& camera, const Shader& shader) noexcept;
+		virtual void draw(const Camera& camera, const Shader& shader) noexcept;
 
-		// Get current X position
+		// Uses AABB to check if two models are colliding
+		static inline bool check_collision(const Model& a, const Model& b) noexcept {
+			return (a.bounding.box_max.x >= b.bounding.box_min.x &&
+					a.bounding.box_min.x <= b.bounding.box_max.x &&
+					a.bounding.box_max.y >= b.bounding.box_min.y &&
+					a.bounding.box_min.y <= b.bounding.box_max.y &&
+					a.bounding.box_max.z >= b.bounding.box_min.z &&
+					a.bounding.box_min.z <= b.bounding.box_max.z);
+		}
+
+		// Returns the position of the center of the model
+		inline vec3<float> center_pos() const noexcept {
+			return (this->bounding.box_min + this->bounding.box_max) * 0.5f;
+		}
+
+
+		// Returns current X position
 		inline float get_x() const noexcept {
 			return this->conf.position.x;
 		}
 
-		// Get current Y position
+		// Returns current Y position
 		inline float get_y() const noexcept {
 			return this->conf.position.y;
 		}
 
-		// Get current Z position
+		// Returns current Z position
 		inline float get_z() const noexcept {
 			return this->conf.position.z;
 		}
 
-		// Get current position
+		// Returns current position
 		inline vec3<float> get_position() const noexcept {
 			return this->conf.position;
 		}
 
-		// Get current size of each axis
-		inline vec3<float> get_size() const noexcept {
-			return this->conf.size;
-		}
-
-		// Get current scale of each axis
+		// Returns current scale of each axis
 		inline vec3<float> get_scale() const noexcept {
 			return this->conf.scale;
 		}
 
-		// Get current color
+		// Returns current color
 		inline Color get_color() const noexcept {
 			return this->conf.color;
 		}
 
-		// Get current angle
+		// Returns current angle
 		inline float get_angle() const noexcept {
 			return this->conf.angle;
 		}
 
 
-		// Get minimum corner of the bounding box (AABB)
-		inline vec3<float> get_min() const noexcept {
-			return this->min;
+		// Returns minimum corner of the bounding box (AABB)
+		inline vec3<float> get_box_min() const noexcept {
+			return this->bounding.box_min;
 		}
 
-		// Get maximum corner of the bounding box (AABB)
-		inline vec3<float> get_max() const noexcept {
-			return this->max;
+		// Returns maximum corner of the bounding box (AABB)
+		inline vec3<float> get_box_max() const noexcept {
+			return this->bounding.box_max;
+		}
+
+		// Returns the difference of the bounding box min and max.
+		// This represents the size of the model
+		inline vec3<float> get_box_size() const noexcept {
+			return this->bounding.box_size;
+		}
+
+		// Returns if the model is showing the bounding box
+		inline bool is_showing_box() const noexcept {
+			return this->show_box;
 		}
 
 
@@ -98,7 +124,7 @@ class Model : public Mesh {
 		// Set a new position using a vector
 		inline Model& set_position(const vec3<float>& position) noexcept {
 			this->conf.position = position;
-			this->update_min_and_max();
+			// this->update_min_and_max();
 			this->isdirty = true;
 			return *this;
 		}
@@ -125,25 +151,26 @@ class Model : public Mesh {
 		}
 
 		// Set a new size using a vector (X and Y)
-		inline Model& set_size(const vec3<float>& size) noexcept {
-			this->conf.size = size;
-			this->update_min_and_max();
-			this->isdirty = true;
-			return *this;
-		}
-
+		// inline Model& set_size(const vec3<float>& size) noexcept {
+		// 	this->conf.size = size;
+		// 	this->update_min_and_max();
+		// 	this->isdirty = true;
+		// 	return *this;
+		// }
+		//
 		// Set a new size using a vector (X and Y)
-		inline Model& set_size(const float size) noexcept {
-			this->conf.size = { size, size, size };
-			this->update_min_and_max();
-			this->isdirty = true;
-			return *this;
-		}
+		// inline Model& set_size(const float size) noexcept {
+		// 	this->conf.size = { size, size, size };
+		// 	this->update_min_and_max();
+		// 	this->isdirty = true;
+		// 	return *this;
+		// }
 
 		// Scale the shape using a different value for each axis.
 		// e.g., `size.x = size.x * scale.x`, `size.y = size.y * scale.y` and `size.z = size.z * scale.z`
 		inline Model& set_scale(const vec3<float>& scale) noexcept {
 			this->conf.scale = scale;
+			// this->bounding_box = (this->bounding_box_max - this->bounding_box_min) * scale;
 			this->isdirty = true;
 			return *this;
 		}
@@ -151,9 +178,16 @@ class Model : public Mesh {
 		// Scale the shape using a different value for each axis.
 		// e.g., `size.x = size.x * scale.x`, `size.y = size.y * scale.y` and `size.z = size.z * scale.z`
 		inline Model& set_scale(const float scale) noexcept {
-			this->conf.scale = { scale, scale, scale };
+			vec3<float> newscale = { scale, scale, scale };
+			this->conf.scale = newscale;
+			// this->bounding_box = (this->bounding_box_max - this->bounding_box_min) * newscale;
 			this->isdirty = true;
 			return *this;
+		}
+
+		// Show or hide the bounding box
+		inline void show_bounding_box(const bool show_box) noexcept {
+			this->show_box = show_box;
 		}
 
 		// Set a new color.
@@ -184,29 +218,8 @@ class Model : public Mesh {
 		// Storing config
 		Model::Config conf;
 
-		// min and max corner of the bounding box (AABB)
-		// This will be calculated on constructor
-		vec3<float> min = vec3<float>(0.0f);
-		vec3<float> max = vec3<float>(0.0f);
-
-		// Calculates the size of a shape using it's vertices
-		vec3<float> calc_size(const std::vector<Vertex>& vertices) noexcept;
-
-		// Inline //
-
-		inline void update_min_and_max() noexcept {
-			// Scale or Size?
-			this->min = vec3<float>(
-				this->conf.position.x - this->conf.scale.x / 2,
-				this->conf.position.y - this->conf.scale.y / 2,
-				this->conf.position.z - this->conf.scale.z / 2
-			);
-
-			this->max = vec3<float>(
-				this->conf.position.x + this->conf.scale.x / 2,
-				this->conf.position.y + this->conf.scale.y / 2,
-				this->conf.position.z + this->conf.scale.z / 2
-			);
-		}
+		// Collission
+		BoundingBox bounding;
+		bool show_box = false;
 };
 

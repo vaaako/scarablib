@@ -13,11 +13,13 @@ Model::Model(const char* path) noexcept : Mesh(path), bounding(vertices) {
 
 Model& Model::set_rotation(const float angle, const vec3<bool> axis) noexcept {
 	this->conf.angle = angle;
+
 	// At least one axis need to be true to work
 	if(axis == vec3<bool>(false)) {
-		this->conf.axis = (vec3<float>)axis;
-		return *this;
+		return *this; // Dont update
 	}
+
+	// Just update if at least one true
 	this->conf.axis = (vec3<float>)axis;
 	this->isdirty = true;
 	return *this;
@@ -25,13 +27,14 @@ Model& Model::set_rotation(const float angle, const vec3<bool> axis) noexcept {
 
 Model& Model::set_orientation(const float angle, const vec3<bool> axis) noexcept {
 	this->conf.orient_angle = angle;
-	this->conf.orient_axis = (vec3<float>)axis;
 
 	// At least one axis need to be true to work
 	if(axis == vec3<bool>(false)) {
 		return *this;
 	}
 
+	// Just update if at least one true
+	this->conf.orient_axis = (vec3<float>)axis;
 	this->isdirty = true;
 	return *this;
 }
