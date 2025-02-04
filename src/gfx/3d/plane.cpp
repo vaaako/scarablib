@@ -96,7 +96,7 @@ void Plane::set_angle_textures(const std::vector<std::pair<const char*, bool>> p
 	for(size_t i = 0; i < paths.size(); i++) {
 		const auto& pair = paths.at(i);
 
-		LOG_DEBUG("Placing at index %zu", i);
+		// LOG_DEBUG("Placing at index %zu", i);
 
 		// Place the texture in the eorrect direction
 		this->textures[i] = new Texture({
@@ -119,7 +119,7 @@ void Plane::set_angle_textures(const std::vector<std::pair<const char*, bool>> p
 				.flip_horizontally = true
 			});
 
-			LOG_DEBUG("+ Placing opposite %zu", opposite_index);
+			// LOG_DEBUG("+ Placing opposite %zu", opposite_index);
 		}
 	}
 
