@@ -31,8 +31,8 @@ struct Circle : public Shape2D {
 		// Make static so Scene2D can update viewport
 		static inline Shader& get_shader() {
 			static Shader shader_circle = Shader(
-				FileHelper::read_file(SOURCE_DIR + "/../../opengl/shaders/2d/vertex.glsl").c_str(),
-				FileHelper::read_file(SOURCE_DIR + "/../../opengl/shaders/2d/circle_fragment.glsl").c_str()
+				FileHelper::read_file(THIS_FILE_DIR + "/../../opengl/shaders/2d/vertex.glsl").c_str(),
+				FileHelper::read_file(THIS_FILE_DIR + "/../../opengl/shaders/2d/circle_fragment.glsl").c_str()
 			);
 
 			return shader_circle;

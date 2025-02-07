@@ -96,6 +96,8 @@ I wrote most of the things here very tired, sorry for any english mistake
 	+ Update model matrix in a method (like 2D shapes)
 	+ In scene3d check if model has a shader, if have, use it just for that model
 
+- [ ] Don't store vertices, this makes the memory usage huge for each model
+
 # Features for later
 - Sprite atlas
 - Tick

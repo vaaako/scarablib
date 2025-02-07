@@ -6,6 +6,7 @@
 struct Image {
 	int width, height, nr_channels;
 	uint8* data = nullptr;
+	const char* path;
 
 	// Load an image using a path
 	Image(const char* path, const bool flip_vertically = true, const bool flip_horizontally = false);

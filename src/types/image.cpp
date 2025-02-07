@@ -5,7 +5,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
-Image::Image(const char* path, const bool flip_vertically, const bool flip_horizontally) {
+Image::Image(const char* path, const bool flip_vertically, const bool flip_horizontally) : path(path) {
 	stbi_set_flip_vertically_on_load(flip_vertically);
 
 	this->data = stbi_load(path, &this->width, &this->height, &nr_channels, 0); // STBI_rgb_alpha to standarlize

@@ -29,5 +29,7 @@ bakups/
 # Not ready yet
 features.md
 
-# Silicon
+# Other
+*.ini
 *.png
+*.jpg

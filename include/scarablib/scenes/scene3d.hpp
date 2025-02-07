@@ -63,8 +63,8 @@ class Scene3D : public IScene<Model> {
 
 		Camera& camera;
 		Shader* shader = new Shader(
-			FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/3d/vertex.glsl").c_str(),
-			FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/3d/fragment.glsl").c_str()
+			FileHelper::read_file(THIS_FILE_DIR + "/../opengl/shaders/3d/vertex.glsl").c_str(),
+			FileHelper::read_file(THIS_FILE_DIR + "/../opengl/shaders/3d/fragment.glsl").c_str()
 		);
 };
 

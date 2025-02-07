@@ -3,6 +3,20 @@
 #include "scarablib/opengl/vao_manager.hpp"
 #include "scarablib/proper/log.hpp"
 
+// TEST ONLY
+std::string str_dirs[8] = {
+	"FRONT",
+	"FRONT_RIGHT",
+	"RIGHT",
+	"BACK_RIGHT",
+	"BACK",
+	"BACK_LEFT",
+	"LEFT",
+	"FRONT_LEFT"
+};
+// TEST ONLY //
+
+
 Plane::Plane(const Model::Config& conf, const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept
 	: Model(conf, vertices, indices) {}
 
@@ -13,33 +27,21 @@ Plane::~Plane() noexcept {
 	// Release current vao
 	VAOManager::get_instance().release_vao(vao_hash);
 
-	for(Texture* texture : this->textures) {
-		delete texture;
-	}
+	this->clear_directional_textures();
 }
 
-// // Rotate 4 directions
+// Rotate 4 directions
 void Plane::rotate_four_directions(const vec3<float>& focus_position) noexcept {
-	// Front: -45° <= angle < 45°
-	// Right: 45° <= angle < 135°
-	// Back: 135° <= angle < 225°
-	// Left: 225° <= angle < 315°
+	// [-45,  45] 0 Front
+	// [ 45, 135] 1 Front
+	// [135, 225] 6 Front
+	// [225, 315] 7 Front
 
 	const float angle = this->direction_angle(focus_position);
 
-	// Front
-	if(angle >= -45.0f && angle < 45.0f) {
-		this->set_texture(this->textures.at(0));
-	// Right
-	} else if(angle >= 45.0f && angle < 135.0f) {
-		this->set_texture(this->textures.at(1));
-	// Back
-	} else if(angle >= 135.0f && angle < 225.0f) {
-		this->set_texture(this->textures.at(2));
-	// Left
-	} else {
-		this->set_texture(this->textures.at(3));
-	}
+	const uint32 sector = static_cast<uint32>((angle + 45.0f) / 90.0f) % 4;
+
+	this->set_texture(this->textures.at(sector));
 }
 
 // TODO: Instead of set_texture a more optimized method
@@ -51,37 +53,54 @@ void Plane::rotate_eight_directions(const vec3<float>& focus_position) noexcept 
 	const float angle = this->direction_angle(focus_position);
 
 	// 8 Directions: Divide the circle into 8 sectors of 45° each
-	// Front Right
-	if (angle >= -157.5f && angle < -112.5f) {
-		this->set_texture(this->textures.at(1)); 
-	// Right
-	} else if (angle >= -112.5f && angle < -67.5f) {
-		this->set_texture(this->textures.at(2));
-	// Back Right
-	} else if (angle >= -67.5f && angle < -22.5f) {
-		this->set_texture(this->textures.at(3));
-	// Back
-	} else if (angle >= -22.5f && angle < 22.5f) {
-		this->set_texture(this->textures.at(4));
-	// Back Left
-	} else if (angle >= 22.5f && angle < 67.5f) {
-		this->set_texture(this->textures.at(5));
-	// Left
-	} else if (angle >= 67.5f && angle < 112.5f) {
-		this->set_texture(this->textures.at(6));
-	// Front Left
-	} else if (angle >= 112.5f && angle < 157.5f) {
-		this->set_texture(this->textures.at(7));
-	// Front
-	} else {
-		this->set_texture(this->textures.at(0));
-	}
+	// Sector mapping:
+	// [-180°, -135°) 0 Front
+	// [-135°,  -90°) 1 Front-Right
+	// [ -90°,  -45°) 2 Right
+	// [ -45°,    0°) 3 Back-Right
+	// [   0°,   45°) 4 Back
+	// [  45°,   90°) 5 Back-Left
+	// [  90°,  135°) 6 Left
+	// [ 135°,  180°) 7 Front-Left
+
+	// Angle range is [-180°, 180°]
+	//   0° is Front (facing toward the camera)
+	// 180° is Back  (facing away from the camera)
+
+	// Sector Calculation Logic:
+	// 1. The input angle is in the range [-180°, 180°]
+	// 2. Each sector spans by 45 degrees (360 / 8 sectors = 45)
+	// 3. To align the sectors, add 22.5° to the angle (half the sector size)
+	//    - This centers the sectors around the angle range.
+	// 3. Divide by 45° (sector size) to determine the sector index.
+	// 4. Use modulo 8 to wrap around the index if it exceeds 7
+
+	// What is the Span?
+	// - The span is the angular size of each sector.
+	// - For 8 directions, the span is 45° (360° / 8 sectors).
+	// - The span determines how wide each sector is and is used to map the angle to the correct sector.
+
+	// Why 22.5°?
+	// - Each sector spans 45°, so half of that (22.5°) is added to align the sectors.
+	// - This ensures that the sector boundaries are correctly centered.
+	// - Formula: SP (Span) = (360 / N) = Where N is the number of sectors
+	//    - Sector = (A + (SP / 2) / SP) % N
+
+	// Example:
+	// -180° + 22.5° = -157.5° → Sector 0 (Front)
+	//    0° + 22.5° =   22.5° → Sector 4 (Back)
+	//  180° + 22.5° =  202.5° → Wraps to 22.5° → Sector 0 (Front)
+	const uint32 sector = static_cast<uint32>((angle + 22.5f) / 45.0f) % 8;
+	this->set_texture(this->textures.at(sector));
+	// LOG_INFO("Angle: %f, Direction: [%i] %s", angle, sector, str_dirs[sector].c_str());
 }
 
 
 // TODO: Instead of making a whole new texture for flipped ones, send a uniform for shader flip
 
-void Plane::set_angle_textures(const std::vector<std::pair<const char*, bool>> paths) {
+#define SCARAB_DEBUG_ANGLE_TEXTURES
+
+void Plane::set_directional_textures(const std::vector<std::pair<const char*, bool>> paths) {
 	if(paths.size() < 4 || paths.size() > 8) {
 		throw ScarabError("The number of textures must be at least 4 or at most 8");
 	}
@@ -89,6 +108,11 @@ void Plane::set_angle_textures(const std::vector<std::pair<const char*, bool>> p
 	// 4 for four directions
 	// 5 for flipping textures
 	const size_t texture_size = (paths.size() != 4 || paths.size() == 5) ? 8 : 4;
+
+	#ifdef SCARAB_DEBUG_ANGLE_TEXTURES
+	std::vector<const char*> texture_paths;
+	texture_paths.resize(texture_size, nullptr);
+	#endif
 
 	// Resize so i can check if a index has a texture already
 	this->textures.resize(texture_size, nullptr);
@@ -103,6 +127,10 @@ void Plane::set_angle_textures(const std::vector<std::pair<const char*, bool>> p
 			.path = pair.first,
 			.flip_horizontally = false
 		});
+
+		#ifdef SCARAB_DEBUG_ANGLE_TEXTURES
+		texture_paths[i] = pair.first;
+		#endif
 
 		// Check for opposite texture
 		if(pair.second) {
@@ -119,13 +147,34 @@ void Plane::set_angle_textures(const std::vector<std::pair<const char*, bool>> p
 				.flip_horizontally = true
 			});
 
-			// LOG_DEBUG("+ Placing opposite %zu", opposite_index);
+			#ifdef SCARAB_DEBUG_ANGLE_TEXTURES
+			texture_paths[opposite_index] = pair.first;
+			#endif
+
+			// LOG_DEBUG("Flipping %zu and placing at %zu", i, opposite_index);
 		}
 	}
 
 	if(this->textures.size() != 4 && this->textures.size() != 8) {
 		throw ScarabError("Bad Configuration: The textures final size is %zu, which does not match 4 or 8. \nCheck for flipped textures", this->textures.size());
 	}
+
+	#ifdef SCARAB_DEBUG_ANGLE_TEXTURES
+	LOG_DEBUG("Directions texture paths:");
+	for(size_t i = 0; i < texture_paths.size(); i++) {
+		LOG_DEBUG("[%i] %s", i, texture_paths.at(i));
+	}
+	#endif
+}
+
+void Plane::clear_directional_textures() noexcept {
+	for(Texture* texture : this->textures) {
+		// Just in case
+		if(texture != nullptr) {
+			delete texture;
+		}
+	}
+	this->textures.clear();
 }
 
 // TODO: I have to and will optimize this, this is just testing

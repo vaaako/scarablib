@@ -66,7 +66,7 @@ Skybox::Skybox(const Camera& camera, const std::vector<const char*>& faces) : ca
 	glBindTexture(GL_TEXTURE_CUBE_MAP, this->texid);
 
 	for(uint16 i = 0; i < 6; i++) {
-		Image* image = new Image(faces[i], false);
+		Image* image = new Image(faces.at(i), false);
 
 		// Order: Right > Left > Top > Bottom > Back > Front
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,

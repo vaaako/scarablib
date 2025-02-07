@@ -1,8 +1,11 @@
 #pragma once
 
+#include "scarablib/proper/error.hpp"
 #include "scarablib/typedef.hpp"
+#include "scarablib/types/image.hpp"
 #include <SDL2/SDL_surface.h>
 #include <GL/glew.h>
+#include <vector>
 
 // Size needs to be multiple of 2
 // 16x16, 32x32, 64x64, 128x128, 256x256 etc
@@ -11,24 +14,32 @@
 // Texture object used for shapes (2D and 3D).
 // It will allocate ~1mb of RAM for each loaded texture
 struct Texture {
-	enum class Filter : int {
+	enum class Filter : uint32 {
 		NEAREST =  GL_NEAREST,
 		LINEAR = GL_LINEAR 
 	};
 
-	enum class Wrap : int {
+	enum class Wrap : uint32 {
 		REPEAT = GL_REPEAT,
 		MIRRORED = GL_MIRRORED_REPEAT,
 		CLAMP_TO_EDGE = GL_CLAMP_TO_EDGE,
 		// CLAMP_TO_BORDER = GL_CLAMP_TO_BORDER
 	};
 
+	// enum class Type : uint32 {
+	// 	TEXTURE_2D = GL_TEXTURE_2D,
+	// 	TEXTURE_2D_ARRAY = GL_TEXTURE_2D_ARRAY
+	// };
+
 	struct Config {
 		const char* path;
+
 		Texture::Filter filter = Texture::Filter::NEAREST;
 		Texture::Wrap wrap = Texture::Wrap::REPEAT;
-		bool flip_horizontally = false;
+		// Texture::Type type = Texture::Type::TEXTURE_2D;
+
 		bool flip_vertically = false;
+		bool flip_horizontally = false;
 	};
 
 	// This will make a empty solid white texture
@@ -37,40 +48,43 @@ struct Texture {
 	// Constructor to create a texture from a file path
 	// Optionally sets the filtering and wrapping methods
 	Texture(const Texture::Config& conf);
-	// Texture(const TextureConf& conf);
 
 	// Uses pre-defined data to make a texture
 	// Texture(const void* data, const uint32 width, const uint32 height, const GLenum format);
 	Texture(const void* data, const uint32 width, const uint32 height, const GLint internal_format, const GLenum format);
 
-	// Default copy
+	// Disable Copy
 	Texture(const Texture&) noexcept = default;
 	Texture& operator=(const Texture& other) noexcept = default;
+
+	// Disable Moving
+	Texture(Texture&&) noexcept = delete;
+	Texture& operator=(Texture&&) noexcept = delete;
 
 	// NOTE: I am not using default keyword just because of OpenGL ID, to avoid double deletion or any trouble with it 
 
 	// Move
-	Texture(Texture&& other) noexcept {
-		this->id = other.id;
-		this->format = other.format;
-		this->width = other.width;
-		this->height = other.height;
-		this->tex_type = other.tex_type;
-		other.id = 0;
-	}
-	Texture& operator=(Texture&& other) noexcept {
-		if(this != &other) {
-			// Delete current
-			glDeleteTextures(1, &this->id);
-			this->id = other.id;
-			this->format = other.format;
-			this->width = other.width;
-			this->height = other.height;
-			this->tex_type = other.tex_type;
-			other.id = 0;
-		}
-		return *this;
-	}
+	// Texture(Texture&& other) noexcept {
+	// 	this->id = other.id;
+	// 	this->format = other.format;
+	// 	this->width = other.width;
+	// 	this->height = other.height;
+	// 	this->tex_type = other.tex_type;
+	// 	other.id = 0;
+	// }
+	// Texture& operator=(Texture&& other) noexcept {
+	// 	if(this != &other) {
+	// 		// Delete current
+	// 		glDeleteTextures(1, &this->id);
+	// 		this->id = other.id;
+	// 		this->format = other.format;
+	// 		this->width = other.width;
+	// 		this->height = other.height;
+	// 		this->tex_type = other.tex_type;
+	// 		other.id = 0;
+	// 	}
+	// 	return *this;
+	// }
 
 	~Texture() noexcept;
 
@@ -93,13 +107,27 @@ struct Texture {
 		return this->id;
 	}
 
+	static GLuint extract_data_format(const Image& image) {
+		switch (image.nr_channels) {
+			case 1:
+				return GL_RED;
+				break;
+			case 3:
+				return GL_RGB;
+				break;
+			case 4:
+				return GL_RGBA;
+				break;
+			default:
+				throw ScarabError("Failed to load texture (%s). Unsupported format: %d channels", image.path, image.nr_channels);
+		}
+	}
 	private:
+		const GLuint tex_type = GL_TEXTURE_2D;
+
 		GLuint id;
 		GLenum format;
 		uint32 width;
 		uint32 height;
-		GLuint tex_type = GL_TEXTURE_2D; // Type of texture (2D by default)
 
-		// Texture atlas
-		// GLuint tex_type = GL_TEXTURE_2D_ARRAY;
 };

@@ -11,6 +11,7 @@
 #include "scarablib/proper/log.hpp"
 #include "scarablib/types/font.hpp"
 #include "scarablib/gfx/skybox.hpp"
+#include "scarablib/utils/file.hpp"
 #include "scarablib/utils/math.hpp"
 #include "scarablib/window/window.hpp"
 #include "scarablib/input/keycode.hpp"
@@ -104,11 +105,12 @@ int main() {
 
 	// Load assets
 	Texture tex1  = Texture({ .path = "test/assets/images/kuromi.png" });
-	Texture tex2  = Texture({ "test/assets/images/purin.png" });
-	Texture tex3  = Texture({ "test/assets/images/brick.png" });
-	Texture snail = Texture({ "test/assets/images/snail.png" });
+	Texture tex2  = Texture({ .path = "test/assets/images/purin.png" });
+	Texture tex3  = Texture({ .path = "test/assets/images/brick.png" });
+	Texture snail = Texture({ .path = "test/assets/images/snail.png" });
 
 	// TODO: Make it use only one drawcall
+	// WARNING: FONTS ARE NOT COMPLETED YET, I WILL UPDATE IT LATER
 	Font msgothic = Font("test/assets/fonts/Ubuntu-R.ttf", 24);
 
 	// Make scenes
@@ -163,18 +165,29 @@ int main() {
 	});
 
 	// Front-right and Right are unecessary since they are the same texture but flipped
-	plane->set_angle_textures({
-		{ "test/assets/images/directions/0front.png",      false },
+	// plane->set_directional_textures({
+	// 	{ "test/assets/images/directions/pinky/0.png", false },
+	// 	// Flip to 7
+	// 	{ "test/assets/images/directions/pinky/1.png", true  },
+	// 	// Flip to 6
+	// 	{ "test/assets/images/directions/pinky/2.png", true  },
+	// 	// Flip to 5
+	// 	{ "test/assets/images/directions/pinky/3.png", true  },
+	// 	{ "test/assets/images/directions/pinky/4.png", false }
+	// });
+
+	plane->set_directional_textures({
+		{ "test/assets/images/directions/cacodemon/0.png", false }, // Front
 		// Flip and use in the opposite direction (7)
-		{ "test/assets/images/directions/1frontright.png", true  },
+		{ "test/assets/images/directions/cacodemon/1.png", true  }, // Front right
 		// Flip and use in the opposite direction (6)
-		{ "test/assets/images/directions/2right.png",      true  },
+		{ "test/assets/images/directions/cacodemon/2.png", true  }, // Right
 		// Flip and use in the opposite direction (5)
-		{ "test/assets/images/directions/3backleft.png",   true  },
-		{ "test/assets/images/directions/4back.png",       false }
+		{ "test/assets/images/directions/cacodemon/3.png", true  }, // Back left
+		{ "test/assets/images/directions/cacodemon/4.png", false }  // Back
 	});
 
-	plane->show_bounding_box(true);
+	// plane->show_bounding_box(true);
 	scene3d.add_to_scene("plane", plane);
 
 	// Rectangle* rectangle = new Rectangle({
@@ -238,7 +251,7 @@ int main() {
 		// TODO: Optimize rotate directions methods (four and eight)
 		//
 		// Rotate plane
-		plane->face_position(camera.get_position());
+		plane->face_rotation(camera.get_position()); // This slows down the while-loop
 		plane->rotate_eight_directions(camera.get_position());
 
 
@@ -302,6 +315,8 @@ int main() {
 		// ImGui::NewFrame();
 		//
 		// // Create a simple ImGui window
+
+// chiro 🌸
 		// ImGui::Begin("Hello, ImGui!");
 		// ImGui::Text("This is a simple ImGui window.");
 		// if (ImGui::Button("Click Me")) {

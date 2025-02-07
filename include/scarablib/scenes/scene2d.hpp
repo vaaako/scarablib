@@ -61,8 +61,8 @@ class Scene2D : public IScene<Shape2D> {
 		uint32 height;
 
 		Shader* shader = new Shader(
-			FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/2d/vertex.glsl").c_str(),
-			FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/2d/fragment.glsl").c_str()
+			FileHelper::read_file(THIS_FILE_DIR + "/../opengl/shaders/2d/vertex.glsl").c_str(),
+			FileHelper::read_file(THIS_FILE_DIR + "/../opengl/shaders/2d/fragment.glsl").c_str()
 		);
 };
 

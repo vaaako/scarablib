@@ -1,7 +1,5 @@
 #include "scarablib/types/texture.hpp"
-#include "scarablib/proper/error.hpp"
 #include "scarablib/typedef.hpp"
-#include "scarablib/types/image.hpp"
 #include <SDL2/SDL_render.h>
 
 Texture::Texture() noexcept {
@@ -30,12 +28,16 @@ Texture::Texture(const Texture::Config& conf) {
 	// STB use
 	Image* image = new Image(conf.path, !conf.flip_vertically, conf.flip_horizontally);
 
+	this->format = Texture::extract_data_format(*image);
+	this->width  = static_cast<uint32>(image->width);
+	this->height = static_cast<uint32>(image->height);
+
 	#ifdef SCARAB_DEBUG_TEXTURE
 	LOG_INFO("Texture loaded succesfully! Width: %d, Height: %d", surface->w, surface->h);
 	#endif
 
 	// Generate and bind texture
-	glGenTextures(1, &this->id); // num of textures, pointer
+	glGenTextures(1, &this->id);
 	glBindTexture(this->tex_type, this->id);
 
 	// Set filter parameters
@@ -46,25 +48,6 @@ Texture::Texture(const Texture::Config& conf) {
 	// Repeat, Mirrored Repeat, Clamp to Edge, Clamp to Border (then use array of RGBA to color the border)
 	glTexParameteri(this->tex_type, GL_TEXTURE_WRAP_S, (GLint)conf.wrap);
 	glTexParameteri(this->tex_type, GL_TEXTURE_WRAP_T, (GLint)conf.wrap);
-
-	// Get format
-	GLenum format;
-	switch (image->nr_channels) {
-		case 1:
-			format = GL_RED;
-			break;
-		case 3:
-			format = GL_RGB;
-			break;
-		case 4:
-			format = GL_RGBA;
-			break;
-		default:
-			throw ScarabError("Failed to load texture (%s). Unsupported format: %d channels", conf.path, image->nr_channels);
-	}
-	this->format = format;
-	this->width  = static_cast<uint32>(image->width);
-	this->height = static_cast<uint32>(image->height);
 
 	// Generate
 	glTexImage2D(this->tex_type, 0, static_cast<GLint>(format), image->width, image->height, 0, format, GL_UNSIGNED_BYTE, image->data);

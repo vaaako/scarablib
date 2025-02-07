@@ -15,6 +15,8 @@ class Font {
 	// To update viewport
 	friend class Scene2D;
 
+	// WARNING: FONTS ARE NOT COMPLETED YET, I WILL UPDATE IT LATER
+
 	public:
 		// Build a font object passing a path to a .ttf file.
 		// Also pass font's text, size and color
@@ -44,8 +46,8 @@ class Font {
 
 		static inline Shader& get_shader() {
 			static Shader shader_circle = Shader(
-				FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/2d/font_vertex.glsl").c_str(),
-				FileHelper::read_file(SOURCE_DIR + "/../opengl/shaders/2d/font_fragment.glsl").c_str()
+				FileHelper::read_file(THIS_FILE_DIR + "/../opengl/shaders/2d/font_vertex.glsl").c_str(),
+				FileHelper::read_file(THIS_FILE_DIR + "/../opengl/shaders/2d/font_fragment.glsl").c_str()
 			);
 
 			return shader_circle;
