@@ -20,6 +20,11 @@ class Mesh {
 		// Set a new texture to the mesh
 		void set_texture(Texture* texture) noexcept;
 
+		// Returns the current texture being used
+		inline Texture& get_texture() const noexcept {
+			return *this->texture;
+		}
+
 		// Removes the shape's texture
 		inline void remove_texture() noexcept {
 			this->texture = &this->get_deftex();

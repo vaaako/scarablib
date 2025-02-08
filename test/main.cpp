@@ -27,6 +27,7 @@ bool can_move = false;
 
 void camera_movement(Window& window, Camera& camera, KeyboardHandler& keyboard) {
 	const float dt = window.dt();
+	// LOG_DEBUG("Camera dt: %f", dt);
 
 	if(keyboard.isdown(Keycode::W)) {
 		camera.move_front(dt);
@@ -115,7 +116,7 @@ int main() {
 
 	// Make scenes
 	Camera camera = Camera(window, 75.0f, 80.0f);
-	camera.set_speed(1.0f * DELTATIME_MODIFIER);
+	camera.set_speed(2.0f * DELTATIME_MODIFIER);
 
 
 	Scene2D scene2d = Scene2D(window);
@@ -136,7 +137,7 @@ int main() {
 	cow->set_position({ 0.0f, 0.0f, -5.0f });
 	cow->set_color(Colors::CHIROYELLOW);
 	cow->set_orientation(90.0f, { false, false, true });
-	// scene3d.add_to_scene("cow", cow);
+	scene3d.add_to_scene("cow", cow);
 
 	// Make shapes
 	// Cube position doenst matter because will change later
@@ -159,36 +160,36 @@ int main() {
 	// Dont add to scene to not draw it
 	// scene3d.add_to_scene("cameracollision", camera_hitbox);
 
-	Plane* plane = ModelFactory::create_plane({
+	Billboard* bill = ModelFactory::create_billboard({
 		.position = vec3<float>(-5.0f, 1.0f, -10.0f),
 		.scale = vec3<float>(4.0f),
 	});
 
 	// Front-right and Right are unecessary since they are the same texture but flipped
-	// plane->set_directional_textures({
-	// 	{ "test/assets/images/directions/pinky/0.png", false },
-	// 	// Flip to 7
-	// 	{ "test/assets/images/directions/pinky/1.png", true  },
-	// 	// Flip to 6
-	// 	{ "test/assets/images/directions/pinky/2.png", true  },
-	// 	// Flip to 5
-	// 	{ "test/assets/images/directions/pinky/3.png", true  },
-	// 	{ "test/assets/images/directions/pinky/4.png", false }
-	// });
-
-	plane->set_directional_textures({
-		{ "test/assets/images/directions/cacodemon/0.png", false }, // Front
-		// Flip and use in the opposite direction (7)
-		{ "test/assets/images/directions/cacodemon/1.png", true  }, // Front right
-		// Flip and use in the opposite direction (6)
-		{ "test/assets/images/directions/cacodemon/2.png", true  }, // Right
-		// Flip and use in the opposite direction (5)
-		{ "test/assets/images/directions/cacodemon/3.png", true  }, // Back left
-		{ "test/assets/images/directions/cacodemon/4.png", false }  // Back
+	bill->set_directional_textures({
+		{ "test/assets/images/directions/pinky/0.png", false },
+		// Flip to 7
+		{ "test/assets/images/directions/pinky/1.png", true  },
+		// Flip to 6
+		{ "test/assets/images/directions/pinky/2.png", true  },
+		// Flip to 5
+		{ "test/assets/images/directions/pinky/3.png", true  },
+		{ "test/assets/images/directions/pinky/4.png", false }
 	});
 
+	// bill->set_directional_textures({
+	// 	{ "test/assets/images/directions/cacodemon/0.png", false }, // Front
+	// 	// Flip to 7
+	// 	{ "test/assets/images/directions/cacodemon/1.png", true  }, // Front right
+	// 	// Flip to 6
+	// 	{ "test/assets/images/directions/cacodemon/2.png", true  }, // Right
+	// 	// Flip to 5
+	// 	{ "test/assets/images/directions/cacodemon/3.png", true  }, // Back left
+	// 	{ "test/assets/images/directions/cacodemon/4.png", false }  // Back
+	// });
+
 	// plane->show_bounding_box(true);
-	scene3d.add_to_scene("plane", plane);
+	scene3d.add_to_scene("bill", bill);
 
 	// Rectangle* rectangle = new Rectangle({
 	// 	.position = vec2<uint32>(
@@ -251,8 +252,11 @@ int main() {
 		// TODO: Optimize rotate directions methods (four and eight)
 		//
 		// Rotate plane
-		plane->face_rotation(camera.get_position()); // This slows down the while-loop
-		plane->rotate_eight_directions(camera.get_position());
+		// bill->face_rotation(camera.get_position()); // TODO: This slows down the movement
+		// - Set orientation problem
+		//
+
+		bill->rotate_eight_directions(camera.get_position());
 
 
 		// // Calculate the direction from the plane to the camera, focusing on X and Z axes only
@@ -298,7 +302,7 @@ int main() {
 		uint32 current = window.timenow();
 		if(current - timer >= 1000) {
 			timer = current; // Reset timer
-			window.set_title("FPS: " + std::to_string(window.fps()));
+			window.set_title("FPS: " + std::to_string(window.fps()) + " / Delta: " + std::to_string(window.dt()));
 		}
 
 

@@ -13,9 +13,9 @@ vec4 normalized_color(vec4 color) {
 
 void main() {
 	vec4 tex = texture(texSampler, texCoord);
-	// if(tex.a == 0.0) {
-	// 	discard;
-	// }
+	if(tex.a == 0.0) {
+		discard;
+	}
 
 	FragColor =  tex * normalized_color(shapeColor.rgba);
 }

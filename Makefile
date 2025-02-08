@@ -1,7 +1,5 @@
 CXX = clang++
 CXXFLAGS = -std=c++20 -O3 \
-		   -Wall \
-		   -Wextra \
 		   -I./include \
 		   -I./include/external \
 		   -I./include/external/freetype

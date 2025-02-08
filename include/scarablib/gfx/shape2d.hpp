@@ -28,7 +28,7 @@ class Shape2D {
 		// GETTERS //
 
 		// Get current texture
-		inline Texture get_texture() const noexcept {
+		inline Texture& get_texture() const noexcept {
 			return *this->texture;
 		}
 
@@ -55,64 +55,58 @@ class Shape2D {
 		// SETTERS //
 
 		// Set a texture to be used
-		inline Shape2D& set_texture(Texture* texture) noexcept {
+		inline void set_texture(Texture* texture) noexcept {
 			if(texture == nullptr){
 				this->texture = &this->get_deftex();
-				return *this;
+				return;
 			}
 
 			this->texture = texture;
-			return *this;
 		}
 
 		// Removes the shape's texture
-		inline Shape2D& remove_texture() noexcept {
+		inline void remove_texture() noexcept {
 			this->texture = &this->get_deftex();
-			return *this;
 		}
 
 		// Set a new position using a vector
-		inline Shape2D& set_position(const vec2<float>& position) noexcept {
+		inline void set_position(const vec2<float>& position) noexcept {
 			this->conf.position = position;
 			this->isdirty = true;
-			return *this;
 		}
 
 		// Set a new size using a vector (X and Y)
-		inline Shape2D& set_size(const vec2<float>& size) noexcept {
+		inline void set_size(const vec2<float>& size) noexcept {
 			this->conf.size = size;
 			this->isdirty = true;
-			return *this;
 		}
 
 		// Scale the shape using a single value for all axis.
 		// e.g., `size = size.xy * scale`
-		// inline Shape2D& set_scale(const float& scale) {
+		// inline void set_scale(const float& scale) {
 		// 	this->conf.size * scale;
 		// 	this->isdirty = true;
-		// 	return *this;
+		// 	
 		// }
 
 		// Scale the shape using a different value for each axis.
 		// e.g., `size.x = size.x * scale.x` and `size.y = size.y * scale.y`
-		// inline Shape2D& set_scale(const vec2<float>& scale) {
+		// inline void set_scale(const vec2<float>& scale) {
 		// 	this->conf.size * scale;
 		// 	this->isdirty = true;
-		// 	return *this;
+		// 	
 		// }
 
 		// Set a new color
 		// If using a texture and a color at the same time, the texture will be colorized using the color defined
-		inline Shape2D& set_color(const Color& color) noexcept {
+		inline void set_color(const Color& color) noexcept {
 			this->conf.color = color;
-			return *this;
 		}
 
 		// Set a new rotation angle
-		inline Shape2D& set_angle(const float angle) noexcept {
+		inline void set_angle(const float angle) noexcept {
 			this->conf.angle = angle;
 			this->isdirty = true;
-			return *this;
 		}
 
 	protected:

@@ -67,7 +67,6 @@ class Camera {
 				LOG_ERROR("new \"near plane\" value can't be higher than \"far plane\" current value");
 				return;
 			}
-
 			this->near_plane = near_plane;
 		}
 
@@ -77,7 +76,6 @@ class Camera {
 				LOG_ERROR("new \"far plane\" value can't be lower than \"near plane\" current value");
 				return;
 			}
-
 			this->far_plane = far_plane;
 		}
 
@@ -87,7 +85,6 @@ class Camera {
 				LOG_ERROR("new \"fov\" value must be between \"near plane\" and \"far plane\" current values");
 				return;
 			}
-
 			this->fov = fov;
 		}
 
@@ -97,7 +94,6 @@ class Camera {
 				LOG_ERROR("new \"min fov\" value can't be higher than \"max fov\" current value");
 				return;
 			}
-
 			this->min_fov = min_fov;
 		}
 
@@ -107,7 +103,6 @@ class Camera {
 				LOG_ERROR("new \"max fov\" value can't be lower than \"min fov\" current value");
 				return;
 			}
-
 			this->max_fov = max_fov;
 		}
 
@@ -205,7 +200,7 @@ class Camera {
 		// -90 in yaw prevents camera from jumping on the first click
 		float yaw = -90.0f; // Horizontal rotation
 		float pitch = 0.0f; // Vertical rotation
-		
+	
 		vec3<float> position    = { 0.0f, 0.0f, 2.0f }; // Real camera's position
 		vec3<float> orientation = { 0.0f, 0.0f, -1.0f };
 		vec3<float> up          = { 0.0f, 1.0f, 0.0f };

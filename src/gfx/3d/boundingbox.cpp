@@ -33,7 +33,7 @@ void BoundingBox::update_world_bounding_box(const glm::mat4& model_matrix) noexc
 	this->box_min = vec3<float>(FLT_MAX);
 	this->box_max = vec3<float>(-FLT_MAX);
 
-	for (const vec3<float>& corner : corners) {
+	for(const vec3<float>& corner : corners) {
 		vec3<float> world_corner = model_matrix * vec4<float>(corner, 1.0f);
 		this->box_min = glm::min(this->box_min, world_corner);
 		this->box_max = glm::max(this->box_max, world_corner);

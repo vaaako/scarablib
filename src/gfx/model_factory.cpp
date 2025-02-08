@@ -87,22 +87,28 @@ Plane* ModelFactory::create_plane(const Model::Config& conf) noexcept {
 		0, 2, 3,
 	};
 
-	// static std::vector<Vertex> vertices = {
-	// 	// Front face
-	// 	Vertex { .position = glm::vec3(-0.5f, -0.5f, 0.0f), .texuv = glm::vec2(1.0f, 0.0f) }, // Bottom left
-	// 	Vertex { .position = glm::vec3( 0.5f, -0.5f, 0.0f), .texuv = glm::vec2(0.0f, 0.0f) }, // Bottom right
-	// 	Vertex { .position = glm::vec3( 0.5f,  0.5f, 0.0f), .texuv = glm::vec2(0.0f, 1.0f) }, // Top right
-	// 	Vertex { .position = glm::vec3(-0.5f,  0.5f, 0.0f), .texuv = glm::vec2(1.0f, 1.0f) }, // Top left
-	// };
-	//
-	// // CCW explanation on plane.hpp
-	// static std::vector<uint32> indices = {
-	// 	// Front face
-	// 	0, 2, 1,
-	// 	0, 3, 2,
-	// };
-	//
 	// Make VAO and return created Plane
 	VAOManager::get_instance().make_vao(vertices, indices);
 	return new Plane(conf, vertices, indices);
+}
+
+
+Billboard* ModelFactory::create_billboard(const Model::Config& conf) noexcept {
+	static std::vector<Vertex> vertices = {
+		// Front face
+		Vertex { .position = glm::vec3(-0.5f, -0.5f, 0.0f), .texuv = glm::vec2(0.0f, 0.0f) }, // Bottom left
+		Vertex { .position = glm::vec3( 0.5f, -0.5f, 0.0f), .texuv = glm::vec2(1.0f, 0.0f) }, // Bottom right
+		Vertex { .position = glm::vec3( 0.5f,  0.5f, 0.0f), .texuv = glm::vec2(1.0f, 1.0f) }, // Top right
+		Vertex { .position = glm::vec3(-0.5f,  0.5f, 0.0f), .texuv = glm::vec2(0.0f, 1.0f) }, // Top left
+	};
+
+	static std::vector<uint32> indices = {
+		// Front face
+		0, 1, 2,
+		0, 2, 3,
+	};
+
+	// Make VAO and return created Plane
+	VAOManager::get_instance().make_vao(vertices, indices);
+	return new Billboard(conf, vertices, indices);
 }

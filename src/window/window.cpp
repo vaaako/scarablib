@@ -153,10 +153,15 @@ double Window::fps() noexcept {
 
 void Window::calc_dt() noexcept {
 	const uint64 now = SDL_GetPerformanceCounter();
-	const uint64 elapsed = now - this->last_update; // Elapsed time
+	const uint64 elapsed = now - this->last_update;
 	this->last_update = now;
 	this->delta_time = static_cast<float>(elapsed) / static_cast<float>(SDL_GetPerformanceFrequency());
 	// note: elapsed may be multiplied by 1000.0f to get milliseconds
+
+	// const uint64 now = SDL_GetTicks();
+	// const uint64 elapsed = now - this->last_update;
+	// this->last_update = now;
+	// this->delta_time = static_cast<float>(elapsed) / 1000.0f;
 }
 
 void Window::frame_capping(const uint32 fps) const noexcept {

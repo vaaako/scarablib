@@ -54,8 +54,8 @@ struct Texture {
 	Texture(const void* data, const uint32 width, const uint32 height, const GLint internal_format, const GLenum format);
 
 	// Disable Copy
-	Texture(const Texture&) noexcept = default;
-	Texture& operator=(const Texture& other) noexcept = default;
+	Texture(const Texture&) noexcept = delete;
+	Texture& operator=(const Texture& other) noexcept = delete;
 
 	// Disable Moving
 	Texture(Texture&&) noexcept = delete;

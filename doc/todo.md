@@ -22,6 +22,10 @@ I wrote most of the things here very tired, sorry for any english mistake
 	+ Currently is very clunky and not dinamic
 - [ ] Mouse "GRABBED" enum (or similar)
 
+- [ ] Use `static_assert`
+	+ Dont forget about model methods
+
+
 # TODO Bug
 - [x] Memory leak somewhere (i don't know if is in my code or in some library, but is not dangerous)
 	+ It appears to be related to SDL2 and its dependencies (X11, PulseAudio, etc.) 
@@ -89,14 +93,17 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [ ] Model size is box size
 - [ ] Camera movement not working properly with VSync disabled
 - [ ] Currently bounding box is always created, make it optional
-- [ ] Make a billboard model
-	+ Changing texture reference: [raycast](https://github.com/vaaako/Raycast/blob/main/src/sprite.lua#L46)
+- [x] Make a billboard model
 	+ Rotate logic to shader
 	+ It will have to be a overrided draw method and other shader
 	+ Update model matrix in a method (like 2D shapes)
 	+ In scene3d check if model has a shader, if have, use it just for that model
 
 - [ ] Don't store vertices, this makes the memory usage huge for each model
+- [ ] Billboard: Instead of making a new texture for each face, use texture ID
+	+ Use texture id on model too
+- [ ] Billboard: Another approach for changing textures? How doom does it? How would a moving billboard work?
+
 
 # Features for later
 - Sprite atlas

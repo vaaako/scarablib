@@ -1,5 +1,4 @@
 #include "scarablib/scenes/camera.hpp"
-#include "imgui.h"
 #include "scarablib/window/window.hpp"
 #include <algorithm>
 

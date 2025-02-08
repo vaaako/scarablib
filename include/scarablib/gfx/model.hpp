@@ -39,7 +39,6 @@ class Model : public Mesh {
 		Model(const Model::Config& conf, const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept;
 		// Make a model using a wavefront .obj file
 		Model(const char* path) noexcept;
-		~Model() noexcept = default;
 
 		// Draw current Model.
 		// It needs a camera object and a shader
@@ -122,67 +121,57 @@ class Model : public Mesh {
 		// SETTERS //
 
 		// Set a new position using a vector
-		inline Model& set_position(const vec3<float>& position) noexcept {
+		inline void set_position(const vec3<float>& position) noexcept {
 			this->conf.position = position;
 			// this->update_min_and_max();
 			this->isdirty = true;
-			return *this;
 		}
 
 		// Set a new X position
-		inline Model& set_x(const float newx) noexcept {
+		inline void set_x(const float newx) noexcept {
 			this->conf.position.x = newx;
 			this->isdirty = true;
-			return *this;
 		}
 
 		// Set a new Y position
-		inline Model& set_y(const float newy) noexcept {
+		inline void set_y(const float newy) noexcept {
 			this->conf.position.y = newy;
 			this->isdirty = true;
-			return *this;
 		}
 
 		// Set a new Z position
-		inline Model& set_z(const float newz) noexcept {
+		inline void set_z(const float newz) noexcept {
 			this->conf.position.z = newz;
 			this->isdirty = true;
-			return *this;
 		}
 
 		// Set a new size using a vector (X and Y)
-		// inline Model& set_size(const vec3<float>& size) noexcept {
+		// inline void set_size(const vec3<float>& size) noexcept {
 		// 	this->conf.size = size;
 		// 	this->update_min_and_max();
 		// 	this->isdirty = true;
-		// 	return *this;
 		// }
 		//
 		// Set a new size using a vector (X and Y)
-		// inline Model& set_size(const float size) noexcept {
+		// inline void set_size(const float size) noexcept {
 		// 	this->conf.size = { size, size, size };
 		// 	this->update_min_and_max();
 		// 	this->isdirty = true;
-		// 	return *this;
 		// }
 
 		// Scale the shape using a different value for each axis.
 		// e.g., `size.x = size.x * scale.x`, `size.y = size.y * scale.y` and `size.z = size.z * scale.z`
-		inline Model& set_scale(const vec3<float>& scale) noexcept {
+		inline void set_scale(const vec3<float>& scale) noexcept {
 			this->conf.scale = scale;
-			// this->bounding_box = (this->bounding_box_max - this->bounding_box_min) * scale;
 			this->isdirty = true;
-			return *this;
 		}
 
 		// Scale the shape using a different value for each axis.
 		// e.g., `size.x = size.x * scale.x`, `size.y = size.y * scale.y` and `size.z = size.z * scale.z`
-		inline Model& set_scale(const float scale) noexcept {
+		inline void set_scale(const float scale) noexcept {
 			vec3<float> newscale = { scale, scale, scale };
 			this->conf.scale = newscale;
-			// this->bounding_box = (this->bounding_box_max - this->bounding_box_min) * newscale;
 			this->isdirty = true;
-			return *this;
 		}
 
 		// Show or hide the bounding box
@@ -190,25 +179,37 @@ class Model : public Mesh {
 			this->show_box = show_box;
 		}
 
+		// If the Model bounding box is not changing as expected or the collision is failed, you may have forget to call this function.
+		// This will enable the bounding box update calculation every time the model is updated
+		inline void enable_collision(const bool enable) noexcept {
+			this->collision_enabled = enable;
+		}
+
 		// Set a new color.
 		// If using a texture and a color at the same time, the texture will be colorized using the color defined
-		inline Model& set_color(const Color& color) noexcept {
+		inline void set_color(const Color& color) noexcept {
 			this->conf.color = color;
-			return *this;
 		}
 
 		// Set a new rotation angle in degrees.
 		// Axis is wich axis the angle will be applied (XYZ)
-		Model& set_rotation(const float angle, const vec3<bool> axis) noexcept;
+		void set_rotation(const float angle, const vec3<bool> axis) noexcept;
 
 		// Set a new orientation to the Model in degrees.
 		// Orientation is the "default" angle of the Model.
 		// The rotation will be applied using the orientation as base
-		Model& set_orientation(const float angle, const vec3<bool> axis) noexcept;
+		void set_orientation(const float angle, const vec3<bool> axis) noexcept;
 
 		// Make a copy of this model
 		inline Model make_instance() const noexcept {
 			return Model(*this);
+		}
+
+		// This returns nullptr since primarily used shader is located in Scene3D.
+		// This is a method that is overrided by models using a different shader.
+		// Scene3D then checks if the shader is nullptr and if it is, it uses the default shader
+		virtual inline Shader* get_shader() const noexcept {
+			return nullptr;
 		}
 
 	protected:
@@ -221,5 +222,9 @@ class Model : public Mesh {
 		// Collission
 		BoundingBox bounding;
 		bool show_box = false;
+		bool collision_enabled = false;
+
+
+		void update_model_matrix() noexcept;
 };
 
