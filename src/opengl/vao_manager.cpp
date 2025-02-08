@@ -1,94 +1,45 @@
 #include "scarablib/opengl/vao_manager.hpp"
-#include "scarablib/proper/log.hpp"
-
-// std::vector<Vertex>
-GLuint VAOManager::make_vao(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept {
-	size_t hash = this->compute_hash(vertices, indices);
-	// If not found, make a new VAO and new entry
-	if(this->vao_map.find(hash) == this->vao_map.end()) {
-		this->vao_map[hash] = { .data = this->create_vao(vertices, indices), .ref_count = 1 };
-	// If found and not already in use, increment ref count
-	} else {
-		vao_map.at(hash).ref_count++; // More models using this VAO
-	}
-	return this->vao_map.at(hash).data.vao_id;
-}
-
-// std::vector<vec3<float>>
-GLuint VAOManager::make_vao(const std::vector<vec3<float>>& vertices, const std::vector<uint32>& indices) noexcept {
-	size_t hash = this->compute_hash(vertices, indices);
-	// If not found, make a new VAO and new entry
-	if(this->vao_map.find(hash) == this->vao_map.end()) {
-		this->vao_map[hash] = { .data = this->create_vao(vertices, indices), .ref_count = 1 };
-	// If found and not already in use, increment ref count
-	} else {
-		vao_map.at(hash).ref_count++; // More models using this VAO
-	}
-	return this->vao_map.at(hash).data.vao_id;
-}
 
 GLuint VAOManager::get_vao(const size_t hash) const noexcept {
-	if(this->vao_map.find(hash) == this->vao_map.end()) {
-		return 0;
+	auto it = vao_map.find(hash);
+	if(it != this->vao_map.end()) {
+		return it->second.data.vao_id;
 	}
-	return this->vao_map.at(hash).data.vao_id;
+	return 0;
 }
 
 void VAOManager::release_vao(const size_t hash) noexcept {
-	if(this->vao_map.find(hash) != this->vao_map.end()) {
+	auto it = vao_map.find(hash);
+	if(it != this->vao_map.end()) {
 		vao_map[hash].ref_count--; // Decrement reference count
 		if(vao_map[hash].ref_count == 0) {
-			// Delete VAO, VBO and EBO if no longer in use
-			glDeleteVertexArrays(1, &vao_map[hash].data.vao_id);
-			glDeleteBuffers(1, &vao_map[hash].data.vbo_id);
-			glDeleteBuffers(1, &vao_map[hash].data.ebo_id);
-			vao_map.erase(hash);
-		}
+			const VAOData& data = it->second.data;
 
-		#ifdef SCARAB_DEBUG_RELEASE_VAO
-		LOG_DEBUG_FN("Hash %d deleted succesfully", hash);
-		#endif
+			// Delete all buffers at once
+			GLuint buffers[] = { data.vbo_id, data.ebo_id };
+			glDeleteBuffers(2, buffers);
+			glDeleteVertexArrays(1, &data.vao_id);
+
+			vao_map.erase(it);
+
+			#ifdef SCARAB_DEBUG_VAO_MANAGER
+			LOG_DEBUG("Hash %zu deleted succesfully", hash);
+			#endif
+		}
 	}
 }
 
 void VAOManager::cleanup() noexcept {
 	for(auto& [hash, entry] : vao_map) {
-		glDeleteVertexArrays(1, &entry.data.vao_id);
-		glDeleteBuffers(1, &entry.data.vbo_id);
-		glDeleteBuffers(1, &entry.data.ebo_id);
+		const VAOData& data = entry.data;
+		GLuint buffers[] = { data.vbo_id, data.ebo_id };
+		glDeleteBuffers(2, buffers);
+		glDeleteVertexArrays(1, &data.vao_id);
 	}
 	vao_map.clear();
 }
 
-// std::vector<Vertex>
-size_t VAOManager::compute_hash(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) const noexcept {
-	size_t seed = vertices.size() + indices.size();
-	for(const auto& v : vertices) {
-		seed ^= std::hash<float>{}(v.position.x) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-		seed ^= std::hash<float>{}(v.position.y) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-		seed ^= std::hash<float>{}(v.position.z) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-	}
-	for(const auto& i : indices) {
-		seed ^= std::hash<uint32>{}(i) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-	}
-	return seed;
-}
 
-// std::vector<vec3<float>>
-size_t VAOManager::compute_hash(const std::vector<vec3<float>>& vertices, const std::vector<uint32>& indices) const noexcept {
-	size_t seed = vertices.size() + indices.size();
-	for(const auto& v : vertices) {
-		seed ^= std::hash<float>{}(v.x) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-		seed ^= std::hash<float>{}(v.y) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-		seed ^= std::hash<float>{}(v.z) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-	}
-	for(const auto& i : indices) {
-		seed ^= std::hash<uint32>{}(i) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-	}
-	return seed;
-}
-
-// TODO: How to unload VBO and EBO dynamically?
 VAOManager::VAOData VAOManager::create_vao(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) const noexcept {
 	VAOData data;
 

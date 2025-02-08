@@ -98,8 +98,7 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [x] Camera optimized movement
 - [x] Model size is box size
 - [x] Camera movement not working properly with VSync disabled
-- [x] Currently bounding box is always created, make it optional
-	+ kinda fixed?
+- [ ] Currently bounding box is always created, make it optional
 - [x] Make a billboard model
 	+ Rotate logic to shader
 	+ It will have to be a overrided draw method and other shader

@@ -1,6 +1,5 @@
 #include "scarablib/gfx/3d/boundingbox.hpp"
 #include "scarablib/opengl/vao_manager.hpp"
-#include "scarablib/types/texture.hpp"
 
 BoundingBox::BoundingBox(const std::vector<Vertex>& vertices) {
 	std::vector<uint32> box_indices = {

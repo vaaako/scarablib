@@ -176,11 +176,8 @@ int main() {
 
 	// bill->set_directional_textures({
 	// 	{ "test/assets/images/directions/cacodemon/0.png", false }, // Front
-	// 	// Flip to 7
 	// 	{ "test/assets/images/directions/cacodemon/1.png", true  }, // Front right
-	// 	// Flip to 6
 	// 	{ "test/assets/images/directions/cacodemon/2.png", true  }, // Right
-	// 	// Flip to 5
 	// 	{ "test/assets/images/directions/cacodemon/3.png", true  }, // Back left
 	// 	{ "test/assets/images/directions/cacodemon/4.png", false }  // Back
 	// });
@@ -212,16 +209,19 @@ int main() {
 		// Get events
 		window.process_events();
 
-
 		// Handle input
 		if((!mouse_captured && window.keyboard().ispressed(Keycode::ESCAPE)) || window.on_event(Event::QUIT)) {
 			window.close();
 		}
 
-
 		// Handle camera keyboard inputs
 		camera_movement(window, camera, window.keyboard());
 		rotate_camera(window, camera, window.mouse());
+
+		// TODO: Make this later
+		// if(window.on_event(Event::WINDOWEVENT_RESIZED)) {
+		// 	camera.update_viewport(widnow);
+		// }
 
 		// WARNING: When drawing 3D and 2D shapes together, draw 3D shapes first
 

@@ -13,5 +13,5 @@ Prints the cursor motion and direction
 # SCARAB_DEBUG_KEYBOARD
 Prints any keyboard key pressed and its state
 
-# SCARAB_DEBUG_RELEASE_VAO
-Shows all VAO's hashes deleted
+# SCARAB_DEBUG_VAO_MANAGER 
+Shows all VAO's hashes created and deleted
