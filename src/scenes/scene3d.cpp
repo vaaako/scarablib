@@ -12,7 +12,7 @@ void Scene3D::add_to_scene(const std::string& key, Model* model) {
 		throw ScarabError("Attempted to add a null Model to the scene with key '%s'", key.c_str());
 	}
 
-	std::shared_ptr<Model> shared_mesh = std::make_shared<Model>(model);
+	std::shared_ptr<Model> shared_mesh = std::shared_ptr<Model>(model);
 	this->scene.emplace(key, shared_mesh); // will not be used here, but is used for get_by_key()
 	this->vao_groups[model->get_vaoid()].emplace_back(shared_mesh);
 }

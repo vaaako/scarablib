@@ -2,9 +2,9 @@
 
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
-#include "glm/geometric.hpp"
 #include "glm/trigonometric.hpp"
 #include "scarablib/input/mouse.hpp"
+#include "scarablib/proper/log.hpp"
 #include "scarablib/window/window.hpp"
 
 class Camera {
@@ -14,7 +14,7 @@ class Camera {
 			IN = 1
 		};
 
-		Camera(const Window& window, const float fov = 45.0f, const float sensitivity = 100.0f) noexcept;
+		Camera(const Window& window, const float fov = 45.0f, const float sensitivity = 0.1f) noexcept;
 
 		// GETTERS
 
@@ -40,7 +40,7 @@ class Camera {
 
 		// Get camera view matrix
 		inline glm::mat4 get_view_matrix() const noexcept {
-			return glm::lookAt(this->position, this->position + this->orientation, this->up);
+			return glm::lookAt(this->position, this->position + this->forward, this->up);
 		}
 
 		// Get camera view matrix
@@ -50,7 +50,6 @@ class Camera {
 				this->near_plane, this->far_plane);
 		}
 
-
 		// SETTERS
 		inline void update_viewport(const Window& window) noexcept {
 			this->update_viewport(window.get_width(), window.get_height());
@@ -59,6 +58,9 @@ class Camera {
 		inline void update_viewport(const uint32 width, const uint32 height) noexcept {
 			this->width = width;
 			this->height = height;
+			// Opengl update
+
+			this->calculate_proj_matrix();
 		}
 
 		// Set camera's near plane. How near to render
@@ -68,6 +70,8 @@ class Camera {
 				return;
 			}
 			this->near_plane = near_plane;
+
+			this->calculate_proj_matrix();
 		}
 
 		// Set camera's far plane. How far to render
@@ -77,6 +81,8 @@ class Camera {
 				return;
 			}
 			this->far_plane = far_plane;
+
+			this->calculate_proj_matrix();
 		}
 
 		// Set camera's fov
@@ -86,6 +92,8 @@ class Camera {
 				return;
 			}
 			this->fov = fov;
+
+			this->calculate_proj_matrix();
 		}
 
 		// Set camera's minimum amount of fov (used for zoom out)
@@ -112,6 +120,8 @@ class Camera {
 			this->fov = (zoom_dir == Zoom::IN)
 				? std::max(fov - speed, min_fov)
 				: std::min(fov + speed, max_fov);
+
+			this->calculate_proj_matrix();
 		}
 
 		// Set camera's movement speed
@@ -131,59 +141,25 @@ class Camera {
 
 		// MOVEMENT
 
-		// Moves foward to the axis the camera is looking
-		inline void move_foward(const float dt) noexcept {
-			this->position += (this->orientation * this->speed) * dt;
+		// Gets a vec3 contanining the direction the camera has moved.
+		// Where X is front/back, Y is up/down and Z is left/right.
+		// Example: [1, 0, -1] means the camera moved to Front-Left
+		inline void move(const vec3<float>& dir, const float dt) noexcept {
+			// Normalize for diagonal movement and if any value is >1.0 or <-1.0
+			// vec3<float> dir = glm::normalize(direction);
+			vec3<float> mov = this->forward * dir.x +
+							  this->up      * dir.y +
+							  this->left    * dir.z;
+			// Apply speed and delta time
+			this->position += mov * this->speed * dt;
 		}
 
-		// Moves backward to the axis the camera is looking
-		inline void move_backward(const float dt) noexcept {
-			this->position -= (this->orientation * this->speed) * dt;
-		}
-
-		// Moves foward relative to the ground, ignoring Y axis
-		inline void move_front(const float dt) noexcept {
-			this->position +=
-				(glm::normalize(glm::vec3(this->orientation.x, 0.0f, this->orientation.z)) * this->speed) * dt;
-		}
-
-		// Moves backward  relative to the ground, ignoring Y axis
-		inline void move_back(const float dt) noexcept {
-			this->position -=
-				(glm::normalize(glm::vec3(this->orientation.x, 0.0f, this->orientation.z)) * this->speed) * dt;
-		}
-
-		// Moves right on X and Z axis
-		inline void move_right(const float dt) noexcept {
-			this->position +=
-				(glm::normalize(glm::cross(this->orientation, this->up)) * this->speed) * dt;
-		}
-
-		// Moves left on X and Z axis
-		inline void move_left(const float dt) noexcept {
-			this->position -=
-				(glm::normalize(glm::cross(this->orientation, this->up)) * this->speed) * dt;
-		}
-
-		// Fly up
-		inline void fly_up(const float dt) noexcept {
-			this->position += (this->up * this->speed) * dt;
-		}
-
-		// Fly down
-		inline void fly_down(const float dt) noexcept {
-			this->position -= (this->up * this->speed) * dt;
-		}
-
-		// Use the mouse to rotate the camera view
+		// Use mouse moved direction to rotate the camera
 		void rotate(const MouseHandler& mouse) noexcept;
 
 	private:
 		uint32 width;
 		uint32 height;
-		// Pre-calculated used in rotate
-		float half_width;
-		float half_height;
 
 		float sensitivity;
 		float speed = 0.1f;
@@ -200,8 +176,18 @@ class Camera {
 		// -90 in yaw prevents camera from jumping on the first click
 		float yaw = -90.0f; // Horizontal rotation
 		float pitch = 0.0f; // Vertical rotation
-	
-		vec3<float> position    = { 0.0f, 0.0f, 2.0f }; // Real camera's position
-		vec3<float> orientation = { 0.0f, 0.0f, -1.0f };
-		vec3<float> up          = { 0.0f, 1.0f, 0.0f };
+
+		vec3<float> position    = { 0.0f, 0.0f,  2.0f }; // Real camera's position
+		vec3<float> up          = { 0.0f, 1.0f,  0.0f };
+		vec3<float> forward     = { 0.0f, 0.0f, -1.0f };
+		vec3<float> left        = { -1.0f, 0.0f, 0.0f };
+
+		glm::mat4 proj_matrix;
+
+		// Pre-calculate proj matrix, since it doesnt change much
+		inline void calculate_proj_matrix() noexcept {
+			this->proj_matrix = glm::perspective(glm::radians(this->fov),
+				(static_cast<float>(this->width) / static_cast<float>(this->height)),
+				this->near_plane, this->far_plane);
+		}
 };

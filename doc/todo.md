@@ -72,6 +72,11 @@ I wrote most of the things here very tired, sorry for any english mistake
 	+ Add to vertex attrib 2 on shape VBO and check if is to use on shape instance
 	+ This could be done by making a custom shape (e.g. `new Cube(custom_color)`), then all variants of this shape with custom color would have this color
 - [ ] Change obsolete VAO and VBO management
+- [ ] Better draw
+- [ ] Better custom shape support
+- [ ] Review old shapes
+- [ ] New shapes: Triangle (for real)
+
 
 # TODO 3D
 - [x] Camera

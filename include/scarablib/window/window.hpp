@@ -143,6 +143,11 @@ class Window {
 			SDL_SetWindowResizable(this->window, static_cast<SDL_bool>(enable));
 		}
 
+		// Enable or disable the window border
+		inline void set_border(const bool enable) noexcept {
+			SDL_SetWindowBordered(this->window, static_cast<SDL_bool>(enable));
+		}
+
 		// Enable or disable vertical sync (VSync).
 		// VSync synchronizes the frame rate with monitor's refresh rate.
 		// Disable it for potentially higher frame rates.
@@ -188,11 +193,15 @@ class Window {
 
 		// FUNCTIONALITIES //
 
-		// Lock the cursor inside the window.
+		// Locks the cursor inside the window.
 		// This prevents the cursor from leaving the window when on focus.
+		inline void jail_cursor(const bool status) const noexcept {
+			SDL_SetWindowGrab(this->window, static_cast<SDL_bool>(status));
+		}
+
+		// Hides and grabs the cursor inside the window
 		inline void grab_cursor(const bool grab) const noexcept {
-			SDL_SetWindowGrab(this->window, static_cast<SDL_bool>(grab));
-			// SDL_SetRelativeMouseMode(static_cast<SDL_bool>(grab));
+			SDL_SetRelativeMouseMode(static_cast<SDL_bool>(grab));
 		}
 
 		// Hide the cursor when it is inside the window.

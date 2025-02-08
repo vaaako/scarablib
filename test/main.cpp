@@ -23,34 +23,36 @@
 #include "backends/imgui_impl_sdl2.h"
 #endif
 
-bool can_move = false;
+bool mouse_captured = false;
 
 void camera_movement(Window& window, Camera& camera, KeyboardHandler& keyboard) {
 	const float dt = window.dt();
 	// LOG_DEBUG("Camera dt: %f", dt);
 
+	vec3<float> direction;
+
 	if(keyboard.isdown(Keycode::W)) {
-		camera.move_front(dt);
+		direction.x = 1.0f;
 	} else if (keyboard.isdown(Keycode::S)) {
-		camera.move_back(dt);
+		direction.x = -1.0f;
 	}
 
 	if(keyboard.isdown(Keycode::A)) {
-		camera.move_left(dt);
+		direction.z = 1.0f;
 	} else if (keyboard.isdown(Keycode::D)) {
-		camera.move_right(dt);
+		direction.z = -1.0f;
 	}
 
 	if(keyboard.isdown(Keycode::SPACE)) {
-		camera.fly_up(dt);
+		direction.y = 1.0f;
 	} else if(keyboard.isdown(Keycode::LSHIFT)) {
-		camera.fly_down(dt);
+		direction.y = -1.0f;
 	}
+	camera.move(direction, dt);
 
-	// Press TAB to not rotate anymore
-	if(can_move && keyboard.ispressed(Keycode::ESCAPE)) {
-		can_move = false;
-		window.hide_cursor(false);
+	if(mouse_captured && keyboard.ispressed(Keycode::ESCAPE)) {
+		mouse_captured = false;
+		window.grab_cursor(false);
 	}
 }
 
@@ -64,20 +66,15 @@ void rotate_camera(Window& window, Camera& camera, MouseHandler& mouse) {
 
 	// ROTATION LOGIC //
 	// Only rotate when click on screen
-	if(mouse.isclick(MouseHandler::Button::LMB) && !can_move) {
+	if(!mouse_captured && mouse.isclick(MouseHandler::Button::LMB)) {
 		LOG_INFO("Clicked");
-		can_move = true;
-		// Prevent initial jump
-		mouse.set_cursor_position(window, window.get_half_width(), window.get_half_height());
-		window.hide_cursor(true);
-		return; // Prevent camera from look where the cursor clicked
+		mouse_captured = true;
+		window.grab_cursor(true);
 	}
 
 	// Rotate camera
-	if(can_move) {
+	if(mouse_captured) {
 		camera.rotate(mouse);
-		// Prevent cursor from exiting the screen
-		mouse.set_cursor_position(window, window.get_half_width(), window.get_half_height());
 	}
 }
 
@@ -100,9 +97,11 @@ int main() {
 		.height = 600,
 		.title = "FPS: 0",
 		.vsync = true,
+		.resizable = true,
 		.debug_info = true
 	});
 	window.set_clear_color(Colors::PINK);
+	// window.set_border(false);
 
 	// Load assets
 	Texture tex1  = Texture({ .path = "test/assets/images/kuromi.png" });
@@ -115,8 +114,8 @@ int main() {
 	Font msgothic = Font("test/assets/fonts/Ubuntu-R.ttf", 24);
 
 	// Make scenes
-	Camera camera = Camera(window, 75.0f, 80.0f);
-	camera.set_speed(2.0f * DELTATIME_MODIFIER);
+	Camera camera = Camera(window, 75.0f, 0.1f);
+	camera.set_speed(1.0f * DELTATIME_MODIFIER);
 
 
 	Scene2D scene2d = Scene2D(window);
@@ -221,7 +220,7 @@ int main() {
 
 
 		// Handle input
-		if((!can_move && window.keyboard().ispressed(Keycode::ESCAPE)) || window.on_event(Event::QUIT)) {
+		if((!mouse_captured && window.keyboard().ispressed(Keycode::ESCAPE)) || window.on_event(Event::QUIT)) {
 			window.close();
 		}
 

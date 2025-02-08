@@ -1,38 +1,29 @@
 #include "scarablib/scenes/camera.hpp"
+#include "glm/geometric.hpp"
 #include "scarablib/window/window.hpp"
-#include <algorithm>
 
 Camera::Camera(const Window& window, const float fov, const float sensitivity) noexcept
 	: width(window.get_width()), height(window.get_height()),
-	  half_width(static_cast<float>(window.get_half_width())), half_height(static_cast<float>(window.get_half_height())),
 	  sensitivity(sensitivity), fov(fov), max_fov(fov) {}
 
 void Camera::rotate(const MouseHandler& mouse) noexcept {
-	// dt is not necessary here
-	const vec2<uint32> mousemotion = mouse.get_motion();
+	vec2<int32> move = mouse.relative_move();
 
-	// Calculate move relative to the screen middle
-	const float xoffset = this->sensitivity * (static_cast<float>(mousemotion.x) - this->half_width) / static_cast<float>(this->width);
-	const float yoffset = this->sensitivity * (static_cast<float>(mousemotion.y) - this->half_height) / static_cast<float>(this->height);
+	this->yaw   += static_cast<float>(move.x) * this->sensitivity;
+	this->pitch += static_cast<float>(-move.y) * this->sensitivity;
+	this->pitch = glm::clamp(this->pitch, -89.0f, 89.0f); // Prevent gimbal lock
 
-	// Update yaw and pitch
-	this->yaw += xoffset;
-	this->pitch -= yoffset;
-
-	// Clamp the pitch to avoid flipping
-	// If >89.0f = 89.0f else <-89.0f = -89.0f
-	this->pitch = std::clamp(this->pitch, -89.0f, 89.0f);
-
+	// CALCULATE VIEW VECTORS //
 	const float radpitch = glm::radians(this->pitch);
 	const float cospitch = std::cos(radpitch);
 	const float radyaw = glm::radians(this->yaw);
 
-	// Update orientation
-	// orientation = front
-	this->orientation = glm::normalize(vec3<float> {
+	this->forward = glm::normalize(vec3<float> {
 		std::cos(radyaw) * cospitch,
 		std::sin(radpitch),
 		std::sin(radyaw) * cospitch
 	});
-}
 
+	this->left = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), forward));
+	this->up = glm::normalize(glm::cross(forward, left));
+}

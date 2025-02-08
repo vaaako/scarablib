@@ -2,6 +2,7 @@
 
 #include <SDL2/SDL_events.h>
 #include <vector>
+#include "SDL_mouse.h"
 #include "scarablib/typedef.hpp"
 
 // Avoid foward declaration
@@ -41,19 +42,26 @@ class MouseHandler {
 		MouseHandler& operator=(MouseHandler&&) noexcept = delete;
 
 
-		// Get mouse last motion
+		// Returns mouse motion/position
 		inline vec2<uint32> get_motion() const noexcept {
 			return this->motion;
 		}
 
-		// Get mouse last click position
+		// Returns mouse click position
 		inline vec2<uint32> get_click_pos() const noexcept {
 			return this->click_pos;
 		}
 
-		// Get mouse last moved direction (e.g. -1, 1 = Left Down)
+		// Returns mouse moved direction (e.g. -1, 1 = Left Down)
 		inline vec2<uint32> get_moved_dir() const noexcept {
 			return this->moved_dir;
+		}
+
+		// Returns how much the mouse moved since the last call
+		inline vec2<int32> relative_move() const noexcept {
+			vec2<int32> mov;
+			SDL_GetRelativeMouseState(&mov.x, &mov.y);
+			return mov;
 		}
 
 		// Check if button is clicking
