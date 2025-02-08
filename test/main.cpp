@@ -48,6 +48,8 @@ void camera_movement(Window& window, Camera& camera, KeyboardHandler& keyboard) 
 	} else if(keyboard.isdown(Keycode::LSHIFT)) {
 		direction.y = -1.0f;
 	}
+
+	// FIX: Diagonal movement acceleration
 	camera.move(direction, dt);
 
 	if(mouse_captured && keyboard.ispressed(Keycode::ESCAPE)) {
@@ -153,18 +155,14 @@ int main() {
 	cube3->set_texture(&tex3);
 	scene3d.add_to_scene("cube3", cube3);
 
-	// Cube* camera_hitbox = ModelFactory::create_cube({
-	// 	.position = vec3<float>(-10.0f, 1.0f, -10.0f)
-	// });
-	// Dont add to scene to not draw it
-	// scene3d.add_to_scene("cameracollision", camera_hitbox);
-
 	Billboard* bill = ModelFactory::create_billboard({
 		.position = vec3<float>(-5.0f, 1.0f, -10.0f),
 		.scale = vec3<float>(4.0f),
 	});
 
 	// Front-right and Right are unecessary since they are the same texture but flipped
+	// TODO: Avoid making a whole new texture for each face
+	// Use texture array
 	bill->set_directional_textures({
 		{ "test/assets/images/directions/pinky/0.png", false },
 		// Flip to 7
@@ -208,11 +206,7 @@ int main() {
 	float rotation = 0.0f;
 	float rotation_speed = 1.0f * DELTATIME_MODIFIER;
 
-	// TODO: BoundingBox color not working
-	// - Different shaders per model support
-	// - Billboarding not working
-	// - New billboarding approach
-
+	// TODO: Bounding box collision not tested
 	while(window.is_open()) {
 		window.clear(); // NOTE -- ~14mb RAM itself
 		// Get events
@@ -229,15 +223,6 @@ int main() {
 		camera_movement(window, camera, window.keyboard());
 		rotate_camera(window, camera, window.mouse());
 
-
-		// Just works with cubes and planes yet
-		// collision = false;
-		// camera_hitbox->set_position(camera.get_position());
-		// if(is_aabb(*camera_hitbox, *cow)) {
-		// 	collision = true;
-		// }
-
-
 		// WARNING: When drawing 3D and 2D shapes together, draw 3D shapes first
 
 		// Rotate models
@@ -247,28 +232,7 @@ int main() {
 		cube2->set_position(ScarabMath::orbitate_y(cowpos, rotation, 5.0f));
 		cube3->set_position(ScarabMath::orbitate_z(cowpos, -rotation, 5.0f));
 
-
-		// TODO: Optimize rotate directions methods (four and eight)
-		//
-		// Rotate plane
-		// bill->face_rotation(camera.get_position()); // TODO: This slows down the movement
-		// - Set orientation problem
-		//
-
 		bill->rotate_eight_directions(camera.get_position());
-
-
-		// // Calculate the direction from the plane to the camera, focusing on X and Z axes only
-		// vec3<float> direction = glm::normalize(camera.get_position() - plane->get_position());
-		// // direction.y = 0; // Ignore the Y component for rotation
-		//
-		// // Calculate the angle between the current forward direction of the plane (assumed to be along the Z-axis)
-		// float angle = glm::degrees(atan2(direction.x, direction.z));
-		//
-		// LOG_DEBUG("Angle: %f", angle);
-		// plane->set_orientation(angle, { false, true, false });
-
-
 
 		// Draw
 		skybox.draw();

@@ -45,9 +45,7 @@ class Camera {
 
 		// Get camera view matrix
 		inline glm::mat4 get_proj_matrix() const noexcept {
-			return glm::perspective(glm::radians(this->fov),
-				(static_cast<float>(this->width) / static_cast<float>(this->height)),
-				this->near_plane, this->far_plane);
+			return this->proj_matrix;
 		}
 
 		// SETTERS

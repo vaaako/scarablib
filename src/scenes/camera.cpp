@@ -4,7 +4,10 @@
 
 Camera::Camera(const Window& window, const float fov, const float sensitivity) noexcept
 	: width(window.get_width()), height(window.get_height()),
-	  sensitivity(sensitivity), fov(fov), max_fov(fov) {}
+	  sensitivity(sensitivity), fov(fov), max_fov(fov) {
+
+	this->calculate_proj_matrix();
+}
 
 void Camera::rotate(const MouseHandler& mouse) noexcept {
 	vec2<int32> move = mouse.relative_move();

@@ -1,0 +1,19 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++20",
+      "-O3",
+      "-I./include",
+      "-I./include/external",
+      "-I./include/external/freetype",
+      "-c",
+      "-o",
+      "build/objs/gfx/model_factory.o",
+      "src/gfx/model_factory.cpp"
+    ],
+    "directory": "/home/vako/Documents/cpp/scarablib",
+    "file": "/home/vako/Documents/cpp/scarablib/src/gfx/model_factory.cpp",
+    "output": "/home/vako/Documents/cpp/scarablib/build/objs/gfx/model_factory.o"
+  }
+]

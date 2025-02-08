@@ -46,8 +46,6 @@ I wrote most of the things here very tired, sorry for any english mistake
 	+ [ ] Texture atlas support
 		* For reference: [anim8](https://github.com/kikito/anim8)
 	+ [ ] Opacity
-- [ ] Animation support
-	+ For reference: [raycast](https://github.com/vaaako/Raycast/blob/main/src/sprite.lua#L46)
 - [x] Batch rendering
 - [x] Use the same font object for different texts
 
@@ -62,7 +60,8 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [ ] Physics (dont know how)
 - [ ] Batch rendering for textures too
 	+ Would have to make another map, its worth it?
-- [ ] Better Shader support for 2D and 3D shapes
+- [x] Better Shader support for 2D and 3D shapes
+	+ for 3d, yeah
 - [x] Remove `ModelConf`
 	+ kinda?
 
@@ -76,6 +75,8 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [ ] Better custom shape support
 - [ ] Review old shapes
 - [ ] New shapes: Triangle (for real)
+- [ ] Animation support
+	+ For reference: [raycast](https://github.com/vaaako/Raycast/blob/main/src/sprite.lua#L46)
 
 
 # TODO 3D
@@ -93,21 +94,23 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [x] Skybox
 - [ ] Normals / Shading value (both?)
 - [x] Model and Mesh
-- [ ] Better solution to AABB
+- [x] Better solution to AABB
 - [x] Camera optimized movement
-- [ ] Model size is box size
-- [ ] Camera movement not working properly with VSync disabled
-- [ ] Currently bounding box is always created, make it optional
+- [x] Model size is box size
+- [x] Camera movement not working properly with VSync disabled
+- [x] Currently bounding box is always created, make it optional
+	+ kinda fixed?
 - [x] Make a billboard model
 	+ Rotate logic to shader
 	+ It will have to be a overrided draw method and other shader
 	+ Update model matrix in a method (like 2D shapes)
 	+ In scene3d check if model has a shader, if have, use it just for that model
 
-- [ ] Don't store vertices, this makes the memory usage huge for each model
-- [ ] Billboard: Instead of making a new texture for each face, use texture ID
-	+ Use texture id on model too
-- [ ] Billboard: Another approach for changing textures? How doom does it? How would a moving billboard work?
+- [x] Don't store vertices, this makes the memory usage huge for each model
+	+ fixed, but is much more of a hack than a actual solution
+- [ ] Billboard: Instead of making a new texture for each face, use a texture array
+- [ ] Billboard: Another approach for changing directional textures? How doom does it? How would a moving billboard work? Changing orientation?
+	+ Explaining better: My problem is that the front face will always be fixed, what would be the better way to change it?
 
 
 # Features for later
