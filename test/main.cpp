@@ -206,13 +206,17 @@ int main() {
 	// TODO: Bounding box collision not tested
 	while(window.is_open()) {
 		window.clear(); // NOTE -- ~14mb RAM itself
-		// Get events
-		window.process_events();
+		window.process_events(); // Process all events
 
-		// Handle input
-		if((!mouse_captured && window.keyboard().ispressed(Keycode::ESCAPE)) || window.on_event(Event::QUIT)) {
+		// Quit if ESC or Q is pressed
+		if((!mouse_captured && window.keyboard().ispressed(Keycode::ESCAPE)) || window.has_event(Event::QUIT)) {
 			window.close();
 		}
+
+		// Resize support
+		window.on_event(Event::WINDOW_RESIZED, [&](){
+			camera.update_viewport(window);
+		});
 
 		// Handle camera keyboard inputs
 		camera_movement(window, camera, window.keyboard());

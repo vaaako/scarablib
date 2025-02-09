@@ -76,7 +76,7 @@ void Scene2D::draw_all() const noexcept {
 
 void Scene2D::update_viewport(const uint32 width, const uint32 height) noexcept {
 	// Update width and : height
-	this->width = width;
+	this->width  = width;
 	this->height = height;
 
 	// Make Projection

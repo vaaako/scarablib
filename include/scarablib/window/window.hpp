@@ -1,11 +1,11 @@
 #pragma once
 
+#include "scarablib/window/events.hpp"
 #include "scarablib/input/keyboard.hpp"
 #include "scarablib/input/mouse.hpp"
 #include "scarablib/proper/log.hpp"
 #include "scarablib/typedef.hpp"
 #include "scarablib/types/color.hpp"
-#include "scarablib/window/events.hpp"
 #include "scarablib/proper/log.hpp"
 
 #include <GL/glew.h>
@@ -17,6 +17,8 @@
 // Main object of the library, used for making and managing a window and events
 class Window {
 	public:
+		// Events related to the window
+
 		struct Config {
 			// Required values
 			uint32 width;
@@ -103,12 +105,12 @@ class Window {
 		}
 
 		// Return the half width of the window in pixels.
-		inline uint32 get_half_width() const noexcept {
+		inline float get_half_width() const noexcept {
 			return this->half_width;
 		}
 
 		// Return the half height of the window in pixels.
-		inline uint32 get_half_height() const noexcept {
+		inline float get_half_height() const noexcept {
 			return this->half_height;
 		}
 
@@ -163,10 +165,15 @@ class Window {
 			this->conf.width = size.x;
 			this->conf.height = size.y;
 
-			this->half_width = size.x / 2;
-			this->half_height = size.y / 2;
+			this->half_width  = static_cast<float>(size.x) * 0.5f;
+			this->half_height = static_cast<float>(size.y) * 0.5f;
+
+			// Update window size
 			SDL_SetWindowSize(this->window, (int)size.x, (int)size.y);
 			glViewport(0, 0, (GLsizei)size.x, (GLsizei)size.y);
+
+			// Trigger event
+			this->frame_events.emplace(Event::WINDOW_RESIZED);
 		}
 
 
@@ -180,8 +187,16 @@ class Window {
 
 		// Check if a given event is present in the current frame's event buffer.
 		// If the event exists in the buffer, it is considered "activated".
-		inline bool on_event(Event event) const noexcept {
-			return this->frame_events.find(static_cast<uint32>(event)) != this->frame_events.end();
+		inline bool has_event(const Event event) const noexcept {
+			return this->frame_events.find(event) != this->frame_events.end();
+		}
+
+		// Run a callback everytime a given event is present in the current frame's event buffer
+		template<typename T>
+		inline void on_event(const Event event, T&& callback) const noexcept {
+			if(has_event(event)) {
+				std::forward<T>(callback)();
+			}
 		}
 
 		// Check if the provided X or Y coordinates are outside the window's bounds.
@@ -254,8 +269,8 @@ class Window {
 		Window::Config conf;
 		vec4<float> clear_color = vec4<float>(1.0f); // Outside conf for better access
 		bool window_open = true;
-		uint32 half_width = 0;
-		uint32 half_height = 0;
+		float half_width = 0;
+		float half_height = 0;
 
 		// Buffer to store all events to be processed each frame
 		std::unordered_set<uint32> frame_events; // unordered_set is faster for look-up
@@ -282,11 +297,11 @@ class Window {
 		// Set the viewport to the provided size.
 		// This won't change the window's size
 		inline void set_viewport(const vec2<uint32>& size) noexcept {
-			this->conf.width = size.x;
+			this->conf.width  = size.x;
 			this->conf.height = size.y;
 
-			this->half_width = size.x / 2;
-			this->half_height = size.y / 2;
+			this->half_width  = static_cast<float>(size.x) * 0.5f;
+			this->half_height = static_cast<float>(size.y) * 0.5f;
 			glViewport(0, 0, (GLsizei)size.x, (GLsizei)size.y);
 		}
 };

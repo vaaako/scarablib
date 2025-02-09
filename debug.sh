@@ -23,6 +23,6 @@ else
 	valgrind --leak-check=full \
 		--show-leak-kinds=all \
 		--track-origins=yes \
-		--gen-suppressions=all --log-file=memcheck.log "$TARGET"
-		# --log-file="$FILE" "$TARGET"
+		--log-file="$FILE" "$TARGET"
+		# --gen-suppressions=all --log-file=memcheck.log "$TARGET"
 fi

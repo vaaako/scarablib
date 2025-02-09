@@ -21,7 +21,7 @@
 
 
 // WARNING -- This code is from https://github.com/libsdl-org/SDL/blob/main/include/SDL3/events.h
-// I just changed the names
+// I just changed the names and added window events to it
 
 
 
@@ -29,8 +29,20 @@
  * The types of events that can be delivered.
  */
 #pragma once
-enum class Event {
+
+// Triggered events
+enum Event {
 	FIRSTEVENT     = 0,     /**< Unused (do not remove) */
+
+	// Window event value (5 - 236)
+
+	// Window resized
+	WINDOW_RESIZED = 5,
+	// Window focus lost
+	WINDOW_FOCUS_LOST = 13,
+	// Cursor leaved window
+	WINDOW_LEAVE = 11,
+
 
 	/* Application events */
 	QUIT           = 0x100, /**< User-requested quit */

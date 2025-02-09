@@ -144,7 +144,6 @@ class Camera {
 		// Example: [1, 0, -1] means the camera moved to Front-Left
 		inline void move(const vec3<float>& dir, const float dt) noexcept {
 			// Normalize for diagonal movement and if any value is >1.0 or <-1.0
-			// vec3<float> dir = glm::normalize(direction);
 			vec3<float> mov = this->forward * dir.x +
 							  this->up      * dir.y +
 							  this->left    * dir.z;

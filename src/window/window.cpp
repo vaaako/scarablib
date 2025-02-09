@@ -11,9 +11,10 @@
 #include "backends/imgui_impl_opengl3.h"
 #endif
 
-Window::Window(const Window::Config& config) : conf(config), half_width(config.width / 2), half_height(config.height / 2) {
+Window::Window(const Window::Config& config) : conf(config), half_width(static_cast<float>(config.width), half_height(static_cast<float>(config.height) * 0.5f) {
 	// Initialize SDL (video and audio)
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) { // NOTE: Memory leak happening here
+	// NOTE: Memory leak happening here
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
 		throw ScarabError("Failed to init SDL: %s", SDL_GetError());
 	}
 
@@ -209,6 +210,9 @@ void Window::process_events() noexcept {
 				break;
 
 			case SDL_WINDOWEVENT: {
+				// Store all window events in this frame
+				this->frame_events.emplace(event.window.event);
+
 				switch (event.window.event) {
 					// // Focus lost
 					// case SDL_WINDOWEVENT_FOCUS_LOST:
@@ -221,7 +225,6 @@ void Window::process_events() noexcept {
 					case SDL_WINDOWEVENT_RESIZED:
 						this->set_viewport(vec2<uint32>(event.window.data1, event.window.data2));
 						break;
-
 
 					default:
 						break;

@@ -32,10 +32,10 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [X] Fix FPS drop when movement is enabled
 
 # TODO Window
-- [ ] Window Events
+- [x] Window Events
 	+ [X] Custom event enums
 	+ [X] Multiple events support
-	+ [ ] Resizing support (Is added but need to change viewport)
+	+ [x] Resizing support (Is added but need to change viewport)
 	+ [x] Mouse handle clicks and motion like keyboard
 - [x] Custom keyboard enums
 
@@ -86,8 +86,8 @@ I wrote most of the things here very tired, sorry for any english mistake
 	+ [X] Custom position for shapes
 	+ [X] Rotation of 3D shape not working
 	+ [X] Shapes custom scale
-	+ [ ] Review [camera movement](https://github.com/swr06/Minecraft/blob/master/Source/Core/Camera.cpp)
-- [ ] Billboarding logic to GPU (shaders)
+	+ [x] Review [camera movement](https://github.com/swr06/Minecraft/blob/master/Source/Core/Camera.cpp)
+	+ Camera movement is stolen from minecraft
 - [ ] Chunk mesh native support
 - [x] Merge `set_angle` and `set_axis` somehow
 - [ ] Sphere
@@ -107,6 +107,7 @@ I wrote most of the things here very tired, sorry for any english mistake
 
 - [x] Don't store vertices, this makes the memory usage huge for each model
 	+ fixed, but is much more of a hack than a actual solution
+- [x] Billboarding logic to GPU (shaders)
 - [ ] Billboard: Instead of making a new texture for each face, use a texture array
 - [ ] Billboard: Another approach for changing directional textures? How doom does it? How would a moving billboard work? Changing orientation?
 	+ Explaining better: My problem is that the front face will always be fixed, what would be the better way to change it?
