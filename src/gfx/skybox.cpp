@@ -66,7 +66,10 @@ Skybox::Skybox(const Camera& camera, const std::vector<const char*>& faces) : ca
 	glBindTexture(GL_TEXTURE_CUBE_MAP, this->texid);
 
 	for(uint16 i = 0; i < 6; i++) {
-		Image* image = new Image(faces.at(i), false);
+		Image* image = new Image(faces.at(i), true); // why when i set this to false the skybox bugs? (true actually makes the textures NOT flip on load, see image.cpp)
+		if(image->data == nullptr) {
+			throw ScarabError("Image (%s) was not found", image->path);
+		}
 
 		// Order: Right > Left > Top > Bottom > Back > Front
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
@@ -84,7 +87,7 @@ Skybox::Skybox(const Camera& camera, const std::vector<const char*>& faces) : ca
 
 	// Bind to set uniform
 	this->shader->use();
-	this->shader->set_int("skybox", 0);
+	this->shader->set_int("samplerSkybox", 0);
 	this->shader->unbind();
 }
 
