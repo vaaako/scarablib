@@ -41,7 +41,6 @@ I wrote most of the things here very tired, sorry for any english mistake
 
 # TODO Features
 - [ ] More texture options
-	+ [ ] Different texture for each face (the other method that is not cubemap)
 	+ [ ] Texture overlay
 	+ [ ] Texture atlas support
 		* For reference: [anim8](https://github.com/kikito/anim8)
@@ -98,7 +97,6 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [x] Camera optimized movement
 - [x] Model size is box size
 - [x] Camera movement not working properly with VSync disabled
-- [ ] Currently bounding box is always created, make it optional
 - [x] Make a billboard model
 	+ Rotate logic to shader
 	+ It will have to be a overrided draw method and other shader
@@ -111,12 +109,19 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [ ] Billboard: Instead of making a new texture for each face, use a texture array
 - [ ] Billboard: Another approach for changing directional textures? How doom does it? How would a moving billboard work? Changing orientation?
 	+ Explaining better: My problem is that the front face will always be fixed, what would be the better way to change it?
-
+- [ ] Currently bounding box is always created, make it optional
+- [ ] Better BoundingBox, not happy with the current state, dont know what to do
+- [ ] Different texture for each face (the other method that is not cubemap)
+	+ I could make the texture layer be a layout to the shader, but then it would not be possible to change it later, maybe make a option just for this and tell that this is more optimized but unchangeable
+- [ ] TextureArray: Able to change which texture to use (off course) idea: `set_texture(id)`, this will only work if a texture array is used in `set_texture`
+	+ make member of "current texture array index" and use it in the shader when drawing a model that uses a texture_array
+- [ ] Support for texture array and common texture to the same model
+	+ how???
 
 # Features for later
 - Sprite atlas
 - Tick
-- Entity manager?
+- Entity manager
 
 ## 3D features
 - Collision
