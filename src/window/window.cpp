@@ -11,7 +11,7 @@
 #include "backends/imgui_impl_opengl3.h"
 #endif
 
-Window::Window(const Window::Config& config) : conf(config), half_width(static_cast<float>(config.width), half_height(static_cast<float>(config.height) * 0.5f) {
+Window::Window(const Window::Config& config) : conf(config), half_width(static_cast<float>(config.width)), half_height(static_cast<float>(config.height) * 0.5f) {
 	// Initialize SDL (video and audio)
 	// NOTE: Memory leak happening here
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {

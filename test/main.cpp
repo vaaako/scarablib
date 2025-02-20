@@ -11,6 +11,7 @@
 #include "scarablib/proper/log.hpp"
 #include "scarablib/types/font.hpp"
 #include "scarablib/gfx/skybox.hpp"
+#include "scarablib/types/texture_array.hpp"
 #include "scarablib/utils/file.hpp"
 #include "scarablib/utils/math.hpp"
 #include "scarablib/window/window.hpp"
@@ -155,35 +156,23 @@ int main() {
 	cube3->set_texture(&tex3);
 	scene3d.add_to_scene("cube3", cube3);
 
+	// BUG: Memory leak somewhere in billboard class
 	Billboard* bill = ModelFactory::create_billboard({
 		.position = vec3<float>(-5.0f, 1.0f, -10.0f),
 		.scale = vec3<float>(4.0f),
 	});
 
-	// Front-right and Right are unecessary since they are the same texture but flipped
-	// TODO: Avoid making a whole new texture for each face
-	// Use texture array
+	// // Front-right and Right are unecessary since they are the same texture but flipped
 	bill->set_directional_textures({
-		{ "test/assets/images/directions/pinky/0.png", false },
-		// Flip to 7
-		{ "test/assets/images/directions/pinky/1.png", true  },
-		// Flip to 6
-		{ "test/assets/images/directions/pinky/2.png", true  },
-		// Flip to 5
-		{ "test/assets/images/directions/pinky/3.png", true  },
-		{ "test/assets/images/directions/pinky/4.png", false }
-	});
+		"test/assets/images/directions/pinky/0.png", // 1
+		"test/assets/images/directions/pinky/1.png", // 2
+		"test/assets/images/directions/pinky/2.png", // 3
+		"test/assets/images/directions/pinky/3.png", // 4
+		"test/assets/images/directions/pinky/4.png"  // 5
+	}, 234); // Flip textures to opposite
 
-	// bill->set_directional_textures({
-	// 	{ "test/assets/images/directions/cacodemon/0.png", false }, // Front
-	// 	{ "test/assets/images/directions/cacodemon/1.png", true  }, // Front right
-	// 	{ "test/assets/images/directions/cacodemon/2.png", true  }, // Right
-	// 	{ "test/assets/images/directions/cacodemon/3.png", true  }, // Back left
-	// 	{ "test/assets/images/directions/cacodemon/4.png", false }  // Back
-	// });
-
-	// plane->show_bounding_box(true);
 	scene3d.add_to_scene("bill", bill);
+	// bill->show_bounding_box(true);
 
 	// Rectangle* rectangle = new Rectangle({
 	// 	.position = vec2<uint32>(
@@ -193,6 +182,7 @@ int main() {
 	// 	.size = vec2<float>(10.0f, 10.0f)
 	// });
 	// scene2d.add_to_scene("rectangle", rectangle);
+
 
 	LOG_INFO("Scene3d length %d", scene3d.length());
 
@@ -221,11 +211,6 @@ int main() {
 		// Handle camera keyboard inputs
 		camera_movement(window, camera, window.keyboard());
 		rotate_camera(window, camera, window.mouse());
-
-		// TODO: Make this later
-		// if(window.on_event(Event::WINDOWEVENT_RESIZED)) {
-		// 	camera.update_viewport(widnow);
-		// }
 
 		// WARNING: When drawing 3D and 2D shapes together, draw 3D shapes first
 

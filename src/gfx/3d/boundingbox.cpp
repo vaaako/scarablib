@@ -41,9 +41,9 @@ void BoundingBox::update_world_bounding_box(const glm::mat4& model_matrix) noexc
 	this->box_size = this->box_max - this->box_min; // Update bounding box size
 }
 
-void BoundingBox::draw(const Camera& camera, const Shader& shader, const glm::mat4& model) const noexcept {
+void BoundingBox::draw(const Camera& camera, const Shader& shader, const glm::mat4& model_matrix) const noexcept {
 	shader.use();
-	shader.set_matrix4f("mvp", camera.get_proj_matrix() * camera.get_view_matrix() * model);
+	shader.set_matrix4f("mvp", camera.get_proj_matrix() * camera.get_view_matrix() * model_matrix);
 	shader.set_color("shapeColor", Colors::RED); // Will not work, since its using the shader with texture
 
 	glBindVertexArray(this->vao_id);

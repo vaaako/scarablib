@@ -38,7 +38,7 @@ class BoundingBox {
 		void update_world_bounding_box(const glm::mat4& model_matrix) noexcept;
 
 		// Draws the bounding box as a wireframe for debugging purposes
-		void draw(const Camera& camera, const Shader& shader, const glm::mat4& model) const noexcept;
+		void draw(const Camera& camera, const Shader& shader, const glm::mat4& model_matrix) const noexcept;
 
 	private:
 		// Minimum and maximum corners of the bounding box (AABB).

@@ -28,23 +28,24 @@ void Scene3D::draw_all() const noexcept {
 		glBindVertexArray(vao);
 
 		for(std::shared_ptr<Model> model : models) {
-			Shader* model_shader = model->get_shader();
-
 			if(this->show_box || model->is_showing_box()) {
 				model->bounding.draw(camera, *shader, model->model);
 				glBindVertexArray(vao); // Rebind the model's VAO (since bounding box unbind VAO)
 			}
 
+			// Shader is not from model class
+			Shader* model_shader = model->get_shader();
 			if(model->get_shader() != nullptr) {
 				model_shader->use();
+				// Pass own shader since its use a interface for this method
 				model->draw(camera, *model_shader);
 				model_shader->unbind();
 
-				shader->use();
+				shader->use(); // Rebind model's shader
 				continue;
 			}
 
-			model->draw(this->camera, *shader);
+			model->draw(camera, *shader);
 		}
 	}
 

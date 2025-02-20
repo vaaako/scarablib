@@ -21,4 +21,3 @@ void main() {
 	gl_Position = proj * view * vec4(billboardedPos, 1.0);
 	texCoord    = aTex;
 }
-

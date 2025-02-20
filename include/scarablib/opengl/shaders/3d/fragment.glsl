@@ -8,7 +8,7 @@ uniform vec4 shapeColor; // Color is defined by user later
 
 // Multiplying by 0.004 gives an approximated result as dividing by 255
 vec4 normalized_color(vec4 color) {
-	return vec4(color.rgb * 0.004, color.a * 0.004);
+	return vec4(color.rgba * 0.004);
 }
 
 void main() {

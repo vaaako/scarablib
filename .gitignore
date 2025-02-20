@@ -14,7 +14,7 @@ build/
 vgcore*
 
 # Valgrind
-memcheck.log
+*.log
 valgrind.supp
 valgrind_output.txt.core.*
 

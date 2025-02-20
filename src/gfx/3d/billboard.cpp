@@ -2,6 +2,10 @@
 #include "scarablib/gfx/model.hpp"
 #include "scarablib/opengl/vao_manager.hpp"
 #include "scarablib/proper/log.hpp"
+#include <algorithm>
+#include <cstddef>
+#include <cstdlib>
+#include <optional>
 
 #ifdef SCARAB_DEBUG_BILLBOARD
 std::string str_dirs[8] = {
@@ -26,20 +30,25 @@ Billboard::~Billboard() noexcept {
 	// Release current vao
 	// Mesh does this, but this is a overrided destructor
 	VAOManager::get_instance().release_vao(vao_hash);
-	this->clear_directional_textures();
+	delete this->shader;
+
+	// Clear directional textures if any
+	if(!this->textures.empty()) {
+		for(const Texture* tex : this->textures) {
+			if(tex != nullptr) {
+				delete tex;
+			}
+		}
+		this->textures.clear();
+	}
 }
 
 
 void Billboard::draw(const Camera& camera, const Shader& shader) noexcept {
 	this->update_model_matrix();
 
-	// View matrix
-	glm::mat4 view = camera.get_view_matrix();
-	// Add perspective
-	glm::mat4 proj = camera.get_proj_matrix();
-
-	shader.set_matrix4f("proj", proj);
-	shader.set_matrix4f("view", view);
+	shader.set_matrix4f("proj", camera.get_proj_matrix());
+	shader.set_matrix4f("view", camera.get_view_matrix());
 
 	// Billboard stuff
 	shader.set_vector3f("billboardPos", this->conf.position);
@@ -55,9 +64,9 @@ void Billboard::draw(const Camera& camera, const Shader& shader) noexcept {
 // Rotate 4 directions
 void Billboard::rotate_four_directions(const vec3<float>& focus_position) noexcept {
 	// [-45,  45] 0 Front
-	// [ 45, 135] 1 Front
-	// [135, 225] 6 Front
-	// [225, 315] 7 Front
+	// [ 45, 135] 1 Right
+	// [135, 225] 2 Left
+	// [225, 315] 3 Back
 
 	const float angle = this->direction_angle(focus_position);
 	const uint32 sector = static_cast<uint32>((angle + 45.0f) / 90.0f) % 4;
@@ -118,83 +127,139 @@ void Billboard::rotate_eight_directions(const vec3<float>& focus_position) noexc
 	#endif
 }
 
+#define SCARAB_DEBUG_BILLBOARD_TEXTURE
 
-// TODO: Instead of making a whole new texture for flipped ones, send a uniform for shader flip
+void Billboard::set_directional_textures(const std::vector<const char*> paths, uint32 flip) {
+	// Get length fron int
+	const size_t fliplength = (flip == 0) ? 0 : static_cast<size_t>(std::log10(std::abs(static_cast<int>(flip))) + 1);
+	const size_t final_size = paths.size() + fliplength; // Track opposite length
 
-void Billboard::set_directional_textures(const std::vector<std::pair<const char*, bool>> paths) {
-	if(paths.size() < 4 || paths.size() > 8) {
-		throw ScarabError("The number of textures must be at least 4 or at most 8");
+	if(paths.size() < 4 && paths.size() > 8) {
+		throw ScarabError("The number of images must be at least 4 or at most 8");
 	}
 
-	// 4 for four directions
-	// 5 for flipping textures
-	const size_t texture_size = (paths.size() != 4 || paths.size() == 5) ? 8 : 4;
+	if(fliplength > paths.size()) {
+		throw ScarabError("Can't flip %i images, since there are only %zu images", fliplength, paths.size());
+	}
 
-	#ifdef SCARAB_DEBUG_BILLBOARD
-	std::vector<const char*> texture_paths;
-	texture_paths.resize(texture_size, nullptr);
-	#endif
+	if(final_size != 4 && final_size != 8) {
+		throw ScarabError("The total number of textures after flip must be 4 or 8. You passed %zu images and %zu images to flip.", paths.size(), fliplength);
+	}
 
-	// Resize so i can check if a index has a texture already
-	this->textures.resize(texture_size, nullptr);
+	// Extract digits from flip
+	std::vector<size_t> digits;
+	while(flip > 0) {
+		digits.push_back(flip % 10); // Push last
+		flip /= 10; // Remove last
+	}
+	// Sort crescent
+	std::sort(digits.begin(), digits.end());
+
+	// Resize and init values with nullptr so i can check if a index has a texture already
+	this->textures.resize(final_size, nullptr);
 
 	for(size_t i = 0; i < paths.size(); i++) {
-		const auto& pair = paths.at(i);
-
-		// LOG_DEBUG("Placing at index %zu", i);
-
-		// Place the texture in the eorrect direction
+		// Add current config
 		this->textures[i] = new Texture({
-			.path = pair.first,
+			.path = paths.at(i),
 			.flip_horizontally = false
 		});
 
-		#ifdef SCARAB_DEBUG_BILLBOARD 
-		texture_paths[i] = pair.first;
-		#endif
+		// If index is in digits, flip and add to configs
+		if(digits.size() > 0 && digits.front() == i + 1) {
+			const size_t opposite_index = final_size - i;
+			#ifdef SCARAB_DEBUG_BILLBOARD_TEXTURE
+			LOG_DEBUG("Flipping %zu and placing at %zu", i, opposite_index);
+			#endif
 
-		// Check for opposite texture
-		if(pair.second) {
-			// Calculate the opposite index
-			const size_t opposite_index = (texture_size - i);
-
-			if(this->textures.at(opposite_index) != nullptr) {
-				throw ScarabError("Bad Configuration: Index %zu already has a texture", opposite_index);
-			}
-
-			// Place the texture in the correct direction
+			// Add config for opposite texture
 			this->textures[opposite_index] = new Texture({
-				.path = pair.first,
+				.path = paths.at(i),
 				.flip_horizontally = true
 			});
 
-			#ifdef SCARAB_DEBUG_BILLBOARD 
-			texture_paths[opposite_index] = pair.first;
-			#endif
-
-			// LOG_DEBUG("Flipping %zu and placing at %zu", i, opposite_index);
+			digits.erase(digits.begin());
 		}
 	}
 
-	if(this->textures.size() != 4 && this->textures.size() != 8) {
-		throw ScarabError("Bad Configuration: The textures final size is %zu, which does not match 4 or 8. \nCheck for flipped textures", this->textures.size());
-	}
-
-	#ifdef SCARAB_DEBUG_BILLBOARD 
-	LOG_DEBUG("Directions texture paths:");
-	for(size_t i = 0; i < texture_paths.size(); i++) {
-		LOG_DEBUG("[%i] %s", i, texture_paths.at(i));
-	}
-	#endif
-}
-
-void Billboard::clear_directional_textures() noexcept {
-	for(Texture* texture : this->textures) {
-		// Just in case
-		if(texture != nullptr) {
-			delete texture;
+	// Check if its all correct
+	for(size_t i = 0; i < this->textures.size(); i++) {
+		if(this->textures[i] == nullptr) {
+			throw ScarabError("Bad Configuration: The texture at index %zu is nullptr. The final quantity of textures must be 4 or 8. This might be due to flipped texture bad configuration", i);
 		}
 	}
-	this->textures.clear();
 }
+
+
+// void Billboard::set_directional_textures(const std::vector<const char*> paths, uint32 flip) {
+// 	// How many to flip
+// 	const size_t fliplength = flip == 0 ? 0 : static_cast<size_t>(std::log10(std::abs(static_cast<int>(flip))) + 1);
+// 	const size_t final_size = paths.size() + fliplength; // Track opposite length
+//
+// 	if(paths.size() < 4 && paths.size() > 8) {
+// 		throw ScarabError("The number of images must be at least 4 or at most 8");
+// 	}
+//
+// 	if(fliplength > paths.size()) {
+// 		throw ScarabError("Can't flip %i images, since there are only %zu images", fliplength, paths.size());
+// 	}
+//
+// 	if(final_size != 4 && final_size != 8) {
+// 		throw ScarabError("The total number of textures after flip must be 4 or 8. You passed %zu images and %zu images to flip.", paths.size(), fliplength);
+// 	}
+//
+// 	// Extract digits from flip
+// 	std::vector<size_t> digits;
+// 	while(flip > 0) {
+// 		digits.push_back(flip % 10); // Push last
+// 		flip /= 10; // Remove last
+// 	}
+// 	// Sort crescent
+// 	std::sort(digits.begin(), digits.end());
+//
+// 	// Will be used to make the TextureArray
+// 	std::vector<TextureArray::Config> configs;
+// 	// Resize and init values with nullptr so i can check if a index has a texture already
+// 	configs.resize(final_size, {});
+//
+// 	for(size_t i = 0; i < paths.size(); i++) {
+// 		// Add current config
+// 		configs[i] = TextureArray::Config {
+// 			.path = paths.at(i),
+// 			.flip_horizontally = false
+// 		};
+//
+// 		// If number is in digits, flip and add to configs
+// 		if(digits.size() > 0 && digits.front() == i + 1) {
+// 			const size_t opposite_index = final_size - i - 1;
+// 			#ifdef SCARAB_DEBUG_BILLBOARD_TEXTURE
+// 			LOG_DEBUG("Flipping %zu and placing at %zu", i, opposite_index);
+// 			#endif
+//
+// 			// Add config for opposite texture
+// 			configs[opposite_index] = TextureArray::Config {
+// 				.path = paths.at(i),
+// 				.flip_horizontally = true
+// 			};
+//
+// 			digits.erase(digits.begin());
+// 		}
+// 	}
+//
+// 	#ifdef SCARAB_DEBUG_BILLBOARD_TEXTURE
+// 	for(size_t i = 0; i < configs.size(); i++) {
+// 		LOG_DEBUG("[%zu]: %s", i, configs.at(i).path);
+// 	}
+// 	#endif
+//
+// 	// Check if is all correct
+// 	for(const TextureArray::Config& conf : configs) {
+// 		// Will be null because all configs are inited as {}
+// 		if(conf.path == NULL) {
+// 			throw ScarabError("Bad Configuration: The final quantity of textures must be 4 or 8. This might be due to flipped texture bad configuration");
+// 		}
+// 	}
+//
+// 	this->texture_array = new TextureArray(configs);
+// }
 

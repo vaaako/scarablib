@@ -9,6 +9,6 @@ struct Image {
 	const char* path;
 
 	// Load an image using a path
-	Image(const char* path, const bool flip_vertically = true, const bool flip_horizontally = false);
+	Image(const char* path, const bool flip_vertically = false, const bool flip_horizontally = false) noexcept;
 	~Image() noexcept;
 };

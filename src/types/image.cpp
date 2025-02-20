@@ -1,19 +1,22 @@
 #include "scarablib/types/image.hpp"
-#include "scarablib/proper/error.hpp"
 
 // STB entry point
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
-Image::Image(const char* path, const bool flip_vertically, const bool flip_horizontally) : path(path) {
-	stbi_set_flip_vertically_on_load(flip_vertically);
+
+Image::Image(const char* path, const bool flip_vertically, const bool flip_horizontally) noexcept : path(path) {
+	// Opposite because stbi acts the opposite
+	stbi_set_flip_vertically_on_load(!flip_vertically);
 
 	this->data = stbi_load(path, &this->width, &this->height, &nr_channels, 0); // STBI_rgb_alpha to standarlize
 
 	// This gives skybox a nice effect
 	// this->data = stbi_load(path, &this->width, &this->height, &nr_channels, STBI_rgb_alpha); // STBI_rgb_alpha to standarlize
-	if(data == NULL) {
-		throw ScarabError("Image (%s) was not found", path);
+
+	if(this->data == NULL) {
+		this->data = nullptr; // For comparasion
+		return;
 	}
 
 	if(flip_horizontally) {
