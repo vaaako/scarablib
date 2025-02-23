@@ -9,7 +9,7 @@
 std::string FileHelper::read_file(const std::string& path) {
 	std::ifstream file = std::ifstream(path);
 	if(!file.is_open()) {
-		throw ScarabError("Could not open file %s", path.c_str());
+		return "";
 	}
 
 	// Prepare buffer
@@ -26,9 +26,33 @@ std::string FileHelper::read_file(const std::string& path) {
 	return buffer;
 }
 
-const std::vector<std::string> FileHelper::list_files(const char* path, const bool sort) {
+std::vector<uint8> FileHelper::read_binary_file(const char* path) noexcept {
+	// Open in binary mode
+	std::ifstream file = std::ifstream(path, std::ios::binary | std::ios::ate);
+	if(!file.is_open()) {
+		return {};
+	}
+
+	// Get file size
+	std::streamsize size = file.tellg();
+
+	// Return to the beginning for reading
+	file.seekg(0, std::ios::beg);
+
+	// Create a buffer
+	std::vector<uint8> buffer = std::vector<uint8>(static_cast<size_t>(size));
+
+	// Read file into buffer
+	if(!file.read(reinterpret_cast<char*>(buffer.data()), size)) {
+		return {};
+	}
+
+	return buffer;
+}
+
+std::vector<std::string> FileHelper::list_files(const char* path, const bool sort) {
 	if(!std::filesystem::exists(path) || !std::filesystem::is_directory(path)) {
-		return std::vector<std::string>();
+		return {};
 	}
 
 	std::vector<std::string> result;

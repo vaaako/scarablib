@@ -51,7 +51,14 @@ Texture::Texture(const Texture::Config& conf) {
 
 	// Generate
 	const GLenum format = Texture::extract_format(*image);
-	glTexImage2D(GL_TEXTURE_2D, 0, static_cast<GLint>(format), image->width, image->height, 0, format, GL_UNSIGNED_BYTE, image->data);
+	glTexImage2D(
+		GL_TEXTURE_2D, 0,
+		static_cast<GLint>(format),
+		image->width, image->height, 0,
+		format,
+		GL_UNSIGNED_BYTE,
+		image->data
+	);
 
 	// Generate mipmap
 	glGenerateMipmap(GL_TEXTURE_2D);
@@ -78,7 +85,14 @@ Texture::Texture(const void* data, const uint32 width, const uint32 height, cons
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	// Generate
-	glTexImage2D(GL_TEXTURE_2D, 0, internal_format, static_cast<GLint>(width), static_cast<GLint>(height), 0, format, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(
+		GL_TEXTURE_2D, 0,
+		internal_format,
+		static_cast<GLint>(width), static_cast<GLint>(height), 0,
+		format,
+		GL_UNSIGNED_BYTE,
+		data
+	);
 
 	// Gen mipmap
 	glGenerateMipmap(GL_TEXTURE_2D);

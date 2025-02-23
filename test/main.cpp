@@ -7,6 +7,7 @@
 #include "scarablib/types/color.hpp"
 #include "scarablib/proper/log.hpp"
 #include "scarablib/gfx/skybox.hpp"
+#include "scarablib/types/font.hpp"
 #include "scarablib/utils/math.hpp"
 #include "scarablib/window/window.hpp"
 #include "scarablib/input/keycode.hpp"
@@ -199,7 +200,7 @@ int main() {
 		bill->rotate_eight_directions(camera.get_position());
 
 		// Draw
-		skybox.draw();
+		// skybox.draw();
 		scene3d.draw_all();
 
 		// Toggle debug mode
@@ -233,13 +234,8 @@ int main() {
 		}
 
 
-		// Draw 2D shapes
-		// msgothic.draw_text("COLLISION: " + std::to_string(collision), { 0.0f, 24.0f });
-		// msgothic.draw_text("X: " + std::to_string(camera.get_x()) + ", "
-		// 		+ "Y: " + std::to_string(camera.get_y()) + ", "
-		// 		+ "Z: " + std::to_string(camera.get_z()), { 0.0f, 24.0f });
-		// scene2d.draw_all();
-
+		// msgothic.add_text("Hello world", { 10.0f, 10.0f }, 1.0f);
+		// msgothic.draw_all();
 
 		// Update rotation
 		rotation += rotation_speed * window.dt();

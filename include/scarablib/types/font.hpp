@@ -1,14 +1,13 @@
 #pragma once
 
 #include "scarablib/opengl/shader.hpp"
-#include "scarablib/opengl/vao.hpp"
-#include "scarablib/opengl/vbo.hpp"
 #include "scarablib/typedef.hpp"
-#include "scarablib/types/color.hpp"
 #include "scarablib/utils/file.hpp"
 #include <unordered_map>
 #include <string>
 #include <GL/glew.h>
+
+#include <stb_truetype.h>
 
 // Font object used to draw text on the screen
 class Font {
@@ -23,34 +22,38 @@ class Font {
 		Font(const char* path, const uint16 size = 24);
 		~Font() noexcept;
 
+		// Add text to batch rendering
+		void add_text(const std::string& text, const vec2<float>& pos, const float scale) noexcept;
 		// Draw font using a shader object
-		void draw_text(const std::string& text, const vec2<uint32>& pos, const Color& color = Colors::WHITE, float scale = 1.0f) noexcept;
+		void draw_all() noexcept;
 
 	private:
 		struct Glyph {
-			GLuint texture_id; // Index of the glyph in the texture map
-			vec2<uint32> size;
-			vec2<uint32> bearing; // Offset from baseline to the left/top
-			uint32 advance; // Horizontal offset to next glyph
+			vec2<float> position;
+			vec2<float> texuv;
 		};
-
-		// OpenGL
-		GLuint texture_array;
-		GLuint vao;
-		GLuint vbo;
 
 		// Font
 		const char* path;
+		uint16 fontsize;
+		int atlas_width = 512;  // Internally int
+		int atlas_height = 512; // Internally int
+		
 		std::vector<Glyph> chars;
-		uint64 char_max;
+		std::unordered_map<char, stbtt_bakedchar> char_data;
 
-		static inline Shader& get_shader() {
-			static Shader shader_circle = Shader(
-				FileHelper::read_file(THIS_FILE_DIR + "/../opengl/shaders/2d/font_vertex.glsl").c_str(),
-				FileHelper::read_file(THIS_FILE_DIR + "/../opengl/shaders/2d/font_fragment.glsl").c_str()
+		// OpenGL
+		GLuint texid;
+		GLuint vao;
+		GLuint vbo;
+
+		static inline Shader& get_shader() noexcept {
+			static Shader shader = Shader(
+				FileHelper::read_file(THIS_FILE_DIR + "/../opengl/shaders/2d/vertex.glsl").c_str(),
+				FileHelper::read_file(THIS_FILE_DIR + "/../opengl/shaders/2d/fragment.glsl").c_str()
 			);
 
-			return shader_circle;
+			return shader;
 		}
 };
 
