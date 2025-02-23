@@ -6,9 +6,11 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tinyobjloader/tiny_obj_loader.h>
 
+
 Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept
 	: vao_hash(VAOManager::get_instance().compute_hash(vertices, indices)),
-	  indices_length(static_cast<uint32>(indices.size())) {
+	  indices_length(static_cast<uint32>(indices.size())),
+	  vertices(vertices) {
 
 	this->vao_id = VAOManager::get_instance().make_vao(vertices, indices);
 }
@@ -50,7 +52,7 @@ Mesh::Mesh(const char* path) {
 				throw ScarabError("Invalid vertex index (%d)", index.vertex_index);
 			}
 
-			// WARNING: Dont push normal by now
+			// WARNING: Dont push normals yet
 
 			// vec3<float> normal;
 			// if(index.normal_index > 0) {
@@ -83,7 +85,7 @@ Mesh::Mesh(const char* path) {
 
 			// Push unique vertices only
 			if(uniq_vertices.find(vertex) == uniq_vertices.end()) {
-				uniq_vertices[vertex] = static_cast<uint32_t>(vertices.size());
+				uniq_vertices[vertex] = static_cast<uint32_t>(this->vertices.size());
 				this->vertices.push_back(vertex);
 			}
 			indices.push_back(uniq_vertices[vertex]);
@@ -91,8 +93,8 @@ Mesh::Mesh(const char* path) {
 	}
 
 	this->indices_length = indices.size();
-	this->vao_hash = VAOManager::get_instance().compute_hash(vertices, indices);
-	this->vao_id = VAOManager::get_instance().make_vao(vertices, indices);
+	this->vao_hash = VAOManager::get_instance().compute_hash(this->vertices, indices);
+	this->vao_id = VAOManager::get_instance().make_vao(this->vertices, indices);
 }
 
 
@@ -100,14 +102,3 @@ Mesh::~Mesh() noexcept {
 	// Release current vao
 	VAOManager::get_instance().release_vao(vao_hash);
 }
-
-
-void Mesh::set_texture(Texture* texture) noexcept {
-	if(texture == nullptr){
-		this->texture = &this->get_deftex();
-		return;
-	}
-
-	this->texture = texture;
-}
-

@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstdlib>
-#include <optional>
 
 #ifdef SCARAB_DEBUG_BILLBOARD
 std::string str_dirs[8] = {
@@ -21,8 +20,8 @@ std::string str_dirs[8] = {
 #endif
 
 
-Billboard::Billboard(const Model::Config& conf, const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept
-	: Model(conf, vertices, indices) {}
+Billboard::Billboard(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept
+	: Model(vertices, indices) {}
 
 // Overrided from Mesh, so is needed to release the vao_mesh
 // This is overrided because if not, it wouldn't be possible to clean the textures
@@ -51,83 +50,16 @@ void Billboard::draw(const Camera& camera, const Shader& shader) noexcept {
 	shader.set_matrix4f("view", camera.get_view_matrix());
 
 	// Billboard stuff
-	shader.set_vector3f("billboardPos", this->conf.position);
-	shader.set_float("billboardSize", this->conf.scale.x);
+	shader.set_vector3f("billboardPos", this->position);
+	shader.set_float("billboardSize", this->scale.x);
 
-	shader.set_color("shapeColor", this->conf.color);
+	shader.set_color("shapeColor", this->color);
 
 	this->texture->bind();
 	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(this->indices_length), GL_UNSIGNED_INT, (void*)0);
 	this->texture->unbind();
 }
 
-// Rotate 4 directions
-void Billboard::rotate_four_directions(const vec3<float>& focus_position) noexcept {
-	// [-45,  45] 0 Front
-	// [ 45, 135] 1 Right
-	// [135, 225] 2 Left
-	// [225, 315] 3 Back
-
-	const float angle = this->direction_angle(focus_position);
-	const uint32 sector = static_cast<uint32>((angle + 45.0f) / 90.0f) % 4;
-	this->set_texture(this->textures.at(sector));
-}
-
-// TODO: Instead of set_texture a more optimized method
-//	+ Maybe changing texture_id
-//	+ Use texture_id on Model instead of Texture object
-
-// Rotate 8 directions
-void Billboard::rotate_eight_directions(const vec3<float>& focus_position) noexcept {
-	const float angle = this->direction_angle(focus_position);
-
-	// 8 Directions: Divide the circle into 8 sectors of 45° each
-	// Sector mapping:
-	// [-180°, -135°) 0 Front
-	// [-135°,  -90°) 1 Front-Right
-	// [ -90°,  -45°) 2 Right
-	// [ -45°,    0°) 3 Back-Right
-	// [   0°,   45°) 4 Back
-	// [  45°,   90°) 5 Back-Left
-	// [  90°,  135°) 6 Left
-	// [ 135°,  180°) 7 Front-Left
-
-	// Angle range is [-180°, 180°]
-	//   0° is Front (facing toward the camera)
-	// 180° is Back  (facing away from the camera)
-
-	// Sector Calculation Logic:
-	// 1. The input angle is in the range [-180°, 180°]
-	// 2. Each sector spans by 45 degrees (360 / 8 sectors = 45)
-	// 3. To align the sectors, add 22.5° to the angle (half the sector size)
-	//    - This centers the sectors around the angle range.
-	// 3. Divide by 45° (sector size) to determine the sector index.
-	// 4. Use modulo 8 to wrap around the index if it exceeds 7
-
-	// What is the Span?
-	// - The span is the angular size of each sector.
-	// - For 8 directions, the span is 45° (360° / 8 sectors).
-	// - The span determines how wide each sector is and is used to map the angle to the correct sector.
-
-	// Why 22.5°?
-	// - Each sector spans 45°, so half of that (22.5°) is added to align the sectors.
-	// - This ensures that the sector boundaries are correctly centered.
-	// - Formula: SP (Span) = (360 / N) = Where N is the number of sectors
-	//    - Sector = (A + (SP / 2) / SP) % N
-
-	// Example:
-	// -180° + 22.5° = -157.5° → Sector 0 (Front)
-	//    0° + 22.5° =   22.5° → Sector 4 (Back)
-	//  180° + 22.5° =  202.5° → Wraps to 22.5° → Sector 0 (Front)
-	const uint32 sector = static_cast<uint32>((angle + 22.5f) / 45.0f) % 8;
-	this->set_texture(this->textures.at(sector));
-
-	#ifdef SCARAB_DEBUG_BILLBOARD
-	LOG_INFO("Angle: %f, Direction: [%i] %s", angle, sector, str_dirs[sector].c_str());
-	#endif
-}
-
-#define SCARAB_DEBUG_BILLBOARD_TEXTURE
 
 void Billboard::set_directional_textures(const std::vector<const char*> paths, uint32 flip) {
 	// Get length fron int

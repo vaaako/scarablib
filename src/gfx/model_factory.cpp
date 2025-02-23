@@ -1,7 +1,7 @@
 #include "scarablib/gfx/model_factory.hpp"
 #include "scarablib/opengl/vao_manager.hpp"
 
-Cube* ModelFactory::create_cube(const Model::Config& conf) noexcept {
+Cube* ModelFactory::create_cube() noexcept {
 	static std::vector<Vertex> vertices = {
 		// Vertices: 24
 		// Front face
@@ -69,10 +69,10 @@ Cube* ModelFactory::create_cube(const Model::Config& conf) noexcept {
 
 	// Make VAO and return created Cube
 	VAOManager::get_instance().make_vao(vertices, indices);
-	return new Cube(conf, vertices, indices);
+	return new Cube(vertices, indices);
 }
 
-Plane* ModelFactory::create_plane(const Model::Config& conf) noexcept {
+Plane* ModelFactory::create_plane() noexcept {
 	static std::vector<Vertex> vertices = {
 		// Front face
 		Vertex { .position = glm::vec3(-0.5f, -0.5f, 0.0f), .texuv = glm::vec2(0.0f, 0.0f) }, // Bottom left
@@ -89,11 +89,11 @@ Plane* ModelFactory::create_plane(const Model::Config& conf) noexcept {
 
 	// Make VAO and return created Plane
 	VAOManager::get_instance().make_vao(vertices, indices);
-	return new Plane(conf, vertices, indices);
+	return new Plane(vertices, indices);
 }
 
 
-Billboard* ModelFactory::create_billboard(const Model::Config& conf) noexcept {
+Billboard* ModelFactory::create_billboard() noexcept {
 	static std::vector<Vertex> vertices = {
 		// Front face
 		Vertex { .position = glm::vec3(-0.5f, -0.5f, 0.0f), .texuv = glm::vec2(0.0f, 0.0f) }, // Bottom left
@@ -110,5 +110,5 @@ Billboard* ModelFactory::create_billboard(const Model::Config& conf) noexcept {
 
 	// Make VAO and return created Plane
 	VAOManager::get_instance().make_vao(vertices, indices);
-	return new Billboard(conf, vertices, indices);
+	return new Billboard(vertices, indices);
 }

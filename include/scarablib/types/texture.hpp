@@ -2,6 +2,7 @@
 
 #include "scarablib/proper/error.hpp"
 #include "scarablib/typedef.hpp"
+#include "scarablib/types/color.hpp"
 #include "scarablib/types/image.hpp"
 #include <SDL2/SDL_surface.h>
 #include <GL/glew.h>
@@ -41,9 +42,9 @@ struct Texture {
 		bool flip_horizontally = false;
 	};
 
-	// This will make a empty solid white texture.
+	// This will make a empty solid color texture.
 	// Do not use this if you dont know what are you doing
-	Texture() noexcept;
+	Texture(const Color& color) noexcept;
 
 	~Texture() noexcept;
 

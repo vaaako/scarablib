@@ -124,7 +124,7 @@ class Shape2D {
 
 		// Default texture (solid white)
 		inline Texture& get_deftex() const noexcept {
-			static Texture def_tex = Texture(); // Make solid white texture
+			static Texture def_tex = Texture(Colors::WHITE); // Make solid white texture
 			return def_tex;
 		}
 };

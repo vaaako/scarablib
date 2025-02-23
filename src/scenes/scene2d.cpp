@@ -55,7 +55,7 @@ void Scene2D::add_to_scene(const std::string& key, Shape2D* shape) {
 void Scene2D::draw_all() const noexcept {
 	// This is just necessary if doing 2D and 3D
 	#ifdef SCARAB_2D_AND_3D
-		glDepthFunc(GL_ALWAYS);
+	glDepthFunc(GL_ALWAYS);
 	#endif
 
 	this->vao->bind();
@@ -69,7 +69,7 @@ void Scene2D::draw_all() const noexcept {
 	this->shader->unbind();
 
 	#ifdef SCARAB_USE_2D_AND_3D
-		glDepthFunc(GL_LESS);
+	glDepthFunc(GL_LESS);
 	#endif
 }
 

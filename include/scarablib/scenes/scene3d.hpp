@@ -41,10 +41,10 @@ class Scene3D : public IScene<Model> {
 			return *this->shader;
 		}
 
-		// If enabled it will show the bounding box of every model.
+		// If enabled it will draw the collision of every model.
 		// You can also enable for invidual models
-		inline void show_bounding_box(bool show) noexcept {
-			this->show_box = show;
+		inline void draw_all_collider(const bool draw) noexcept {
+			this->draw_every_box = draw;
 		}
 
 		// Update the scene viewport using the window object
@@ -59,7 +59,7 @@ class Scene3D : public IScene<Model> {
 
 
 	private:
-		bool show_box = false;
+		bool draw_every_box = false;
 
 		Camera& camera;
 		Shader* shader = new Shader(

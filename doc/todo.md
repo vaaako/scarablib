@@ -20,7 +20,7 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [ ] Replace `enum class` to `enum` in some cases where there are multiple conversions
 - [ ] Discord RPC support
 	+ Currently is very clunky and not dinamic
-- [ ] Mouse "GRABBED" enum (or similar)
+- [x] Mouse "GRABBED" enum (or similar)
 
 - [ ] Use `static_assert`
 	+ Dont forget about model methods
@@ -53,9 +53,6 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [x] Custom shapes support (kinda, i think)
 - [ ] Color matrix support
 - [ ] Use one shader for 2D and 3D shapes
-- [ ] Collider class (for 3D and 2D)
-	+ Like [Windfield](https://github.com/a327ex/windfield). Show collider and easy setting
-	+ Rigid body
 - [ ] Physics (dont know how)
 - [ ] Batch rendering for textures too
 	+ Would have to make another map, its worth it?
@@ -63,6 +60,10 @@ I wrote most of the things here very tired, sorry for any english mistake
 	+ for 3d, yeah
 - [x] Remove `ModelConf`
 	+ kinda?
+
+- [ ] TextureArray
+	- [ ] Support for texture array and common texture to the same model
+	- [ ] make member of "current texture array index" and use it in the shader when drawing a model that uses a texture_array
 
 # TODO 2D
 - [x] Unify shader and `shader_texture` somehow
@@ -76,6 +77,11 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [ ] New shapes: Triangle (for real)
 - [ ] Animation support
 	+ For reference: [raycast](https://github.com/vaaako/Raycast/blob/main/src/sprite.lua#L46)
+- [ ] Collider class
+	+ Like [Windfield](https://github.com/a327ex/windfield). Show collider and easy setting
+	+ Rigid body
+	+ use bounding box?
+- [ ] If possible, use mesh.hpp for 2D shapes
 
 
 # TODO 3D
@@ -102,22 +108,20 @@ I wrote most of the things here very tired, sorry for any english mistake
 	+ It will have to be a overrided draw method and other shader
 	+ Update model matrix in a method (like 2D shapes)
 	+ In scene3d check if model has a shader, if have, use it just for that model
-
 - [x] Don't store vertices, this makes the memory usage huge for each model
 	+ fixed, but is much more of a hack than a actual solution
 - [x] Billboarding logic to GPU (shaders)
-- [ ] Billboard: Instead of making a new texture for each face, use a texture array
-- [ ] Billboard: Another approach for changing directional textures? How doom does it? How would a moving billboard work? Changing orientation?
+- [x] Billboard: Instead of making a new texture for each face, use a texture array
+	+ idea discarted, using a TEXTURE 2D or TEXTURE ARRAY makes no significant difference (in memory) just makes harder and more process for the CPU for deciding which shader use
 	+ Explaining better: My problem is that the front face will always be fixed, what would be the better way to change it?
-- [ ] Currently bounding box is always created, make it optional
-- [ ] Better BoundingBox, not happy with the current state, dont know what to do
-- [ ] Different texture for each face (the other method that is not cubemap)
-	+ I could make the texture layer be a layout to the shader, but then it would not be possible to change it later, maybe make a option just for this and tell that this is more optimized but unchangeable
-- [ ] TextureArray: Able to change which texture to use (off course) idea: `set_texture(id)`, this will only work if a texture array is used in `set_texture`
-	+ make member of "current texture array index" and use it in the shader when drawing a model that uses a texture_array
-- [ ] Support for texture array and common texture to the same model
-	+ how???
+- [ ] Billboard: Another approach for changing directional textures? How doom does it? How would a moving billboard work? Changing orientation?
+- [x] Currently bounding box is always created, make it optional
+	+ now needs to calll a method to create it, also the draw is now correct
+- [x] Better BoundingBox, not happy with the current state, dont know what to do
 
+
+- [ ] Different texture for each face (the other method that is not cubemap)
+ 
 # Features for later
 - Sprite atlas
 - Tick

@@ -18,9 +18,10 @@ class Mesh {
 		virtual ~Mesh() noexcept;
 
 		// Set a new texture to the mesh
-		void set_texture(Texture* texture) noexcept;
+		inline void set_texture(Texture* texture) noexcept {
+			this->texture = (texture != nullptr) ? texture : &this->get_deftex();
+		}
 
-		// Returns the current texture being used
 		inline Texture& get_texture() const noexcept {
 			return *this->texture;
 		}
@@ -34,20 +35,30 @@ class Mesh {
 			return this->vao_id;
 		}
 
+		// This will create a collider for the mesh.
+		// If your mesh is not static, you should also enable the calculation with the method `calc_collision(bool)`
+		// WARNING: Call this method ONLY AFTER configuring the model
+		virtual inline void make_collider() noexcept = 0;
+
 	protected:
-		// Texture will always be a "reference" to another existing texture
-		Texture* texture = &this->get_deftex(); // Current texture being used
-
 		// OpenGL
-		size_t vao_hash;              // Keep track of the hash being used
-		size_t indices_length;
-		uint32 vao_id;                // This is used for wavefront .obj files only
-		std::vector<Vertex> vertices; // This is only used for calculating size on Model
+		size_t vao_hash;               // Keep track of the hash being used
+		size_t indices_length;         // For drawing
+		uint32 vao_id;                 // This is used for wavefront .obj files only
+		std::vector<Vertex> vertices;  // Used for calculate the bounding box (cleared after that)
 
-		// Default texture (solid white)
+		// Current texture being used
+		// This will always be a shared pointer to other texture
+		Texture* texture = &this->get_deftex(); // Default texture
+
+		// NOTE: Dont want this here, but i was forced since it needs vertices
+		// and i dont want to store vertices just for this
+
+		// NOTE: I wish this was a member, but i would have to initialize in window.hpp
+		// because i cant make a texture if the opengl context isnt ready yet
 		inline Texture& get_deftex() const noexcept {
 			// I don't like data being statically allocated but whatever
-			static Texture def_tex = Texture(); // Make solid white texture
+			static Texture def_tex = Texture(Colors::WHITE); // Make solid white texture
 			return def_tex;
 		}
 };
