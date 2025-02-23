@@ -17,56 +17,74 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wundef -Wpointer-arith -Wcast-align -Ws
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wwrite-strings -Wcast-qual -Wswitch-default")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wconversion -Wunreachable-code")
 
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSCARAB_DEBUG_GLYPHS_LOADED")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSCARAB_2D_AND_3D -DSCARAB_IMGUI")
+option(USE_STATIC_LIBS "Link against static libraries instead of shared ones" OFF)
 
-
-# Include directories
-include_directories(
-	include
-	include/external
-	include/external/freetype # Freetype needs
-
-	include test/imgui
-	include/external/SDL2 # For imgui
-)
-
-# Link directories
-link_directories(
-	lib/GLEW
-	lib/SDL2
-	lib/SDL2_mixer
-	lib/freetype
-)
-
-# Source files
-file(GLOB_RECURSE SOURCES src/*.cpp src/*/*.cpp src/**/*.cpp
-	test/imgui/imgui.cpp
-	test/imgui/imgui_draw.cpp
-	test/imgui/imgui_tables.cpp
-	test/imgui/imgui_widgets.cpp
-	test/imgui/backends/imgui_impl_sdl2.cpp
-	test/imgui/backends/imgui_impl_opengl3.cpp
-)
-
+file(GLOB_RECURSE SOURCES src/*.cpp src/*/*.cpp src/**/*.cpp)
 add_executable(${PROJECT_NAME} ${SOURCES} test/main.cpp)
 
-# Define the paths to static libraries
-set(LIB_GLEW "${CMAKE_SOURCE_DIR}/lib/GLEW/libGLEW.a")
-set(LIB_SDL2 "${CMAKE_SOURCE_DIR}/lib/SDL2/libSDL2.a")
-set(LIB_SDL2_MIXER "${CMAKE_SOURCE_DIR}/lib/SDL2_mixer/libSDL2_mixer.a")
-set(LIB_FREETYPE "${CMAKE_SOURCE_DIR}/lib/freetype/libfreetype.a")
+if(USE_STATIC_LIBS)
+	# Include directories
+	include_directories(
+		include
+		include/external
+		include/external/tinyobjloader
+		include/external/stb
+		include/external/freetype2 # Freetype needs
+	)
 
-# Link static libraries
-target_link_libraries(scarablib_dev 
-	GL # Link OpenGL dynamically
-	# ${LIB_GLEW}
-	# ${LIB_SDL2}
-	# ${LIB_SDL2_MIXER}
-	# ${LIB_FREETYPE}
+	link_directories(
+		lib/GLEW
+		lib/SDL2
+		lib/SDL2_mixer
+		lib/freetype
+	)
 
-	GLEW
-	SDL2
-	SDL2_mixer
-	freetype
-)
+	# Define the paths to static libraries
+	set(LIB_GLEW "${CMAKE_SOURCE_DIR}/lib/GLEW/libGLEW.a")
+	set(LIB_SDL2 "${CMAKE_SOURCE_DIR}/lib/SDL2/libSDL2.a")
+	set(LIB_SDL2_MIXER "${CMAKE_SOURCE_DIR}/lib/SDL2_mixer/libSDL2_mixer.a")
+	set(LIB_FREETYPE "${CMAKE_SOURCE_DIR}/lib/freetype/libfreetype.a")
+
+	# Link static libraries
+	target_link_libraries(scarablib_dev 
+		GL # Link OpenGL dynamically
+		${LIB_GLEW}
+		${LIB_SDL2}
+		${LIB_SDL2_MIXER}
+		${LIB_FREETYPE}
+	)
+
+else()
+	# Include directories
+	include_directories(
+		include
+		include/external/tinyobjloader
+		include/external/stb
+	)
+
+	# Set to modern OpenGL
+	set(OpenGL_GL_PREFERENCE "GLVND")
+	# Find shared libraries
+	find_package(OpenGL REQUIRED)
+	find_package(GLEW REQUIRED)
+	find_package(SDL2 REQUIRED)
+	find_package(SDL2_mixer REQUIRED)
+	find_package(Freetype REQUIRED)
+
+	# Link shared libraries
+	target_link_libraries(scarablib_dev 
+		${OPENGL_LIBRARIES}
+		GLEW::GLEW
+		SDL2::SDL2
+		SDL2_mixer::SDL2_mixer
+		Freetype::Freetype
+	)
+endif()
+
+
+
+
+
+
+
+

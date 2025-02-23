@@ -1,8 +1,8 @@
 CXX = clang++
 CXXFLAGS = -std=c++20 -O3 \
 		   -I./include \
-		   -I./include/external \
-		   -I./include/external/freetype
+		   -Iinclude/external/tinyobjloader \
+		   -Iinclude/external/stb
 
 LDFLAGS = -L./lib/GLEW \
 		  -L./lib/SDL2 \

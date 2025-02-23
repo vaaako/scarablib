@@ -5,7 +5,7 @@
 #include "scarablib/proper/log.hpp"
 #include "scarablib/utils/string.hpp"
 
-#include <freetype/ft2build.h>
+#include <freetype2/ft2build.h>
 #include FT_FREETYPE_H
 
 // NOTE: I wouldn't get to this point without the help of https://www.youtube.com/@WhateversRightStudios

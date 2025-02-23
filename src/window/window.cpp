@@ -5,12 +5,6 @@
 #include <SDL2/SDL_video.h>
 #include <SDL2/SDL_mixer.h>
 
-#ifdef SCARAB_IMGUI
-#include "imgui.h"
-#include "backends/imgui_impl_sdl2.h"
-#include "backends/imgui_impl_opengl3.h"
-#endif
-
 Window::Window(const Window::Config& config) : conf(config), half_width(static_cast<float>(config.width)), half_height(static_cast<float>(config.height) * 0.5f) {
 	// Initialize SDL (video and audio)
 	// NOTE: Memory leak happening here
@@ -88,32 +82,12 @@ Window::Window(const Window::Config& config) : conf(config), half_width(static_c
 		LOG_INFO("Renderer: %s", glGetString(GL_RENDERER));
 		LOG_INFO("Viewport: %dx%d", config.width, config.height);
 	}
-
-
-	#ifdef SCARAB_IMGUI
-	// After initializing SDL and OpenGL, initialize ImGui
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO();
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-	// Set up style
-	ImGui::StyleColorsDark();
-	// Backend
-	ImGui_ImplSDL2_InitForOpenGL(this->window, this->glContext);
-	ImGui_ImplOpenGL3_Init("#version 330");
-	#endif
 }
 
 Window::~Window() noexcept {
 	if (this->conf.debug_info) {
 		LOG_INFO("Window %d destroyed", SDL_GetWindowID(this->window));
 	}
-
-	#ifdef SCARAB_IMGUI
-	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplSDL2_Shutdown();
-	ImGui::DestroyContext();
-	#endif
 
 	// Clean up OpenGL context
 	SDL_GL_DeleteContext(this->glContext);
@@ -186,9 +160,7 @@ void Window::process_events() noexcept {
 
 	SDL_Event event;
 	while(SDL_PollEvent(&event)) {
-		#ifdef SCARAB_IMGUI
-		ImGui_ImplSDL2_ProcessEvent(&event);
-		#endif
+		// ImGui_ImplSDL2_ProcessEvent(&event);
 
 		// Store all events in this frame
 		this->frame_events.emplace(event.type);

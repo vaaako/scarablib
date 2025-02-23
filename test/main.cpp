@@ -1,28 +1,16 @@
-#include "glm/trigonometric.hpp"
 #include "scarablib/opengl/shader.hpp"
 #include "scarablib/scenes/camera.hpp"
 #include "scarablib/scenes/scene2d.hpp"
 #include "scarablib/scenes/scene3d.hpp"
-#include "scarablib/gfx/2d/rectangle.hpp"
 #include "scarablib/gfx/3d/cube.hpp"
-#include "scarablib/gfx/3d/plane.hpp"
 #include "scarablib/gfx/model_factory.hpp"
 #include "scarablib/types/color.hpp"
 #include "scarablib/proper/log.hpp"
-#include "scarablib/types/font.hpp"
 #include "scarablib/gfx/skybox.hpp"
-#include "scarablib/types/texture_array.hpp"
-#include "scarablib/utils/file.hpp"
 #include "scarablib/utils/math.hpp"
 #include "scarablib/window/window.hpp"
 #include "scarablib/input/keycode.hpp"
 #include <cstdio>
-#include <iostream>
-
-#ifdef SCARAB_IMGUI
-#include "backends/imgui_impl_opengl3.h"
-#include "backends/imgui_impl_sdl2.h"
-#endif
 
 bool mouse_captured = false;
 
@@ -60,12 +48,10 @@ void camera_movement(Window& window, Camera& camera, KeyboardHandler& keyboard) 
 }
 
 void rotate_camera(Window& window, Camera& camera, MouseHandler& mouse) {
-	#ifdef SCARAB_IMGUI
 	// Ignore if mouse event was in imgui window
-	if (ImGui::GetIO().WantCaptureMouse) {
-		return;
-	}
-	#endif
+	// if (ImGui::GetIO().WantCaptureMouse) {
+	// 	return;
+	// }
 
 	// ROTATION LOGIC //
 	// Only rotate when click on screen
@@ -114,12 +100,11 @@ int main() {
 
 	// TODO: Make it use only one drawcall
 	// WARNING: FONTS ARE NOT COMPLETED YET, I WILL UPDATE IT LATER
-	Font msgothic = Font("test/assets/fonts/Ubuntu-R.ttf", 24);
+	// Font msgothic = Font("test/assets/fonts/Ubuntu-R.ttf", 24);
 
 	// Make scenes
 	Camera camera = Camera(window, 75.0f, 0.1f);
 	camera.set_speed(1.0f * DELTATIME_MODIFIER);
-
 
 	Scene2D scene2d = Scene2D(window);
 	Scene3D scene3d = Scene3D(window, camera);
@@ -139,9 +124,6 @@ int main() {
 	cow->set_color(Colors::CHIROYELLOW);
 	cow->set_orientation(90.0f, { false, false, true });
 	scene3d.add_to_scene("cow", cow);
-
-	cow->make_collider();
-	cow->show_collider(true);
 
 	// Make shapecollision
 	Cube* cube = ModelFactory::create_cube();
@@ -258,27 +240,6 @@ int main() {
 		// 		+ "Z: " + std::to_string(camera.get_z()), { 0.0f, 24.0f });
 		// scene2d.draw_all();
 
-		#ifdef SCARAB_IMGUI
-		// ImGui_ImplOpenGL3_NewFrame();
-		// ImGui_ImplSDL2_NewFrame();
-		// ImGui::NewFrame();
-		//
-		// // Create a simple ImGui window
-
-// chiro 🌸
-		// ImGui::Begin("Hello, ImGui!");
-		// ImGui::Text("This is a simple ImGui window.");
-		// if (ImGui::Button("Click Me")) {
-		// 	printf("Button clicked!\n");
-		// }
-		// ImGui::End();
-		// #endif
-		//
-		// #ifdef SCARAB_IMGUI
-		// // Render ImGui
-		// ImGui::Render();
-		// ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-		#endif
 
 		// Update rotation
 		rotation += rotation_speed * window.dt();
@@ -294,4 +255,5 @@ int main() {
 	if(err != GL_NO_ERROR) {
 		LOG_ERROR("OpenGL error code: %x", err);
 	}
+
 }

@@ -82,7 +82,7 @@ I wrote most of the things here very tired, sorry for any english mistake
 	+ Rigid body
 	+ use bounding box?
 - [ ] If possible, use mesh.hpp for 2D shapes
-
+- [ ] Remove `SCARAB_2D_AND_3D`
 
 # TODO 3D
 - [x] Camera
@@ -115,6 +115,7 @@ I wrote most of the things here very tired, sorry for any english mistake
 	+ idea discarted, using a TEXTURE 2D or TEXTURE ARRAY makes no significant difference (in memory) just makes harder and more process for the CPU for deciding which shader use
 	+ Explaining better: My problem is that the front face will always be fixed, what would be the better way to change it?
 - [ ] Billboard: Another approach for changing directional textures? How doom does it? How would a moving billboard work? Changing orientation?
+- [ ] Billboard: Method to invert rotation
 - [x] Currently bounding box is always created, make it optional
 	+ now needs to calll a method to create it, also the draw is now correct
 - [x] Better BoundingBox, not happy with the current state, dont know what to do
