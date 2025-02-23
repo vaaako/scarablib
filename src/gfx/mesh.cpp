@@ -1,6 +1,8 @@
+#include "scarablib/gfx/3d/boundingbox.hpp"
 #include "scarablib/opengl/vao_manager.hpp"
 #include "scarablib/gfx/mesh.hpp"
 #include "scarablib/proper/error.hpp"
+#include "scarablib/utils/string.hpp"
 #include <unordered_map>
 
 #define TINYOBJLOADER_IMPLEMENTATION
@@ -9,9 +11,9 @@
 
 Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept
 	: vao_hash(VAOManager::get_instance().compute_hash(vertices, indices)),
-	  indices_length(static_cast<uint32>(indices.size())),
-	  vertices(vertices) {
+	  indices_length(static_cast<uint32>(indices.size())) {
 
+	this->boxsize = BoundingBox::calculate_size_from_vertices(vertices);
 	this->vao_id = VAOManager::get_instance().make_vao(vertices, indices);
 }
 
@@ -23,7 +25,7 @@ Mesh::Mesh(const char* path) {
 
 	// Load obj
 	std::string err;
-	bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, path);
+	bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, path, (StringHelper::base_dir(path) + "/").c_str());
 
 	if(!err.empty()) {
 		throw ScarabError("Error loading obj (%s): %s", path, err.c_str());
@@ -40,7 +42,8 @@ Mesh::Mesh(const char* path) {
 		total_indices += shape.mesh.indices.size();
 	}
 
-	this->vertices.reserve(total_indices);
+	std::vector<Vertex> vertices;
+	vertices.reserve(total_indices);
 	indices.reserve(total_indices);
 
 	// Decompress
@@ -85,16 +88,25 @@ Mesh::Mesh(const char* path) {
 
 			// Push unique vertices only
 			if(uniq_vertices.find(vertex) == uniq_vertices.end()) {
-				uniq_vertices[vertex] = static_cast<uint32_t>(this->vertices.size());
-				this->vertices.push_back(vertex);
+				uniq_vertices[vertex] = static_cast<uint32_t>(vertices.size());
+				vertices.push_back(vertex);
 			}
 			indices.push_back(uniq_vertices[vertex]);
 		}
 	}
 
+	this->boxsize = BoundingBox::calculate_size_from_vertices(vertices);
+
 	this->indices_length = indices.size();
-	this->vao_hash = VAOManager::get_instance().compute_hash(this->vertices, indices);
-	this->vao_id = VAOManager::get_instance().make_vao(this->vertices, indices);
+	this->vao_hash = VAOManager::get_instance().compute_hash(vertices, indices);
+	this->vao_id = VAOManager::get_instance().make_vao(vertices, indices);
+
+	// Free memory
+	attrib.vertices.clear();
+	attrib.normals.clear();
+	attrib.texcoords.clear();
+	shapes.clear();
+	materials.clear();
 }
 
 

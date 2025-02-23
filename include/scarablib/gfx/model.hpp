@@ -61,6 +61,11 @@ class Model : public Mesh {
 			return this->position;
 		}
 
+		// Returns the center of the model
+		inline vec3<float> get_center_position() const noexcept {
+		return this->boxsize.min + (this->boxsize.size * 0.5f);	
+		}
+
 		// Returns current scale of each axis
 		inline vec3<float> get_scale() const noexcept {
 			return this->scale;
@@ -79,18 +84,18 @@ class Model : public Mesh {
 
 		// Returns minimum corner of the bounding box (AABB)
 		inline vec3<float> get_min() const noexcept {
-			return this->bounding->min;
+			return this->bounding->boxsize.min;
 		}
 
 		// Returns maximum corner of the bounding box (AABB)
 		inline vec3<float> get_max() const noexcept {
-			return this->bounding->max;
+			return this->bounding->boxsize.max;
 		}
 
 		// Returns the difference of the bounding box min and max.
 		// This represents the size of the model
 		inline vec3<float> get_size() const noexcept {
-			return this->bounding->size;
+			return this->bounding->boxsize.size;
 		}
 
 
@@ -99,26 +104,15 @@ class Model : public Mesh {
 			return this->bounding != nullptr;
 		}
 
-		// Returns if the model is showing the bounding box
-		// inline bool is_showing_collider() const noexcept {
-		// 	return this->draw_box;
-		// }
-
 		// Uses AABB to check if two models are colliding
 		static inline bool check_collision(const Model& a, const Model& b) noexcept {
-			return (a.bounding->max.x >= b.bounding->min.x &&
-					a.bounding->min.x <= b.bounding->max.x &&
-					a.bounding->max.y >= b.bounding->min.y &&
-					a.bounding->min.y <= b.bounding->max.y &&
-					a.bounding->max.z >= b.bounding->min.z &&
-					a.bounding->min.z <= b.bounding->max.z);
+			return (a.bounding->boxsize.max.x >= b.bounding->boxsize.min.x &&
+					a.bounding->boxsize.min.x <= b.bounding->boxsize.max.x &&
+					a.bounding->boxsize.max.y >= b.bounding->boxsize.min.y &&
+					a.bounding->boxsize.min.y <= b.bounding->boxsize.max.y &&
+					a.bounding->boxsize.max.z >= b.bounding->boxsize.min.z &&
+					a.bounding->boxsize.min.z <= b.bounding->boxsize.max.z);
 		}
-
-		// Returns the position of the center of the model
-		inline vec3<float> center_pos() const noexcept {
-			return (this->bounding->min + this->bounding->max) * 0.5f;
-		}
-
 
 		// SETTERS //
 
@@ -127,8 +121,8 @@ class Model : public Mesh {
 		// WARNING: Call this method ONLY AFTER configuring the model
 		virtual inline void make_collider() noexcept override {
 			this->update_model_matrix();
-			this->bounding = new BoundingBox(this->vertices, this->model);
-			this->vertices.clear();
+			this->bounding = new BoundingBox(this->boxsize, this->model);
+			this->bounding->update_world_bounding_box(this->model);
 		}
 
 		// This will enable the collider to update every time the model is updated.

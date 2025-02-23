@@ -123,7 +123,6 @@ int main() {
 
 	Scene2D scene2d = Scene2D(window);
 	Scene3D scene3d = Scene3D(window, camera);
-	// scene3d.show_bounding_box(true);
 
 	Skybox skybox = Skybox(camera, {
 		"test/assets/images/skybox/right.jpg",
@@ -141,28 +140,28 @@ int main() {
 	cow->set_orientation(90.0f, { false, false, true });
 	scene3d.add_to_scene("cow", cow);
 
-	// Make shapes
-	// Cube position doenst matter because will change later
-	Cube* cube = ModelFactory::create_cube({});
-	scene3d.add_to_scene("cube1", cube);
-	cube->set_texture(&tex1);
-	// std::shared_ptr<Cube> cubefrom = scene3d.get_by_key<Cube>("cube1");
+	cow->make_collider();
+	cow->show_collider(true);
 
-	Cube* cube2 = ModelFactory::create_cube({});
+	// Make shapecollision
+	Cube* cube = ModelFactory::create_cube();
+	scene3d.add_to_scene("cube1", cube);
+	cube->set_position({ -10.0f, 1.0f, -10.0f }); // Cube position doesnt matter because will change later
+	cube->set_texture(&tex1);
+
+	Cube* cube2 = ModelFactory::create_cube();
 	cube2->set_texture(&tex2);
 	scene3d.add_to_scene("cube2", cube2);
 
-	Cube* cube3 = ModelFactory::create_cube({});
+	Cube* cube3 = ModelFactory::create_cube();
 	cube3->set_texture(&tex3);
 	scene3d.add_to_scene("cube3", cube3);
 
 	// BUG: Memory leak somewhere in billboard class
-	Billboard* bill = ModelFactory::create_billboard({
-		.position = vec3<float>(-5.0f, 1.0f, -10.0f),
-		.scale = vec3<float>(4.0f),
-	});
-
-	// // Front-right and Right are unecessary since they are the same texture but flipped
+	Billboard* bill = ModelFactory::create_billboard();
+	bill->set_position({ -5.0f, 1.0f, -10.0f });
+	bill->set_scale(vec4<float>(4.0f));
+	// Front-right and Right are unecessary since they are the same texture but flipped
 	bill->set_directional_textures({
 		"test/assets/images/directions/pinky/0.png", // 1
 		"test/assets/images/directions/pinky/1.png", // 2
@@ -172,17 +171,11 @@ int main() {
 	}, 234); // Flip textures to opposite
 
 	scene3d.add_to_scene("bill", bill);
-	// bill->show_bounding_box(true);
 
-	// Rectangle* rectangle = new Rectangle({
-	// 	.position = vec2<uint32>(
-	// 		window.get_half_width()  - 10,
-	// 		window.get_half_height() - 10
-	// 	),
-	// 	.size = vec2<float>(10.0f, 10.0f)
-	// });
-	// scene2d.add_to_scene("rectangle", rectangle);
-
+	// Cube* testcube = ModelFactory::create_cube();
+	// testcube->set_scale(vec3<float>(0.5f));
+	// testcube->set_position(cow->get_center_position());
+	// scene3d.add_to_scene("testcube", testcube);
 
 	LOG_INFO("Scene3d length %d", scene3d.length());
 

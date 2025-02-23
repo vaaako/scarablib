@@ -1,5 +1,6 @@
 #pragma once
 
+#include "scarablib/gfx/3d/boundingbox.hpp"
 #include "scarablib/typedef.hpp"
 #include "scarablib/types/texture.hpp"
 #include "scarablib/types/vertex.hpp"
@@ -45,7 +46,12 @@ class Mesh {
 		size_t vao_hash;               // Keep track of the hash being used
 		size_t indices_length;         // For drawing
 		uint32 vao_id;                 // This is used for wavefront .obj files only
-		std::vector<Vertex> vertices;  // Used for calculate the bounding box (cleared after that)
+		// std::vector<Vertex> vertices;  // Used for calculate the bounding box (cleared after that)
+
+		// Bounding box
+		// I wish this wasnt in this class, but i need vertices and dont want to store it, because is a waste of memory
+		// This makes a little more "processor expensive" for creating a model, but, i wont have to store vertices for each model which consumes much memory
+		BoundingBox::Size boxsize;
 
 		// Current texture being used
 		// This will always be a shared pointer to other texture

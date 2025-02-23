@@ -16,3 +16,13 @@ std::string StringHelper::file_extension(const std::string& filename) noexcept {
 	});
 	return ext;
 }
+
+
+std::string StringHelper::base_dir(const std::string& path) noexcept {
+	// Find the last position of '.' in filename
+	size_t slash_pos = path.find_last_of("/");
+
+	return (slash_pos != std::string::npos)
+		? path.substr(0, slash_pos) // Extract and return extension
+		: ".";                      // Return an empty string if period is not found
+}
