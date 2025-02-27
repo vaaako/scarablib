@@ -17,10 +17,10 @@ Scarablib 🪲 is a C++ library designed to simplify graphical development, offe
 # Libraries used
 - [`SDL2`](https://www.libsdl.org/) for window management
 	+ [`SDL2_mixer`](https://www.libsdl.org/projects/mixer/) for sound handling
-- [`Freetype`](http://freetype.org/) for font loading
-- [`stb`](https://github.com/nothings/stb/tree/master) for image loading
+- [`stb_image`](https://github.com/nothings/stb) for image loading
+- [`stb_truetype`](https://github.com/nothings/stb) for TTF loading
 - [`GLEW`](https://glew.sourceforge.net/) for OpenGL support
-- [`glm`](https://github.com/g-truc/glm) for mathematical operations
+- [`glm`](https://github.com/g-truc/glm) for vector and matrix math
 - [`tinyobjloader`](https://github.com/tinyobjloader/tinyobjloader) for wavefront obj loader
 
 >You can find the licenses for these libraries in the [`licenses/`](licenses/) directory
@@ -37,13 +37,11 @@ The following code snippet demonstrates how to create a simple scene with Scarab
 
 Outside main loop:
 ```cpp
-Cube* cube = ModelFactory::create_cube({
-	// This is a required arg (will change later so can set it to 0.0)
-	.position = vec3<float>(0.0f),
-});
+// Position will change later, so dont need to intialize here
+Cube* cube = ModelFactory::new_cube();
 
 // Above is the same as passing nothing
-Cube* cube2 = ModelFactory::create_cube({});
+Cube* cube2 = ModelFactory::new_cube();
 
 // Set textures
 cube1->set_texture(&tex1);
@@ -54,13 +52,16 @@ scene3d.add_to_scene("cube1", cube); // Models added to scene must be pointers (
 scene3d.add_to_scene("cube2", cube2);
 
 // Rectangle object
-Rectangle* aim = new Rectangle({
-	.position = vec2<uint32>(
-		window.get_half_width()  - 5,
-		window.get_half_height() - 5
-	),
-	.size = vec2<float>(10.0f, 10.0f)
+const float AIM_WIDTH = 10.0f;
+const float AIM_HEIGHT = 10.0f;
+
+Rectangle* aim = SpriteFactory::new_rectangle();
+aim->set_position({
+	window.get_half_width()  - AIM_WIDTH  / 2,
+	window.get_half_height() - AIM_HEIGHT / 2
 });
+aim->set_size({ AIM_WIDTH, AIM_HEIGHT });
+
 scene2d.add_to_scene("aim", aim);
 ```
 
@@ -69,12 +70,14 @@ Inside the main loop:
 // Modify cube
 //                                        center,               angle, radius
 cube2.set_position(ScarabMath::orbitate_y(cube1.get_position(), rotation, 2.0f));
-// Draw 3D shapes
+
+// Draw all 3D shapes
 scene3d.draw_all();
 
 // Draw font
 msgothic.draw_text("FPS: " + std::to_string(window.fps()), { 0.0f, 0.0f });
-// Draw 2D shapes
+
+// Draw all 2D shapes
 scene2d.draw_all();
 
 // Update rotation
@@ -125,9 +128,9 @@ Unlike CMake, this will compile the library as a shared file and then link to it
 Currently, Scarablib does not officially support Windows. However, you can attempt to compile it yourself
 
 ## Scripts
-<!-- - `compile_and_run.sh`: Uses `make` to compile and run -->
 - `debug.sh`: Debug using valgrind
 - `build_compile_commands.sh`: Uses [bear](https://github.com/rizsotto/Bear) to generate `compile_commands.json` file for LSP integration
+- `install-flamegraph.sh` and `run-flamegraph.sh`: Easy install and run [flamegraph](https://github.com/brendangregg/FlameGraph)
 
 
 # Contributing
@@ -136,6 +139,3 @@ Scarablib is a hobby project, and contributions are welcome! If you’d like to 
 # LICENSE
 This project is licensed under a modified version of the zlib License. See the [LICENSE](LICENSE) file for details
 
-<!-- # Inspirations -->
-<!-- gunslinger -->
-<!-- rayllib -->
