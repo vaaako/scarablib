@@ -1,0 +1,47 @@
+#include "scarablib/gfx/2d/sprite.hpp"
+#include "scarablib/gfx/mesh.hpp"
+
+Sprite::Sprite(const std::vector<Vertex>& vertices) noexcept
+	: Mesh(vertices) {
+
+}
+
+void Sprite::update_model_matrix() noexcept {
+	// Just update if is dirty
+	if(!this->isdirty) {
+		return;
+	}
+
+	this->model = glm::mat4(1.0f);
+
+	// Modify in place
+	this->model = glm::translate(this->model, glm::vec3(this->position, 0.0f));
+
+	// Origin from top-lef to center, to apply rotation
+	this->model = glm::translate(this->model, glm::vec3(0.5f * this->size.x, 0.5f * this->size.y, 0.0f));
+	// Rotate
+	this->model = glm::rotate(this->model, glm::radians(this->angle), glm::vec3(0.0f, 0.0f, 1.0f));
+	// Origin back to top-left
+	this->model = glm::translate(this->model, glm::vec3(-0.5f * this->size.x, -0.5f * this->size.y, 0.0f));
+	this->model = glm::scale(this->model, glm::vec3(this->size, 0.0f));
+
+	this->isdirty = false;
+
+	// Collision calculation will be here
+}
+
+// I could just need to provide the mvp just if any of the matrix changes, because the value is stored
+void Sprite::draw(const Camera2D& camera, const Shader& shader) noexcept {
+	this->update_model_matrix();
+
+	// NOTE: "is dirty" for color wouldn't work because would set the last color updated for all Modeles (using this later maybe)
+	shader.set_color("shapeColor", this->color);
+	shader.set_matrix4f("mvp", (camera.get_proj_matrix() * camera.get_view_matrix()) * this->model);
+
+	this->texture->bind();
+
+	// Not indices btw
+	glDrawArrays(GL_TRIANGLE_FAN, 0, this->indices_length);
+	this->texture->unbind();
+}
+

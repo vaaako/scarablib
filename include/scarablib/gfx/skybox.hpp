@@ -24,7 +24,7 @@ struct Skybox {
 		VBO* vbo = new VBO();
 
 		Shader* shader = new Shader(
-			FileHelper::read_file(THIS_FILE_DIR + "/../opengl/shaders/3d/skybox_vertex.glsl").c_str(),
-			FileHelper::read_file(THIS_FILE_DIR + "/../opengl/shaders/3d/skybox_fragment.glsl").c_str()
+			FileHelper::read_file("resources/shaders/3d/skybox_vs.glsl").c_str(),
+			FileHelper::read_file("resources/shaders/3d/skybox_fs.glsl").c_str()
 		);
 };

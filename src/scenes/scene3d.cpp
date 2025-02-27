@@ -1,7 +1,7 @@
 #include "scarablib/scenes/scene3d.hpp"
 #include <GL/glew.h>
 
-Scene3D::Scene3D(const Window& window, Camera& camera) noexcept : IScene(window), camera(camera) {}
+Scene3D::Scene3D(Camera& camera) noexcept : IScene(), camera(camera) {}
 
 Scene3D::~Scene3D() noexcept {
 	delete this->shader;
@@ -27,6 +27,7 @@ void Scene3D::draw_all() const noexcept {
 	for(const auto& [vao, models] : this->vao_groups) {
 		glBindVertexArray(vao);
 
+		// Draw all sprites with this VAO
 		for(std::shared_ptr<Model> model : models) {
 			if((this->draw_every_box || model->draw_box) && model->bounding) {
 				model->bounding->draw(camera, *shader);
@@ -35,21 +36,22 @@ void Scene3D::draw_all() const noexcept {
 
 			// Shader is not from model class
 			Shader* model_shader = model->get_shader();
-			if(model->get_shader() != nullptr) {
+			if(model_shader != nullptr) {
 				model_shader->use();
-				// Pass own shader since its use a interface for this method
+				// Pass deafult shader since this is a virtual method, and the shader wont be used inside anyway
 				model->draw(camera, *model_shader);
 				model_shader->unbind();
 
-				shader->use(); // Rebind model's shader
+				shader->use(); // Rebind scene shader
 				continue;
 			}
 
+			// Draw model
 			model->draw(camera, *shader);
 		}
 	}
 
 	glBindVertexArray(0);
-	this->shader->unbind();
+	shader->unbind();
 }
 

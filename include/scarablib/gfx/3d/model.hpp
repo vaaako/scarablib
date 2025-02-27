@@ -13,10 +13,11 @@ class Scene3D;
 
 // An object used for as a base for 3D Shapes
 class Model : public Mesh {
-	// Access bounding object and model matrix
+	// Access bounding object and model matrix without using get method (less memory override)
 	friend Scene3D;
 
 	public:
+		// To make a model use ModelFactory.
 		// Init model using custom config and pre-defined VAO.
 		// Vertices and Indices will be used to gerate VBO and EBO in this VAO
 		Model(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept;
@@ -34,7 +35,7 @@ class Model : public Mesh {
 
 
 
-		// This returns nullptr since primarily used shader is located in Scene3D.
+		// This returns nullptr since by default is used shader is located in Scene3D.
 		// This is a method that is overrided by models using a different shader.
 		// Scene3D then checks if the shader is nullptr and if it is, it uses the default shader
 		virtual inline Shader* get_shader() const noexcept {
@@ -143,14 +144,14 @@ class Model : public Mesh {
 			this->draw_box = draw_box;
 		}
 
+
+
+
 		// Set a new position using a vector
 		inline void set_position(const vec3<float>& position) noexcept {
 			this->position = position;
 			this->isdirty = true;
 		}
-
-
-
 
 		// Set a new X position
 		inline void set_x(const float newx) noexcept {
@@ -203,7 +204,7 @@ class Model : public Mesh {
 		vec3<float> axis        = { 1.0f, 0.0f, 0.0f }; // Need to have at least one axis to work, even if angle is 0.0
 
 		// Matrix
-		bool isdirty; // Calculate matrix if anything changed (initializing on constructor so inheritance works)
+		bool isdirty; // Calculate matrix if anything changed
 		glm::mat4 model = glm::mat4(1.0f);
 
 		// Collission

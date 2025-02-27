@@ -1,17 +1,5 @@
 #include "scarablib/gfx/2d/triangle.hpp"
 
-Triangle::Triangle(const Shape2DConf& conf) noexcept
-	: Shape2D(conf) {
-}
+Triangle::Triangle(const std::vector<Vertex>& vertices) noexcept
+	: Sprite(vertices) {}
 
-void Triangle::draw(const Shader& shader) noexcept {
-	// Apply transformations if needed
-	this->update_model();
-
-	shader.set_matrix4f("model", this->model);
-	shader.set_color("shapeColor", this->conf.color);
-
-	this->texture->bind();
-	glDrawArrays(GL_TRIANGLES, 4, 3);
-	this->texture->unbind();
-}

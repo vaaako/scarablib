@@ -1,23 +1,10 @@
 #include "scarablib/gfx/3d/billboard.hpp"
-#include "scarablib/gfx/model.hpp"
+#include "scarablib/gfx/3d/model.hpp"
 #include "scarablib/opengl/vao_manager.hpp"
 #include "scarablib/proper/log.hpp"
 #include <algorithm>
 #include <cstddef>
 #include <cstdlib>
-
-#ifdef SCARAB_DEBUG_BILLBOARD
-std::string str_dirs[8] = {
-	"FRONT",
-	"FRONT_RIGHT",
-	"RIGHT",
-	"BACK_RIGHT",
-	"BACK",
-	"BACK_LEFT",
-	"LEFT",
-	"FRONT_LEFT"
-};
-#endif
 
 
 Billboard::Billboard(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept

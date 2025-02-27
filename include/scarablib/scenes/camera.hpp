@@ -9,7 +9,7 @@
 
 class Camera {
 	public:
-		enum class Zoom : bool {
+		enum Zoom : bool {
 			OUT = 0,
 			IN = 1
 		};
@@ -18,34 +18,39 @@ class Camera {
 
 		// GETTERS
 
-		// Get camera position
+		// Returns camera position
 		inline vec3<float> get_position() const noexcept {
 			return this->position;
 		}
 
-		// Get current X position
+		// Returns current X position
 		inline float get_x() const noexcept {
 			return this->position.x;
 		}
 
-		// Get current Y position
+		// Returns current Y position
 		inline float get_y() const noexcept {
 			return this->position.y;
 		}
 
-		// Get current Z position
+		// Returns current Z position
 		inline float get_z() const noexcept {
 			return this->position.z;
 		}
 
-		// Get camera view matrix
+		// Returns camera view matrix
 		inline glm::mat4 get_view_matrix() const noexcept {
 			return glm::lookAt(this->position, this->position + this->forward, this->up);
 		}
 
-		// Get camera view matrix
+		// Returns camera projection matrix
 		inline glm::mat4 get_proj_matrix() const noexcept {
-			return this->proj_matrix;
+			return this->proj;
+		}
+
+		// Retuns camera's direction
+		inline vec3<float> get_direction() const noexcept {
+			return this->forward;
 		}
 
 		// SETTERS
@@ -57,8 +62,7 @@ class Camera {
 			this->width = width;
 			this->height = height;
 			// Opengl update
-
-			this->calculate_proj_matrix();
+			this->update_proj_matrix();
 		}
 
 		// Set camera's near plane. How near to render
@@ -69,7 +73,7 @@ class Camera {
 			}
 			this->near_plane = near_plane;
 
-			this->calculate_proj_matrix();
+			this->update_proj_matrix();
 		}
 
 		// Set camera's far plane. How far to render
@@ -80,7 +84,7 @@ class Camera {
 			}
 			this->far_plane = far_plane;
 
-			this->calculate_proj_matrix();
+			this->update_proj_matrix();
 		}
 
 		// Set camera's fov
@@ -91,7 +95,7 @@ class Camera {
 			}
 			this->fov = fov;
 
-			this->calculate_proj_matrix();
+			this->update_proj_matrix();
 		}
 
 		// Set camera's minimum amount of fov (used for zoom out)
@@ -119,7 +123,7 @@ class Camera {
 				? std::max(fov - speed, min_fov)
 				: std::min(fov + speed, max_fov);
 
-			this->calculate_proj_matrix();
+			this->update_proj_matrix();
 		}
 
 		// Set camera's movement speed
@@ -179,11 +183,12 @@ class Camera {
 		vec3<float> forward     = { 0.0f, 0.0f, -1.0f };
 		vec3<float> left        = { -1.0f, 0.0f, 0.0f };
 
-		glm::mat4 proj_matrix;
+		glm::mat4 proj;
 
 		// Pre-calculate proj matrix, since it doesnt change much
-		inline void calculate_proj_matrix() noexcept {
-			this->proj_matrix = glm::perspective(glm::radians(this->fov),
+		inline void update_proj_matrix() noexcept {
+			this->proj = glm::mat4(1.0f);
+			this->proj = glm::perspective(glm::radians(this->fov),
 				(static_cast<float>(this->width) / static_cast<float>(this->height)),
 				this->near_plane, this->far_plane);
 		}

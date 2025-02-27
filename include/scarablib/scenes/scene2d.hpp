@@ -1,10 +1,8 @@
 #pragma once
 
-#include "scarablib/opengl/vao.hpp"
-#include "scarablib/opengl/vbo.hpp"
+#include "scarablib/gfx/2d/sprite.hpp"
 #include "scarablib/scenes/Iscene.hpp"
-#include "scarablib/gfx/2d/circle.hpp"
-#include "scarablib/gfx/shape2d.hpp"
+#include "scarablib/scenes/camera2d.hpp"
 #include "scarablib/utils/file.hpp"
 #include "scarablib/window/window.hpp"
 
@@ -26,10 +24,10 @@
 // (i know how depth test works, but i dont know why this is happening here and not on the code pre-revamp)
 
 // Scene object used for managing 2D objects
-class Scene2D : public IScene<Shape2D> {
+class Scene2D : public IScene<Sprite> {
 	public:
 		// Build the Scene using the window object
-		Scene2D(const Window& window) noexcept;
+		Scene2D(Camera2D& camera) noexcept;
 		~Scene2D() noexcept;
 
 		// Disable copy and moving
@@ -38,31 +36,39 @@ class Scene2D : public IScene<Shape2D> {
 		Scene2D(Scene2D&&) = delete;
 		Scene2D& operator=(Scene2D&&) = delete;
 
-		// Add a shape to the scene
-		void add_to_scene(const std::string& key, Shape2D* shape) override;
+		// Add a shape to the scene.
+		// Do not pass a pointer of a non allocated model
+		void add_to_scene(const std::string& key, Sprite* mesh) override;
 
-		// Draw all objects added to the scene
+		// Draw all models added to the scene
 		void draw_all() const noexcept override;
 
-		// Update scene viewport using the window object
-		inline void update_viewport(const Window& window) noexcept override {
-			this->update_viewport(window.get_width(), window.get_height());
+		// Returns the default shader used by the scene
+		inline Shader& get_shader() {
+			return *this->shader;
 		}
 
-		// Update scene viewport using custon width and height values
-		void update_viewport(const uint32 width, const uint32 height) noexcept override;
+		// Update the scene viewport using the window object
+		inline void update_viewport(const Window& window) noexcept override {
+			this->camera.update_viewport(window.get_width(), window.get_height());
+		}
+
+		// Update the scene viewport using a custom width and height values
+		inline void update_viewport(const uint32 width, const uint32 height) noexcept override {
+			this->camera.update_viewport(width, height);
+		}
 
 	private:
-		// TODO: Make struct to store these tree? (add a method to bind, unbind etc)
-		VAO* vao = new VAO();
-		VBO* vbo = new VBO();
+		Camera2D& camera;
 
+		// Viewport
 		uint32 width;
 		uint32 height;
+		glm::mat4 proj;
 
 		Shader* shader = new Shader(
-			FileHelper::read_file(THIS_FILE_DIR + "/../opengl/shaders/2d/vertex.glsl").c_str(),
-			FileHelper::read_file(THIS_FILE_DIR + "/../opengl/shaders/2d/fragment.glsl").c_str()
+			FileHelper::read_file("resources/shaders/vertex.glsl").c_str(),
+			FileHelper::read_file("resources/shaders/fragment.glsl").c_str()
 		);
 };
 

@@ -4,13 +4,13 @@ out vec4 FragColor;
 in vec2 texCoord;
 
 uniform sampler2D texSampler;
-uniform vec4 shapeColor; // Color defined by user later
+uniform vec4 shapeColor;
 
 uniform float blur;
 
 // Multiplying by 0.004 gives an approximated result as dividing by 255
 vec3 normalized_color(vec3 color) {
-	return vec3(color.r * 0.004, color.g * 0.004, color.b * 0.004);
+	return vec3(color.rgb * 0.004);
 }
 
 vec3 circle_area(vec2 uv, vec2 center, float radius, float blur) {
@@ -28,8 +28,12 @@ vec3 circle_area(vec2 uv, vec2 center, float radius, float blur) {
 
 
 void main() {
-	// Apply circle as a texture
-	// This method only works if the texture coordinates are normalized
+	vec4 tex = texture(texSampler, texCoord);
+	if(tex.a == 0.0) {
+		discard;
+	}
 
-	FragColor = vec4(normalized_color(shapeColor.rgb), circle_area(texCoord, vec2(0.5, 0.5), 0.5, blur));
+	// Apply circle as a texture
+	// Cut alpha from rectangle to make it circular
+	FragColor = vec4(tex.rgb * normalized_color(shapeColor.rgb), tex.a * circle_area(texCoord, vec2(0.5, 0.5), 0.5, blur).r);
 }

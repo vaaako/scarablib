@@ -65,8 +65,11 @@ Window::Window(const Window::Config& config) : conf(config), half_width(static_c
 	glViewport(0, 0, (GLsizei)config.width, (GLsizei)config.height);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
-	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
+
+	// To enable cull face i need to make 2D shapes CCW
+	// glEnable(GL_CULL_FACE);
+	// glCullFace(GL_BACK);
 
 	// SDL Configurations
 	SDL_SetWindowResizable(this->window, (SDL_bool)config.resizable);

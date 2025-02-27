@@ -2,17 +2,18 @@
 #include "scarablib/opengl/shader.hpp"
 #include "scarablib/proper/error.hpp"
 #include "scarablib/proper/log.hpp"
+#include "scarablib/scenes/camera2d.hpp"
 #include "scarablib/utils/file.hpp"
 
 #define STB_TRUETYPE_IMPLEMENTATION
 #include <stb_truetype.h>
 
-Font::Font(const char* path, const uint16 size) : fontsize(size) {
+// TODO: Optimize. More characters
+
+Font::Font(const char* path, const uint16 size) {
 	std::vector<uint8> buffer = FileHelper::read_binary_file(path);
 
-	if(!FileHelper::file_exists(path)) {
-		throw ScarabError("Font file (%s) is invalid", path);
-	} else if(buffer.empty()) {
+	if(buffer.empty()) {
 		throw ScarabError("Font file (%s) is invalid", path);
 	} else if(buffer.size() < 4) {
 		throw ScarabError("Font file (%s) is too small", path);
@@ -24,25 +25,28 @@ Font::Font(const char* path, const uint16 size) : fontsize(size) {
 		LOG_WARNING("Unexpected font version: %08x", version);
 	}
 
-	std::vector<uint8> temp_bitmap = std::vector<uint8>(static_cast<size_t>(this->atlas_width * this->atlas_height));
+	// TEST
+	constexpr int atlas_width  = 512;
+	constexpr int atlas_height = 512;
 
-	this->char_data.reserve(128); // ASCII Characters
+	std::vector<uint8> temp_bitmap = std::vector<uint8>(static_cast<size_t>(atlas_width * atlas_height));
 
-
-	stbtt_bakedchar char_data[128];
-	stbtt_BakeFontBitmap(
+	int result = stbtt_BakeFontBitmap(
 		buffer.data(), 0,
-		this->fontsize,
+		size,
 		temp_bitmap.data(),
-		this->atlas_width, this->atlas_height,
-		32, 96, // ASCII 32 to 127
-		char_data
+		atlas_width, atlas_height,
+		32, 96, // ASCII 32 to 127, 96 printable ASCII
+		this->cdata
 	);
 
-	// Store char data in map for easy access
-	for(int i = 0; i < 96; i++) {
-		this->char_data[static_cast<char>(i + 32)] = char_data[i];
+	if (result <= 0) {
+		// Maximum size is 88
+		throw ScarabError("Failed to bake font (%s) bitmap. Maybe the size is too big or too small", path);
 	}
+
+	this->buffer_capacity = 20;
+	this->buffer_data = new Glyph[this->buffer_capacity * 6];
 
 	// Create Texture from bitmap
 	// NOTE: could use texture class here
@@ -51,8 +55,8 @@ Font::Font(const char* path, const uint16 size) : fontsize(size) {
 	glBindTexture(GL_TEXTURE_2D, this->texid);
 	glTexImage2D(
 		GL_TEXTURE_2D, 0,
-		GL_R8,
-		this->atlas_width, this->atlas_height, 0,
+		GL_RED,
+		atlas_width, atlas_height, 0,
 		GL_RED,
 		GL_UNSIGNED_BYTE,
 		temp_bitmap.data()
@@ -60,6 +64,11 @@ Font::Font(const char* path, const uint16 size) : fontsize(size) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glBindTexture(GL_TEXTURE_2D, 0);
+
+	// Store char data in map for easy access
+	// for(int i = 0; i < 96; i++) {
+	// 	this->char_data[static_cast<char>(i + 32)] = char_data[i];
+	// }
 
 	// Create VAO and VBO
 	glGenVertexArrays(1, &this->vao);
@@ -69,8 +78,11 @@ Font::Font(const char* path, const uint16 size) : fontsize(size) {
 	glBindVertexArray(this->vao);
 	glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
 
+	// Allocate memory
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Glyph) * 6 * this->buffer_capacity, 0, GL_DYNAMIC_DRAW);
+
 	// Set VAO and VBO attributes
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Glyph), (void*)offsetof(Glyph, position));
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Glyph), (void*)0);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Glyph), (void*)offsetof(Glyph, texuv));
 	glEnableVertexAttribArray(1);
@@ -86,62 +98,72 @@ Font::~Font() noexcept {
 	glDeleteTextures(1, &this->texid);
 };
 
-void Font::add_text(const std::string& text, const vec2<float>& pos, const float scale) noexcept {
-	float start_x = pos.x;
-
-	for(char c : text) {
-		if(this->char_data.find(c) == this->char_data.end()) {
-			continue;
-		}
-
-		stbtt_bakedchar& char_info = this->char_data[c];
-
-		float x0 = start_x + char_info.xoff * scale;
-		float y0 = pos.y + char_info.yoff * scale;
-		float x1 = x0 + char_info.x1 - char_info.x0 * scale;
-		float y1 = y0 + char_info.y1 - char_info.y0 * scale;
-
-		float s0 = char_info.x0 / (float)this->atlas_width;
-		float t0 = char_info.y0 / (float)this->atlas_height;
-		float s1 = char_info.x1 / (float)this->atlas_width;
-		float t1 = char_info.y1 / (float)this->atlas_height;
-
-		// Add quad to batch
-		Glyph vertices[6] = {
-			{ vec2<float>(x0, y0), vec2<float>(s0, t0) },
-			{ vec2<float>(x1, y0), vec2<float>(s1, t0) },
-			{ vec2<float>(x0, y1), vec2<float>(s0, t1) },
-			{ vec2<float>(x0, y1), vec2<float>(s0, t1) },
-			{ vec2<float>(x1, y0), vec2<float>(s1, t0) },
-			{ vec2<float>(x1, y1), vec2<float>(s1, t1) }
-		};
-
-		this->chars.insert(this->chars.end(), std::begin(vertices), std::end(vertices));
-
-		start_x += char_info.xadvance * scale;
-	}
-}
-
-
-void Font::draw_all() noexcept {
-	glDepthFunc(GL_ALWAYS);
-	if(this->chars.empty()) {
-		return;
-	}
-
+void Font::add_text(const Camera2D& camera, const std::string& text, const vec2<float>& pos, const float scale) noexcept {
 	glBindVertexArray(this->vao);
-
 	glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
-	glBufferData(GL_ARRAY_BUFFER, this->chars.size() * sizeof(Glyph),
-		this->chars.data(), GL_DYNAMIC_DRAW);
 
+	// Resize the vector to fit all characters
+	if(this->buffer_capacity < text.length()) {
+		this->buffer_capacity = text.length();
+		glBufferData(GL_ARRAY_BUFFER, sizeof(Glyph) * 6 * this->buffer_capacity, 0, GL_DYNAMIC_DRAW);
+		delete[] this->buffer_data;
+		this->buffer_data = new Glyph[this->buffer_capacity * 6];
+	}
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, this->texid);
+
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(pos.x, pos.y, 0.0f));
+	model = glm::scale(model, glm::vec3(scale, scale, 1.0f));
 
 	Shader& shader = this->get_shader();
 	shader.use();
-	shader.set_color("shapeColor", Colors::WHITE);
+	shader.set_color("shapeColor", Colors::YELLOW);
+	shader.set_matrix4f("mvp", (camera.get_proj_matrix() * camera.get_view_matrix()) * model);
 
-	glDrawArrays(GL_TRIANGLES, 0, (GLsizei)this->chars.size());
+	// Remove const
+	float x = pos.x;
+	float y = pos.y;
 
-	this->chars.clear();
-	glBindVertexArray(0);
+	uint32 num_vertices = 0;
+	// size_t vertex_index = 0;
+
+	Glyph* data = this->buffer_data;
+	for(char c : text) {
+		// In range
+		if(c < 32 || c > 128) {
+			continue;
+		}
+
+		stbtt_aligned_quad q;
+		stbtt_GetBakedQuad(this->cdata, 512, 512, c - 32, &x, &y, &q, 1);
+
+		// Apply scale if needed
+		// float x0 = q.x0 * scale;
+		// float y0 = q.y0 * scale;
+		// float x1 = q.x1 * scale;
+		// float y1 = q.y1 * scale;
+
+		data[0].position = vec2<float>(q.x0, q.y0);
+		data[1].position = vec2<float>(q.x1, q.y0);
+		data[2].position = vec2<float>(q.x1, q.y1);
+		data[3].position = vec2<float>(q.x0, q.y1);
+		data[4].position = vec2<float>(q.x0, q.y0);
+		data[5].position = vec2<float>(q.x1, q.y1);
+
+		data[0].texuv = vec2<float>(q.s0, q.t0); 
+		data[1].texuv = vec2<float>(q.s1, q.t0);
+		data[2].texuv = vec2<float>(q.s1, q.t1);
+		data[3].texuv = vec2<float>(q.s0, q.t1);
+		data[4].texuv = vec2<float>(q.s0, q.t0);
+		data[5].texuv = vec2<float>(q.s1, q.t1);
+
+		data += 6;
+		num_vertices += 6;
+	}
+
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Glyph) * num_vertices, this->buffer_data);
+	glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(num_vertices));
 }
+

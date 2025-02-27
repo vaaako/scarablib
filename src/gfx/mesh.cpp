@@ -8,13 +8,20 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
 
-
 Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept
 	: vao_hash(VAOManager::get_instance().compute_hash(vertices, indices)),
-	  indices_length(static_cast<uint32>(indices.size())) {
+	  indices_length(static_cast<GLsizei>(indices.size())) {
 
 	this->boxsize = BoundingBox::calculate_size_from_vertices(vertices);
 	this->vao_id = VAOManager::get_instance().make_vao(vertices, indices);
+}
+
+Mesh::Mesh(const std::vector<Vertex>& vertices) noexcept
+	: vao_hash(VAOManager::get_instance().compute_hash(vertices)) {
+
+	// Not indices, but fuck it
+	this->indices_length = static_cast<GLsizei>(vertices.size());
+	this->vao_id = VAOManager::get_instance().make_vao(vertices);
 }
 
 Mesh::Mesh(const char* path) {
@@ -97,7 +104,7 @@ Mesh::Mesh(const char* path) {
 
 	this->boxsize = BoundingBox::calculate_size_from_vertices(vertices);
 
-	this->indices_length = indices.size();
+	this->indices_length = static_cast<GLsizei>(indices.size());
 	this->vao_hash = VAOManager::get_instance().compute_hash(vertices, indices);
 	this->vao_id = VAOManager::get_instance().make_vao(vertices, indices);
 

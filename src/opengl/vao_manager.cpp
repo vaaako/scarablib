@@ -11,7 +11,9 @@ GLuint VAOManager::get_vao(const size_t hash) const noexcept {
 void VAOManager::release_vao(const size_t hash) noexcept {
 	auto it = vao_map.find(hash);
 	if(it != this->vao_map.end()) {
-		vao_map[hash].ref_count--; // Decrement reference count
+		// Decrement reference count
+		vao_map[hash].ref_count--;
+		// If no more hash is using this VAO
 		if(vao_map[hash].ref_count == 0) {
 			const VAOData& data = it->second.data;
 
@@ -39,65 +41,3 @@ void VAOManager::cleanup() noexcept {
 	vao_map.clear();
 }
 
-
-VAOManager::VAOData VAOManager::create_vao(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) const noexcept {
-	VAOData data;
-
-	// Gen VAO
-	glGenVertexArrays(1, &data.vao_id);
-	glBindVertexArray(data.vao_id);
-
-	// Gen and bind EBO
-	glGenBuffers(1, &data.ebo_id);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, data.ebo_id);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizei>(indices.size() * sizeof(uint32)), indices.data(), GL_STATIC_DRAW);
-
-	// Gen and bind VBO
-	glGenBuffers(1, &data.vbo_id);
-	glBindBuffer(GL_ARRAY_BUFFER, data.vbo_id);
-	glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(vertices.size() * sizeof(Vertex)), vertices.data(), GL_STATIC_DRAW);
-	// Position
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
-	glEnableVertexAttribArray(0);
-	// Normal
-	// glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-	// glEnableVertexAttribArray(1);
-	// TexUV
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texuv));
-	glEnableVertexAttribArray(1);
-
-	// Unbind all
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-	return data;
-}
-
-VAOManager::VAOData VAOManager::create_vao(const std::vector<vec3<float>>& vertices, const std::vector<uint32>& indices) const noexcept {
-	VAOData data;
-
-	// Gen VAO
-	glGenVertexArrays(1, &data.vao_id);
-	glBindVertexArray(data.vao_id);
-
-	// Gen and bind EBO
-	glGenBuffers(1, &data.ebo_id);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, data.ebo_id);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizei>(indices.size() * sizeof(uint32)), indices.data(), GL_STATIC_DRAW);
-
-	// Gen and bind VBO
-	glGenBuffers(1, &data.vbo_id);
-	glBindBuffer(GL_ARRAY_BUFFER, data.vbo_id);
-	glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(vertices.size() * sizeof(vec3<float>)), vertices.data(), GL_STATIC_DRAW);
-	// Position
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vec3<float>), (void*)0);
-	glEnableVertexAttribArray(0);
-
-	// Unbind all
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-	return data;
-}

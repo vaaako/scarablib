@@ -1,20 +1,15 @@
 #include "scarablib/gfx/2d/circle.hpp"
 
-Circle::Circle(const Shape2DConf& conf) noexcept
-	: Shape2D(conf) {}
+Circle::Circle(const std::vector<Vertex>& vertices) noexcept
+	: Sprite(vertices) {}
 
-void Circle::draw(const Shader& shader) noexcept {
-	shader.unbind();
+void Circle::draw(const Camera2D& camera, const Shader& shader) noexcept {
+	this->update_model_matrix();
 
-	// Apply transformations if needed
-	this->update_model();
+	shader.set_matrix4f("mvp", (camera.get_proj_matrix() * camera.get_view_matrix()) * this->model);
+	shader.set_color("shapeColor", this->color);
 
-	// Bind shader and apply changes
-	Shader& circle_shader = this->get_shader();
-	circle_shader.use();
-	circle_shader.set_matrix4f("model", this->model);
-	shader.set_color("shapeColor", this->conf.color);
-	circle_shader.set_float("blur", this->blur);
+	shader.set_float("blur", this->blur);
 
 	this->texture->bind();
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);

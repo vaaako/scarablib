@@ -19,24 +19,27 @@ class VAOManager {
 			return instance;
 		}
 
-		// Check if the VAO of the vertices (std::vector<vec3<float>>) and indices exists and get its ID.
-		// If not found, it will create a new entry.
-		// WARNING: Only use this function one time per mesh
+		// Check if the vertices and indices (optional) alredy has a VAO.
+		// This will make a unique hash based on the vertices and indices.
+		// If has is not found in the map, it will create a new VAO and an entry.
+		// At the end, it will return the VAO's ID.
+		// WARNING: Use this method only one time per Mesh, since it keep track of how many Meshes are using the same VAO, and using it again will mess up the reference count
 		template<typename T>
-		GLuint make_vao(const std::vector<T>& vertices, const std::vector<uint32_t>& indices) noexcept;
+		GLuint make_vao(const std::vector<T>& vertices, const std::vector<uint32_t>& indices = {}) noexcept;
 
-		// Get an hash based on the vertices (std::vector<T>) and indices
+		// Generate a new unique hash based on the vertices and indices (optional)
 		template<typename T>
-		size_t compute_hash(const std::vector<T>& vertices, const std::vector<uint32_t>& indices) const noexcept;
+		size_t compute_hash(const std::vector<T>& vertices, const std::vector<uint32_t>& indices = {}) const noexcept;
 
-		// Get a VAO ID from its hash
+		// Get the VAO's ID from its hash
 		GLuint get_vao(const size_t hash) const noexcept;
 
 		// Remove a VAO from the map.
 		// The method will check if any other model is using the VAO and then release
 		void release_vao(const size_t hash) noexcept;
 
-		// Clean up all VAOs
+		// Clean up all VAOs.
+		// WARNING: This is called when a window is destroyed, don't call it manually
 		void cleanup() noexcept;
 	private:
 		struct VAOData {
@@ -48,7 +51,7 @@ class VAOManager {
 		// Keep track of how many models are using the same VAO.
 		// If reach 0, delete VAO
 		struct VAOEntry {
-			VAOData data;
+			VAOManager::VAOData data;
 			uint32 ref_count;
 		};
 
@@ -58,18 +61,21 @@ class VAOManager {
 		VAOManager(const VAOManager&) noexcept = delete;
 		VAOManager& operator=(const VAOManager&) noexcept = delete;
 
-		// Make the VAO, VBO and EBO
-		VAOData create_vao(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) const noexcept;
-		// Make the VAO, VBO and EBO (using single pos vertices)
-		VAOData create_vao(const std::vector<vec3<float>>& vertices, const std::vector<uint32>& indices) const noexcept;
+		// Make the VAO, VBO and EBO.
+		// Indices is optional
+		template<typename T>
+		VAOManager::VAOData create_vao(const std::vector<T>& vertices, const std::vector<uint32>& indices) const noexcept;
 };
 
 template<typename T>
 GLuint VAOManager::make_vao(const std::vector<T>& vertices, const std::vector<uint32_t>& indices) noexcept {
-	const size_t hash = compute_hash(vertices, indices);
+	static_assert(std::is_same<T, vec3<float>>::value || std::is_same<T, Vertex>::value,
+			"Only vec3<float> and Vertex types for vertices are accepted");
 
-	auto it = this->vao_map.find(hash);
+	const size_t hash = this->compute_hash(vertices, indices);
+
 	// If not found, make a new VAO and entry
+	auto it = this->vao_map.find(hash);
 	if (it == this->vao_map.end()) {
 		VAOEntry entry = { .data = this->create_vao(vertices, indices), .ref_count = 1 };
 		this->vao_map[hash] = entry;
@@ -91,8 +97,11 @@ GLuint VAOManager::make_vao(const std::vector<T>& vertices, const std::vector<ui
 }
 
 // Specialized hash function for better distribution
-template<typename T>
+template <typename T>
 size_t VAOManager::compute_hash(const std::vector<T>& vertices, const std::vector<uint32_t>& indices) const noexcept {
+	static_assert(std::is_same<T, vec3<float>>::value || std::is_same<T, Vertex>::value,
+			"Only vec3<float> and Vertex types for vertices are accepted");
+
 	// Use FNV-1a hash for better distribution
 	constexpr size_t FNV_PRIME = 1099511628211ULL;
 	constexpr size_t FNV_OFFSET = 14695981039346656037ULL;
@@ -108,14 +117,61 @@ size_t VAOManager::compute_hash(const std::vector<T>& vertices, const std::vecto
 		hash *= FNV_PRIME;
 	}
 
-	// Hash index data
-	const auto* index_data = reinterpret_cast<const char*>(indices.data());
-	const size_t index_bytes = indices.size() * sizeof(uint32_t);
-	
-	for (size_t i = 0; i < index_bytes; i++) {
-		hash ^= static_cast<size_t>(index_data[i]);
-		hash *= FNV_PRIME;
+	// Hash index data (only if indices are provided)
+	if (!indices.empty()) {
+		const auto* index_data = reinterpret_cast<const char*>(indices.data());
+		const size_t index_bytes = indices.size() * sizeof(uint32_t);
+		
+		for (size_t i = 0; i < index_bytes; i++) {
+			hash ^= static_cast<size_t>(index_data[i]);
+			hash *= FNV_PRIME;
+		}
 	}
 
 	return hash;
+}
+
+
+template<typename T>
+VAOManager::VAOData VAOManager::create_vao(const std::vector<T>& vertices, const std::vector<uint32>& indices) const noexcept {
+	// dont need static assert here, since it was already checked in make_vao
+
+	VAOData data;
+
+	// Gen VAO
+	glGenVertexArrays(1, &data.vao_id);
+	glBindVertexArray(data.vao_id);
+
+	// Gen and bind EBO
+	if(!indices.empty()) {
+		glGenBuffers(1, &data.ebo_id);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, data.ebo_id);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizei>(indices.size() * sizeof(uint32)), indices.data(), GL_STATIC_DRAW);
+	}
+
+	// Gen and bind VBO
+	glGenBuffers(1, &data.vbo_id);
+	glBindBuffer(GL_ARRAY_BUFFER, data.vbo_id);
+	glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(vertices.size() * sizeof(T)), vertices.data(), GL_STATIC_DRAW);
+	// Position
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(T), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	// T is only a Vertex or a vec3<float>
+	// if(sizeof(T) == sizeof(Vertex)) {
+	if constexpr (std::is_same<T, Vertex>::value) {
+		// Normal
+		// glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+		// glEnableVertexAttribArray(1);
+		// TexUV
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(T), (void*)offsetof(T, texuv));
+		glEnableVertexAttribArray(1);
+	}
+
+	// Unbind all
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	return data;
 }

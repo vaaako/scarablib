@@ -25,6 +25,8 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [ ] Use `static_assert`
 	+ Dont forget about model methods
 
+- [ ] Shader in billboard and circle will make a new one for each instance, make static
+- [ ] Optimize scene different shader bind by changing the local shader when different then changing back
 
 # TODO Bug
 - [x] Memory leak somewhere (i don't know if is in my code or in some library, but is not dangerous)
@@ -51,8 +53,8 @@ I wrote most of the things here very tired, sorry for any english mistake
 # TODO Shapes
 - [x] Make a Model Factory instead of static `get vao` and a struct for each model
 - [x] Custom shapes support (kinda, i think)
+- [x] Use one shader for 2D and 3D shapes
 - [ ] Color matrix support
-- [ ] Use one shader for 2D and 3D shapes
 - [ ] Physics (dont know how)
 - [ ] Batch rendering for textures too
 	+ Would have to make another map, its worth it?
@@ -60,6 +62,7 @@ I wrote most of the things here very tired, sorry for any english mistake
 	+ for 3d, yeah
 - [x] Remove `ModelConf`
 	+ kinda?
+- [ ] CCW vertices
 
 - [ ] TextureArray
 	- [ ] Support for texture array and common texture to the same model
@@ -70,10 +73,10 @@ I wrote most of the things here very tired, sorry for any english mistake
 	+ Use a blank texture as default (texture made in code)
 	+ Add to vertex attrib 2 on shape VBO and check if is to use on shape instance
 	+ This could be done by making a custom shape (e.g. `new Cube(custom_color)`), then all variants of this shape with custom color would have this color
-- [ ] Change obsolete VAO and VBO management
-- [ ] Better draw
-- [ ] Better custom shape support
-- [ ] Review old shapes
+- [x] Change obsolete VAO and VBO management
+- [x] Better draw
+- [x] Better custom shape support
+- [x] Review old shapes
 - [ ] New shapes: Triangle (for real)
 - [ ] Animation support
 	+ For reference: [raycast](https://github.com/vaaako/Raycast/blob/main/src/sprite.lua#L46)
@@ -81,8 +84,8 @@ I wrote most of the things here very tired, sorry for any english mistake
 	+ Like [Windfield](https://github.com/a327ex/windfield). Show collider and easy setting
 	+ Rigid body
 	+ use bounding box?
-- [ ] If possible, use mesh.hpp for 2D shapes
-- [ ] Remove `SCARAB_2D_AND_3D`
+- [x] If possible, use mesh.hpp for 2D shapes
+- [x] Remove `SCARAB_2D_AND_3D`
 
 # TODO 3D
 - [x] Camera

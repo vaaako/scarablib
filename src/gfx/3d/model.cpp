@@ -1,4 +1,4 @@
-#include "scarablib/gfx/model.hpp"
+#include "scarablib/gfx/3d/model.hpp"
 
 Model::Model(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept
 	: Mesh(vertices, indices) {}
@@ -45,25 +45,26 @@ void Model::update_model_matrix() noexcept {
 	this->model *= orientation;
 	this->model *= rotation;
 
+	this->isdirty = false;
+
 	// Update the bounding box in world space
 	if(this->calc_enabled) {
 		this->bounding->update_world_bounding_box(this->model);
 	}
-
-	this->isdirty = false;
 }
 
+// I just need to provide the mvp just if any of the matrix changes, because the value is stored
+// but i dont know how to do it currently (and i am lazy)
 void Model::draw(const Camera& camera, const Shader& shader) noexcept {
-	this->update_model_matrix();
+	// Shader is binded outside for batch rendering
 
-	glm::mat4 view = camera.get_view_matrix();
-	glm::mat4 proj = camera.get_proj_matrix(); // Add perspective
+	this->update_model_matrix();
 
 	// NOTE: "is dirty" for color wouldn't work because would set the last color updated for all Modeles (using this later maybe)
 	shader.set_color("shapeColor", this->color);
-	shader.set_matrix4f("mvp", (proj * view) * this->model);
+	shader.set_matrix4f("mvp", (camera.get_proj_matrix() * camera.get_view_matrix()) * this->model);
 
 	this->texture->bind();
-	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(this->indices_length), GL_UNSIGNED_INT, (void*)0);
+	glDrawElements(GL_TRIANGLES, this->indices_length, GL_UNSIGNED_INT, (void*)0);
 	this->texture->unbind();
 }

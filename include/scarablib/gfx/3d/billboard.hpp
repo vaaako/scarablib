@@ -2,10 +2,23 @@
 
 // This is a class to make a billboard model.
 // WARNING: Do not use this class directly, use ModelFactory::create_billboard(const Model::Config& conf)
-#include "scarablib/gfx/model.hpp"
+#include "scarablib/gfx/3d/model.hpp"
 #include "scarablib/utils/file.hpp"
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/vector_angle.hpp>
+
+#define SCARAB_DEBUG_BILLBOARD
+
+// Class for billboard model
 struct Billboard : public Model {
+	enum class Direction : uint8 {
+		EAST,
+		NORTH,
+		WEST,
+		SOUTH
+	};
+
 	//          FRONT
 	//            ↑
 	// FRONT_LEFT   FRONT_RIGHT
@@ -16,7 +29,7 @@ struct Billboard : public Model {
 	//            ↓
 	//           BACK
 
-	// WARNING: Do not use this class directly, use ModelFactory::create_cube(const Model::Config& conf)
+	// WARNING: Do not use this constructor, use ModelFactory
 	Billboard(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept;
 	// This is overrided because if not, it wouldn't be possible to clean the textures
 	~Billboard() noexcept override;
@@ -35,13 +48,13 @@ struct Billboard : public Model {
 	// Changes the texture based on the angle of the billboard front face relative to the focus position.
 	// Just use this method if you have at least 4 textures set.
 	// *WARNING:* This method DOES NOT check if textures was set correctly, you will have a error if don't
-	inline void rotate_four_directions(const vec3<float>& focus_position) noexcept {
+	inline void rotate_four_directions(const vec3<float>& target_position) noexcept {
 		// [-45,  45] 0 Front
 		// [ 45, 135] 1 Right
 		// [135, 225] 2 Left
 		// [225, 315] 3 Back
 
-		const float angle = this->direction_angle(focus_position);
+		const float angle = this->direction_angle(target_position);
 		const uint32 sector = static_cast<uint32>((angle + 45.0f) / 90.0f) % 4;
 		this->set_texture(this->textures[sector]);
 	}
@@ -49,7 +62,7 @@ struct Billboard : public Model {
 	// Changes the texture based on the angle of the billboard front face relative to the focus position.
 	// Just use this method if you have 8 textures set.
 	// *WARNING:* This method DOES NOT check if textures was set correctly, you will have a error if don't
-	inline void rotate_eight_directions(const vec3<float>& focus_position) noexcept {
+	inline void rotate_eight_directions(const vec3<float>& target_position) noexcept {
 		// 8 Directions: Divide the circle into 8 sectors of 45° each
 		// Sector mapping:
 		// [-180°, -135°) 0 Front
@@ -91,7 +104,7 @@ struct Billboard : public Model {
 
 		// NOTE: Eight is conveniently a power of two, so you could use bit manipulation
 
-		const float angle = this->direction_angle(focus_position);
+		const float angle = this->direction_angle(target_position);
 		const uint32 sector = static_cast<uint32>((angle + 22.5f) / 45.0f) % 8;
 		if(sector != this->cur_sector) {
 			this->set_texture(this->textures[sector]);
@@ -99,8 +112,73 @@ struct Billboard : public Model {
 		}
 
 		#ifdef SCARAB_DEBUG_BILLBOARD
+		static std::string str_dirs[8] = {
+			"FRONT",
+			"FRONT_RIGHT",
+			"RIGHT",
+			"BACK_RIGHT",
+			"BACK",
+			"BACK_LEFT",
+			"LEFT",
+			"FRONT_LEFT"
+		};
 		LOG_INFO("Angle: %f, Direction: [%i] %s", angle, sector, str_dirs[sector].c_str());
 		#endif
+	}
+
+	// Returns the angle of the focus position relative to the billboard.
+	// In simple terms: Where the camera is relative to the billboard? 0.0 is in the FRONT and 180.0 is in the BACK
+	inline float direction_angle(const vec3<float>& target_position) const noexcept  {
+		// Avoid full 3D vector normalization - only need 2D directions
+		return glm::degrees(
+			// Only calculate in 2D (xz-plane) since thats all is needed for billboards
+			std::atan2(
+				target_position.x - this->position.x,
+				target_position.z - this->position.z
+
+				// Flipped
+				// this->position.z - target_position.z,
+				// this->position.x - target_position.x
+			)
+		);
+	}
+
+	// Just makes the billboard always follow the target
+	// void face_target(const vec3<float>& target_position) noexcept;
+
+
+	// TESTES ONLY NOT READY THIS IS JUST FOR TESTS //
+
+	// Changes the texture based to where the billboard is looking at.
+	// *WARNING:* This method DOES NOT check if textures was set correctly, you will have a error if don't
+	void relative_angle(const vec3<float>& target_pos) noexcept {
+		// Angle between this and target
+		const float angle_to_target = std::atan2(
+			target_pos.z - this->position.z,
+			target_pos.x - this->position.x
+		);
+
+		// Relative angle (in radians)
+		float relative_angle = static_cast<float>(angle_to_target - this->directions[static_cast<uint8>(this->cur_dir)] + M_PI);
+		// Normalize to 0-2pi range
+		relative_angle = (float)std::fmod(relative_angle + 2.0f * M_PI, 2 * M_PI);
+
+		uint32 sector = static_cast<uint32>(relative_angle * 8 / (2 * M_PI)) % 8;
+		this->set_texture(this->textures[sector]);
+
+		// float angle_deg = (float)(angle_to_target * (180.0f / M_PI));
+		// float cur_dir_deg = (float)(this->directions[static_cast<uint8>(this->cur_dir)]);
+		// float relative_angle = std::fmod(angle_deg - cur_dir_deg + 360.0f, 360.0f);
+		// uint32 sector = static_cast<uint32>(relative_angle / 45) % 8;
+		//
+		// this->set_texture(this->textures[sector]);
+
+		// LOG_INFO("Angle: %f, RAngle: %f, Sector: %i", angle_to_target, relative_angle, sector);
+	}
+	// TESTES ONLY NOT READY THIS IS JUST FOR TESTS //
+
+	inline void set_direction(const Billboard::Direction dir) {
+		this->cur_dir = dir;
 	}
 
 	// Returns the shader used by billboard
@@ -108,31 +186,45 @@ struct Billboard : public Model {
 		return this->shader;
 	};
 
-	// Returns the angle of the focus position relative to the billboard.
-	// In simple terms: Where the camera is relative to the billboard? 0.0 is in the FRONT and 180.0 is in the BACK
-	inline float direction_angle(const vec3<float>& focus_position) const noexcept  {
-		// Avoid full 3D vector normalization - only need 2D directions
-		return glm::degrees(
-			// Only calculate in 2D (xz-plane) since thats all is needed for billboards
-			std::atan2(
-				focus_position.x - this->position.x,
-				focus_position.z - this->position.z
-			)
-		);
-
-		// vec3<float> direction = focus_position - this->position;
-		// direction = glm::normalize(direction);
-		// return glm::degrees(std::atan2(direction.x, direction.z));
-	}
-
 	private:
+		Billboard::Direction cur_dir = Billboard::Direction::NORTH;
+
+		double directions[8] = {
+			0.0f,               // 0 [  0] EAST        (RIGHT)
+			// 0.785375
+			M_PI / 4.0f,        // 1 [ 45] NORTH-EAST  (UP-RIGHT)
+			// 1.57075
+			M_PI / 2.0f,        // 2 [ 90] NORTH       (UP)
+			// 2.356125
+			3.0f * M_PI / 4.0f, // 3 [135] NORTH-WEAST (UP-LEFT)
+			// 3.1415
+			M_PI,               // 4 [180] WEST        (LEFT)
+			// 3.926875
+			5.0f * M_PI / 4.0f, // 5 [225] SOUTH-WEAST (DOWN-LEFT)
+			// 4.71225
+			3.0f * M_PI / 2.0f, // 6 [270] SOUTH       (DOWN)
+			// 5.497625
+			7.0f * M_PI / 4.0f  // 7 [315] SOUTH-EAST  (DOWN-RIGHT)
+		};
+
+		// float directions[8] = {
+		// 	0.0,     // [  0°] EAST        (RIGHT)
+		// 	45.0,    // [ 45°] NORTHEAST   (UP-RIGHT)
+		// 	90.0,    // [ 90°] NORTH       (UP)
+		// 	135.0,   // [135°] NORTHWEST   (UP-LEFT)
+		// 	180.0,   // [180°] WEST        (LEFT)
+		// 	225.0,   // [225°] SOUTHWEST   (DOWN-LEFT)
+		// 	270.0,   // [270°] SOUTH       (DOWN)
+		// 	315.0    // [315°] SOUTHEAST   (DOWN-RIGHT)
+		// };
+
 		// Only used for directional textures
 		std::vector<Texture*> textures;
 		uint32 cur_sector; // Save to check and only change texture if needed
 
 		Shader* shader = new Shader(
-			FileHelper::read_file(THIS_FILE_DIR + "/../../opengl/shaders/3d/billboard_vertex.glsl").c_str(),
-			FileHelper::read_file(THIS_FILE_DIR + "/../../opengl/shaders/3d/fragment.glsl").c_str()
+			FileHelper::read_file("resources/shaders/3d/billboard_vs.glsl").c_str(),
+			FileHelper::read_file("resources/shaders/fragment.glsl").c_str()
 		);
 
 		void draw(const Camera& camera, const Shader& shader) noexcept override;

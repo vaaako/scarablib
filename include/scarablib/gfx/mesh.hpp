@@ -13,6 +13,9 @@ class Mesh {
 		// Build Mesh using object's vertices and indices
 		// This is used for custom models
 		Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept;
+		// Build Mesh using only vertices.
+		// This is manly used for 2D Shapes. It will not make a collider
+		Mesh(const std::vector<Vertex>& vertices) noexcept;
 		// Build Mesh using a wavefront .obj file
 		Mesh(const char* path);
 
@@ -20,7 +23,7 @@ class Mesh {
 
 		// Set a new texture to the mesh
 		inline void set_texture(Texture* texture) noexcept {
-			this->texture = (texture != nullptr) ? texture : &this->get_deftex();
+			this->texture = (texture != nullptr) ? texture : &Texture::default_texture();
 		}
 
 		inline Texture& get_texture() const noexcept {
@@ -29,7 +32,7 @@ class Mesh {
 
 		// Removes the shape's texture
 		inline void remove_texture() noexcept {
-			this->texture = &this->get_deftex();
+			this->texture = &Texture::default_texture();
 		}
 
 		inline GLuint get_vaoid() const noexcept {
@@ -44,27 +47,16 @@ class Mesh {
 	protected:
 		// OpenGL
 		size_t vao_hash;               // Keep track of the hash being used
-		size_t indices_length;         // For drawing
+		GLsizei indices_length;        // For drawing (in 2D this is not the indices size, but i dont know how to call it)
 		uint32 vao_id;                 // This is used for wavefront .obj files only
 		// std::vector<Vertex> vertices;  // Used for calculate the bounding box (cleared after that)
 
 		// Bounding box
 		// I wish this wasnt in this class, but i need vertices and dont want to store it, because is a waste of memory
 		// This makes a little more "processor expensive" for creating a model, but, i wont have to store vertices for each model which consumes much memory
-		BoundingBox::Size boxsize;
+		BoundingBox::Size boxsize = {};
 
 		// Current texture being used
 		// This will always be a shared pointer to other texture
-		Texture* texture = &this->get_deftex(); // Default texture
-
-		// NOTE: Dont want this here, but i was forced since it needs vertices
-		// and i dont want to store vertices just for this
-
-		// NOTE: I wish this was a member, but i would have to initialize in window.hpp
-		// because i cant make a texture if the opengl context isnt ready yet
-		inline Texture& get_deftex() const noexcept {
-			// I don't like data being statically allocated but whatever
-			static Texture def_tex = Texture(Colors::WHITE); // Make solid white texture
-			return def_tex;
-		}
+		Texture* texture = &Texture::default_texture(); // Default texture
 };

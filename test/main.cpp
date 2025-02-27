@@ -1,9 +1,12 @@
+#include "scarablib/gfx/2d/rectangle.hpp"
+#include "scarablib/gfx/2d/sprite_factory.hpp"
 #include "scarablib/opengl/shader.hpp"
 #include "scarablib/scenes/camera.hpp"
+#include "scarablib/scenes/camera2d.hpp"
 #include "scarablib/scenes/scene2d.hpp"
 #include "scarablib/scenes/scene3d.hpp"
 #include "scarablib/gfx/3d/cube.hpp"
-#include "scarablib/gfx/model_factory.hpp"
+#include "scarablib/gfx/3d/model_factory.hpp"
 #include "scarablib/types/color.hpp"
 #include "scarablib/proper/log.hpp"
 #include "scarablib/gfx/skybox.hpp"
@@ -11,6 +14,7 @@
 #include "scarablib/utils/math.hpp"
 #include "scarablib/window/window.hpp"
 #include "scarablib/input/keycode.hpp"
+#include <algorithm>
 #include <cstdio>
 
 bool mouse_captured = false;
@@ -101,14 +105,16 @@ int main() {
 
 	// TODO: Make it use only one drawcall
 	// WARNING: FONTS ARE NOT COMPLETED YET, I WILL UPDATE IT LATER
-	// Font msgothic = Font("test/assets/fonts/Ubuntu-R.ttf", 24);
+	Font msgothic = Font("test/assets/fonts/Ubuntu-R.ttf", 32);
 
 	// Make scenes
 	Camera camera = Camera(window, 75.0f, 0.1f);
 	camera.set_speed(1.0f * DELTATIME_MODIFIER);
 
-	Scene2D scene2d = Scene2D(window);
-	Scene3D scene3d = Scene3D(window, camera);
+	Camera2D camera2d = Camera2D(window);
+
+	Scene2D scene2d = Scene2D(camera2d);
+	Scene3D scene3d = Scene3D(camera);
 
 	Skybox skybox = Skybox(camera, {
 		"test/assets/images/skybox/right.jpg",
@@ -127,21 +133,21 @@ int main() {
 	scene3d.add_to_scene("cow", cow);
 
 	// Make shapecollision
-	Cube* cube = ModelFactory::create_cube();
+	Cube* cube = ModelFactory::new_cube();
 	scene3d.add_to_scene("cube1", cube);
 	cube->set_position({ -10.0f, 1.0f, -10.0f }); // Cube position doesnt matter because will change later
 	cube->set_texture(&tex1);
 
-	Cube* cube2 = ModelFactory::create_cube();
+	Cube* cube2 = ModelFactory::new_cube();
 	cube2->set_texture(&tex2);
 	scene3d.add_to_scene("cube2", cube2);
 
-	Cube* cube3 = ModelFactory::create_cube();
+	Cube* cube3 = ModelFactory::new_cube();
 	cube3->set_texture(&tex3);
 	scene3d.add_to_scene("cube3", cube3);
 
 	// BUG: Memory leak somewhere in billboard class
-	Billboard* bill = ModelFactory::create_billboard();
+	Billboard* bill = ModelFactory::new_billboard();
 	bill->set_position({ -5.0f, 1.0f, -10.0f });
 	bill->set_scale(vec4<float>(4.0f));
 	// Front-right and Right are unecessary since they are the same texture but flipped
@@ -159,6 +165,13 @@ int main() {
 	// testcube->set_scale(vec3<float>(0.5f));
 	// testcube->set_position(cow->get_center_position());
 	// scene3d.add_to_scene("testcube", testcube);
+
+	// Rectangle* sprite = SpriteFactory::new_rectangle();
+	// sprite->set_position({ 10.0f, 10.0f });
+	// sprite->set_size({ 100.0f, 100.0f });
+	// sprite->set_color(Colors::PINK);
+	// sprite->set_texture(&tex1);
+	// scene2d.add_to_scene("rec", sprite);
 
 	LOG_INFO("Scene3d length %d", scene3d.length());
 
@@ -180,8 +193,10 @@ int main() {
 		}
 
 		// Resize support
+		// (OpenGL viewport is updated automatically)
 		window.on_event(Event::WINDOW_RESIZED, [&](){
-			camera.update_viewport(window);
+			scene2d.update_viewport(window);
+			scene3d.update_viewport(window);
 		});
 
 		// Handle camera keyboard inputs
@@ -193,11 +208,18 @@ int main() {
 		// Rotate models
 		vec3<float> cowpos = cow->get_position();
 		// cow->set_rotation(rotation, { true, true, true });
-		cube->set_position(ScarabMath::orbitate_x(cowpos, -rotation, 5.0f));
+		// cube->set_position(ScarabMath::orbitate_x(cowpos, -rotation, 5.0f));
 		cube2->set_position(ScarabMath::orbitate_y(cowpos, rotation, 5.0f));
 		cube3->set_position(ScarabMath::orbitate_z(cowpos, -rotation, 5.0f));
 
-		bill->rotate_eight_directions(camera.get_position());
+		cube->set_position(ScarabMath::orbitate_z(bill->get_position(), -rotation, 5.0f));
+		// bill->rotate_eight_directions(cube->get_position());
+		// bill->rotate_eight_directions(camera.get_position());
+		bill->relative_angle(camera.get_position());
+		// bill->relative_angle(cube->get_position());
+
+
+		// bill->rotate_eight_directions(camera.get_position());
 
 		// Draw
 		// skybox.draw();
@@ -234,8 +256,9 @@ int main() {
 		}
 
 
-		// msgothic.add_text("Hello world", { 10.0f, 10.0f }, 1.0f);
+		msgothic.add_text(camera2d, "Hello world", { 10.0f, 10.0f }, 1.0f);
 		// msgothic.draw_all();
+		scene2d.draw_all();
 
 		// Update rotation
 		rotation += rotation_speed * window.dt();

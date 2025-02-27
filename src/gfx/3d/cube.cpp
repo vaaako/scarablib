@@ -1,5 +1,4 @@
 #include "scarablib/gfx/3d/cube.hpp"
-#include "scarablib/gfx/model.hpp"
 
 Cube::Cube(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept
 	: Model(vertices, indices) {}

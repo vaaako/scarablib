@@ -82,6 +82,15 @@ struct Texture {
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
+	// NOTE: I wish this was a member, but i would have to initialize in window.hpp
+	// because i cant make a texture if the opengl context isnt ready yet
+	// so lazy load...
+	static Texture& default_texture() noexcept {
+		// I don't like data being statically allocated but whatever
+		static Texture def_tex = Texture(Colors::WHITE); // Make solid white texture
+		return def_tex;
+	}
+
 	static GLuint extract_format(const Image& image) {
 		switch (image.nr_channels) {
 			case 1:

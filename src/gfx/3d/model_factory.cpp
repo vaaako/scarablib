@@ -1,7 +1,7 @@
-#include "scarablib/gfx/model_factory.hpp"
+#include "scarablib/gfx/3d/model_factory.hpp"
 #include "scarablib/opengl/vao_manager.hpp"
 
-Cube* ModelFactory::create_cube() noexcept {
+Cube* ModelFactory::new_cube() noexcept {
 	static std::vector<Vertex> vertices = {
 		// Vertices: 24
 		// Front face
@@ -72,7 +72,7 @@ Cube* ModelFactory::create_cube() noexcept {
 	return new Cube(vertices, indices);
 }
 
-Plane* ModelFactory::create_plane() noexcept {
+Plane* ModelFactory::new_plane() noexcept {
 	static std::vector<Vertex> vertices = {
 		// Front face
 		Vertex { .position = glm::vec3(-0.5f, -0.5f, 0.0f), .texuv = glm::vec2(0.0f, 0.0f) }, // Bottom left
@@ -93,7 +93,7 @@ Plane* ModelFactory::create_plane() noexcept {
 }
 
 
-Billboard* ModelFactory::create_billboard() noexcept {
+Billboard* ModelFactory::new_billboard() noexcept {
 	static std::vector<Vertex> vertices = {
 		// Front face
 		Vertex { .position = glm::vec3(-0.5f, -0.5f, 0.0f), .texuv = glm::vec2(0.0f, 0.0f) }, // Bottom left
@@ -108,7 +108,7 @@ Billboard* ModelFactory::create_billboard() noexcept {
 		0, 2, 3,
 	};
 
-	// Make VAO and return created Plane
+	// Make VAO and return created billboard
 	VAOManager::get_instance().make_vao(vertices, indices);
 	return new Billboard(vertices, indices);
 }

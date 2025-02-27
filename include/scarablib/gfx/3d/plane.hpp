@@ -1,11 +1,9 @@
 #pragma once
 
-#include "scarablib/gfx/model.hpp"
-#include <vector>
+#include "scarablib/gfx/3d/model.hpp"
 
-// This is a class to make a plane model.
-// WARNING: Do not use this class directly, use ModelFactory::create_cube(const Model::Config& conf)
+// Class for plane model
 struct Plane : public Model {
-	// WARNING: Do not use this class directly, use ModelFactory::create_cube(const Model::Config& conf)
+	// WARNING: Do not use this constructor, use ModelFactory
 	Plane(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept;
 };

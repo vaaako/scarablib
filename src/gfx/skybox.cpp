@@ -9,6 +9,7 @@ Skybox::Skybox(const Camera& camera, const std::vector<const char*>& faces) : ca
 	}
 
 	// All cube faces
+	// NOTE: Dont make static since a skybox will created only one or two times, so its a waste of memory
 	std::vector<float> vertices = {
 		-1.0f,  1.0f, -1.0f,
 		-1.0f, -1.0f, -1.0f,

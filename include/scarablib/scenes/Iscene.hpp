@@ -1,6 +1,6 @@
 #pragma once
 
-#include "scarablib/gfx/model.hpp"
+#include "scarablib/gfx/3d/model.hpp"
 #include "scarablib/proper/error.hpp"
 #include "scarablib/window/window.hpp"
 #include <memory>
@@ -15,23 +15,21 @@ enum DrawMode : uint32 {
 };
 
 // Avoid foward declaration
-class Shape2D;
-class Shape3D;
+class Sprite;
 
 // Virtual class used to make Scene2D and Scene3D
 template <typename T>
 class IScene {
 	// Only Shape2D and Shape3D are accepted
-	static_assert(std::is_same<T, Shape2D>::value || std::is_same<T, Model>::value,
-			"Scene can only be instantiated with Shape2D or Mesh");
+	static_assert(std::is_same<T, Sprite>::value || std::is_same<T, Model>::value,
+			"Scene can only be instantiated with Sprite or Mesh");
 
 	public:
 		// Build scene object using the window object for viewport
-		IScene(const Window& window) noexcept;
+		IScene() noexcept;
 		virtual ~IScene() = default;
 
 		// Add a shape object to the scene.
-		// WARNING: Shapes added to the scene are not deleted automatically, is recommended to make the shape object and then add to the scene as a pointer
 		virtual void add_to_scene(const std::string& key, T* mesh) = 0;
 
 		// Get a object by key and dynamically convert it
@@ -74,14 +72,6 @@ class IScene {
 		}
 
 	protected:
-		// TODO: This will be useful for window resize
-		const Window& window;
-
-		// TODO: Remove this when implementing window resize
-		// Viewport
-		// uint32 width;
-		// uint32 height;
-
 		// Objects added to the scene
 		std::unordered_map<std::string, std::shared_ptr<T>> scene;
 		// Use VAO as ID to track and batch draw meshes with the same VAO
@@ -89,15 +79,13 @@ class IScene {
 };
 
 template <typename T> // Return the shared pointer
-IScene<T>::IScene(const Window& window) noexcept
-	: window(window) {}
-
+IScene<T>::IScene() noexcept {}
 
 template <typename T>
 void IScene<T>::remove_by_key(const std::string& key) noexcept {
 	auto it = this->scene.find(key);
 	if(it == this->scene.end()) {
-		throw ScarabError("Key '%s' not found", key.c_str());
+		throw ScarabError("Key '%s' was not found", key.c_str());
 	}
 	this->scene.erase(it);
 }

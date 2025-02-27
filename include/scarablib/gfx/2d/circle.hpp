@@ -1,41 +1,35 @@
 #pragma once
 
-#include "scarablib/gfx/shape2d.hpp"
+#include "scarablib/gfx/2d/sprite.hpp"
 #include "scarablib/utils/file.hpp"
 
-// Circle shape object, used to draw circle
-struct Circle : public Shape2D {
-	// To update viewport (not making a static variable because only Shape2D needs to access it)
-	friend class Scene2D;
+// Class for rectangle sprite
+struct Circle : public Sprite {
+	// WARNING: Do not use this constructor, use SpriteFactory
+	Circle(const std::vector<Vertex>& vertices) noexcept;
 
-	// Initialize current shape using the Shape2DConf struct
-	Circle(const Shape2DConf& conf) noexcept;
+	void draw(const Camera2D& camera, const Shader& shader) noexcept override;
 
-	// Draw the circle using the circle shader.
-	// No shader is needed here, since Circle has a different shader stored in the struct. This method is a virtual method from Shape2D.
-	void draw(const Shader& shader) noexcept override;
-
-	// Get the current blur value
+	// Returns the current blur value
 	inline float get_blur() {
 		return this->blur;
 	}
 
-	// Set a blur value around the circle
+	// Set a new blur value around the circle
 	inline void set_blur(const float blur) {
 		this->blur = blur;
 	}
 
+	// Circle has a different shader
+	inline Shader* get_shader() const noexcept override {
+		return this->shader;
+	};
+
 	private:
 		float blur = 0.01f;
 
-		// Make static so Scene2D can update viewport
-		static inline Shader& get_shader() {
-			static Shader shader_circle = Shader(
-				FileHelper::read_file(THIS_FILE_DIR + "/../../opengl/shaders/2d/vertex.glsl").c_str(),
-				FileHelper::read_file(THIS_FILE_DIR + "/../../opengl/shaders/2d/circle_fragment.glsl").c_str()
-			);
-
-			return shader_circle;
-		}
-
+		Shader* shader = new Shader(
+			FileHelper::read_file("resources/shaders/vertex.glsl").c_str(),
+			FileHelper::read_file("resources/shaders/2d/circle_fs.glsl").c_str()
+		);
 };
