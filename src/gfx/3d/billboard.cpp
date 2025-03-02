@@ -111,7 +111,6 @@ void Billboard::config_directional_textures(const std::vector<const char*> paths
 // TODO: back not showing fuck it i hatge myself
 void Billboard::relative_angle(const vec3<float>& target_pos, const uint8 num_sectors) noexcept {
 	// Use radians in this case is more accurate
-
 	const float angle_step = M_PI2 / num_sectors;
 
 	const float angle_to_target = std::atan2(

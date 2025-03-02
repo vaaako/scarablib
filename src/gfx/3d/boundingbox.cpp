@@ -45,7 +45,7 @@ void BoundingBox::draw(const Camera& camera, const Shader& shader) const noexcep
 	shader.use();
 	// If used the model matrix, the box would have the model's "new model", which would not be corresponding
 	shader.set_matrix4f("mvp", camera.get_proj_matrix() * camera.get_view_matrix() * this->model);
-	// shader.set_color("shapeColor", Colors::RED); // Will not work, since its using the shader with texture
+	// shader.set_color("shapeColor", Colors::RED); // Will not work, since bounding box doesnt have a texture
 
 	glBindVertexArray(this->vao_id);
 	glDrawElements(GL_LINES, this->indices_size, GL_UNSIGNED_INT, (void*)0);

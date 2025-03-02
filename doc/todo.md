@@ -126,6 +126,8 @@ I wrote most of the things here very tired, sorry for any english mistake
 	+ now needs to calll a method to create it, also the draw is now correct
 - [x] Better BoundingBox, not happy with the current state, dont know what to do
 
+- [ ] Show bounding box: When enabled to show all or a specific bounding box, add to the scene map with some sufix like `cube_boundingbox`, when removed, just remove the bounding box from the map, this will prevent the if-else
+	+ How to pass shader then?
 - [ ] Different texture for each face (the other method that is not cubemap)
  
 # Features for later

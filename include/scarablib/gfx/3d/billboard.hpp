@@ -52,7 +52,6 @@ struct Billboard : public Model {
 	void relative_angle(const vec3<float>& camera_pos, const uint8 num_sectors = 8) noexcept;
 	// First arg isnt camera object to give some freedom
 
-
 	// Returns the current direction the billboard is facing
 	inline Billboard::Direction get_direction() const noexcept {
 		return this->cur_dir;
@@ -79,6 +78,8 @@ struct Billboard : public Model {
 	};
 
 	private:
+		// Precalculated directions
+		// M_PI is a predefined macro
 		const float directions[8] = {
 			0.0f,                // [  0°] EAST        (RIGHT)
 			M_PI_4f,             // [ 45°] NORTHEAST   (UP-RIGHT)
@@ -93,10 +94,12 @@ struct Billboard : public Model {
 
 		// Directional textures
 		std::vector<Texture*> textures;
-		Billboard::Direction cur_dir = Billboard::Direction::NORTH; // Only used inside relative_angle
+		Billboard::Direction cur_dir = Billboard::Direction::EAST; // Only used inside relative_angle
 		// Save to check and only change texture if needed
 		uint32 cur_sector = 9; // This value so that it will always change in first change
 
+
+		// Not the best solution but wtv
 		static inline Shader* get_sshader() noexcept {
 			static Shader shader = Shader(
 				FileHelper::read_file("resources/shaders/3d/billboard_vs.glsl").c_str(),
