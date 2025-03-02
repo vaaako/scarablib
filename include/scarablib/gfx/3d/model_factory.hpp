@@ -7,14 +7,14 @@
 struct ModelFactory {
 	// Creates a cube model.
 	// The return is a pointer, remember to add to a Scene OR manually delete it
-	static Cube* new_cube() noexcept;
+	static Cube* create_cube() noexcept;
 	// Creates a Plane model.
 	// The return is a pointer, remember to add to a Scene OR manually delete it
-	static Plane* new_plane() noexcept;
+	static Plane* create_plane() noexcept;
 
 	// Creates a Plane model.
 	// The return is a pointer, remember to add to a Scene OR manually delete it,
 	// The difference between a Billboard and a Plane is that a Billboard will always face the camera.
 	// Also the billboard can have directional textures
-	static Billboard* new_billboard() noexcept;
+	static Billboard* create_billboard() noexcept;
 };

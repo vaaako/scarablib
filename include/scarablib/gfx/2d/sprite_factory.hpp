@@ -7,11 +7,11 @@
 struct SpriteFactory {
 	// Creates a Rectangle shape.
 	// The return is a pointer, remember to add to a Scene OR manually delete it
-	static Rectangle* new_rectangle() noexcept;
+	static Rectangle* create_rectangle() noexcept;
 	// Creates a Triangle shape.
 	// The return is a pointer, remember to add to a Scene OR manually delete it
-	static Triangle* new_triangle() noexcept;
+	static Triangle* create_triangle() noexcept;
 	// Creates a Circle shape.
 	// The return is a pointer, remember to add to a Scene OR manually delete it
-	static Circle* new_circle() noexcept;
+	static Circle* create_circle() noexcept;
 };

@@ -38,10 +38,10 @@ The following code snippet demonstrates how to create a simple scene with Scarab
 Outside main loop:
 ```cpp
 // Position will change later, so dont need to intialize here
-Cube* cube = ModelFactory::new_cube();
+Cube* cube = ModelFactory::create_cube();
 
 // Above is the same as passing nothing
-Cube* cube2 = ModelFactory::new_cube();
+Cube* cube2 = ModelFactory::create_cube();
 
 // Set textures
 cube1->set_texture(&tex1);
@@ -55,7 +55,7 @@ scene3d.add_to_scene("cube2", cube2);
 const float AIM_WIDTH = 10.0f;
 const float AIM_HEIGHT = 10.0f;
 
-Rectangle* aim = SpriteFactory::new_rectangle();
+Rectangle* aim = SpriteFactory::create_rectangle();
 aim->set_position({
 	window.get_half_width()  - AIM_WIDTH  / 2,
 	window.get_half_height() - AIM_HEIGHT / 2

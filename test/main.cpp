@@ -133,33 +133,24 @@ int main() {
 	scene3d.add_to_scene("cow", cow);
 
 	// Make shapecollision
-	Cube* cube = ModelFactory::new_cube();
+	Cube* cube = ModelFactory::create_cube();
 	scene3d.add_to_scene("cube1", cube);
 	cube->set_position({ -10.0f, 1.0f, -10.0f }); // Cube position doesnt matter because will change later
 	cube->set_texture(&tex1);
 
-	Cube* cube2 = ModelFactory::new_cube();
+	Cube* cube2 = ModelFactory::create_cube();
 	cube2->set_texture(&tex2);
 	scene3d.add_to_scene("cube2", cube2);
 
-	Cube* cube3 = ModelFactory::new_cube();
+	Cube* cube3 = ModelFactory::create_cube();
 	cube3->set_texture(&tex3);
 	scene3d.add_to_scene("cube3", cube3);
 
 	// BUG: Memory leak somewhere in billboard class
-	Billboard* bill = ModelFactory::new_billboard();
+	Billboard* bill = ModelFactory::create_billboard();
 	bill->set_position({ -5.0f, 1.0f, -10.0f });
 	bill->set_scale(vec4<float>(4.0f));
 	// Front-right and Right are unecessary since they are the same texture but flipped
-	// bill->config_directional_textures({
-	// 	"test/assets/images/directions/pinky/0.png", // 1
-	// 	"test/assets/images/directions/pinky/1.png", // 2
-	// 	"test/assets/images/directions/pinky/2.png", // 3
-	// 	"test/assets/images/directions/pinky/3.png", // 4
-	// 	"test/assets/images/directions/pinky/4.png"  // 5
-	// }, 234); // Flip textures to opposite
-
-
 	bill->config_directional_textures({
 		"test/assets/images/directions/pinky/0.png", // 1
 		"test/assets/images/directions/pinky/1.png", // 2
@@ -175,7 +166,7 @@ int main() {
 	// testcube->set_position(cow->get_center_position());
 	// scene3d.add_to_scene("testcube", testcube);
 
-	// Rectangle* sprite = SpriteFactory::new_rectangle();
+	// Rectangle* sprite = SpriteFactory::create_rectangle();
 	// sprite->set_position({ 10.0f, 10.0f });
 	// sprite->set_size({ 100.0f, 100.0f });
 	// sprite->set_color(Colors::PINK);
@@ -223,6 +214,8 @@ int main() {
 		cube3->set_position(ScarabMath::orbitate_z(cowpos, -rotation, 5.0f));
 
 		bill->relative_angle(camera.get_position());
+
+		// LOG_DEBUG("Cardinal: %s", camera.get_cardinal_direction().c_str());
 
 		// Draw
 		skybox.draw();
