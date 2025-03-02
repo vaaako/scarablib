@@ -38,6 +38,16 @@ class Camera {
 			return this->position.z;
 		}
 
+		// Returns current yaw. Horizontal rotation
+		inline float get_yaw() const noexcept {
+			return this->yaw;
+		}
+
+		// Returns current pitch. Vertical rotation
+		inline float get_pitch() const noexcept {
+			return this->pitch;
+		}
+
 		// Returns camera view matrix
 		inline glm::mat4 get_view_matrix() const noexcept {
 			return glm::lookAt(this->position, this->position + this->forward, this->up);
@@ -63,6 +73,16 @@ class Camera {
 			this->height = height;
 			// Opengl update
 			this->update_proj_matrix();
+		}
+
+		// Changes the camera rotation using yaw and pitch angles.
+		// Yaw is horizontal rotation, Pitch is vertical
+		inline void set_rotation(const float yaw, const float pitch) noexcept {
+			// Wrap yaw to stay within 360 range
+			this->yaw = std::fmod(yaw, 360.0f);
+			// Prevent gimbal lock
+			this->pitch = glm::clamp(pitch, -89.0f, 89.0f);
+			this->update_camera_vectors();
 		}
 
 		// Set camera's near plane. How near to render
@@ -158,6 +178,19 @@ class Camera {
 		// Use mouse moved direction to rotate the camera
 		void rotate(const MouseHandler& mouse) noexcept;
 
+		static std::string get_cardinal_direction(const float yaw) {
+			// Define the cardinal directions
+			static std::vector<std::string> directions = {
+				"North", "Northeast", "East", "Southeast",
+				"South", "Southwest", "West", "Northwest"
+			};
+
+			// Determine the sector index
+			size_t sector = static_cast<size_t>((yaw + 45.0f / 2.0f) / 45.0f) % 8;
+
+			return directions[sector];
+		}
+
 	private:
 		uint32 width;
 		uint32 height;
@@ -184,6 +217,9 @@ class Camera {
 		vec3<float> left        = { -1.0f, 0.0f, 0.0f };
 
 		glm::mat4 proj;
+
+		// Update position, up, foward and left
+		void update_camera_vectors() noexcept;
 
 		// Pre-calculate proj matrix, since it doesnt change much
 		inline void update_proj_matrix() noexcept {

@@ -16,7 +16,6 @@ Billboard::~Billboard() noexcept {
 	// Release current vao
 	// Mesh does this, but this is a overrided destructor
 	VAOManager::get_instance().release_vao(vao_hash);
-	delete this->shader;
 
 	// Clear directional textures if any
 	if(!this->textures.empty()) {
@@ -48,7 +47,7 @@ void Billboard::draw(const Camera& camera, const Shader& shader) noexcept {
 }
 
 
-void Billboard::set_directional_textures(const std::vector<const char*> paths, uint32 flip) {
+void Billboard::config_directional_textures(const std::vector<const char*> paths, uint32 flip) {
 	// Get length fron int
 	const size_t fliplength = (flip == 0) ? 0 : static_cast<size_t>(std::log10(std::abs(static_cast<int>(flip))) + 1);
 	const size_t final_size = paths.size() + fliplength; // Track opposite length
@@ -109,6 +108,31 @@ void Billboard::set_directional_textures(const std::vector<const char*> paths, u
 	}
 }
 
+// TODO: back not showing fuck it i hatge myself
+void Billboard::relative_angle(const vec3<float>& target_pos, const uint8 num_sectors) noexcept {
+	// Use radians in this case is more accurate
+
+	const float angle_step = M_PI2 / num_sectors;
+
+	const float angle_to_target = std::atan2(
+		// This is inverted to get the result that i want
+		// Invert back if the intention is the billboard change relative to some external object
+		target_pos.x - this->position.x,
+		target_pos.z - this->position.z
+	);
+
+	const float cur_dir = this->directions[static_cast<uint8>(this->cur_dir)];
+	const float relative_angle = std::fmod(angle_to_target - cur_dir + M_PI2, M_PI2);
+	const uint32 sector = static_cast<uint32>(relative_angle / angle_step) % num_sectors;
+	if(sector != this->cur_sector) {
+		this->cur_sector = sector;
+		this->set_texture(this->textures[sector]);
+	}
+
+	#ifdef SCARAB_DEBUG_BILLBOARD_ANGLE
+	LOG_INFO("Angle: %f, RAngle: %f, Sector: %i", angle_to_target, relative_angle, sector);
+	#endif
+}
 
 // void Billboard::set_directional_textures(const std::vector<const char*> paths, uint32 flip) {
 // 	// How many to flip

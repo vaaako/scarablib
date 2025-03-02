@@ -67,6 +67,9 @@ Window::Window(const Window::Config& config) : conf(config), half_width(static_c
 	glEnable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 
+	glDepthFunc(GL_ALWAYS);
+	glDepthFunc(GL_LEQUAL);
+
 	// To enable cull face i need to make 2D shapes CCW
 	// glEnable(GL_CULL_FACE);
 	// glCullFace(GL_BACK);

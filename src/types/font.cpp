@@ -10,7 +10,7 @@
 
 // TODO: Optimize. More characters
 
-Font::Font(const char* path, const uint16 size) {
+Font::Font(const Camera2D& camera, const char* path, const uint16 size) : camera(camera) {
 	std::vector<uint8> buffer = FileHelper::read_binary_file(path);
 
 	if(buffer.empty()) {
@@ -25,23 +25,19 @@ Font::Font(const char* path, const uint16 size) {
 		LOG_WARNING("Unexpected font version: %08x", version);
 	}
 
-	// TEST
-	constexpr int atlas_width  = 512;
-	constexpr int atlas_height = 512;
-
-	std::vector<uint8> temp_bitmap = std::vector<uint8>(static_cast<size_t>(atlas_width * atlas_height));
+	std::vector<uint8> temp_bitmap = std::vector<uint8>(static_cast<size_t>(this->atlas_width * this->atlas_height));
 
 	int result = stbtt_BakeFontBitmap(
 		buffer.data(), 0,
 		size,
 		temp_bitmap.data(),
-		atlas_width, atlas_height,
+		this->atlas_width, this->atlas_height,
 		32, 96, // ASCII 32 to 127, 96 printable ASCII
 		this->cdata
 	);
 
 	if (result <= 0) {
-		// Maximum size is 88
+		// Maximum size is 88 btw, but im not sure, so i wont put it here
 		throw ScarabError("Failed to bake font (%s) bitmap. Maybe the size is too big or too small", path);
 	}
 
@@ -49,14 +45,14 @@ Font::Font(const char* path, const uint16 size) {
 	this->buffer_data = new Glyph[this->buffer_capacity * 6];
 
 	// Create Texture from bitmap
-	// NOTE: could use texture class here
+	// NOTE: could use texture class and VBO class here
 
 	glGenTextures(1, &this->texid);
 	glBindTexture(GL_TEXTURE_2D, this->texid);
 	glTexImage2D(
 		GL_TEXTURE_2D, 0,
 		GL_RED,
-		atlas_width, atlas_height, 0,
+		this->atlas_width, this->atlas_height, 0,
 		GL_RED,
 		GL_UNSIGNED_BYTE,
 		temp_bitmap.data()
@@ -64,11 +60,6 @@ Font::Font(const char* path, const uint16 size) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glBindTexture(GL_TEXTURE_2D, 0);
-
-	// Store char data in map for easy access
-	// for(int i = 0; i < 96; i++) {
-	// 	this->char_data[static_cast<char>(i + 32)] = char_data[i];
-	// }
 
 	// Create VAO and VBO
 	glGenVertexArrays(1, &this->vao);
@@ -96,11 +87,29 @@ Font::~Font() noexcept {
 	glDeleteVertexArrays(1, &this->vao);
 	glDeleteBuffers(1, &this->vbo);
 	glDeleteTextures(1, &this->texid);
+
+	delete[] this->buffer_data;
 };
 
-void Font::add_text(const Camera2D& camera, const std::string& text, const vec2<float>& pos, const float scale) noexcept {
+void Font::draw_text(const std::string& text, const vec2<float>& pos, const float scale, const Color& color) noexcept {
+	// Bind VAO and VBO
 	glBindVertexArray(this->vao);
 	glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
+
+	// Bind Texture
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, this->texid);
+
+	// Make model
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(pos.x, pos.y, 0.0f));
+	model = glm::scale(model, glm::vec3(scale, scale, 1.0f));
+
+	// Bind Shader
+	Shader& shader = this->get_shader();
+	shader.use();
+	shader.set_color("shapeColor", color);
+	shader.set_matrix4f("mvp", (this->camera.get_proj_matrix() * this->camera.get_view_matrix()) * model);
 
 	// Resize the vector to fit all characters
 	if(this->buffer_capacity < text.length()) {
@@ -110,25 +119,11 @@ void Font::add_text(const Camera2D& camera, const std::string& text, const vec2<
 		this->buffer_data = new Glyph[this->buffer_capacity * 6];
 	}
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, this->texid);
-
-	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(pos.x, pos.y, 0.0f));
-	model = glm::scale(model, glm::vec3(scale, scale, 1.0f));
-
-	Shader& shader = this->get_shader();
-	shader.use();
-	shader.set_color("shapeColor", Colors::YELLOW);
-	shader.set_matrix4f("mvp", (camera.get_proj_matrix() * camera.get_view_matrix()) * model);
-
 	// Remove const
 	float x = pos.x;
 	float y = pos.y;
 
 	uint32 num_vertices = 0;
-	// size_t vertex_index = 0;
-
 	Glyph* data = this->buffer_data;
 	for(char c : text) {
 		// In range
@@ -137,7 +132,8 @@ void Font::add_text(const Camera2D& camera, const std::string& text, const vec2<
 		}
 
 		stbtt_aligned_quad q;
-		stbtt_GetBakedQuad(this->cdata, 512, 512, c - 32, &x, &y, &q, 1);
+		stbtt_GetBakedQuad(this->cdata, this->atlas_width, this->atlas_height,
+				c - 32, &x, &y, &q, 1);
 
 		// Apply scale if needed
 		// float x0 = q.x0 * scale;
@@ -152,7 +148,7 @@ void Font::add_text(const Camera2D& camera, const std::string& text, const vec2<
 		data[4].position = vec2<float>(q.x0, q.y0);
 		data[5].position = vec2<float>(q.x1, q.y1);
 
-		data[0].texuv = vec2<float>(q.s0, q.t0); 
+		data[0].texuv = vec2<float>(q.s0, q.t0);
 		data[1].texuv = vec2<float>(q.s1, q.t0);
 		data[2].texuv = vec2<float>(q.s1, q.t1);
 		data[3].texuv = vec2<float>(q.s0, q.t1);
@@ -166,4 +162,3 @@ void Font::add_text(const Camera2D& camera, const std::string& text, const vec2<
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Glyph) * num_vertices, this->buffer_data);
 	glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(num_vertices));
 }
-

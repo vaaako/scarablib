@@ -99,7 +99,7 @@ Skybox::~Skybox() noexcept {
 }
 
 void Skybox::draw() noexcept {
-	glDepthFunc(GL_LEQUAL);
+	// glDepthFunc(GL_LEQUAL);
 
 	this->shader->use();
 	glBindTexture(GL_TEXTURE_CUBE_MAP, this->texid);
@@ -114,5 +114,5 @@ void Skybox::draw() noexcept {
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
 	// Back to default
-	glDepthFunc(GL_LESS);
+	// glDepthFunc(GL_LESS);
 }

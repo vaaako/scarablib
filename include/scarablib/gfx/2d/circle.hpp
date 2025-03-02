@@ -22,14 +22,18 @@ struct Circle : public Sprite {
 
 	// Circle has a different shader
 	inline Shader* get_shader() const noexcept override {
-		return this->shader;
+		return this->get_sshader();
 	};
 
 	private:
 		float blur = 0.01f;
 
-		Shader* shader = new Shader(
-			FileHelper::read_file("resources/shaders/vertex.glsl").c_str(),
-			FileHelper::read_file("resources/shaders/2d/circle_fs.glsl").c_str()
-		);
+		static inline Shader* get_sshader() noexcept {
+			static Shader shader = Shader(
+				FileHelper::read_file("resources/shaders/vertex.glsl").c_str(),
+				FileHelper::read_file("resources/shaders/2d/circle_fs.glsl").c_str()
+			);
+
+			return &shader;
+		}
 };

@@ -4,7 +4,6 @@
 #include "scarablib/scenes/camera2d.hpp"
 #include "scarablib/typedef.hpp"
 #include "scarablib/utils/file.hpp"
-#include <unordered_map>
 #include <string>
 #include <GL/glew.h>
 
@@ -20,15 +19,17 @@ class Font {
 	public:
 		// Build a font object passing a path to a .ttf file.
 		// Also pass font's text, size and color
-		Font(const char* path, const uint16 size = 24);
+		Font(const Camera2D& camera, const char* path, const uint16 size = 24);
 		~Font() noexcept;
 
 		// Add text to batch rendering
-		void add_text(const Camera2D& camera, const std::string& text, const vec2<float>& pos, const float scale) noexcept;
-		// Draw font using a shader object
-		void draw_all() noexcept;
+		void draw_text(const std::string& text, const vec2<float>& pos, const float scale = 1.0f, const Color& color = Colors::WHITE) noexcept;
 
 	private:
+		const Camera2D& camera;
+		static constexpr int atlas_height = 512;
+		static constexpr int atlas_width  = 512;
+
 		struct Glyph {
 			vec2<float> position;
 			vec2<float> texuv;
@@ -37,7 +38,7 @@ class Font {
 		// Font
 		stbtt_bakedchar cdata[96];
 		Glyph* buffer_data;
-		uint32 buffer_capacity;
+		size_t buffer_capacity;
 
 		// OpenGL
 		GLuint texid;

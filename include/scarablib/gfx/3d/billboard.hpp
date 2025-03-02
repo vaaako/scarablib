@@ -10,24 +10,27 @@
 
 #define SCARAB_DEBUG_BILLBOARD
 
+// PI * 2
+#define M_PI2 6.283185307179586f
+#define M_PI3 9.42477796076938f 
+
 // Class for billboard model
 struct Billboard : public Model {
-	enum class Direction : uint8 {
+	enum Direction : uint8 {
 		EAST,
+		NORTHEAST,
 		NORTH,
+		NORTHWEST,
 		WEST,
-		SOUTH
+		SOUTHWEST,
+		SOUTH,
+		SOUTHEAST
 	};
 
-	//          FRONT
-	//            ↑
-	// FRONT_LEFT   FRONT_RIGHT
-	//      ↖           ↗
-	// LEFT   ← billboard →   RIGHT
-	//      ↙           ↘
-	// BACK_LEFT    BACK_RIGHT
-	//            ↓
-	//           BACK
+	enum : uint8 {
+		FOUR_SECTORS = 4,
+		EIGHT_SECTORS = 8
+	};
 
 	// WARNING: Do not use this constructor, use ModelFactory
 	Billboard(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept;
@@ -41,191 +44,67 @@ struct Billboard : public Model {
 	// Example: 123 will flip the respective textures to 567.
 	// The vector MUST have minimum of 4 elements and maximum of 8 elements
 	// WARNING: Please use this method just at the creation of the billboard, if you want to change a texture
-	void set_directional_textures(const std::vector<const char*> paths, uint32 flip);
+	void config_directional_textures(const std::vector<const char*> paths, uint32 flip);
 
-
-
-	// Changes the texture based on the angle of the billboard front face relative to the focus position.
-	// Just use this method if you have at least 4 textures set.
+	// The directional texture is changed relative to the direction the billboard is facing.
+	// num_sectors is the number of textures set in the billboard, please choose either 4 or 8.
 	// *WARNING:* This method DOES NOT check if textures was set correctly, you will have a error if don't
-	inline void rotate_four_directions(const vec3<float>& target_position) noexcept {
-		// [-45,  45] 0 Front
-		// [ 45, 135] 1 Right
-		// [135, 225] 2 Left
-		// [225, 315] 3 Back
+	void relative_angle(const vec3<float>& camera_pos, const uint8 num_sectors = 8) noexcept;
+	// First arg isnt camera object to give some freedom
 
-		const float angle = this->direction_angle(target_position);
-		const uint32 sector = static_cast<uint32>((angle + 45.0f) / 90.0f) % 4;
-		this->set_texture(this->textures[sector]);
+
+	// Returns the current direction the billboard is facing
+	inline Billboard::Direction get_direction() const noexcept {
+		return this->cur_dir;
 	}
 
-	// Changes the texture based on the angle of the billboard front face relative to the focus position.
-	// Just use this method if you have 8 textures set.
-	// *WARNING:* This method DOES NOT check if textures was set correctly, you will have a error if don't
-	inline void rotate_eight_directions(const vec3<float>& target_position) noexcept {
-		// 8 Directions: Divide the circle into 8 sectors of 45° each
-		// Sector mapping:
-		// [-180°, -135°) 0 Front
-		// [-135°,  -90°) 1 Front-Right
-		// [ -90°,  -45°) 2 Right
-		// [ -45°,    0°) 3 Back-Right
-		// [   0°,   45°) 4 Back
-		// [  45°,   90°) 5 Back-Left
-		// [  90°,  135°) 6 Left
-		// [ 135°,  180°) 7 Front-Left
-
-		// Angle range is [-180°, 180°]
-		//   0° is Front (facing toward the camera)
-		// 180° is Back  (facing away from the camera)
-
-		// Sector Calculation Logic:
-		// 1. The input angle is in the range [-180°, 180°]
-		// 2. Each sector spans by 45 degrees (360 / 8 sectors = 45)
-		// 3. To align the sectors, add 22.5° to the angle (half the sector size)
-		//    - This centers the sectors around the angle range.
-		// 3. Divide by 45° (sector size) to determine the sector index.
-		// 4. Use modulo 8 to wrap around the index if it exceeds 7
-
-		// What is the Span?
-		// - The span is the angular size of each sector.
-		// - For 8 directions, the span is 45° (360° / 8 sectors).
-		// - The span determines how wide each sector is and is used to map the angle to the correct sector.
-
-		// Why 22.5°?
-		// - Each sector spans 45°, so half of that (22.5°) is added to align the sectors.
-		// - This ensures that the sector boundaries are correctly centered.
-		// - Formula: SP (Span) = (360 / N) = Where N is the number of sectors
-		//    - Sector = (A + (SP / 2) / SP) % N
-
-		// Example:
-		// -180° + 22.5° = -157.5° → Sector 0 (Front)
-		//    0° + 22.5° =   22.5° → Sector 4 (Back)
-		//  180° + 22.5° =  202.5° → Wraps to 22.5° → Sector 0 (Front)
-
-		// NOTE: Eight is conveniently a power of two, so you could use bit manipulation
-
-		const float angle = this->direction_angle(target_position);
-		const uint32 sector = static_cast<uint32>((angle + 22.5f) / 45.0f) % 8;
-		if(sector != this->cur_sector) {
-			this->set_texture(this->textures[sector]);
-			this->cur_sector = sector;
-		}
-
-		#ifdef SCARAB_DEBUG_BILLBOARD
-		static std::string str_dirs[8] = {
-			"FRONT",
-			"FRONT_RIGHT",
-			"RIGHT",
-			"BACK_RIGHT",
-			"BACK",
-			"BACK_LEFT",
-			"LEFT",
-			"FRONT_LEFT"
-		};
-		LOG_INFO("Angle: %f, Direction: [%i] %s", angle, sector, str_dirs[sector].c_str());
-		#endif
-	}
-
-	// Returns the angle of the focus position relative to the billboard.
-	// In simple terms: Where the camera is relative to the billboard? 0.0 is in the FRONT and 180.0 is in the BACK
-	inline float direction_angle(const vec3<float>& target_position) const noexcept  {
-		// Avoid full 3D vector normalization - only need 2D directions
-		return glm::degrees(
-			// Only calculate in 2D (xz-plane) since thats all is needed for billboards
-			std::atan2(
-				target_position.x - this->position.x,
-				target_position.z - this->position.z
-
-				// Flipped
-				// this->position.z - target_position.z,
-				// this->position.x - target_position.x
-			)
-		);
-	}
-
-	// Just makes the billboard always follow the target
-	// void face_target(const vec3<float>& target_position) noexcept;
-
-
-	// TESTES ONLY NOT READY THIS IS JUST FOR TESTS //
-
-	// Changes the texture based to where the billboard is looking at.
-	// *WARNING:* This method DOES NOT check if textures was set correctly, you will have a error if don't
-	void relative_angle(const vec3<float>& target_pos) noexcept {
-		// Angle between this and target
-		const float angle_to_target = std::atan2(
-			target_pos.z - this->position.z,
-			target_pos.x - this->position.x
-		);
-
-		// Relative angle (in radians)
-		float relative_angle = static_cast<float>(angle_to_target - this->directions[static_cast<uint8>(this->cur_dir)] + M_PI);
-		// Normalize to 0-2pi range
-		relative_angle = (float)std::fmod(relative_angle + 2.0f * M_PI, 2 * M_PI);
-
-		uint32 sector = static_cast<uint32>(relative_angle * 8 / (2 * M_PI)) % 8;
-		this->set_texture(this->textures[sector]);
-
-		// float angle_deg = (float)(angle_to_target * (180.0f / M_PI));
-		// float cur_dir_deg = (float)(this->directions[static_cast<uint8>(this->cur_dir)]);
-		// float relative_angle = std::fmod(angle_deg - cur_dir_deg + 360.0f, 360.0f);
-		// uint32 sector = static_cast<uint32>(relative_angle / 45) % 8;
-		//
-		// this->set_texture(this->textures[sector]);
-
-		// LOG_INFO("Angle: %f, RAngle: %f, Sector: %i", angle_to_target, relative_angle, sector);
-	}
-	// TESTES ONLY NOT READY THIS IS JUST FOR TESTS //
-
+	// Set a new direction to the billboard face.
+	// This is used in relative_angle
 	inline void set_direction(const Billboard::Direction dir) {
 		this->cur_dir = dir;
 	}
 
+	// Set a texture from the directional textures
+	inline void set_dir_texture(const uint32 index) noexcept {
+		if(index > this->textures.size()) {
+			LOG_ERROR_FN("Index out of range");
+			return;
+		}
+		this->set_texture(this->textures[index]);
+	}
+
 	// Returns the shader used by billboard
 	inline Shader* get_shader() const noexcept override {
-		return this->shader;
+		return this->get_sshader();
 	};
 
 	private:
-		Billboard::Direction cur_dir = Billboard::Direction::NORTH;
-
-		double directions[8] = {
-			0.0f,               // 0 [  0] EAST        (RIGHT)
-			// 0.785375
-			M_PI / 4.0f,        // 1 [ 45] NORTH-EAST  (UP-RIGHT)
-			// 1.57075
-			M_PI / 2.0f,        // 2 [ 90] NORTH       (UP)
-			// 2.356125
-			3.0f * M_PI / 4.0f, // 3 [135] NORTH-WEAST (UP-LEFT)
-			// 3.1415
-			M_PI,               // 4 [180] WEST        (LEFT)
-			// 3.926875
-			5.0f * M_PI / 4.0f, // 5 [225] SOUTH-WEAST (DOWN-LEFT)
-			// 4.71225
-			3.0f * M_PI / 2.0f, // 6 [270] SOUTH       (DOWN)
-			// 5.497625
-			7.0f * M_PI / 4.0f  // 7 [315] SOUTH-EAST  (DOWN-RIGHT)
+		const float directions[8] = {
+			0.0f,                // [  0°] EAST        (RIGHT)
+			M_PI_4f,             // [ 45°] NORTHEAST   (UP-RIGHT)
+			M_PI_2f,             // [ 90°] NORTH       (UP)
+			2.356194490192345f,  // [135°] NORTHWEST   (UP-LEFT)     3.0f * M_PI_4f
+			M_PIf,               // [180°] WEST        (LEFT)
+			3.9269908169872414f, // [225°] SOUTHWEST   (DOWN-LEFT)   5.0f * M_PI_4f
+			4.71238898038469f,   // [270°] SOUTH       (DOWN)        3.0f * M_PI_2f
+			5.497787143782138f   // [315°] SOUTHEAST   (DOWN-RIGHT)  7.0f * M_PI_4f
 		};
 
-		// float directions[8] = {
-		// 	0.0,     // [  0°] EAST        (RIGHT)
-		// 	45.0,    // [ 45°] NORTHEAST   (UP-RIGHT)
-		// 	90.0,    // [ 90°] NORTH       (UP)
-		// 	135.0,   // [135°] NORTHWEST   (UP-LEFT)
-		// 	180.0,   // [180°] WEST        (LEFT)
-		// 	225.0,   // [225°] SOUTHWEST   (DOWN-LEFT)
-		// 	270.0,   // [270°] SOUTH       (DOWN)
-		// 	315.0    // [315°] SOUTHEAST   (DOWN-RIGHT)
-		// };
 
-		// Only used for directional textures
+		// Directional textures
 		std::vector<Texture*> textures;
-		uint32 cur_sector; // Save to check and only change texture if needed
+		Billboard::Direction cur_dir = Billboard::Direction::NORTH; // Only used inside relative_angle
+		// Save to check and only change texture if needed
+		uint32 cur_sector = 9; // This value so that it will always change in first change
 
-		Shader* shader = new Shader(
-			FileHelper::read_file("resources/shaders/3d/billboard_vs.glsl").c_str(),
-			FileHelper::read_file("resources/shaders/fragment.glsl").c_str()
-		);
+		static inline Shader* get_sshader() noexcept {
+			static Shader shader = Shader(
+				FileHelper::read_file("resources/shaders/3d/billboard_vs.glsl").c_str(),
+				FileHelper::read_file("resources/shaders/fragment.glsl").c_str()
+			);
+
+			return &shader;
+		}
 
 		void draw(const Camera& camera, const Shader& shader) noexcept override;
 };

@@ -103,10 +103,6 @@ int main() {
 	Texture tex3  = Texture({ .path = "test/assets/images/brick.png" });
 	Texture snail = Texture({ .path = "test/assets/images/snail.png" });
 
-	// TODO: Make it use only one drawcall
-	// WARNING: FONTS ARE NOT COMPLETED YET, I WILL UPDATE IT LATER
-	Font msgothic = Font("test/assets/fonts/Ubuntu-R.ttf", 32);
-
 	// Make scenes
 	Camera camera = Camera(window, 75.0f, 0.1f);
 	camera.set_speed(1.0f * DELTATIME_MODIFIER);
@@ -115,6 +111,10 @@ int main() {
 
 	Scene2D scene2d = Scene2D(camera2d);
 	Scene3D scene3d = Scene3D(camera);
+
+
+	// WARNING: FONTS ARE NOT COMPLETED YET, I WILL UPDATE IT LATER
+	Font msgothic = Font(camera2d, "test/assets/fonts/msgothic.ttf", 32);
 
 	Skybox skybox = Skybox(camera, {
 		"test/assets/images/skybox/right.jpg",
@@ -151,7 +151,16 @@ int main() {
 	bill->set_position({ -5.0f, 1.0f, -10.0f });
 	bill->set_scale(vec4<float>(4.0f));
 	// Front-right and Right are unecessary since they are the same texture but flipped
-	bill->set_directional_textures({
+	// bill->config_directional_textures({
+	// 	"test/assets/images/directions/pinky/0.png", // 1
+	// 	"test/assets/images/directions/pinky/1.png", // 2
+	// 	"test/assets/images/directions/pinky/2.png", // 3
+	// 	"test/assets/images/directions/pinky/3.png", // 4
+	// 	"test/assets/images/directions/pinky/4.png"  // 5
+	// }, 234); // Flip textures to opposite
+
+
+	bill->config_directional_textures({
 		"test/assets/images/directions/pinky/0.png", // 1
 		"test/assets/images/directions/pinky/1.png", // 2
 		"test/assets/images/directions/pinky/2.png", // 3
@@ -174,6 +183,7 @@ int main() {
 	// scene2d.add_to_scene("rec", sprite);
 
 	LOG_INFO("Scene3d length %d", scene3d.length());
+
 
 	bool debug_mode = false;
 	bool envsync = true;
@@ -212,21 +222,14 @@ int main() {
 		cube2->set_position(ScarabMath::orbitate_y(cowpos, rotation, 5.0f));
 		cube3->set_position(ScarabMath::orbitate_z(cowpos, -rotation, 5.0f));
 
-		cube->set_position(ScarabMath::orbitate_z(bill->get_position(), -rotation, 5.0f));
-		// bill->rotate_eight_directions(cube->get_position());
-		// bill->rotate_eight_directions(camera.get_position());
 		bill->relative_angle(camera.get_position());
-		// bill->relative_angle(cube->get_position());
-
-
-		// bill->rotate_eight_directions(camera.get_position());
 
 		// Draw
-		// skybox.draw();
+		skybox.draw();
 		scene3d.draw_all();
 
 		// Toggle debug mode
-		if (window.keyboard().ispressed(Keycode::F3)) {
+		if(window.keyboard().ispressed(Keycode::F3)) {
 			debug_mode = !debug_mode;
 		}
 
@@ -256,9 +259,9 @@ int main() {
 		}
 
 
-		msgothic.add_text(camera2d, "Hello world", { 10.0f, 10.0f }, 1.0f);
-		// msgothic.draw_all();
-		scene2d.draw_all();
+		// msgothic.draw_text("Hello world", { 10.0f, 10.0f });
+		// msgothic.draw_all(); // drop fps i think
+		// scene2d.draw_all();
 
 		// Update rotation
 		rotation += rotation_speed * window.dt();

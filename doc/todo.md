@@ -47,6 +47,7 @@ I wrote most of the things here very tired, sorry for any english mistake
 	+ [ ] Texture atlas support
 		* For reference: [anim8](https://github.com/kikito/anim8)
 	+ [ ] Opacity
+	+ [x] Texture Array (not really used by anything currently)
 - [x] Batch rendering
 - [x] Use the same font object for different texts
 
@@ -55,7 +56,6 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [x] Custom shapes support (kinda, i think)
 - [x] Use one shader for 2D and 3D shapes
 - [ ] Color matrix support
-- [ ] Physics (dont know how)
 - [ ] Batch rendering for textures too
 	+ Would have to make another map, its worth it?
 - [x] Better Shader support for 2D and 3D shapes
@@ -83,7 +83,6 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [ ] Collider class
 	+ Like [Windfield](https://github.com/a327ex/windfield). Show collider and easy setting
 	+ Rigid body
-	+ use bounding box?
 - [x] If possible, use mesh.hpp for 2D shapes
 - [x] Remove `SCARAB_2D_AND_3D`
 
@@ -95,10 +94,12 @@ I wrote most of the things here very tired, sorry for any english mistake
 	+ [X] Rotation of 3D shape not working
 	+ [X] Shapes custom scale
 	+ [x] Review [camera movement](https://github.com/swr06/Minecraft/blob/master/Source/Core/Camera.cpp)
+	+ [ ] Third person, Front view and top down
 	+ Camera movement is stolen from minecraft
 - [ ] Chunk mesh native support
 - [x] Merge `set_angle` and `set_axis` somehow
 - [ ] Sphere
+- [ ] Pyramid
 - [x] Skybox
 - [ ] Normals / Shading value (both?)
 - [x] Model and Mesh
@@ -117,12 +118,13 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [x] Billboard: Instead of making a new texture for each face, use a texture array
 	+ idea discarted, using a TEXTURE 2D or TEXTURE ARRAY makes no significant difference (in memory) just makes harder and more process for the CPU for deciding which shader use
 	+ Explaining better: My problem is that the front face will always be fixed, what would be the better way to change it?
-- [ ] Billboard: Another approach for changing directional textures? How doom does it? How would a moving billboard work? Changing orientation?
-- [ ] Billboard: Method to invert rotation
+- [x] Billboard: Another approach for changing directional textures? How doom does it? How would a moving billboard work? Changing orientation?
+	+ Doom checks for the billboard direction and changes based in it (kinda)
+- [x] Billboard: Method to invert rotation
+	+ isnt really necessary
 - [x] Currently bounding box is always created, make it optional
 	+ now needs to calll a method to create it, also the draw is now correct
 - [x] Better BoundingBox, not happy with the current state, dont know what to do
-
 
 - [ ] Different texture for each face (the other method that is not cubemap)
  

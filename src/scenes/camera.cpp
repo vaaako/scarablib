@@ -16,7 +16,10 @@ void Camera::rotate(const MouseHandler& mouse) noexcept {
 	this->pitch += static_cast<float>(-move.y) * this->sensitivity;
 	this->pitch = glm::clamp(this->pitch, -89.0f, 89.0f); // Prevent gimbal lock
 
-	// CALCULATE VIEW VECTORS //
+	this->update_camera_vectors();
+}
+
+void Camera::update_camera_vectors() noexcept {
 	const float radpitch = glm::radians(this->pitch);
 	const float cospitch = std::cos(radpitch);
 	const float radyaw = glm::radians(this->yaw);

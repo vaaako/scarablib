@@ -55,27 +55,38 @@ std::string Log::get_date_and_time() noexcept {
 // }
 
 void Log::log_impl(const char* level, const char* func, bool include_time, const char* fmt, ...) noexcept {
+	std::vector<char> buffer = std::vector<char>(1024);
+
 	va_list args;
 	va_start(args, fmt);
 
-	std::vector<char> buffer = std::vector<char>(1024);
-	size_t needed = vsnprintf(buffer.data(), buffer.size(), fmt, args);
+	// Try with the current buffer
+	va_list args_copy;
+	va_copy(args_copy, args);
+	int needed = vsnprintf(buffer.data(), buffer.size(), fmt, args_copy);
+	va_end(args_copy);
 
 	// Resize buffer if the formatted string is too large
-	if (needed >= buffer.size()) {
+	if (needed >= static_cast<int>(buffer.size())) {
 		buffer.resize(needed + 1);
 		vsnprintf(buffer.data(), buffer.size(), fmt, args);
 	}
+	va_end(args);
 
+	std::string prefix;
 	if(include_time) {
-		std::printf("[%s] [%s] %s\n", get_time().c_str(), level ? level : "", buffer.data());
-	} else if(level) {
-		std::printf("[%s] %s\n", level, buffer.data());
-	} else if(func) {
-		std::printf("[%s] [%s] %s\n", level ? level : "", func, buffer.data());
-	} else {
-		std::printf("%s\n", buffer.data());
+		prefix = "[" + get_time() + "] ";
 	}
 
-	va_end(args);
+	// Check if level is not empty
+	if(level && *level) {
+		prefix += "[" + std::string(level) + "] ";
+	}
+
+	// Check if func is not empty
+	if(func && *func) {
+		prefix += "(" + std::string(func) + ") ";
+	}
+
+	std::printf("%s%s\n", prefix.c_str(), buffer.data());
 }
