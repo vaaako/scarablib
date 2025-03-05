@@ -1,6 +1,3 @@
-#include "scarablib/gfx/2d/rectangle.hpp"
-#include "scarablib/gfx/2d/sprite_factory.hpp"
-#include "scarablib/opengl/shader.hpp"
 #include "scarablib/scenes/camera.hpp"
 #include "scarablib/scenes/camera2d.hpp"
 #include "scarablib/scenes/scene2d.hpp"
@@ -14,7 +11,6 @@
 #include "scarablib/utils/math.hpp"
 #include "scarablib/window/window.hpp"
 #include "scarablib/input/keycode.hpp"
-#include <algorithm>
 #include <cstdio>
 
 bool mouse_captured = false;
@@ -23,7 +19,7 @@ void camera_movement(Window& window, Camera& camera, KeyboardHandler& keyboard) 
 	const float dt = window.dt();
 	// LOG_DEBUG("Camera dt: %f", dt);
 
-	vec3<float> direction;
+	vec3<float> direction = vec3<float>(0.0f);
 
 	if(keyboard.isdown(Keycode::W)) {
 		direction.x = 1.0f;
@@ -64,6 +60,11 @@ void rotate_camera(Window& window, Camera& camera, MouseHandler& mouse) {
 		LOG_INFO("Clicked");
 		mouse_captured = true;
 		window.grab_cursor(true);
+
+		// BUG: I HADNT TO DO THIS BEFORE WHY DO I NEED IT NOW?????? WTF????
+		int dummy_x;
+		int dummy_y;
+		SDL_GetRelativeMouseState(&dummy_x, &dummy_y);
 	}
 
 	// Rotate camera
@@ -213,7 +214,7 @@ int main() {
 		cube2->set_position(ScarabMath::orbitate_y(cowpos, rotation, 5.0f));
 		cube3->set_position(ScarabMath::orbitate_z(cowpos, -rotation, 5.0f));
 
-		bill->relative_angle(camera.get_position());
+		// bill->relative_angle(camera.get_position());
 
 		// LOG_DEBUG("Cardinal: %s", camera.get_cardinal_direction().c_str());
 
