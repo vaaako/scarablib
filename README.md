@@ -93,36 +93,30 @@ if(rotation >= 360.0f) {
 Scarablib can be built using either `CMake` or `Makefile`. Both methods are supported, but they serve slightly different purposes:
 
 ## CMake
-Use CMake for testing the library:
+CMake in this project is used to compile and run the [test/main.cpp](test/main.cpp) file, which is the file used for testing the library
 ```sh
 cmake -S . -B build    # Configure
 cmake --build build    # Compile
 ./build/scarablib_dev  # Run
 ```
 
-This will compile the file `test/main.cpp`, which is the file used for testing the library
-
 ## Makefile
-With `Make` you can compile the library to a shared and static library to use on your own projects:
+With `Make` you can compile the library to a shared or static library to use it on your own projects.
+The default target will generate a static library in the `build/` directory.
+
+The static target will use the static dependencies libraries located in the `lib/` directory
 ```
 make
 ```
 
-This will generate a shared library in the `build/` directory
+You can change the target to generate a shared library instead.
+Note that for generating the shared library, you don't need to install the dependencies, but for using it, you will need to install the dependencies.
 
-For static library, use:
+The shared target will use the shared dependencies libraries located in the `lib/` directory.
 ```
-make static
-```
-
-## Development
-To compile and run the test file (`test/main.cpp`):
-```sh
-make dev              # Compile
-./build/scarablib_dev # Run
+make LIBRARY_TYPE=shared
 ```
 
-Unlike CMake, this will compile the library as a shared file and then link to it
 
 # Windows Support
 Currently, Scarablib does not officially support Windows. However, you can attempt to compile it yourself

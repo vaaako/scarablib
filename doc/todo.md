@@ -21,12 +21,10 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [ ] Discord RPC support
 	+ Currently is very clunky and not dinamic
 - [x] Mouse "GRABBED" enum (or similar)
+- [x] Shader in billboard and circle will make a new one for each instance, make static
+- [x] Optimize scene different shader bind by changing the local shader when different then changing back
 
-- [ ] Use `static_assert`
-	+ Dont forget about model methods
-
-- [ ] Shader in billboard and circle will make a new one for each instance, make static
-- [ ] Optimize scene different shader bind by changing the local shader when different then changing back
+- [ ] In Window::rotate i didnt have to clear the rotation before, why do i need it now? (last commit: https://github.com/vaaako/scarablib/commit/d2a5717958a1f73fde39dafbd6640e2c19dab076)
 
 # TODO Bug
 - [x] Memory leak somewhere (i don't know if is in my code or in some library, but is not dangerous)
