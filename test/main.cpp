@@ -60,11 +60,6 @@ void rotate_camera(Window& window, Camera& camera, MouseHandler& mouse) {
 		LOG_INFO("Clicked");
 		mouse_captured = true;
 		window.grab_cursor(true);
-
-		// BUG: I HADNT TO DO THIS BEFORE WHY DO I NEED IT NOW?????? WTF????
-		int dummy_x;
-		int dummy_y;
-		SDL_GetRelativeMouseState(&dummy_x, &dummy_y);
 	}
 
 	// Rotate camera
@@ -74,14 +69,16 @@ void rotate_camera(Window& window, Camera& camera, MouseHandler& mouse) {
 }
 
 
-// RAM usage [Approximated values] (~140mb total in this example):
-// Tested using 16Gb RAM, Xeon E5 2620 v3 and RX450
-// - Window: ~126mb
+// RAM usage [Approximated values]
+// Tested using 16Gb RAM, Xeon E5 2620 v3 and RX550
+//
+// RAM usage: ~160mb -> Main loop / Clear / Swap Buffer / Process events
+// - Window: ~126mb - Some of this may be the storage of float values and event map
 //    + OpenGL: ~10mb to ~15mb
 //    + SDL: ~12mb
 //    + "SDL_WINDOW_OPENGL" flag: ~100mb (really, just this flag)
 //
-// This flag also slows the time take to create a window speed
+// This flag also slows the time it takes to create a window
 
 int main() {
 	constexpr float DELTATIME_MODIFIER = 100.0f; // Multipling by 100 because of delta (since it's in ms)
@@ -190,7 +187,7 @@ int main() {
 		window.process_events(); // Process all events
 
 		// Quit if ESC or Q is pressed
-		if((!mouse_captured && window.keyboard().ispressed(Keycode::ESCAPE)) || window.has_event(Event::QUIT)) {
+		if((!mouse_captured && window.keyboard().ispressed(Keycode::ESCAPE)) || window.has_event(Event::WINDOW_QUIT)) {
 			window.close();
 		}
 
@@ -214,7 +211,7 @@ int main() {
 		cube2->set_position(ScarabMath::orbitate_y(cowpos, rotation, 5.0f));
 		cube3->set_position(ScarabMath::orbitate_z(cowpos, -rotation, 5.0f));
 
-		// bill->relative_angle(camera.get_position());
+		bill->relative_angle(camera.get_position());
 
 		// LOG_DEBUG("Cardinal: %s", camera.get_cardinal_direction().c_str());
 

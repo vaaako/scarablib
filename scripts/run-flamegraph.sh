@@ -18,7 +18,7 @@ perf record -p $1 -g -- sleep $SECONDS
 echo "Generating flamegraph..."
 TIMESTAMP=$(date +"%d%m%y-%H%M%S")
 
-perf script | stackcollapse-perf.pl > out.perf-folded
+sudo perf script | stackcollapse-perf.pl > out.perf-folded
 flamegraph.pl out.perf-folded > $TIMESTAMP.svg
 
 echo "$TIMESTAMP.svg generated"

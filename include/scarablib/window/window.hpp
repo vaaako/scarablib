@@ -38,6 +38,16 @@ class Window {
 		// This function should be called once at the beginning of each frame to process input events.
 		void process_events() noexcept;
 
+		// Will call the callback function for each SDL event, passing SDL_Event as a parameter.
+		// This is generally used for ImGui process events.
+		// Example: window.raw_events([](SDL_Event event) { ImGui_ImplSDL2_ProcessEvent(&event); });
+		template<typename T>
+		void raw_events(T&& callback) noexcept {
+			SDL_Event event;
+			while(SDL_PollEvent(&event)) {
+				std::forward<T>(callback)(event);
+			}
+		}
 
 		// WINDOW PROCESS //
 
@@ -50,18 +60,6 @@ class Window {
 		// This should be called at the end of each frame
 		// to display the newly rendered frame to the screen
 		inline void swap_buffers() noexcept {
-			#ifdef SCARAB_DEBUG_EVENTCOUNT
-			if(frame_events.size() > 0) {
-				LOG_DEBUG("Events in this frame: %zu\n", frame_events.size());
-				if(frame_events.size() > 5) {
-					for(uint32 event : frame_events) {
-						LOG_DEBUG("+ event: %u\n", event);
-					}
-				
-				}
-			}
-			#endif
-
 			// Make operations that need to happen at the end of each frame
 			this->frame_events.clear(); // Clear events
 			SDL_GL_SwapWindow(this->window);
@@ -194,13 +192,13 @@ class Window {
 		// Run a callback everytime a given event is present in the current frame's event buffer
 		template<typename T>
 		inline void on_event(const Event event, T&& callback) const noexcept {
-			if(has_event(event)) {
+			if(this->has_event(event)) {
 				std::forward<T>(callback)();
 			}
 		}
 
 		// Check if the provided X or Y coordinates are outside the window's bounds.
-		inline bool out_of_bounds(const uint32 x, const uint32 y) const noexcept {
+		inline bool is_out_of_bounds(const uint32 x, const uint32 y) const noexcept {
 			return ((int)x < 0 || x > this->conf.width) ||
 				   ((int)y < 0 || y > this->conf.height);
 		}
@@ -217,6 +215,14 @@ class Window {
 		// Hides and grabs the cursor inside the window
 		inline void grab_cursor(const bool grab) const noexcept {
 			SDL_SetRelativeMouseMode(static_cast<SDL_bool>(grab));
+
+			// BUG:? I HADNT TO DO THIS BEFORE WHY DO I NEED IT NOW?????? WTF????
+			// Grab Cursor -> Move based on last mouse position
+			// If this is not done, the cursor will jump to the last location
+			// This is way is only need when the cursor is locked
+			int dummy_x;
+			int dummy_y;
+			SDL_GetRelativeMouseState(&dummy_x, &dummy_y);
 		}
 
 		// Hide the cursor when it is inside the window.

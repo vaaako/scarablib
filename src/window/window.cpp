@@ -1,6 +1,8 @@
 #include "scarablib/window/window.hpp"
+#include "scarablib/opengl/shader_manager.hpp"
 #include "scarablib/opengl/vao_manager.hpp"
 #include "scarablib/proper/error.hpp"
+#include "scarablib/utils/math.hpp"
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_video.h>
 #include <SDL2/SDL_mixer.h>
@@ -71,7 +73,8 @@ Window::Window(const Window::Config& config) : conf(config), half_width(static_c
 	glDepthFunc(GL_LEQUAL);
 
 	// To enable cull face i need to make 2D shapes CCW
-	// glEnable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_CW);
 	// glCullFace(GL_BACK);
 
 	// SDL Configurations
@@ -81,8 +84,13 @@ Window::Window(const Window::Config& config) : conf(config), half_width(static_c
 	}
 
 	// Debug info
-	if (config.debug_info) {
+	if(config.debug_info) {
+		SDL_version compiled;
+		SDL_VERSION(&compiled);
+
+		LOG_INFO("SDL Loaded!");
 		LOG_INFO("OpenGL Loaded!");
+		LOG_INFO("SDL version: %d.%d.%d", compiled.major, compiled.minor, compiled.patch);
 		LOG_INFO("GL Version: %s", glGetString(GL_VERSION));
 		LOG_INFO("Vendor: %s", glGetString(GL_VENDOR));
 		LOG_INFO("Renderer: %s", glGetString(GL_RENDERER));
@@ -103,8 +111,10 @@ Window::~Window() noexcept {
 	Mix_CloseAudio();
 	// Quit SDL
 	SDL_Quit();
-	// Clean up VAO
+	// Clean up VAO Manager
 	VAOManager::get_instance().cleanup();
+	// Clean up Shader Manager
+	ShaderManager::get_instance().cleanup();
 }
 
 
@@ -117,7 +127,7 @@ double Window::fps() noexcept {
 	// Update every second
 	if(elapsed >= 1000) {
 		// Avoid division by zero
-		if(elapsed == 0.0f) {
+		if(ScarabMath::is_near_zero(elapsed)) {
 			elapsed = 0.01f;
 		}
 
@@ -158,7 +168,6 @@ void Window::frame_capping(const uint32 fps) const noexcept {
 	// If actual >= desired, the frame is already running slower than desired, so no delay is needed
 }
 
-
 void Window::process_events() noexcept {
 	// Frame beggining calculations
 	this->calc_dt();
@@ -166,8 +175,6 @@ void Window::process_events() noexcept {
 
 	SDL_Event event;
 	while(SDL_PollEvent(&event)) {
-		// ImGui_ImplSDL2_ProcessEvent(&event);
-
 		// Store all events in this frame
 		this->frame_events.emplace(event.type);
 

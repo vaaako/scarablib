@@ -31,6 +31,7 @@
 #pragma once
 
 // Triggered events
+
 enum Event {
 	FIRSTEVENT     = 0,     /**< Unused (do not remove) */
 
@@ -45,7 +46,7 @@ enum Event {
 
 
 	/* Application events */
-	QUIT           = 0x100, /**< User-requested quit */
+	WINDOW_QUIT           = 0x100, /**< User-requested quit */
 
 	/* These application events have special meaning on iOS, see README-ios.md for details */
 	APP_TERMINATING,        /**< The application is being terminated by the OS
