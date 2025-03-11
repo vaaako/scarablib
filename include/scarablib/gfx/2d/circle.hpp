@@ -1,6 +1,7 @@
 #pragma once
 
 #include "scarablib/gfx/2d/sprite.hpp"
+#include "scarablib/opengl/shader_manager.hpp"
 #include "scarablib/utils/file.hpp"
 
 // Class for rectangle sprite
@@ -22,18 +23,13 @@ struct Circle : public Sprite {
 
 	// Circle has a different shader
 	inline Shader* get_shader() const noexcept override {
-		return this->get_sshader();
+		return ShaderManager::get_instance().get_or_load_shader(
+			"circle",
+			FileHelper::read_file("resources/shaders/vertex.glsl").c_str(),
+			FileHelper::read_file("resources/shaders/2d/circle_fs.glsl").c_str()
+		);
 	};
 
 	private:
 		float blur = 0.01f;
-
-		static inline Shader* get_sshader() noexcept {
-			static Shader shader = Shader(
-				FileHelper::read_file("resources/shaders/vertex.glsl").c_str(),
-				FileHelper::read_file("resources/shaders/2d/circle_fs.glsl").c_str()
-			);
-
-			return &shader;
-		}
 };

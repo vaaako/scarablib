@@ -2,7 +2,7 @@
 
 #include <SDL2/SDL_events.h>
 #include <vector>
-#include "SDL_mouse.h"
+#include <SDL2/SDL_mouse.h>
 #include "scarablib/typedef.hpp"
 
 // Avoid foward declaration
@@ -57,7 +57,7 @@ class MouseHandler {
 			return this->moved_dir;
 		}
 
-		// Returns how much the mouse moved since the last call
+		// Returns mouse movent since last call
 		inline vec2<int32> relative_move() const noexcept {
 			vec2<int32> mov;
 			SDL_GetRelativeMouseState(&mov.x, &mov.y);

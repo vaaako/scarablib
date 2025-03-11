@@ -75,16 +75,6 @@ class Camera {
 			this->update_proj_matrix();
 		}
 
-		// Changes the camera rotation using yaw and pitch angles.
-		// Yaw is horizontal rotation, Pitch is vertical
-		inline void set_rotation(const float yaw, const float pitch) noexcept {
-			// Wrap yaw to stay within 360 range
-			this->yaw = std::fmod(yaw, 360.0f);
-			// Prevent gimbal lock
-			this->pitch = glm::clamp(pitch, -89.0f, 89.0f);
-			this->update_camera_vectors();
-		}
-
 		// Set camera's near plane. How near to render
 		inline void set_near_plane(const float near_plane) noexcept {
 			if(near_plane > this->far_plane) {
@@ -158,6 +148,16 @@ class Camera {
 
 		inline void set_sensitivity(const float sensitivity) noexcept {
 			this->sensitivity = sensitivity;
+		}
+
+		// Changes the camera rotation using yaw and pitch angles.
+		// Yaw is horizontal rotation, Pitch is vertical
+		inline void set_rotation(const float yaw, const float pitch) noexcept {
+			// Wrap yaw to stay within 360 range
+			this->yaw = std::fmod(yaw, 360.0f);
+			// Prevent gimbal lock
+			this->pitch = glm::clamp(pitch, -89.0f, 89.0f);
+			this->update_camera_vectors();
 		}
 
 

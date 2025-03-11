@@ -8,15 +8,16 @@ Scene3D::~Scene3D() noexcept {
 	delete this->shader;
 }
 
-void Scene3D::add_to_scene(const std::string& key, Model* model) {
+void Scene3D::add_to_scene(const char* key, Model* model) {
 	if(!model) {
-		throw ScarabError("Attempted to add a null Model to the scene with key '%s'", key.c_str());
+		throw ScarabError("Attempted to add a null Model to the scene with key '%s'", key);
 	}
 
 	std::shared_ptr<Model> shared_mesh = std::shared_ptr<Model>(model);
 	this->scene.emplace(key, shared_mesh); // Used be get_by_key()
 
 	auto& vao_groups = this->vao_groups[model->get_vaoid()];
+	// vao_groups.emplace_back(shared_mesh);
 
 	// Sort shaders to minimize shader changes
 	// Find the correct position for insertion
@@ -51,7 +52,7 @@ void Scene3D::draw_all() const noexcept {
 	Shader* shader = this->shader;
 	Camera& camera = this->camera;
 
-	// Track currently bound objects to avoid redundant bindings
+	// // Track currently bound objects to avoid redundant bindings
 	Shader* cur_shader = this->shader;
 	GLuint cur_vao = 0;
 
@@ -75,6 +76,15 @@ void Scene3D::draw_all() const noexcept {
 				model_shader->use();
 				cur_shader = model_shader;
 			}
+
+			// Shader* model_shader = model->get_shader();
+			// if(model_shader != nullptr) {
+			// 	model_shader->use();
+			// 	model->draw(camera, *model_shader);
+			// 	model_shader->unbind();
+			// 	shader->use(); // Rebind scene shader
+			// 	continue;
+			// }
 
 			// Draw model
 			model->draw(camera, *cur_shader);

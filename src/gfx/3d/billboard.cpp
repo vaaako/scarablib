@@ -108,8 +108,10 @@ void Billboard::config_directional_textures(const std::vector<const char*> paths
 	}
 }
 
-// TODO: back not showing fuck it i hatge myself
 void Billboard::relative_angle(const vec3<float>& target_pos, const uint8 num_sectors) noexcept {
+	assert((target_pos != vec3<float>(0.0f)) && "The target position can't be zero");
+	assert((num_sectors == 4 || num_sectors == 8) && "The number of sectors must be 4 or 8");
+
 	// Use radians in this case is more accurate
 	const float angle_step = M_PI2 / num_sectors;
 

@@ -31,7 +31,7 @@ class Scene3D : public IScene<Model> {
 
 		// Add a model to the scene.
 		// Do not pass a pointer of a non allocated model
-		void add_to_scene(const std::string& key, Model* model) override;
+		void add_to_scene(const char* key, Model* model) override;
 
 		// Draw all models added to the scene
 		void draw_all() const noexcept override;

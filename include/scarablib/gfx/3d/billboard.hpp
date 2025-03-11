@@ -3,16 +3,14 @@
 // This is a class to make a billboard model.
 // WARNING: Do not use this class directly, use ModelFactory::create_billboard(const Model::Config& conf)
 #include "scarablib/gfx/3d/model.hpp"
+#include "scarablib/opengl/shader_manager.hpp"
 #include "scarablib/utils/file.hpp"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/vector_angle.hpp>
 
-#define SCARAB_DEBUG_BILLBOARD
-
 // PI * 2
 #define M_PI2 6.283185307179586f
-#define M_PI3 9.42477796076938f 
 
 // Class for billboard model
 struct Billboard : public Model {
@@ -74,7 +72,11 @@ struct Billboard : public Model {
 
 	// Returns the shader used by billboard
 	inline Shader* get_shader() const noexcept override {
-		return this->get_sshader();
+		return ShaderManager::get_instance().get_or_load_shader(
+			"billboard",
+			FileHelper::read_file("resources/shaders/3d/billboard_vs.glsl").c_str(),
+			FileHelper::read_file("resources/shaders/fragment.glsl").c_str()
+		);
 	};
 
 	private:
@@ -97,17 +99,6 @@ struct Billboard : public Model {
 		Billboard::Direction cur_dir = Billboard::Direction::EAST; // Only used inside relative_angle
 		// Save to check and only change texture if needed
 		uint32 cur_sector = 9; // This value so that it will always change in first change
-
-
-		// Not the best solution but wtv
-		static inline Shader* get_sshader() noexcept {
-			static Shader shader = Shader(
-				FileHelper::read_file("resources/shaders/3d/billboard_vs.glsl").c_str(),
-				FileHelper::read_file("resources/shaders/fragment.glsl").c_str()
-			);
-
-			return &shader;
-		}
 
 		void draw(const Camera& camera, const Shader& shader) noexcept override;
 };

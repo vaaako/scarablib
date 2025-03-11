@@ -1,6 +1,7 @@
 #pragma once
 
 #include <GL/glew.h>
+#include <cassert>
 #include "scarablib/gfx/3d/boundingbox.hpp"
 #include "scarablib/gfx/mesh.hpp"
 #include "scarablib/opengl/shader.hpp"

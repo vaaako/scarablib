@@ -11,9 +11,9 @@ Scene2D::~Scene2D() noexcept {
 	delete this->shader;
 }
 
-void Scene2D::add_to_scene(const std::string& key, Sprite* shape) {
+void Scene2D::add_to_scene(const char* key, Sprite* shape) {
 	if(!shape) {
-		throw ScarabError("Attempted to add a null Shape to the scene with key '%s'", key.c_str());
+		throw ScarabError("Attempted to add a null Shape to the scene with key '%s'", key);
 	}
 
 	std::shared_ptr<Sprite> shared_shape = std::shared_ptr<Sprite>(shape);

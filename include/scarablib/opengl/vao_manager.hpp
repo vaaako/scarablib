@@ -57,10 +57,6 @@ class VAOManager {
 
 		std::unordered_map<size_t, VAOEntry> vao_map;
 
-		VAOManager() noexcept = default;
-		VAOManager(const VAOManager&) noexcept = delete;
-		VAOManager& operator=(const VAOManager&) noexcept = delete;
-
 		// Make the VAO, VBO and EBO.
 		// Indices is optional
 		template<typename T>

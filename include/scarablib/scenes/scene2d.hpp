@@ -38,7 +38,7 @@ class Scene2D : public IScene<Sprite> {
 
 		// Add a shape to the scene.
 		// Do not pass a pointer of a non allocated model
-		void add_to_scene(const std::string& key, Sprite* mesh) override;
+		void add_to_scene(const char* key, Sprite* mesh) override;
 
 		// Draw all models added to the scene
 		void draw_all() const noexcept override;

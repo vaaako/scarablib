@@ -32,12 +32,12 @@ void VAOManager::release_vao(const size_t hash) noexcept {
 }
 
 void VAOManager::cleanup() noexcept {
-	for(auto& [hash, entry] : vao_map) {
+	for(auto& [hash, entry] : this->vao_map) {
 		const VAOData& data = entry.data;
-		GLuint buffers[] = { data.vbo_id, data.ebo_id };
+		GLuint buffers[] = { data.vbo_id, data.ebo_id }; // Delete both at the same time
 		glDeleteBuffers(2, buffers);
 		glDeleteVertexArrays(1, &data.vao_id);
 	}
-	vao_map.clear();
+	this->vao_map.clear();
 }
 
