@@ -27,9 +27,10 @@ if(USE_STATIC_LIBS)
 	include_directories(
 		include
 		include/external
+		include/external/SDL2 # SDL_mixer includes SDL_stdinc
+		include/external/SDL_mixer
 		include/external/tinyobjloader
 		include/external/stb
-		include/external/freetype2 # Freetype needs
 	)
 
 	link_directories(
@@ -55,29 +56,33 @@ if(USE_STATIC_LIBS)
 	)
 
 else()
+
+	# Set to modern OpenGL
+	set(OpenGL_GL_PREFERENCE "GLVND")
+
 	# Include directories
 	include_directories(
 		include
+		include/external
+		include/external/SDL2 # SDL_mixer includes SDL_stdinc
+		include/external/SDL_mixer
 		include/external/tinyobjloader
 		include/external/stb
 	)
 
-	# Set to modern OpenGL
-	set(OpenGL_GL_PREFERENCE "GLVND")
 	# Find shared libraries
 	find_package(OpenGL REQUIRED)
-	find_package(GLEW REQUIRED)
-	find_package(SDL2 REQUIRED)
-	find_package(SDL2_mixer REQUIRED)
-	find_package(Freetype REQUIRED)
+
+	find_library(SDL2_LIBRARY SDL2 PATHS ${CMAKE_SOURCE_DIR}/lib/SDL2)
+	find_library(SDL2_MIXER_LIBRARY SDL2_mixer PATHS ${CMAKE_SOURCE_DIR}/lib/SDL2_mixer)
+	find_library(GLEW_LIBRARY GLEW PATHS ${CMAKE_SOURCE_DIR}/lib/GLEW)
 
 	# Link shared libraries
 	target_link_libraries(scarablib_dev 
 		${OPENGL_LIBRARIES}
-		GLEW::GLEW
-		SDL2::SDL2
-		SDL2_mixer::SDL2_mixer
-		Freetype::Freetype
+		${GLEW_LIBRARY}
+		${SDL2_LIBRARY}
+		${SDL2_MIXER_LIBRARY}
 	)
 endif()
 

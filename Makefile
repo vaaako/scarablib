@@ -1,14 +1,27 @@
 CXX = clang++
 CXXFLAGS = -std=c++20 -O3 \
 		   -I./include \
+		   -I./include/external/SDL2 \
+		   -I./include/external/SDL_mixer \
 		   -Iinclude/external/tinyobjloader \
 		   -Iinclude/external/stb
+# -I./include/external/SDL2 -> SDL_mixer
 
-LDFLAGS = -L./lib/GLEW \
-		  -L./lib/SDL2 \
-		  -L./lib/SDL2_mixer \
-		  -L./lib/freetype \
-		  -lGL -lGLEW -lSDL2 -lSDL2main -lSDL2_mixer -lfreetype
+# Default to 'static' if not specified
+LIBRARY_TYPE ?= static
+
+# Conditional LDFLAGS based on LIBRARY_TYPE
+ifeq ($(LIBRARY_TYPE), static)
+	LDFLAGS = ./lib/GLEW/libGLEW.a \
+			  ./lib/SDL2/libSDL2.a \
+			  ./lib/SDL2_mixer/libSDL2_mixer.a \
+			  -lGL -ldl -lpthread -lm
+else ifeq ($(LIBRARY_TYPE), shared)
+	LDFLAGS = -L./lib/GLEW \
+			  -L./lib/SDL2 \
+			  -L./lib/SDL2_mixer \
+			  -lGL -lGLEW -lSDL2 -lSDL2main -lSDL2_mixer
+endif
 
 # Dirs
 BUILD_DIR = build
@@ -25,7 +38,7 @@ TARGET = scarablib
 TARGET_STATIC = $(BUILD_DIR)/lib$(TARGET).a
 TARGET_SHARED = $(BUILD_DIR)/lib$(TARGET).so
 
-all: shared
+all: $(LIBRARY_TYPE)
 
 # Static library
 static: $(TARGET_STATIC)
@@ -68,11 +81,11 @@ $(DEPS_DIR)/%.d: src/%.cpp
 
 # Test with static
 # TODO -- change to shared later
-dev: static
-	make -f Makefile.dev
+# dev: static
+# 	make -f Makefile.dev
 
 clean:
 	rm -rf $(BUILD_DIR)/$(TARGET_LIB) $(OBJS_DIR)
-	make clean -f Makefile.dev
+	# make clean -f Makefile.dev
 
 .PHONY: all static shared clean
