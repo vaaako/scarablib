@@ -1,3 +1,4 @@
+#include "scarablib/gfx/2d/sprite_factory.hpp"
 #include "scarablib/scenes/camera.hpp"
 #include "scarablib/scenes/camera2d.hpp"
 #include "scarablib/scenes/scene2d.hpp"
@@ -167,12 +168,12 @@ int main() {
 	// testcube->set_position(cow->get_center_position());
 	// scene3d.add_to_scene("testcube", testcube);
 
-	// Rectangle* sprite = SpriteFactory::create_rectangle();
-	// sprite->set_position({ 10.0f, 10.0f });
-	// sprite->set_size({ 100.0f, 100.0f });
-	// sprite->set_color(Colors::PINK);
-	// sprite->set_texture(&tex1);
-	// scene2d.add_to_scene("rec", sprite);
+	Rectangle* sprite = SpriteFactory::create_rectangle();
+	sprite->set_position({ 10.0f, 10.0f });
+	sprite->set_size({ 100.0f, 100.0f });
+	sprite->set_color(Colors::PINK);
+	sprite->set_texture(&tex1);
+	scene2d.add_to_scene("rec", sprite);
 
 	LOG_INFO("Scene3d length %d", scene3d.length());
 
@@ -264,7 +265,7 @@ int main() {
 
 		// msgothic.draw_text("Hello world", { 10.0f, 10.0f });
 		// msgothic.draw_all(); // drop fps i think
-		// scene2d.draw_all();
+		scene2d.draw_all();
 
 		// Update rotation
 		rotation += rotation_speed * window.dt();
@@ -277,6 +278,6 @@ int main() {
 	// Check for any OpenGL error
 	GLenum err = glGetError();
 	if(err != GL_NO_ERROR) {
-		LOG_ERROR("OpenGL error code: %x", err);
+		LOG_ERROR("\nOpenGL error code: %x", err);
 	}
 }

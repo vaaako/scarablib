@@ -68,6 +68,7 @@ Window::Window(const Window::Config& config) : conf(config), half_width(static_c
 	// Blending
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
+
 	glEnable(GL_DEPTH_TEST);
 
 	// 2D and Skybox support
@@ -75,8 +76,7 @@ Window::Window(const Window::Config& config) : conf(config), half_width(static_c
 	glDepthFunc(GL_LEQUAL);
 
 	// Cull Face
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_CW); // To work with 2D shapes
+	// glEnable(GL_CULL_FACE);
 	// glCullFace(GL_BACK);
 
 	// SDL Configurations

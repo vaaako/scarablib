@@ -44,7 +44,7 @@ class Camera2D {
 		}
 
 	private:
-		vec2<float> position;
+		vec2<float> position = vec2<float>(0.0f, 0.0f);
 
 		float width;
 		float height;

@@ -8,6 +8,7 @@
 #define STB_TRUETYPE_IMPLEMENTATION
 #include <stb_truetype.h>
 
+// WARNING: NOT FINISHED YET. STILL DONT WORKING PROPERLY
 // TODO: Optimize. More characters
 
 Font::Font(const Camera2D& camera, const char* path, const uint16 size) : camera(camera) {

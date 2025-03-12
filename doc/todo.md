@@ -16,17 +16,19 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [x] Use noexcept keyword
 - [x] Better color struct
 
-- [ ] All graphics logic possible to glsl *(GPU)*
-- [ ] Replace `enum class` to `enum` in some cases where there are multiple conversions
-- [ ] Discord RPC support
-	+ Currently is very clunky and not dinamic
+- [x] All graphics logic possible to glsl *(GPU)*
+- [x] Replace `enum class` to `enum` in some cases where there are multiple conversions
 - [x] Mouse "GRABBED" enum (or similar)
 - [x] Shader in billboard and circle will make a new one for each instance, make static
 - [x] Optimize scene different shader bind by changing the local shader when different then changing back
 
+- [x] Move `Scene3D::add_to_scene` to interface IScene
+- [x] Shader from Scene3D and Scene2D use shader manager
+- [ ] make transparency work without `if(tex.a == 0.0)`
+
+- [ ] Discord RPC support?
+
 - [ ] In Window::rotate i didnt have to clear the rotation before, why do i need it now? (last commit: https://github.com/vaaako/scarablib/commit/d2a5717958a1f73fde39dafbd6640e2c19dab076)
-- [ ] Move `Scene3D::add_to_scene` to interface IScene
-- [ ] Shader from Scene3D and Scene2D use shader manager
 
 # TODO Bug
 - [x] Memory leak somewhere (i don't know if is in my code or in some library, but is not dangerous)
@@ -85,9 +87,10 @@ I wrote most of the things here very tired, sorry for any english mistake
 	+ Rigid body
 - [x] If possible, use mesh.hpp for 2D shapes
 - [x] Remove `SCARAB_2D_AND_3D`
+- [ ] Make it work with CULL_FACE
 
 # TODO 3D
-- [x] Camera
+- [ ] Camera
 	+ [X] **[DISCARTED]** [Camera Movement](https://github.com/vaaako/Vakraft/blob/main/src/main/java/com/magenta/main/Game.java#L121)
 	+ [X] Best mouse movement
 	+ [X] Custom position for shapes

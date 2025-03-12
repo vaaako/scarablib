@@ -14,7 +14,7 @@ class Font {
 	// To update viewport
 	friend class Scene2D;
 
-	// WARNING: FONTS ARE NOT COMPLETED YET, I WILL UPDATE IT LATER
+	// WARNING: NOT FINISHED YET. STILL DONT WORKING PROPERLY
 
 	public:
 		// Build a font object passing a path to a .ttf file.
