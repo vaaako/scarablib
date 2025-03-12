@@ -7,10 +7,6 @@
 Scene2D::Scene2D(Camera2D& camera) noexcept
 	: IScene<Sprite>(), camera(camera) {}
 
-Scene2D::~Scene2D() noexcept {
-	delete this->shader;
-}
-
 void Scene2D::add_to_scene(const char* key, Sprite* shape) {
 	if(!shape) {
 		throw ScarabError("Attempted to add a null Shape to the scene with key '%s'", key);
@@ -26,36 +22,37 @@ void Scene2D::draw_all() const noexcept {
 	Shader* shader   = this->shader;
 	Camera2D& camera = this->camera;
 
-	// This is just necessary if doing 2D and 3D
-	glDepthFunc(GL_ALWAYS);
+	// Track current shader to avoid redundant bindings
+	Shader* cur_shader = this->shader;
 
 	shader->use();
+
+	// glDepthFunc(GL_ALWAYS);
 
 	for(const auto& [vao, models] : this->vao_groups) {
 		glBindVertexArray(vao);
 
 		// Draw all sprites with this VAO
 		for(std::shared_ptr<Sprite> sprite : models) {
-			Shader* sprite_shader = sprite->get_shader();
-			if(sprite_shader != nullptr) {
-				sprite_shader->use();
-				// Pass deafult shader since this is a virtual method, and the shader wont be used inside anyway
-				sprite->draw(camera, *sprite_shader);
-				sprite_shader->unbind();
+			// Determine which shader to use
+			Shader* sprite_shader = (sprite->get_shader() != nullptr) ? sprite->get_shader() : shader;
 
-				shader->use(); // Rebind scene shader
-				continue;
+			// Change between default shader and different shader
+			if(sprite_shader != cur_shader) {
+				cur_shader->unbind();
+				sprite_shader->use();
+				cur_shader = sprite_shader;
 			}
 
 			// Draw sprite
-			sprite->draw(camera, *shader);
+			sprite->draw(camera, *cur_shader);
 		}
 	}
 
+	// glDepthFunc(GL_LESS);
+
 	glBindVertexArray(0);
 	shader->unbind();
-
-	glDepthFunc(GL_LESS);
 }
 
 

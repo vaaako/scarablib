@@ -65,16 +65,18 @@ Window::Window(const Window::Config& config) : conf(config), half_width(static_c
 
 	// Configure OpenGL
 	glViewport(0, 0, (GLsizei)config.width, (GLsizei)config.height);
+	// Blending
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 
-	glDepthFunc(GL_ALWAYS);
+	// 2D and Skybox support
+	// glDepthFunc(GL_ALWAYS);
 	glDepthFunc(GL_LEQUAL);
 
-	// To enable cull face i need to make 2D shapes CCW
+	// Cull Face
 	glEnable(GL_CULL_FACE);
-	glCullFace(GL_CW);
+	glCullFace(GL_CW); // To work with 2D shapes
 	// glCullFace(GL_BACK);
 
 	// SDL Configurations

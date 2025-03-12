@@ -13,6 +13,11 @@ namespace FileHelper {
 	// Returns an empty string if the file does not exist
 	std::string read_file(const std::string& path);
 
+	// Return the content of a file as char*.
+	// Returns nullptr if the file does not exist.
+	// WARNING: delete the returned char*
+	char* read_file_char(const std::string& path);
+
 	// Return the content of a file.
 	// Returns an empty vector if the file does not exist
 	std::vector<uint8> read_binary_file(const char* path) noexcept;

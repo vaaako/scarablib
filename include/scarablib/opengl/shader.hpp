@@ -9,8 +9,9 @@
 
 // OpenGL shader struct
 struct Shader {
-		// Construct a shader using vertex and fragment shaders content
-		Shader(const char* vertex_source, const char* fragment_source);
+		// Construct a shader using vertex and fragment shaders content or file path.
+		// is_file_path is true if vertex and fragment are file paths
+		Shader(const char* vertex, const char* fragment, const bool is_file_path = false);
 		~Shader() noexcept;
 
 		// Disable copy and moving

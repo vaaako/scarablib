@@ -1,6 +1,6 @@
 #pragma once
 
-#include "scarablib/opengl/shader.hpp"
+#include "scarablib/opengl/shader_manager.hpp"
 #include "scarablib/opengl/vbo.hpp"
 #include "scarablib/scenes/camera.hpp"
 #include "scarablib/typedef.hpp"
@@ -23,8 +23,9 @@ struct Skybox {
 		VAO* vao = new VAO();
 		VBO* vbo = new VBO();
 
-		Shader* shader = new Shader(
-			FileHelper::read_file("resources/shaders/3d/skybox_vs.glsl").c_str(),
-			FileHelper::read_file("resources/shaders/3d/skybox_fs.glsl").c_str()
+		Shader* shader = ShaderManager::get_instance().get_or_load_shader(
+			"skybox", true,
+			(THIS_FILE_DIR + "/../opengl/shaders/3d/skybox_vs.glsl").c_str(),
+			(THIS_FILE_DIR + "/../opengl/shaders/3d/skybox_fs.glsl").c_str()
 		);
 };

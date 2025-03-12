@@ -1,6 +1,7 @@
 #pragma once
 
 #include "scarablib/opengl/shader.hpp"
+#include <string_view>
 #include <unordered_map>
 
 class ShaderManager {
@@ -12,12 +13,13 @@ class ShaderManager {
 
 		// Returns a reference to a existing shader or make a new one if it doesn't exist.
 		// This tracks the shader existence by its name.
-		// This should be used in Model::get_shader()
-		Shader* get_or_load_shader(const char* name, const char* vs_path, const char* fs_path) noexcept;
+		// is_file_path is true if vertex and fragment are file paths.
+		// NOTE: This should be used when overriding Model::get_shader()
+		Shader* get_or_load_shader(const std::string_view& name, const bool is_file_path, const char* vertex_shader, const char* fragment_shader) noexcept;
 
 		// Get a existing shader by its name.
 		// If the shader doesn't exist, it will return nullptr
-		Shader* get_shader(const char* name) const noexcept;
+		Shader* get_shader(const std::string_view& name) const noexcept;
 
 
 		// Clean up all Shaders.
@@ -25,5 +27,6 @@ class ShaderManager {
 		void cleanup() noexcept;
 
 	private:
-		std::unordered_map<const char*, Shader*> shader_map;
+		// If I use char* here, it will look up the memory address of the string instead of the string itself
+		std::unordered_map<std::string_view, Shader*> shader_map;
 };

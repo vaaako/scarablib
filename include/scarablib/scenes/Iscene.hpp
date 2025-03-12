@@ -1,10 +1,10 @@
 #pragma once
 
 #include "scarablib/gfx/3d/model.hpp"
+#include "scarablib/opengl/shader_manager.hpp"
 #include "scarablib/proper/error.hpp"
+#include "scarablib/utils/file.hpp"
 #include "scarablib/window/window.hpp"
-#include <memory>
-#include <unordered_map>
 
 // Different modes of drawing shapes
 // `OUTLINEMODE` draws the outline of the shape
@@ -27,7 +27,9 @@ class IScene {
 	public:
 		// Build scene object using the window object for viewport
 		IScene() noexcept;
-		virtual ~IScene() = default;
+		virtual ~IScene() noexcept {
+			// delete this->shader;
+		}
 
 		// Add a shape object to the scene.
 		virtual void add_to_scene(const char* key, T* mesh) = 0;
@@ -61,7 +63,12 @@ class IScene {
 		// Update the scene viewport using a custom width and height values
 		virtual void update_viewport(const uint32 width, const uint32 height) noexcept = 0;
 
-		// Set drawmode to following shapes
+		// Returns the default shader used by the scene
+		inline Shader& get_shader() {
+			return *this->shader;
+		}
+
+		// Set drawmode to the following shapes
 		inline void set_drawmode(const DrawMode drawmode) noexcept {
 			glPolygonMode(GL_FRONT_AND_BACK, drawmode);
 		}
@@ -76,9 +83,15 @@ class IScene {
 		std::unordered_map<const char*, std::shared_ptr<T>> scene;
 		// Use VAO as ID to track and batch draw meshes with the same VAO
 		std::unordered_map<GLuint, std::vector<std::shared_ptr<T>>> vao_groups;
+
+		Shader* shader = ShaderManager::get_instance().get_or_load_shader(
+			"scene", true,
+			(THIS_FILE_DIR + "/../opengl/shaders/vertex.glsl").c_str(),
+			(THIS_FILE_DIR + "/../opengl/shaders/fragment.glsl").c_str()
+		);
 };
 
-template <typename T> // Return the shared pointer
+template <typename T>
 IScene<T>::IScene() noexcept {}
 
 template <typename T>

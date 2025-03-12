@@ -1,7 +1,6 @@
 #include "scarablib/opengl/shader_manager.hpp"
 
-
-Shader* ShaderManager::get_or_load_shader(const char* name, const char* vs_path, const char* fs_path) noexcept {
+Shader* ShaderManager::get_or_load_shader(const std::string_view& name, const bool is_file_path, const char* vertex_shader, const char* fragment_shader) noexcept {
 	// Return existing shader if already loaded
 	if(this->shader_map.find(name) != this->shader_map.end()) {
 		return this->shader_map.at(name);
@@ -10,15 +9,15 @@ Shader* ShaderManager::get_or_load_shader(const char* name, const char* vs_path,
 	// NOTE: I could use unique_ptr, but i fell more safe using raw pointer here
 
 	// Load new shader
-	Shader* uniq_shader = new Shader(vs_path, fs_path);
-	this->shader_map[name] = std::move(uniq_shader); // unique_ptr move ownership
+	Shader* uniq_shader = new Shader(vertex_shader, fragment_shader, is_file_path);
+	this->shader_map[name] = std::move(uniq_shader); // move ownerhip to map
 
 	// Return shared pointer
 	Shader* shader_ptr = uniq_shader;
 	return shader_ptr;
 }
 
-Shader* ShaderManager::get_shader(const char* name) const noexcept {
+Shader* ShaderManager::get_shader(const std::string_view& name) const noexcept {
 	if(this->shader_map.find(name) != this->shader_map.end()) {
 		return this->shader_map.at(name);
 	}
@@ -27,7 +26,7 @@ Shader* ShaderManager::get_shader(const char* name) const noexcept {
 
 
 void ShaderManager::cleanup() noexcept {
-	for(auto& [hash, entry] : this->shader_map) {
+	for(auto& [_, entry] : this->shader_map) {
 		delete entry;
 	}
 	this->shader_map.clear();

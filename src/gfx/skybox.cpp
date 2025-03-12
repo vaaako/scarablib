@@ -95,7 +95,6 @@ Skybox::Skybox(const Camera& camera, const std::vector<const char*>& faces) : ca
 Skybox::~Skybox() noexcept {
 	delete this->vao;
 	delete this->vbo;
-	delete this->shader;
 }
 
 void Skybox::draw() noexcept {

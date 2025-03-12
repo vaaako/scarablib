@@ -13,6 +13,9 @@
 #include "scarablib/input/keycode.hpp"
 #include <cstdio>
 
+#include <sys/sysinfo.h>
+#include <sys/resource.h>
+
 bool mouse_captured = false;
 
 void camera_movement(Window& window, Camera& camera, KeyboardHandler& keyboard) {
@@ -247,6 +250,15 @@ int main() {
 		if(current - timer >= 1000) {
 			timer = current; // Reset timer
 			window.set_title("FPS: " + std::to_string(window.fps()) + " / Delta: " + std::to_string(window.dt()));
+		
+
+	// 		LOG_DEBUG("CPU Count: %d", SDL_GetCPUCount());
+	// 		LOG_DEBUG("Cache Line Size: %d bytes", SDL_GetCPUCacheLineSize());
+	// 
+	// 		struct rusage usage;
+	// 		getrusage(RUSAGE_SELF, &usage);
+	// 		int64 ramusage = usage.ru_maxrss / 1024;
+	// 		LOG_DEBUG("RAM Usage: %ld MB", ramusage);
 		}
 
 
@@ -262,11 +274,9 @@ int main() {
 		window.swap_buffers(); // NOTE -- ~14mb RAM
 	}
 
-
 	// Check for any OpenGL error
 	GLenum err = glGetError();
 	if(err != GL_NO_ERROR) {
 		LOG_ERROR("OpenGL error code: %x", err);
 	}
-
 }

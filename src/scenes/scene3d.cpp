@@ -2,11 +2,8 @@
 #include <GL/glew.h>
 #include <algorithm>
 
-Scene3D::Scene3D(Camera& camera) noexcept : IScene(), camera(camera) {}
-
-Scene3D::~Scene3D() noexcept {
-	delete this->shader;
-}
+Scene3D::Scene3D(Camera& camera) noexcept
+	: IScene(), camera(camera) {}
 
 void Scene3D::add_to_scene(const char* key, Model* model) {
 	if(!model) {
@@ -52,7 +49,7 @@ void Scene3D::draw_all() const noexcept {
 	Shader* shader = this->shader;
 	Camera& camera = this->camera;
 
-	// // Track currently bound objects to avoid redundant bindings
+	// Track currently bound objects to avoid redundant bindings
 	Shader* cur_shader = this->shader;
 	GLuint cur_vao = 0;
 
@@ -76,15 +73,6 @@ void Scene3D::draw_all() const noexcept {
 				model_shader->use();
 				cur_shader = model_shader;
 			}
-
-			// Shader* model_shader = model->get_shader();
-			// if(model_shader != nullptr) {
-			// 	model_shader->use();
-			// 	model->draw(camera, *model_shader);
-			// 	model_shader->unbind();
-			// 	shader->use(); // Rebind scene shader
-			// 	continue;
-			// }
 
 			// Draw model
 			model->draw(camera, *cur_shader);

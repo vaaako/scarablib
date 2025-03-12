@@ -1,5 +1,4 @@
 #include "scarablib/utils/file.hpp"
-#include "scarablib/proper/error.hpp"
 #include "scarablib/typedef.hpp"
 #include <algorithm>
 #include <filesystem>
@@ -24,6 +23,27 @@ std::string FileHelper::read_file(const std::string& path) {
 	file.read(buffer.data(), size);
 
 	return buffer;
+}
+
+char* FileHelper::read_file_char(const std::string& path) {
+	std::ifstream file = std::ifstream(path, std::ios::binary);
+	if (!file) {
+		return nullptr;
+	}
+
+	// Read file content into a string stream
+	std::stringstream buffer;
+	buffer << file.rdbuf();
+
+	std::string content = buffer.str();
+	size_t size = content.size();
+
+	// Allocate memory for the content
+	char* result = new char[size + 1];
+	std::copy(content.begin(), content.end(), result);
+
+	result[size] = '\0'; // Null-terminate the string
+	return result;
 }
 
 std::vector<uint8> FileHelper::read_binary_file(const char* path) noexcept {

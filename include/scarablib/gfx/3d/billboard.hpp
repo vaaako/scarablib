@@ -72,11 +72,7 @@ struct Billboard : public Model {
 
 	// Returns the shader used by billboard
 	inline Shader* get_shader() const noexcept override {
-		return ShaderManager::get_instance().get_or_load_shader(
-			"billboard",
-			FileHelper::read_file("resources/shaders/3d/billboard_vs.glsl").c_str(),
-			FileHelper::read_file("resources/shaders/fragment.glsl").c_str()
-		);
+		return this->shader;
 	};
 
 	private:
@@ -99,6 +95,13 @@ struct Billboard : public Model {
 		Billboard::Direction cur_dir = Billboard::Direction::EAST; // Only used inside relative_angle
 		// Save to check and only change texture if needed
 		uint32 cur_sector = 9; // This value so that it will always change in first change
+
+		// Store and get one time only (deleted inside window destructor)
+		Shader* shader = ShaderManager::get_instance().get_or_load_shader(
+			"billboard", true,
+			(THIS_FILE_DIR + "/../../opengl/shaders/3d/billboard_vs.glsl").c_str(),
+			(THIS_FILE_DIR + "/../../opengl/shaders/fragment.glsl").c_str()
+		);
 
 		void draw(const Camera& camera, const Shader& shader) noexcept override;
 };

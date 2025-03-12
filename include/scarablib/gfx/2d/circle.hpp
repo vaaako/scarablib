@@ -4,7 +4,7 @@
 #include "scarablib/opengl/shader_manager.hpp"
 #include "scarablib/utils/file.hpp"
 
-// Class for rectangle sprite
+// Class for circle sprite
 struct Circle : public Sprite {
 	// WARNING: Do not use this constructor, use SpriteFactory
 	Circle(const std::vector<Vertex>& vertices) noexcept;
@@ -23,13 +23,16 @@ struct Circle : public Sprite {
 
 	// Circle has a different shader
 	inline Shader* get_shader() const noexcept override {
-		return ShaderManager::get_instance().get_or_load_shader(
-			"circle",
-			FileHelper::read_file("resources/shaders/vertex.glsl").c_str(),
-			FileHelper::read_file("resources/shaders/2d/circle_fs.glsl").c_str()
-		);
+		return this->shader;
 	};
 
 	private:
 		float blur = 0.01f;
+
+		// Store and get one time only (deleted inside window destructor)
+		Shader* shader = ShaderManager::get_instance().get_or_load_shader(
+			"circle", true,
+			(THIS_FILE_DIR + "/../../opengl/shaders/vertex.glsl").c_str(),
+			(THIS_FILE_DIR + "/../../opengl/shaders/2d/circle_fs.glsl").c_str()
+		);
 };
