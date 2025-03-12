@@ -7,16 +7,6 @@
 Scene2D::Scene2D(Camera2D& camera) noexcept
 	: IScene<Sprite>(), camera(camera) {}
 
-void Scene2D::add_to_scene(const char* key, Sprite* shape) {
-	if(!shape) {
-		throw ScarabError("Attempted to add a null Shape to the scene with key '%s'", key);
-	}
-
-	std::shared_ptr<Sprite> shared_shape = std::shared_ptr<Sprite>(shape);
-	this->scene.emplace(key, shared_shape); // will not be used here, but is used for get_by_key()
-	this->vao_groups[shape->get_vaoid()].emplace_back(shared_shape);
-}
-
 void Scene2D::draw_all() const noexcept {
 	// Cache shader and camera
 	Shader* shader   = this->shader;

@@ -177,6 +177,10 @@ int main() {
 
 	LOG_INFO("Scene3d length %d", scene3d.length());
 
+	// Testing get by key (works)
+	// auto cube1_later = scene3d.get_by_key<Cube>("cube1");
+	// cube1_later->set_color(Colors::CHIROYELLOW);
+
 
 	bool debug_mode = false;
 	bool envsync = true;
