@@ -5,7 +5,7 @@
 
 // No need to set width and height here, since it will be set in update_viewport
 Scene2D::Scene2D(Camera2D& camera) noexcept
-	: IScene<Sprite>(), camera(camera) {}
+	: IScene(), camera(camera) {}
 
 void Scene2D::draw_all() const noexcept {
 	// Cache shader and camera

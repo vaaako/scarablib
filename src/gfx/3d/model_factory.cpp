@@ -67,9 +67,8 @@ Cube* ModelFactory::create_cube() noexcept {
 		20, 22, 23
 	};
 
-	// Make VAO and return created Cube
-	VAOManager::get_instance().make_vao(vertices, indices);
-	return new Cube(vertices, indices);
+	// Returns created cube
+	return new Cube(vertices, indices); // The vao is made by mesh
 }
 
 Plane* ModelFactory::create_plane() noexcept {
@@ -87,9 +86,8 @@ Plane* ModelFactory::create_plane() noexcept {
 		0, 2, 3,
 	};
 
-	// Make VAO and return created Plane
-	VAOManager::get_instance().make_vao(vertices, indices);
-	return new Plane(vertices, indices);
+	// Returns created Plane
+	return new Plane(vertices, indices); // The vao is made by mesh
 }
 
 
@@ -108,7 +106,6 @@ Billboard* ModelFactory::create_billboard() noexcept {
 		0, 2, 3,
 	};
 
-	// Make VAO and return created billboard
-	VAOManager::get_instance().make_vao(vertices, indices);
-	return new Billboard(vertices, indices);
+	// Return created billboard
+	return new Billboard(vertices, indices); // The vao is made by mesh
 }

@@ -85,6 +85,6 @@ $(DEPS_DIR)/%.d: src/%.cpp
 # 	make -f Makefile.dev
 
 clean:
-	rm -rf $(TARGET_LIB) $(OBJS_DIR) $(DEPS_DIR)
+	rm -rf $(OBJS_DIR) $(DEPS_DIR)
 
 .PHONY: all static shared clean

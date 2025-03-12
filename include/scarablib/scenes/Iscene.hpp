@@ -21,7 +21,7 @@ class Sprite;
 // Virtual class used to make Scene2D and Scene3D
 template <typename T>
 class IScene {
-	// Only Shape2D and Shape3D are accepted
+	// Only Sprite and Model are accepted
 	static_assert(std::is_same<T, Sprite>::value || std::is_same<T, Model>::value,
 			"Scene can only be instantiated with Sprite or Mesh");
 
@@ -61,7 +61,7 @@ class IScene {
 		}
 
 		// Remove object by key
-		void remove_by_key(const std::string_view& key) noexcept;
+		void remove_by_key(const std::string_view& key);
 
 		// Draw all objects added to the scene
 		virtual void draw_all() const noexcept = 0;
@@ -100,11 +100,12 @@ class IScene {
 		);
 };
 
+
 template <typename T>
 IScene<T>::IScene() noexcept {}
 
 template <typename T>
-void IScene<T>::remove_by_key(const std::string_view& key) noexcept {
+void IScene<T>::remove_by_key(const std::string_view& key) {
 	auto it = this->scene.find(key);
 	if(it == this->scene.end()) {
 		throw ScarabError("Key '%s' was not found", key.data());
@@ -114,6 +115,9 @@ void IScene<T>::remove_by_key(const std::string_view& key) noexcept {
 
 template <typename T>
 void IScene<T>::add_to_scene(const std::string_view& key, T* mesh) {
+	static_assert(std::is_same<T, Sprite>::value || std::is_same<T, Model>::value,
+			"Scene can only be instantiated with Sprite or Mesh");
+
 	if(!mesh) {
 		throw ScarabError("Attempted to add a null mesh to the scene with key '%s'", key.data());
 	}
@@ -121,7 +125,7 @@ void IScene<T>::add_to_scene(const std::string_view& key, T* mesh) {
 	std::shared_ptr<T> shared_mesh = std::shared_ptr<T>(mesh);
 	this->scene.emplace(key, shared_mesh); // Used be get_by_key()
 
-	auto& vao_groups = this->vao_groups[mesh->get_vaoid()];
+	auto& vao_groups = this->vao_groups[mesh->get_bundle().get_vao_id()];
 
 	// Sort shaders to minimize shader changes
 	// Find the correct position for insertion
@@ -153,8 +157,7 @@ void IScene<T>::add_to_scene(const std::string_view& key, T* mesh) {
 
 
 template <typename T>
-void add_to_scene(const std::string_view& key, T&& mesh)  {
+void IScene<T>::add_to_scene(const std::string_view& key, T&& mesh)  {
 	mesh; // Prevent unused parameter warning
 	throw ScarabError("You are trying to add a mesh to the scene, but %s is a temporary object, which is not allowed", key.data());
 }
-

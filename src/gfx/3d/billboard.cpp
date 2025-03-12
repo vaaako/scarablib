@@ -1,6 +1,5 @@
 #include "scarablib/gfx/3d/billboard.hpp"
 #include "scarablib/gfx/3d/model.hpp"
-#include "scarablib/opengl/vao_manager.hpp"
 #include "scarablib/proper/log.hpp"
 #include <algorithm>
 #include <cstddef>
@@ -15,7 +14,7 @@ Billboard::Billboard(const std::vector<Vertex>& vertices, const std::vector<uint
 Billboard::~Billboard() noexcept {
 	// Release current vao
 	// Mesh does this, but this is a overrided destructor
-	VAOManager::get_instance().release_vao(vao_hash);
+	// VAOManager::get_instance().release_vao(vao_hash);
 
 	// Clear directional textures if any
 	if(!this->textures.empty()) {

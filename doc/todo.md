@@ -26,8 +26,9 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [x] Shader from Scene3D and Scene2D use shader manager
 - [ ] make transparency work without `if(tex.a == 0.0)`
 
-- [ ] Discord RPC support?
+- [ ] Having problems with shaders, when compiling to executable
 
+- [ ] Discord RPC support?
 - [ ] In Window::rotate i didnt have to clear the rotation before, why do i need it now? (last commit: https://github.com/vaaako/scarablib/commit/d2a5717958a1f73fde39dafbd6640e2c19dab076)
 
 # TODO Bug

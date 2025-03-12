@@ -19,7 +19,8 @@ class VAOManager {
 			return instance;
 		}
 
-		// Check if the vertices and indices (optional) alredy has a VAO.
+		// Check if the vertices and indices alredy has a VAO.
+		// Indices is an optional parameter, you can pass an empty vector.
 		// This will make a unique hash based on the vertices and indices.
 		// If has is not found in the map, it will create a new VAO and an entry.
 		// At the end, it will return the VAO's ID.
@@ -27,7 +28,8 @@ class VAOManager {
 		template<typename T>
 		GLuint make_vao(const std::vector<T>& vertices, const std::vector<uint32_t>& indices = {}) noexcept;
 
-		// Generate a new unique hash based on the vertices and indices (optional)
+		// Generate a new unique hash based on the vertices and indices.
+		// Indices is an optional parameter, you can pass an empty vector.
 		template<typename T>
 		size_t compute_hash(const std::vector<T>& vertices, const std::vector<uint32_t>& indices = {}) const noexcept;
 
@@ -114,7 +116,7 @@ size_t VAOManager::compute_hash(const std::vector<T>& vertices, const std::vecto
 	}
 
 	// Hash index data (only if indices are provided)
-	if (!indices.empty()) {
+	if(!indices.empty()) {
 		const auto* index_data = reinterpret_cast<const char*>(indices.data());
 		const size_t index_bytes = indices.size() * sizeof(uint32_t);
 		

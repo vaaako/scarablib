@@ -1,8 +1,8 @@
 #pragma once
 
+#include "scarablib/opengl/bufferbundle.hpp"
 #include "scarablib/opengl/shader.hpp"
 #include "scarablib/scenes/camera.hpp"
-#include "scarablib/types/vertex.hpp"
 
 class Model;
 
@@ -76,8 +76,7 @@ class BoundingBox {
 		glm::mat4 model;
 
 		// OpenGL
-		size_t vao_hash; // Keep track of the hash being used
-		uint32 vao_id;   // For drawing
+		BufferBundle bundle = BufferBundle(); // Bundle of VAO, VBO and EBO
 		static constexpr GLsizei indices_size = 24;
 };
 

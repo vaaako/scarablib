@@ -1,5 +1,4 @@
 #include "scarablib/gfx/2d/sprite_factory.hpp"
-#include "scarablib/opengl/vao_manager.hpp"
 
 // CW
 
@@ -12,9 +11,8 @@ Rectangle* SpriteFactory::create_rectangle() noexcept {
 		Vertex { .position = glm::vec3(0.0f, 1.0f, 0.0f), .texuv = glm::vec2(0.0f, 0.0f) }, // Top Left
 	};
 
-	// Make VAO and return created Rectangle
-	VAOManager::get_instance().make_vao(vertices);
-	return new Rectangle(vertices);
+	// Return created rectangle
+	return new Rectangle(vertices); // The vao is made by mesh
 }
 
 Triangle* SpriteFactory::create_triangle() noexcept {
@@ -25,9 +23,8 @@ Triangle* SpriteFactory::create_triangle() noexcept {
 		Vertex { .position = glm::vec3(0.5f, 0.0f, 0.0f), .texuv = glm::vec2(0.5f, 1.0f) }  // Middle
 	};
 
-	// Make VAO and return created triangle
-	VAOManager::get_instance().make_vao(vertices);
-	return new Triangle(vertices);
+	// Return created triangle
+	return new Triangle(vertices); // The vao is made by mesh
 }
 
 
@@ -40,7 +37,6 @@ Circle* SpriteFactory::create_circle() noexcept {
 		{ .position = glm::vec3(0.0f, 1.0f, 0.0f), .texuv = glm::vec2(0.0f, 0.0f) },  // Top Left
 	};
 
-	// Make VAO and return created circle
-	VAOManager::get_instance().make_vao(vertices);
-	return new Circle(vertices);
+	// Return created circle
+	return new Circle(vertices); // The vao is made by mesh
 }

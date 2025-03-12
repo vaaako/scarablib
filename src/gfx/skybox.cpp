@@ -1,6 +1,7 @@
 #include "scarablib/gfx/skybox.hpp"
 #include "scarablib/opengl/vbo.hpp"
 #include "scarablib/proper/error.hpp"
+#include "scarablib/typedef.hpp"
 #include "scarablib/types/image.hpp"
 
 Skybox::Skybox(const Camera& camera, const std::vector<const char*>& faces) : camera(camera) {
@@ -10,57 +11,51 @@ Skybox::Skybox(const Camera& camera, const std::vector<const char*>& faces) : ca
 
 	// All cube faces
 	// NOTE: Dont make static since a skybox will created only one or two times, so its a waste of memory
-	std::vector<float> vertices = {
-		-1.0f,  1.0f, -1.0f,
-		-1.0f, -1.0f, -1.0f,
-		 1.0f, -1.0f, -1.0f,
-		 1.0f, -1.0f, -1.0f,
-		 1.0f,  1.0f, -1.0f,
-		-1.0f,  1.0f, -1.0f,
+	std::vector<vec3<float>> vertices = {
+		{ -1.0f,  1.0f, -1.0f },
+		{ -1.0f, -1.0f, -1.0f },
+		{  1.0f, -1.0f, -1.0f },
+		{  1.0f, -1.0f, -1.0f },
+		{  1.0f,  1.0f, -1.0f },
+		{ -1.0f,  1.0f, -1.0f },
 
-		-1.0f, -1.0f,  1.0f,
-		-1.0f, -1.0f, -1.0f,
-		-1.0f,  1.0f, -1.0f,
-		-1.0f,  1.0f, -1.0f,
-		-1.0f,  1.0f,  1.0f,
-		-1.0f, -1.0f,  1.0f,
+		{ -1.0f, -1.0f,  1.0f },
+		{ -1.0f, -1.0f, -1.0f },
+		{ -1.0f,  1.0f, -1.0f },
+		{ -1.0f,  1.0f, -1.0f },
+		{ -1.0f,  1.0f,  1.0f },
+		{ -1.0f, -1.0f,  1.0f },
 
-		 1.0f, -1.0f, -1.0f,
-		 1.0f, -1.0f,  1.0f,
-		 1.0f,  1.0f,  1.0f,
-		 1.0f,  1.0f,  1.0f,
-		 1.0f,  1.0f, -1.0f,
-		 1.0f, -1.0f, -1.0f,
+		{  1.0f, -1.0f, -1.0f },
+		{  1.0f, -1.0f,  1.0f },
+		{  1.0f,  1.0f,  1.0f },
+		{  1.0f,  1.0f,  1.0f },
+		{  1.0f,  1.0f, -1.0f },
+		{  1.0f, -1.0f, -1.0f },
 
-		-1.0f, -1.0f,  1.0f,
-		-1.0f,  1.0f,  1.0f,
-		 1.0f,  1.0f,  1.0f,
-		 1.0f,  1.0f,  1.0f,
-		 1.0f, -1.0f,  1.0f,
-		-1.0f, -1.0f,  1.0f,
+		{ -1.0f, -1.0f,  1.0f },
+		{ -1.0f,  1.0f,  1.0f },
+		{  1.0f,  1.0f,  1.0f },
+		{  1.0f,  1.0f,  1.0f },
+		{  1.0f, -1.0f,  1.0f },
+		{ -1.0f, -1.0f,  1.0f },
 
-		-1.0f,  1.0f, -1.0f,
-		 1.0f,  1.0f, -1.0f,
-		 1.0f,  1.0f,  1.0f,
-		 1.0f,  1.0f,  1.0f,
-		-1.0f,  1.0f,  1.0f,
-		-1.0f,  1.0f, -1.0f,
+		{ -1.0f,  1.0f, -1.0f },
+		{  1.0f,  1.0f, -1.0f },
+		{  1.0f,  1.0f,  1.0f },
+		{  1.0f,  1.0f,  1.0f },
+		{ -1.0f,  1.0f,  1.0f },
+		{ -1.0f,  1.0f, -1.0f },
 
-		-1.0f, -1.0f, -1.0f,
-		-1.0f, -1.0f,  1.0f,
-		 1.0f, -1.0f, -1.0f,
-		 1.0f, -1.0f, -1.0f,
-		-1.0f, -1.0f,  1.0f,
-		 1.0f, -1.0f,  1.0f
+		{ -1.0f, -1.0f, -1.0f },
+		{ -1.0f, -1.0f,  1.0f },
+		{  1.0f, -1.0f, -1.0f },
+		{  1.0f, -1.0f, -1.0f },
+		{ -1.0f, -1.0f,  1.0f },
+		{  1.0f, -1.0f,  1.0f }
 	};
 
-	this->vao->bind();
-
-	this->vbo->bind();
-	this->vbo->make_from_vertices(vertices, 3, GL_STATIC_DRAW);
-
-	this->vao->unbind();
-	this->vbo->unbind();
+	this->bundle.make_vao_with_manager(vertices, {});
 
 	// Gen texture cube map
 	glGenTextures(1, &this->texid);
@@ -92,11 +87,6 @@ Skybox::Skybox(const Camera& camera, const std::vector<const char*>& faces) : ca
 	this->shader->unbind();
 }
 
-Skybox::~Skybox() noexcept {
-	delete this->vao;
-	delete this->vbo;
-}
-
 void Skybox::draw() noexcept {
 	// glDepthFunc(GL_LEQUAL);
 
@@ -105,9 +95,9 @@ void Skybox::draw() noexcept {
 	this->shader->set_matrix4f("view", glm::mat3(camera.get_view_matrix())); // Conversion: Remove translation
 	this->shader->set_matrix4f("proj", camera.get_proj_matrix());
 
-	this->vao->bind();
+	this->bundle.bind_vao();
 	glDrawArrays(GL_TRIANGLES, 0, 36);
-	this->vao->unbind();
+	this->bundle.unbind_vao();
 
 	this->shader->unbind();
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);

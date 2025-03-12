@@ -2,9 +2,7 @@
 #include "scarablib/gfx/mesh.hpp"
 
 Sprite::Sprite(const std::vector<Vertex>& vertices) noexcept
-	: Mesh(vertices) {
-
-}
+	: Mesh(vertices) {}
 
 void Sprite::update_model_matrix() noexcept {
 	// Just update if is dirty

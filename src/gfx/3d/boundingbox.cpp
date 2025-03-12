@@ -1,5 +1,4 @@
 #include "scarablib/gfx/3d/boundingbox.hpp"
-#include "scarablib/opengl/vao_manager.hpp"
 
 BoundingBox::BoundingBox(BoundingBox::Size& boxsize, const glm::mat4& model_matrix) noexcept
 	: boxsize(boxsize), model(model_matrix) {
@@ -10,17 +9,12 @@ BoundingBox::BoundingBox(BoundingBox::Size& boxsize, const glm::mat4& model_matr
 		0, 4, 1, 5, 2, 6, 3, 7  // Vertical edges
 	};
 
-	// Get hash and create VAO
-	this->vao_hash = VAOManager::get_instance().compute_hash(this->get_bounding_corners(), indices);
-	this->vao_id = VAOManager::get_instance().make_vao(
-		this->get_bounding_corners(), indices
-	);
+	// Make VAO using the VAO Manager
+	this->bundle.make_vao_with_manager(this->get_bounding_corners(), indices);
 }
 
-BoundingBox::~BoundingBox() noexcept {
-	// Release current vao
-	VAOManager::get_instance().release_vao(vao_hash);
-}
+// BoundingBox::~BoundingBox() noexcept {
+// }
 
 void BoundingBox::update_world_bounding_box(const glm::mat4& model_matrix) noexcept {
 	this->model = model_matrix;
@@ -47,8 +41,8 @@ void BoundingBox::draw(const Camera& camera, const Shader& shader) const noexcep
 	shader.set_matrix4f("mvp", camera.get_proj_matrix() * camera.get_view_matrix() * this->model);
 	// shader.set_color("shapeColor", Colors::RED); // Will not work, since bounding box doesnt have a texture
 
-	glBindVertexArray(this->vao_id);
+	this->bundle.bind_vao();
 	glDrawElements(GL_LINES, this->indices_size, GL_UNSIGNED_INT, (void*)0);
-	glBindVertexArray(0);
+	this->bundle.unbind_vao();
 }
 

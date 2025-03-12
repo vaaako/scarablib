@@ -1,5 +1,4 @@
 #include "scarablib/gfx/3d/boundingbox.hpp"
-#include "scarablib/opengl/vao_manager.hpp"
 #include "scarablib/gfx/mesh.hpp"
 #include "scarablib/proper/error.hpp"
 #include "scarablib/utils/string.hpp"
@@ -9,19 +8,18 @@
 #include <tiny_obj_loader.h>
 
 Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept
-	: vao_hash(VAOManager::get_instance().compute_hash(vertices, indices)),
-	  indices_length(static_cast<GLsizei>(indices.size())) {
+		: indices_length(static_cast<GLsizei>(indices.size())) {
+
+	this->bundle.make_vao_with_manager(vertices, indices);
 
 	this->boxsize = BoundingBox::calculate_size_from_vertices(vertices);
-	this->vao_id = VAOManager::get_instance().make_vao(vertices, indices);
 }
 
-Mesh::Mesh(const std::vector<Vertex>& vertices) noexcept
-	: vao_hash(VAOManager::get_instance().compute_hash(vertices)) {
+Mesh::Mesh(const std::vector<Vertex>& vertices) noexcept {
+	this->bundle.make_vao_with_manager(vertices, {});
 
-	// Not indices, but fuck it
+	// Is not indices, but will have a similar use
 	this->indices_length = static_cast<GLsizei>(vertices.size());
-	this->vao_id = VAOManager::get_instance().make_vao(vertices);
 }
 
 Mesh::Mesh(const char* path) {
@@ -105,8 +103,8 @@ Mesh::Mesh(const char* path) {
 	this->boxsize = BoundingBox::calculate_size_from_vertices(vertices);
 
 	this->indices_length = static_cast<GLsizei>(indices.size());
-	this->vao_hash = VAOManager::get_instance().compute_hash(vertices, indices);
-	this->vao_id = VAOManager::get_instance().make_vao(vertices, indices);
+
+	this->bundle.make_vao_with_manager(vertices, indices);
 
 	// Free memory
 	attrib.vertices.clear();
@@ -117,7 +115,5 @@ Mesh::Mesh(const char* path) {
 }
 
 
-Mesh::~Mesh() noexcept {
-	// Release current vao
-	VAOManager::get_instance().release_vao(vao_hash);
-}
+// Mesh::~Mesh() noexcept {
+// }

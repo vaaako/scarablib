@@ -1,6 +1,7 @@
 #pragma once
 
 #include "scarablib/gfx/3d/boundingbox.hpp"
+#include "scarablib/opengl/bufferbundle.hpp"
 #include "scarablib/typedef.hpp"
 #include "scarablib/types/texture.hpp"
 #include "scarablib/types/vertex.hpp"
@@ -19,7 +20,7 @@ class Mesh {
 		// Build Mesh using a wavefront .obj file
 		Mesh(const char* path);
 
-		virtual ~Mesh() noexcept;
+		virtual ~Mesh() noexcept = default;
 
 		// Set a new texture to the mesh
 		inline void set_texture(Texture* texture) noexcept {
@@ -35,8 +36,8 @@ class Mesh {
 			this->texture = &Texture::default_texture();
 		}
 
-		inline GLuint get_vaoid() const noexcept {
-			return this->vao_id;
+		inline BufferBundle& get_bundle() noexcept {
+			return this->bundle;
 		}
 
 		// This will create a collider for the mesh.
@@ -46,10 +47,8 @@ class Mesh {
 
 	protected:
 		// OpenGL
-		size_t vao_hash;               // Keep track of the hash being used
-		GLsizei indices_length;        // For drawing (in 2D this is not the indices size, but i dont know how to call it)
-		uint32 vao_id;                 // This is used for wavefront .obj files only
-		// std::vector<Vertex> vertices;  // Used for calculate the bounding box (cleared after that)
+		BufferBundle bundle;    // Bundle of VAO, VBO and EBO
+		GLsizei indices_length; // For drawing (in 2D this is not the indices size, but i dont know how to call it)
 
 		// Bounding box
 		// I wish this wasnt in this class, but i need vertices and dont want to store it, because is a waste of memory
