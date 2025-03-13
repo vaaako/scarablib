@@ -22,10 +22,11 @@ Texture::Texture(const Color& color) noexcept {
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-Texture::Texture(const Texture::Config& conf) {
+Texture::Texture(const Texture::Config& config) {
 	// STB use
-	Image* image = new Image(conf.path, conf.flip_vertically, conf.flip_horizontally);
+	Image* image = new Image(config.path, config.flip_vertically, config.flip_horizontally);
 	if(image->data == nullptr) {
+		delete image;
 		throw ScarabError("Image (%s) was not found", image->path);
 	}
 
@@ -42,12 +43,12 @@ Texture::Texture(const Texture::Config& conf) {
 
 	// Set filter parameters
 	// Nearest: Pixelate / Linear: Blur
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, (GLint)conf.filter);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, (GLint)conf.filter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, (GLint)config.filter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, (GLint)config.filter);
 
 	// Repeat, Mirrored Repeat, Clamp to Edge, Clamp to Border (then use array of RGBA to color the border)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, (GLint)conf.wrap);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, (GLint)conf.wrap);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, (GLint)config.wrap);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, (GLint)config.wrap);
 
 	// Generate
 	const GLenum format = Texture::extract_format(*image);

@@ -6,8 +6,8 @@
 // Used for setting coordinates for vertices position, texture and normals
 struct Vertex {
 	vec3<float> position;
+	vec3<float> texuv; // Use z = 0 for 2D, z = layer for texture arrays
 	// vec3<float> normal;
-	vec2<float> texuv;
 
 	bool operator==(const Vertex& other) const noexcept {
 		return this->position == other.position

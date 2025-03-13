@@ -134,7 +134,8 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [ ] Show bounding box: When enabled to show all or a specific bounding box, add to the scene map with some sufix like `cube_boundingbox`, when removed, just remove the bounding box from the map, this will prevent the if-else
 	+ How to pass shader then?
 - [ ] Different texture for each face (the other method that is not cubemap)
- 
+- [ ] In `ModelFactory::create_cube` add option to change Z of each face
+
 # Features for later
 - Sprite atlas
 - Tick

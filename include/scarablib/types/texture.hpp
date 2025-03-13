@@ -50,17 +50,15 @@ struct Texture {
 
 	// Constructor to create a texture from a file path.
 	// Optionally sets the filtering and wrapping methods
-	Texture(const Texture::Config& conf);
+	Texture(const Texture::Config& config);
 
 	// Uses pre-defined data to make a texture.
 	Texture(const void* data, const uint32 width, const uint32 height, const GLint internal_format, const GLenum format);
 	// Texture(const void* data, const uint32 width, const uint32 height, const GLenum format);
 
-	// Disable Copy
+	// Disable Copy and Moving
 	Texture(const Texture&) noexcept = delete;
 	Texture& operator=(const Texture& other) noexcept = delete;
-
-	// Disable Moving
 	Texture(Texture&&) noexcept = delete;
 	Texture& operator=(Texture&&) noexcept = delete;
 
