@@ -1,8 +1,7 @@
 #include "scarablib/gfx/3d/model_factory.hpp"
-#include "scarablib/opengl/vao_manager.hpp"
 
 Cube* ModelFactory::create_cube() noexcept {
-	static std::vector<Vertex> vertices = {
+	std::vector<Vertex> vertices = {
 		// Vertices: 24
 		// Front face
 		Vertex { .position = glm::vec3(-0.5f, -0.5f, 0.5f), .texuv = glm::vec2(0.0f, 0.0f) }, // Bottom left
@@ -41,7 +40,7 @@ Cube* ModelFactory::create_cube() noexcept {
 		Vertex { .position = glm::vec3(-0.5f,  0.5f, -0.5f), .texuv = glm::vec2(0.0f, 1.0f) }  // 23
 	};
 
-	static std::vector<uint32> indices = {
+	std::vector<uint32> indices = {
 		// Front face
 		0, 1, 2,
 		0, 2, 3,
@@ -72,7 +71,7 @@ Cube* ModelFactory::create_cube() noexcept {
 }
 
 Plane* ModelFactory::create_plane() noexcept {
-	static std::vector<Vertex> vertices = {
+	std::vector<Vertex> vertices = {
 		// Front face
 		Vertex { .position = glm::vec3(-0.5f, -0.5f, 0.0f), .texuv = glm::vec2(0.0f, 0.0f) }, // Bottom left
 		Vertex { .position = glm::vec3( 0.5f, -0.5f, 0.0f), .texuv = glm::vec2(1.0f, 0.0f) }, // Bottom right
@@ -80,7 +79,7 @@ Plane* ModelFactory::create_plane() noexcept {
 		Vertex { .position = glm::vec3(-0.5f,  0.5f, 0.0f), .texuv = glm::vec2(0.0f, 1.0f) }, // Top left
 	};
 
-	static std::vector<uint32> indices = {
+	std::vector<uint32> indices = {
 		// Front face
 		0, 1, 2,
 		0, 2, 3,
@@ -92,7 +91,7 @@ Plane* ModelFactory::create_plane() noexcept {
 
 
 Billboard* ModelFactory::create_billboard() noexcept {
-	static std::vector<Vertex> vertices = {
+	std::vector<Vertex> vertices = {
 		// Front face
 		Vertex { .position = glm::vec3(-0.5f, -0.5f, 0.0f), .texuv = glm::vec2(0.0f, 0.0f) }, // Bottom left
 		Vertex { .position = glm::vec3( 0.5f, -0.5f, 0.0f), .texuv = glm::vec2(1.0f, 0.0f) }, // Bottom right
@@ -100,7 +99,7 @@ Billboard* ModelFactory::create_billboard() noexcept {
 		Vertex { .position = glm::vec3(-0.5f,  0.5f, 0.0f), .texuv = glm::vec2(0.0f, 1.0f) }, // Top left
 	};
 
-	static std::vector<uint32> indices = {
+	std::vector<uint32> indices = {
 		// Front face
 		0, 1, 2,
 		0, 2, 3,

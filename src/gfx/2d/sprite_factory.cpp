@@ -3,7 +3,7 @@
 // CW
 
 Rectangle* SpriteFactory::create_rectangle() noexcept {
-	static std::vector<Vertex> vertices = {
+	std::vector<Vertex> vertices = {
 		// Rectangle
 		Vertex { .position = glm::vec3(0.0f, 0.0f, 0.0f), .texuv = glm::vec2(0.0f, 1.0f) }, // Bottom Left
 		Vertex { .position = glm::vec3(1.0f, 0.0f, 0.0f), .texuv = glm::vec2(1.0f, 1.0f) }, // Bottom Right
@@ -16,7 +16,7 @@ Rectangle* SpriteFactory::create_rectangle() noexcept {
 }
 
 Triangle* SpriteFactory::create_triangle() noexcept {
-	static std::vector<Vertex> vertices = {
+	std::vector<Vertex> vertices = {
 		// Triangle
 		Vertex { .position = glm::vec3(1.0f, 1.0f, 0.0f), .texuv = glm::vec2(1.0f, 0.0f) }, // Bottom Right
 		Vertex { .position = glm::vec3(0.0f, 1.0f, 0.0f), .texuv = glm::vec2(0.0f, 0.0f) }, // Bottom Left
@@ -29,7 +29,7 @@ Triangle* SpriteFactory::create_triangle() noexcept {
 
 
 Circle* SpriteFactory::create_circle() noexcept {
-	static std::vector<Vertex> vertices = {
+	std::vector<Vertex> vertices = {
 		// Rectangle
 		{ .position = glm::vec3(0.0f, 0.0f, 0.0f), .texuv = glm::vec2(0.0f, 1.0f) }, // Bottom Left
 		{ .position = glm::vec3(1.0f, 0.0f, 0.0f), .texuv = glm::vec2(1.0f, 1.0f) }, // Bottom Right
