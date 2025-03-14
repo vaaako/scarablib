@@ -1,5 +1,6 @@
 #pragma once
 
+#include "scarablib/proper/error.hpp"
 #include "scarablib/types/vertex.hpp"
 #include <GL/glew.h>
 #include <unordered_map>
@@ -26,12 +27,29 @@ class VAOManager {
 		// At the end, it will return the VAO's ID.
 		// WARNING: Use this method only one time per Mesh, since it keep track of how many Meshes are using the same VAO, and using it again will mess up the reference count
 		template<typename T>
-		GLuint make_vao(const std::vector<T>& vertices, const std::vector<uint32_t>& indices = {}) noexcept;
+		GLuint get_or_make_vao(const std::vector<T>& vertices, const std::vector<uint32>& indices = {}) noexcept;
+
+		// Check if the vertices and indices alredy has a VAO.
+		// Indices is an optional parameter, you can pass an empty vector.
+		// This will make a unique hash based on the vertices and indices.
+		// If has is not found in the map, it will create a new VAO and an entry.
+		// At the end, it will return the VAO's ID.
+		// The first vector is a vector of a vector containing vec3<float>.
+		// this may represent vertices and tex coords together or any more fields.
+		// WARNING: The first vector of data MUST BE a vector of vertices
+		// WARNING: Use this method only one time per Mesh, since it keep track of how many Meshes are using the same VAO, and using it again will mess up the reference count
+		GLuint get_or_make_vao(const std::vector<std::vector<vec3<float>>>& data, const std::vector<uint32>& indices = {});
+		/*
+		std::vector<std:vector<vec3<float>>> {
+			std::vector<vec3<float>> vertices = {},
+			std::vector<vec3<float>> texuv = {}
+		}
+		*/
 
 		// Generate a new unique hash based on the vertices and indices.
 		// Indices is an optional parameter, you can pass an empty vector.
 		template<typename T>
-		size_t compute_hash(const std::vector<T>& vertices, const std::vector<uint32_t>& indices = {}) const noexcept;
+		size_t compute_hash(const std::vector<T>& vertices, const std::vector<uint32>& indices = {}) const noexcept;
 
 		// Get the VAO's ID from its hash
 		GLuint get_vao(const size_t hash) const noexcept;
@@ -63,12 +81,18 @@ class VAOManager {
 		// Indices is optional
 		template<typename T>
 		VAOManager::VAOData create_vao(const std::vector<T>& vertices, const std::vector<uint32>& indices) const noexcept;
+
+		// Make using data vector
+		VAOManager::VAOData create_vao(const std::vector<std::vector<vec3<float>>>& vertices, const std::vector<uint32>& indices) const noexcept;
 };
 
 template<typename T>
-GLuint VAOManager::make_vao(const std::vector<T>& vertices, const std::vector<uint32_t>& indices) noexcept {
+GLuint VAOManager::get_or_make_vao(const std::vector<T>& vertices, const std::vector<uint32>& indices) noexcept {
 	static_assert(std::is_same<T, vec3<float>>::value || std::is_same<T, Vertex>::value,
 			"Only vec3<float> and Vertex types for vertices are accepted");
+	if(vertices.empty()) {
+		throw ScarabError("Vertices vector is empty");
+	}
 
 	const size_t hash = this->compute_hash(vertices, indices);
 
@@ -96,7 +120,7 @@ GLuint VAOManager::make_vao(const std::vector<T>& vertices, const std::vector<ui
 
 // Specialized hash function for better distribution
 template <typename T>
-size_t VAOManager::compute_hash(const std::vector<T>& vertices, const std::vector<uint32_t>& indices) const noexcept {
+size_t VAOManager::compute_hash(const std::vector<T>& vertices, const std::vector<uint32>& indices) const noexcept {
 	static_assert(std::is_same<T, vec3<float>>::value || std::is_same<T, Vertex>::value,
 			"Only vec3<float> and Vertex types for vertices are accepted");
 
@@ -118,7 +142,7 @@ size_t VAOManager::compute_hash(const std::vector<T>& vertices, const std::vecto
 	// Hash index data (only if indices are provided)
 	if(!indices.empty()) {
 		const auto* index_data = reinterpret_cast<const char*>(indices.data());
-		const size_t index_bytes = indices.size() * sizeof(uint32_t);
+		const size_t index_bytes = indices.size() * sizeof(uint32);
 		
 		for (size_t i = 0; i < index_bytes; i++) {
 			hash ^= static_cast<size_t>(index_data[i]);
@@ -158,12 +182,12 @@ VAOManager::VAOData VAOManager::create_vao(const std::vector<T>& vertices, const
 	// T is only a Vertex or a vec3<float>
 	// if(sizeof(T) == sizeof(Vertex)) {
 	if constexpr (std::is_same<T, Vertex>::value) {
-		// Normal
-		// glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-		// glEnableVertexAttribArray(1);
-		// TexUV
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(T), (void*)offsetof(T, texuv));
 		glEnableVertexAttribArray(1);
+		// Normal
+		// glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+		// glEnableVertexAttribArray(2);
+		// TexUV
 	}
 
 	// Unbind all

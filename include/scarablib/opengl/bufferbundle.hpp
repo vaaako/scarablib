@@ -40,8 +40,16 @@ class BufferBundle {
 					"Only vec3<float> and Vertex types for vertices are accepted");
 
 			this->vao_hash = VAOManager::get_instance().compute_hash(vertices, indices);
-			this->vao_id = VAOManager::get_instance().make_vao(
+			this->vao_id = VAOManager::get_instance().get_or_make_vao(
 				vertices, indices
+			);
+		}
+
+		template <typename T>
+		inline void make_vao_with_manager(const std::vector<std::vector<vec3<float>>>& data, const std::vector<uint32>& indices) noexcept {
+			this->vao_hash = VAOManager::get_instance().compute_hash(data.at(0), indices);
+			this->vao_id = VAOManager::get_instance().get_or_make_vao(
+				data, indices
 			);
 		}
 

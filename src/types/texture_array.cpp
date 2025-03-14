@@ -26,7 +26,6 @@ TextureArray::TextureArray(const std::vector<TextureArray::Config>& textures, co
 	// Load first image to get dimensions
 	Image* image = new Image(textures.front().path);
 	if(image->data == nullptr) {
-		delete image;
 		throw ScarabError("Image (%s) was not found", image->path);
 	}
 
@@ -64,7 +63,6 @@ TextureArray::TextureArray(const std::vector<TextureArray::Config>& textures, co
 		Image* image = new Image(conf.path, conf.flip_vertically, conf.flip_horizontally);
 
 		if(image->data == nullptr) {
-			delete image;
 			throw ScarabError("Image in texture array (%s) was not found", conf.path);
 		}
 
@@ -120,7 +118,6 @@ void TextureArray::add_texture(const TextureArray::Config& config) {
 	// Load texture
 	Image* image = new Image(config.path, config.flip_vertically, config.flip_horizontally);
 	if(image->data == nullptr) {
-		delete image;
 		throw ScarabError("Image (%s) was not found", image->path);
 	}
 
