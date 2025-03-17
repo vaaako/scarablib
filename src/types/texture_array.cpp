@@ -1,9 +1,7 @@
 #include "scarablib/types/texture_array.hpp"
 #include "scarablib/proper/error.hpp"
-#include "scarablib/types/texture.hpp"
 
-
-TextureArray::TextureArray(const uint32 width, const uint32 height, const uint32 num_textures)
+TextureArray::TextureArray(const uint32 width, const uint32 height, const uint32 num_textures, const Texture::Filter filter)
 	: width(static_cast<GLint>(width)), height(static_cast<GLint>(height)), max_textures(num_textures) {
 
 	GLint max_layers;
@@ -16,13 +14,20 @@ TextureArray::TextureArray(const uint32 width, const uint32 height, const uint32
 	glGenTextures(1, &this->id);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, this->id);
 	glTexStorage3D(
-		GL_TEXTURE_2D_ARRAY, 1, GL_RGBA,
+		GL_TEXTURE_2D_ARRAY,
+		1, // Mipmap level
+		GL_RGB8,
 		static_cast<GLint>(width), static_cast<GLint>(height),
 		static_cast<GLint>(num_textures)
 	);
+
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, static_cast<GLint>(filter));
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, static_cast<GLint>(filter));
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
 }
 
-TextureArray::TextureArray(const std::vector<TextureArray::Config>& textures, const uint32 num_textures) {
+TextureArray::TextureArray(const std::vector<TextureArray::Config>& textures, const Texture::Filter filter, const uint32 num_textures) {
 	// Load first image to get dimensions
 	Image* image = new Image(textures.front().path);
 	if(image->data == nullptr) {
@@ -50,7 +55,8 @@ TextureArray::TextureArray(const std::vector<TextureArray::Config>& textures, co
 	glGenTextures(1, &this->id);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, this->id);
 	glTexStorage3D(
-		GL_TEXTURE_2D_ARRAY, 1, Texture::extract_internal_format(*image),
+		GL_TEXTURE_2D_ARRAY, 1,
+		Texture::extract_internal_format(*image),
 		image->width, image->height,
 		static_cast<GLint>(max_textures)
 	);
@@ -91,8 +97,8 @@ TextureArray::TextureArray(const std::vector<TextureArray::Config>& textures, co
 	this->cur_index = static_cast<GLint>(textures.size());
 
 	// Set texture parameters
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, static_cast<GLint>(filter));
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, static_cast<GLint>(filter));
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
@@ -112,14 +118,20 @@ void TextureArray::add_texture(const TextureArray::Config& config) {
 		throw ScarabError("Texture array limit (%d) has been reached", this->max_textures);
 	}
 
-	// Bind
-	glBindTexture(GL_TEXTURE_2D_ARRAY, this->id);
-
 	// Load texture
 	Image* image = new Image(config.path, config.flip_vertically, config.flip_horizontally);
 	if(image->data == nullptr) {
 		throw ScarabError("Image (%s) was not found", image->path);
 	}
+
+	// Validate dimensions
+	if((image->width != (int)this->width) || (image->height != (int)this->height)) {
+		delete image;
+		throw ScarabError("Image (%s) has incorrect dimensions for texture array (%ix%i)", config.path, this->width, this->height);
+	}
+
+	// Bind
+	glBindTexture(GL_TEXTURE_2D_ARRAY, this->id);
 
 	// Upload to texture array
 	glTexSubImage3D(
@@ -128,7 +140,8 @@ void TextureArray::add_texture(const TextureArray::Config& config) {
 		0, 0, this->cur_index, // x, y, layer (z)
 		static_cast<GLint>(this->width), static_cast<GLint>(this->height),
 		1, // Depth
-		Texture::extract_format(*image),
+		// Texture::extract_format(*image),
+		GL_RGBA,
 		GL_UNSIGNED_BYTE,
 		image->data
 	);
@@ -138,6 +151,9 @@ void TextureArray::add_texture(const TextureArray::Config& config) {
 
 	// Unbind
 	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+
+	// Cleanup
+	delete image;
 }
 
 TextureArray::~TextureArray() noexcept {

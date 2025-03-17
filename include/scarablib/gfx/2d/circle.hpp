@@ -2,7 +2,7 @@
 
 #include "scarablib/gfx/2d/sprite.hpp"
 #include "scarablib/opengl/shader_manager.hpp"
-#include "scarablib/utils/file.hpp"
+#include "scarablib/opengl/shaders.hpp"
 
 // Class for circle sprite
 struct Circle : public Sprite {
@@ -31,8 +31,8 @@ struct Circle : public Sprite {
 
 		// Store and get one time only (deleted inside window destructor)
 		Shader* shader = ShaderManager::get_instance().get_or_load_shader(
-			"circle", true,
-			(THIS_FILE_DIR + "/../../opengl/shaders/vertex.glsl").c_str(),
-			(THIS_FILE_DIR + "/../../opengl/shaders/2d/circle_fs.glsl").c_str()
+			"circle",
+			Shaders::DEFAULT_VERTEX,
+			Shaders::CIRCLE_FRAGMENT
 		);
 };

@@ -26,6 +26,10 @@ namespace FileHelper {
 	// Returns an empty vector if the directory does not exist
 	std::vector<std::string> list_files(const char* path, const bool sort);
 
+
+	// Return the absolute path of the executable
+	std::string executable_path();
+
 	// Returns the current static path of the file
 	// For absolute path, use the macro THIS_FILE_DIR
 	inline std::filesystem::path current_path() noexcept {

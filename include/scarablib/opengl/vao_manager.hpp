@@ -25,26 +25,11 @@ class VAOManager {
 		// This will make a unique hash based on the vertices and indices.
 		// If has is not found in the map, it will create a new VAO and an entry.
 		// At the end, it will return the VAO's ID.
+		// If T is Vertex it will make a VAO will all Vertex fields.
+		// If T is a vec3<float> it will make a VAO with only the position field.
 		// WARNING: Use this method only one time per Mesh, since it keep track of how many Meshes are using the same VAO, and using it again will mess up the reference count
 		template<typename T>
-		GLuint get_or_make_vao(const std::vector<T>& vertices, const std::vector<uint32>& indices = {}) noexcept;
-
-		// Check if the vertices and indices alredy has a VAO.
-		// Indices is an optional parameter, you can pass an empty vector.
-		// This will make a unique hash based on the vertices and indices.
-		// If has is not found in the map, it will create a new VAO and an entry.
-		// At the end, it will return the VAO's ID.
-		// The first vector is a vector of a vector containing vec3<float>.
-		// this may represent vertices and tex coords together or any more fields.
-		// WARNING: The first vector of data MUST BE a vector of vertices
-		// WARNING: Use this method only one time per Mesh, since it keep track of how many Meshes are using the same VAO, and using it again will mess up the reference count
-		GLuint get_or_make_vao(const std::vector<std::vector<vec3<float>>>& data, const std::vector<uint32>& indices = {});
-		/*
-		std::vector<std:vector<vec3<float>>> {
-			std::vector<vec3<float>> vertices = {},
-			std::vector<vec3<float>> texuv = {}
-		}
-		*/
+		GLuint get_or_make_vao(const std::vector<T>& vertices, const std::vector<uint32>& indices = {});
 
 		// Generate a new unique hash based on the vertices and indices.
 		// Indices is an optional parameter, you can pass an empty vector.
@@ -80,14 +65,14 @@ class VAOManager {
 		// Make the VAO, VBO and EBO.
 		// Indices is optional
 		template<typename T>
-		VAOManager::VAOData create_vao(const std::vector<T>& vertices, const std::vector<uint32>& indices) const noexcept;
+		VAOManager::VAOData create_vao(const std::vector<T>& vertices, const std::vector<uint32>& indices) const;
 
 		// Make using data vector
-		VAOManager::VAOData create_vao(const std::vector<std::vector<vec3<float>>>& vertices, const std::vector<uint32>& indices) const noexcept;
+		VAOManager::VAOData create_vao(const std::vector<std::vector<vec3<float>>>& vertices, const std::vector<uint32>& indices) const;
 };
 
 template<typename T>
-GLuint VAOManager::get_or_make_vao(const std::vector<T>& vertices, const std::vector<uint32>& indices) noexcept {
+GLuint VAOManager::get_or_make_vao(const std::vector<T>& vertices, const std::vector<uint32>& indices) {
 	static_assert(std::is_same<T, vec3<float>>::value || std::is_same<T, Vertex>::value,
 			"Only vec3<float> and Vertex types for vertices are accepted");
 	if(vertices.empty()) {
@@ -155,9 +140,8 @@ size_t VAOManager::compute_hash(const std::vector<T>& vertices, const std::vecto
 
 
 template<typename T>
-VAOManager::VAOData VAOManager::create_vao(const std::vector<T>& vertices, const std::vector<uint32>& indices) const noexcept {
+VAOManager::VAOData VAOManager::create_vao(const std::vector<T>& vertices, const std::vector<uint32>& indices) const {
 	// dont need static assert here, since it was already checked in make_vao
-
 	VAOData data;
 
 	// Gen VAO
@@ -182,7 +166,8 @@ VAOManager::VAOData VAOManager::create_vao(const std::vector<T>& vertices, const
 	// T is only a Vertex or a vec3<float>
 	// if(sizeof(T) == sizeof(Vertex)) {
 	if constexpr (std::is_same<T, Vertex>::value) {
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(T), (void*)offsetof(T, texuv));
+		// Vertex texuv is now vec3
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(T), (void*)offsetof(T, texuv));
 		glEnableVertexAttribArray(1);
 		// Normal
 		// glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));

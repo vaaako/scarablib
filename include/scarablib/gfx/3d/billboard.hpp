@@ -1,10 +1,8 @@
 #pragma once
 
-// This is a class to make a billboard model.
-// WARNING: Do not use this class directly, use ModelFactory::create_billboard(const Model::Config& conf)
 #include "scarablib/gfx/3d/model.hpp"
 #include "scarablib/opengl/shader_manager.hpp"
-#include "scarablib/utils/file.hpp"
+#include "scarablib/opengl/shaders.hpp"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/vector_angle.hpp>
@@ -13,6 +11,7 @@
 #define M_PI2 6.283185307179586f
 
 // Class for billboard model
+// WARNING: Do not use this class directly, use ModelFactory::create_billboard()
 struct Billboard : public Model {
 	enum Direction : uint8 {
 		EAST,
@@ -98,9 +97,9 @@ struct Billboard : public Model {
 
 		// Store and get one time only (deleted inside window destructor)
 		Shader* shader = ShaderManager::get_instance().get_or_load_shader(
-			"billboard", true,
-			(THIS_FILE_DIR + "/../../opengl/shaders/3d/billboard_vs.glsl").c_str(),
-			(THIS_FILE_DIR + "/../../opengl/shaders/fragment.glsl").c_str()
+			"billboard",
+			Shaders::BILLBOARD_VERTEX,
+			Shaders::DEFAULT_FRAGMENT
 		);
 
 		void draw(const Camera& camera, const Shader& shader) noexcept override;

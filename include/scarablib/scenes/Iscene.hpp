@@ -2,6 +2,7 @@
 
 #include "scarablib/gfx/3d/model.hpp"
 #include "scarablib/opengl/shader_manager.hpp"
+#include "scarablib/opengl/shaders.hpp"
 #include "scarablib/proper/error.hpp"
 #include "scarablib/utils/file.hpp"
 #include "scarablib/window/window.hpp"
@@ -94,9 +95,9 @@ class IScene {
 		std::unordered_map<GLuint, std::vector<std::shared_ptr<T>>> vao_groups;
 
 		Shader* shader = ShaderManager::get_instance().get_or_load_shader(
-			"scene", true,
-			(THIS_FILE_DIR + "/../opengl/shaders/vertex.glsl").c_str(),
-			(THIS_FILE_DIR + "/../opengl/shaders/fragment.glsl").c_str()
+			"scene",
+			Shaders::DEFAULT_VERTEX,
+			Shaders::DEFAULT_FRAGMENT
 		);
 };
 

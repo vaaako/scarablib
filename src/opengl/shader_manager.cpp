@@ -1,6 +1,6 @@
 #include "scarablib/opengl/shader_manager.hpp"
 
-Shader* ShaderManager::get_or_load_shader(const std::string_view& name, const bool is_file_path, const char* vertex_shader, const char* fragment_shader) noexcept {
+Shader* ShaderManager::get_or_load_shader(const std::string_view& name, const char* vertex_shader, const char* fragment_shader, const bool is_file_path) noexcept {
 	// Return existing shader if already loaded
 	if(this->shader_map.find(name) != this->shader_map.end()) {
 		return this->shader_map.at(name);

@@ -5,6 +5,8 @@
 #include <fstream>
 #include <ios>
 
+#include <unistd.h> // readlink
+
 std::string FileHelper::read_file(const std::string& path) {
 	std::ifstream file = std::ifstream(path);
 	if(!file.is_open()) {
@@ -90,3 +92,16 @@ std::vector<std::string> FileHelper::list_files(const char* path, const bool sor
 
 	return result;
 }
+
+std::string FileHelper::executable_path() {
+#ifdef _WIN32
+	char buffer[MAX_PATH];
+	GetModuleFileNameA(NULL, buffer, MAX_PATH);
+	return std::string(buffer);
+#else
+	char buffer[PATH_MAX];
+	ssize_t count = readlink("/proc/self/exe", buffer, PATH_MAX);
+	return std::string(buffer, static_cast<size_t>((count > 0) ? count : 0));
+#endif
+}
+

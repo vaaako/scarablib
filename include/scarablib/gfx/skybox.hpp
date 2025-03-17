@@ -2,9 +2,9 @@
 
 #include "scarablib/opengl/bufferbundle.hpp"
 #include "scarablib/opengl/shader_manager.hpp"
+#include "scarablib/opengl/shaders.hpp"
 #include "scarablib/scenes/camera.hpp"
 #include "scarablib/typedef.hpp"
-#include "scarablib/utils/file.hpp"
 #include <vector>
 
 struct Skybox {
@@ -22,8 +22,8 @@ struct Skybox {
 		BufferBundle bundle;
 
 		Shader* shader = ShaderManager::get_instance().get_or_load_shader(
-			"skybox", true,
-			(THIS_FILE_DIR + "/../opengl/shaders/3d/skybox_vs.glsl").c_str(),
-			(THIS_FILE_DIR + "/../opengl/shaders/3d/skybox_fs.glsl").c_str()
+			"skybox",
+			Shaders::SKYBOX_VERTEX,
+			Shaders::SKYBOX_FRAGMENT
 		);
 };

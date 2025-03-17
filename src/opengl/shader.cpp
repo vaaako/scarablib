@@ -10,8 +10,10 @@ Shader::Shader(const char* vertex, const char* fragment, const bool is_file_path
 
 	// Get content from file (if its a file path)
 	if(is_file_path) {
-		vertex_source   = FileHelper::read_file_char(vertex);
-		fragment_source = FileHelper::read_file_char(fragment);
+		std::string exec_path = FileHelper::executable_path();
+		LOG_DEBUG("Executable path: %s", exec_path.c_str());
+		vertex_source   = FileHelper::read_file_char(exec_path + "/" + vertex);
+		fragment_source = FileHelper::read_file_char(exec_path + "/" + fragment);
 
 		if(vertex_source == nullptr) {
 			throw ScarabError("Failed to read vertex shader files (%s)", vertex);

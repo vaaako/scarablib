@@ -27,13 +27,13 @@ Cube* ModelFactory::create_cube() noexcept {
 		Vertex { .position = glm::vec3( 0.5f, -0.5f,  0.5f), .texuv = glm::vec3(1.0f, 1.0f, 0.0f) }, // 14
 		Vertex { .position = glm::vec3(-0.5f, -0.5f,  0.5f), .texuv = glm::vec3(0.0f, 1.0f, 0.0f) }, // 15
 
-		// Right face
+		// Left face
 		Vertex { .position = glm::vec3(0.5f, -0.5f, -0.5f), .texuv = glm::vec3(1.0f, 0.0f, 0.0f) }, // 16
 		Vertex { .position = glm::vec3(0.5f,  0.5f, -0.5f), .texuv = glm::vec3(1.0f, 1.0f, 0.0f) }, // 17
 		Vertex { .position = glm::vec3(0.5f,  0.5f,  0.5f), .texuv = glm::vec3(0.0f, 1.0f, 0.0f) }, // 18
 		Vertex { .position = glm::vec3(0.5f, -0.5f,  0.5f), .texuv = glm::vec3(0.0f, 0.0f, 0.0f) }, // 19
 
-		// Left face
+		// Right face
 		Vertex { .position = glm::vec3(-0.5f, -0.5f, -0.5f), .texuv = glm::vec3(0.0f, 0.0f, 0.0f) }, // 20
 		Vertex { .position = glm::vec3(-0.5f, -0.5f,  0.5f), .texuv = glm::vec3(1.0f, 0.0f, 0.0f) }, // 21
 		Vertex { .position = glm::vec3(-0.5f,  0.5f,  0.5f), .texuv = glm::vec3(1.0f, 1.0f, 0.0f) }, // 22
@@ -57,11 +57,11 @@ Cube* ModelFactory::create_cube() noexcept {
 		12, 13, 14,
 		12, 14, 15,
 
-		// Right face
+		// Left face
 		16, 17, 18,
 		16, 18, 19,
 
-		// Left face
+		// Right face
 		20, 21, 22,
 		20, 22, 23
 	};

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "scarablib/typedef.hpp"
+#include "scarablib/types/texture.hpp"
 #include <GL/glew.h>
 #include <vector>
 
@@ -20,7 +21,7 @@ struct TextureArray {
 	// You can add textures later with TextureArray::add_texture.
 	// The configuration will be applied respectively to each texture.
 	// NOTE: Since you will manually add textures, remember to call `TextureArray::generate_mipmap` after adding all textures
-	TextureArray(const uint32 width, const uint32 height, const uint32 num_textures);
+	TextureArray(const uint32 width, const uint32 height, const uint32 num_textures, const Texture::Filter filter = Texture::Filter::NEAREST);
 
 	// Creates a texture array, useful for animations or more complex models.
 	// Takes a vector of configuration for each texture.
@@ -29,7 +30,7 @@ struct TextureArray {
 	// NOTE: Mipmap is generated automatically if num_textures is not specified.
 	// Remember to call `TextureArray::generate_mipmap` after adding all textures.
 	// NOTE: The size of all textures will be the same as the first texture
-	TextureArray(const std::vector<TextureArray::Config>& textures, const uint32 num_textures = 0);
+	TextureArray(const std::vector<TextureArray::Config>& textures, const Texture::Filter filter = Texture::Filter::NEAREST, const uint32 num_textures = 0);
 
 	// Loads all images from a directory and stores them as a texture array.
 	// The textures in the array will be ordered alphabetically by filename.
