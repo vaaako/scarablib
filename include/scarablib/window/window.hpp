@@ -87,19 +87,14 @@ class Window {
 			return this->glContext;
 		}
 
-		// Return the current title of the window as a string.
-		inline std::string get_title() const noexcept {
-			return this->conf.title;
-		}
-
 		// Return the width of the window in pixels.
 		inline uint32 get_width() const noexcept {
-			return this->conf.width;
+			return this->width;
 		}
 
 		// Return the height of the window in pixels.
 		inline uint32 get_height() const noexcept {
-			return this->conf.height;
+			return this->height;
 		}
 
 		// Return the half width of the window in pixels.
@@ -129,7 +124,6 @@ class Window {
 
 		// Change the window's title to the provided value.
 		inline void set_title(const std::string& title) noexcept {
-			this->conf.title = title;
 			SDL_SetWindowTitle(this->window, title.c_str());
 		}
 
@@ -160,8 +154,8 @@ class Window {
 		// Set the window's size using the provided width and height values.
 		// This also adjusts the OpenGL viewport to match the new window size.
 		inline void set_size(const vec2<uint32>& size) noexcept {
-			this->conf.width = size.x;
-			this->conf.height = size.y;
+			this->width = size.x;
+			this->height = size.y;
 
 			this->half_width  = static_cast<float>(size.x) * 0.5f;
 			this->half_height = static_cast<float>(size.y) * 0.5f;
@@ -199,8 +193,8 @@ class Window {
 
 		// Check if the provided X or Y coordinates are outside the window's bounds.
 		inline bool is_out_of_bounds(const uint32 x, const uint32 y) const noexcept {
-			return ((int)x < 0 || x > this->conf.width) ||
-				   ((int)y < 0 || y > this->conf.height);
+			return ((int)x < 0 || x > this->width) ||
+				   ((int)y < 0 || y > this->height);
 		}
 
 
@@ -233,7 +227,9 @@ class Window {
 		// TIMER //
 
 		// Window FPS per second
-		double fps() noexcept;
+		inline float fps() const noexcept {
+			return 1.0f / this->delta_time;
+		}
 
 		// Get the time elapsed between the current and last frame, in seconds.
 		constexpr inline float dt() const noexcept {
@@ -272,11 +268,13 @@ class Window {
 
 	private:
 		// Window information
-		Window::Config conf;
+		uint32 width;
+		uint32 height;
+		float half_width        = 0;
+		float half_height       = 0;
+		bool show_debug_info    = false;
 		vec4<float> clear_color = vec4<float>(1.0f); // Outside conf for better access
-		bool window_open = true;
-		float half_width = 0;
-		float half_height = 0;
+		bool window_open        = true;
 
 		// Buffer to store all events to be processed each frame
 		std::unordered_set<uint32> frame_events; // unordered_set is faster for look-up
@@ -285,12 +283,9 @@ class Window {
 		SDL_Window* window;
 		SDL_GLContext glContext;
 
-		// FPS
-		uint32 start_time = SDL_GetTicks();
-		uint32 frame_count = 0;
-		double FPS = 0.0f;
-		// DT
-		float delta_time = 1.0f;
+		// FPS and DT
+		uint32 last_time   = SDL_GetTicks();
+		float delta_time   = 1.0f;
 		uint64 last_update = 0; // Updated on swap_buffers (frame end)
 
 		// KEYS
@@ -298,13 +293,13 @@ class Window {
 		MouseHandler mouse_handler = MouseHandler(); // To not have the same name as the "mouse" function
 
 		// Called at the beggining of the frame
-		void calc_dt() noexcept;
+		void calc_fps_and_dt() noexcept;
 
 		// Set the viewport to the provided size.
 		// This won't change the window's size
 		inline void set_viewport(const vec2<uint32>& size) noexcept {
-			this->conf.width  = size.x;
-			this->conf.height = size.y;
+			this->width  = size.x;
+			this->height = size.y;
 
 			this->half_width  = static_cast<float>(size.x) * 0.5f;
 			this->half_height = static_cast<float>(size.y) * 0.5f;

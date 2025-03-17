@@ -2,12 +2,16 @@
 #include "scarablib/opengl/shader_manager.hpp"
 #include "scarablib/opengl/vao_manager.hpp"
 #include "scarablib/proper/error.hpp"
-#include "scarablib/utils/math.hpp"
+#include "scarablib/proper/log.hpp"
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_video.h>
 #include <SDL2/SDL_mixer.h>
 
-Window::Window(const Window::Config& config) : conf(config), half_width(static_cast<float>(config.width)), half_height(static_cast<float>(config.height) * 0.5f) {
+Window::Window(const Window::Config& config)
+	: width(config.width), height(config.height),
+	half_width(static_cast<float>(config.width) * 0.5f),
+	half_height(static_cast<float>(config.height) * 0.5f), show_debug_info(config.debug_info) {
+
 	// Initialize SDL (video and audio)
 	// NOTE: Memory leak happening here
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
@@ -101,7 +105,7 @@ Window::Window(const Window::Config& config) : conf(config), half_width(static_c
 }
 
 Window::~Window() noexcept {
-	if (this->conf.debug_info) {
+	if (this->show_debug_info) {
 		LOG_INFO("Window %d destroyed", SDL_GetWindowID(this->window));
 	}
 
@@ -119,46 +123,16 @@ Window::~Window() noexcept {
 	ShaderManager::get_instance().cleanup();
 }
 
-
-
-
-double Window::fps() noexcept {
-	const uint32 current = SDL_GetTicks();
-	double elapsed = current - this->start_time;
-
-	// Update every second
-	if(elapsed >= 1000) {
-		// Avoid division by zero
-		if(ScarabMath::is_near_zero(elapsed)) {
-			elapsed = 0.01f;
-		}
-
-		// Calculate FPS
-		this->FPS = this->frame_count / (elapsed / 1000.0);
-
-		// Reset
-		this->frame_count = 0;
-		this->start_time = current; // Update timer
-	}
-
-	return this->FPS;
-}
-
-void Window::calc_dt() noexcept {
+void Window::calc_fps_and_dt() noexcept {
 	const uint64 now = SDL_GetPerformanceCounter();
 	const uint64 elapsed = now - this->last_update;
 	this->last_update = now;
 	this->delta_time = static_cast<float>(elapsed) / static_cast<float>(SDL_GetPerformanceFrequency());
 	// note: elapsed may be multiplied by 1000.0f to get milliseconds
-
-	// const uint64 now = SDL_GetTicks();
-	// const uint64 elapsed = now - this->last_update;
-	// this->last_update = now;
-	// this->delta_time = static_cast<float>(elapsed) / 1000.0f;
 }
 
 void Window::frame_capping(const uint32 fps) const noexcept {
-	const double desired = 1.0 / fps; // ~0.0133 seconds per frame
+	const double desired = 1.0 / fps;
 	const double actual = this->dt();
 
 	// If not synchronized
@@ -172,8 +146,7 @@ void Window::frame_capping(const uint32 fps) const noexcept {
 
 void Window::process_events() noexcept {
 	// Frame beggining calculations
-	this->calc_dt();
-	this->frame_count++;
+	this->calc_fps_and_dt();
 
 	SDL_Event event;
 	while(SDL_PollEvent(&event)) {

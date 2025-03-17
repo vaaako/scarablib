@@ -256,15 +256,6 @@ int main() {
 		if(current - timer >= 1000) {
 			timer = current; // Reset timer
 			window.set_title("FPS: " + std::to_string(window.fps()) + " / Delta: " + std::to_string(window.dt()));
-		
-
-	// 		LOG_DEBUG("CPU Count: %d", SDL_GetCPUCount());
-	// 		LOG_DEBUG("Cache Line Size: %d bytes", SDL_GetCPUCacheLineSize());
-	// 
-	// 		struct rusage usage;
-	// 		getrusage(RUSAGE_SELF, &usage);
-	// 		int64 ramusage = usage.ru_maxrss / 1024;
-	// 		LOG_DEBUG("RAM Usage: %ld MB", ramusage);
 		}
 
 
