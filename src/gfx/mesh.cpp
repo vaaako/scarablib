@@ -71,13 +71,12 @@ Mesh::Mesh(const char* path) {
 			// 	};
 			// }
 
-			vec3<float> texuv = { 0.0f, 0.0f, 0.0f };
+			vec2<float> texuv = { 0.0f, 0.0f };
 			// Check if is valid and inside range
 			if(index.texcoord_index >= 0 && static_cast<size_t>(index.texcoord_index * 2 + 1) < attrib.texcoords.size()) {
 				texuv = {
 					attrib.texcoords[static_cast<size_t>(index.texcoord_index * 2)],
-					attrib.texcoords[static_cast<size_t>(index.texcoord_index * 2 + 1)],
-					0.0f
+					attrib.texcoords[static_cast<size_t>(index.texcoord_index * 2 + 1)]
 				};
 			}
 

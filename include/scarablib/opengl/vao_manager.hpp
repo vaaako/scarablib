@@ -3,6 +3,7 @@
 #include "scarablib/proper/error.hpp"
 #include "scarablib/types/vertex.hpp"
 #include <GL/glew.h>
+#include <algorithm>
 #include <unordered_map>
 
 #ifdef SCARAB_DEBUG_VAO_MANAGER 
@@ -169,6 +170,29 @@ VAOManager::VAOData VAOManager::create_vao(const std::vector<T>& vertices, const
 		// Vertex texuv is now vec3
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(T), (void*)offsetof(T, texuv));
 		glEnableVertexAttribArray(1);
+
+		// Format texid
+		bool can_upload_tex_id = std::all_of(vertices.begin(), vertices.end(), [](const T& v) {
+			return v.texid > -1 && v.texid <= 255;
+		});
+
+		if(can_upload_tex_id) {
+			glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(T), (void*)offsetof(T, texid));
+			glEnableVertexAttribArray(2);
+		}
+
+		// Format shading
+		bool can_upload_shading = std::all_of(vertices.begin(), vertices.end(), [](const T& v) {
+			return v.shading > -1.0f && v.shading <= 1.0f;
+		});
+
+		if(can_upload_shading) {
+			// If texid was uploaded, shading should be at index 3
+			uint8 vertex_id = (can_upload_tex_id) ? 3 : 2;
+			glVertexAttribPointer(vertex_id, 1, GL_FLOAT, GL_FALSE, sizeof(T), (void*)offsetof(T, shading));
+			glEnableVertexAttribArray(vertex_id);
+		}
+
 		// Normal
 		// glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 		// glEnableVertexAttribArray(2);

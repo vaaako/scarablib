@@ -3,26 +3,32 @@
 #include "scarablib/typedef.hpp"
 #include <vector> // For hash
 
-// Used for setting coordinates for vertices position, texture and normals
+// Mesh data uploaded to the GPU
 struct Vertex {
-	vec3<float> position;
-	vec3<float> texuv; // Use z = 0 for 2D, z = layer for texture arrays
-	// vec3<float> normal;
+	// Vertex positions
+	vec3<float> position; // 12 bytes
+	// Normalized texture coordinates
+	vec2<float> texuv;
+
+	// Value: 0-255 (ignored if not in this range)
+	// Optional value, used for Texture Arrays.
+	// Set the index of the texture to use for this vertex.
+	// Should be the same for all faces.
+	// If some vertex of the mesh has this field not in range (0-255), this field will not be uploaded for any face
+	int16 texid = -1; // 2 bytes (optional)
+
+	// Value: 0.0-1.0 (ignored if not in this range)
+	// Optional value, is used for simple shading.
+	// If some vertex of the mesh has this field not in range (0.0f-1.0f), this field will not be uploaded for any face
+	float shading = -1.0f; // 4 bytes (optional)
 
 	bool operator==(const Vertex& other) const noexcept {
-		return this->position == other.position
-			&& this->texuv == other.texuv;
-			// && this->normal == other.normal;
+		return position == other.position &&
+			   texuv == other.texuv &&
+			   texid == other.texid &&
+			   shading == other.shading;
 	}
 };
-
-// // Used for loading models
-// struct Face {
-// 	// Init 3 spaces with zero
-// 	std::vector<int> vertex_index = std::vector<int>(3);
-// 	std::vector<int> texuv_index  = std::vector<int>(3);
-// };
-
 
 // Be able to use Vertex as key in unordered_map
 namespace std {
@@ -40,16 +46,15 @@ namespace std {
 			hash_combine(vertex.position.y);
 			hash_combine(vertex.position.z);
 
-			// Hash texture coordinates
 			hash_combine(vertex.texuv.x);
 			hash_combine(vertex.texuv.y);
 
-			// hash_combine(vertex.normal.x);
-			// hash_combine(vertex.normal.y);
-			// hash_combine(vertex.normal.z);
+			hash_combine(vertex.texid);
+			hash_combine(vertex.shading);
 
 			return seed;
 		}
 	};
 }
+
 
