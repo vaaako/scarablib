@@ -42,19 +42,24 @@ class MouseHandler {
 		MouseHandler& operator=(MouseHandler&&) noexcept = delete;
 
 
-		// Returns mouse motion/position
-		inline vec2<uint32> get_motion() const noexcept {
-			return this->motion;
-		}
-
 		// Returns mouse click position
 		inline vec2<uint32> get_click_pos() const noexcept {
 			return this->click_pos;
 		}
 
+		// Returns mouse motion/position
+		inline vec2<uint32> get_motion() const noexcept {
+			return this->motion;
+		}
+
 		// Returns mouse moved direction (e.g. -1, 1 = Left Down)
-		inline vec2<uint32> get_moved_dir() const noexcept {
+		inline vec2<int16> get_moved_dir() const noexcept {
 			return this->moved_dir;
+		}
+
+		// Returns the button last event
+		inline MouseHandler::State get_last_event(const MouseHandler::Button button) const noexcept {
+			return this->buttonstate[static_cast<uint32>(button)];
 		}
 
 		// Returns mouse movent since last call
@@ -71,7 +76,7 @@ class MouseHandler {
 
 		// Check if button is up
 		inline bool isup(const MouseHandler::Button button) const noexcept {
-			return this->buttonstate[static_cast<uint32>(button)] == State::RELEASED;
+			return this->buttonstate[static_cast<uint32>(button)] == MouseHandler::State::RELEASED;
 		}
 
 		// Get the state of a key
@@ -107,8 +112,9 @@ class MouseHandler {
 		// Motion position (X: 0 -> width / Y: 0 -> height)
 		vec2<uint32> motion;
 		// Direction moved (Ex.: -1, 0 = Left)
-		vec2<int16> moved_dir;
+		vec2<int16> moved_dir; // xrel yrel
 
 		// Handle all mouse events (used on window class only)
 		void handle_event(const SDL_Event& event) noexcept;
 };
+

@@ -14,7 +14,7 @@ void Camera::rotate(const MouseHandler& mouse) noexcept {
 
 	this->yaw   += static_cast<float>(move.x) * this->sensitivity;
 	this->pitch += static_cast<float>(-move.y) * this->sensitivity;
-	this->pitch = glm::clamp(this->pitch, -89.0f, 89.0f); // Prevent gimbal lock
+	this->pitch  = glm::clamp(this->pitch, -89.0f, 89.0f); // Prevent gimbal lock
 
 	this->update_camera_vectors();
 }
@@ -30,6 +30,6 @@ void Camera::update_camera_vectors() noexcept {
 		std::sin(radyaw) * cospitch
 	});
 
-	this->left = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), forward));
-	this->up = glm::normalize(glm::cross(forward, left));
+	this->left = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), this->forward));
+	this->up = glm::normalize(glm::cross(this->forward, this->left));
 }

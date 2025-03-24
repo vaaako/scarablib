@@ -214,9 +214,10 @@ class Window {
 			// Grab Cursor -> Move based on last mouse position
 			// If this is not done, the cursor will jump to the last location
 			// This is way is only need when the cursor is locked
-			int dummy_x;
-			int dummy_y;
-			SDL_GetRelativeMouseState(&dummy_x, &dummy_y);
+			if(grab) {
+				int dummy_x, dummy_y;
+				SDL_GetRelativeMouseState(&dummy_x, &dummy_y);
+			}
 		}
 
 		// Hide the cursor when it is inside the window.

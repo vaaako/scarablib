@@ -5,16 +5,20 @@
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
+// Camera for 2D objects
 class Camera2D {
 	public:
 		Camera2D(const Window& window);
 
 		// MOVE //
+
+		// Set camera's position
 		inline void set_position(const vec2<float>& position) noexcept{
 			this->position = position;
 			this->update_view_matrix();
 		}
 
+		// Move camera around
 		inline void move(const vec2<float>& delta, const float dt) noexcept{
 			this->position += delta * dt;
 			this->update_view_matrix();
@@ -22,12 +26,19 @@ class Camera2D {
 
 		// SETTERS //
 
+		// Update viewport using window object
+		inline void update_viewport(const Window& window) noexcept {
+			this->update_viewport(window.get_width(), window.get_height());
+		}
+
+		// Update viewport for 2D shapes
 		inline void update_viewport(const uint32 width, const uint32 height) noexcept {
 			this->width  = static_cast<float>(width);
 			this->height = static_cast<float>(height);
 			this->update_proj_matrix();
 		}
 
+		// Set camera's zoom
 		inline void set_zoom(const float zoom) noexcept{
 			this->zoom = zoom;
 			this->update_proj_matrix();
@@ -35,10 +46,12 @@ class Camera2D {
 
 		// MATRIX //
 
+		// Returns camera's view matrix
 		inline glm::mat4 get_view_matrix() const noexcept {
 			return this->view;
 		}
 
+		// Returns camera's projection matrix
 		inline glm::mat4 get_proj_matrix() const noexcept {
 			return this->proj;
 		}

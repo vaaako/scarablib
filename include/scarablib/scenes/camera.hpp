@@ -58,8 +58,8 @@ class Camera {
 			return this->proj;
 		}
 
-		// Retuns camera's direction
-		inline vec3<float> get_direction() const noexcept {
+		// Retuns camera's unit direction vector
+		inline vec3<float> get_forward() const noexcept {
 			return this->forward;
 		}
 
