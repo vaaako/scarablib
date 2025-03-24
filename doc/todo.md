@@ -71,6 +71,9 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [ ] TextureArray
 	- [ ] Support for texture array and common texture to the same model
 	- [ ] make member of "current texture array index" and use it in the shader when drawing a model that uses a texture_array
+- [ ] Make a new static struct called `ModelFields` that returns `Vertex`'s fields to `ModelFactory` (and the user can use that for easy manipulation)
+	+ Like in vakraft, make a helper method for easy change faces values
+- [ ] Be able to change `texid` and `shading` fields in `ModelFactory` for each face
 
 # TODO 2D
 - [x] Unify shader and `shader_texture` somehow
