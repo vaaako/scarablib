@@ -1,21 +1,16 @@
 #pragma once
 
 #include "scarablib/opengl/shader.hpp"
+#include "scarablib/opengl/shader_manager.hpp"
+#include "scarablib/opengl/shaders.hpp"
 #include "scarablib/scenes/camera2d.hpp"
 #include "scarablib/typedef.hpp"
-#include "scarablib/utils/file.hpp"
 #include <string>
 #include <GL/glew.h>
 
-#include <stb_truetype.h>
-
 // Font object used to draw text on the screen
+// WARNING: NOT FINISHED YET. STILL DONT WORKING PROPERLY
 class Font {
-	// To update viewport
-	friend class Scene2D;
-
-	// WARNING: NOT FINISHED YET. STILL DONT WORKING PROPERLY
-
 	public:
 		// Build a font object passing a path to a .ttf file.
 		// Also pass font's text, size and color
@@ -24,6 +19,10 @@ class Font {
 
 		// Add text to batch rendering
 		void draw_text(const std::string& text, const vec2<float>& pos, const float scale = 1.0f, const Color& color = Colors::WHITE) noexcept;
+
+		inline Shader& get_shader() const noexcept {
+			return *this->shader;
+		}
 
 	private:
 		const Camera2D& camera;
@@ -36,7 +35,10 @@ class Font {
 		};
 
 		// Font
-		stbtt_bakedchar cdata[96];
+		// If i declare cdata as stbtt_bakedchar in header file
+		// i will have to include stb_truetype.h and when sharing the library i would have to also share stb_truetype.h
+		// which i dont want
+		void* cdata; // stbtt_bakedchar
 		Glyph* buffer_data;
 		size_t buffer_capacity;
 
@@ -45,14 +47,11 @@ class Font {
 		GLuint vao;
 		GLuint vbo;
 
-		static inline Shader& get_shader() noexcept {
-			static Shader shader = Shader(
-				FileHelper::read_file("resources/shaders/vertex.glsl").c_str(),
-				FileHelper::read_file("resources/shaders/2d/font_fs.glsl").c_str()
-			);
-
-			return shader;
-		}
+		Shader* shader = ShaderManager::get_instance().get_or_load_shader(
+			"font",
+			Shaders::DEFAULT_VERTEX,
+			Shaders::FONT_FRAGMENT
+		);
 };
 
 

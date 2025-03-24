@@ -12,6 +12,11 @@
 // TODO: Optimize. More characters
 
 Font::Font(const Camera2D& camera, const char* path, const uint16 size) : camera(camera) {
+	// If i declare cdata as stbtt_bakedchar in header file
+	// i will have to include stb_truetype.h and when sharing the library i would have to also share stb_truetype.h
+	// which i dont want
+	this->cdata = std::malloc(sizeof(stbtt_bakedchar) * 96);
+
 	std::vector<uint8> buffer = FileHelper::read_binary_file(path);
 
 	if(buffer.empty()) {
@@ -34,7 +39,7 @@ Font::Font(const Camera2D& camera, const char* path, const uint16 size) : camera
 		temp_bitmap.data(),
 		this->atlas_width, this->atlas_height,
 		32, 96, // ASCII 32 to 127, 96 printable ASCII
-		this->cdata
+		(stbtt_bakedchar*)this->cdata
 	);
 
 	if (result <= 0) {
@@ -89,6 +94,8 @@ Font::~Font() noexcept {
 	glDeleteBuffers(1, &this->vbo);
 	glDeleteTextures(1, &this->texid);
 
+	std::free(this->cdata);
+
 	delete[] this->buffer_data;
 };
 
@@ -133,7 +140,7 @@ void Font::draw_text(const std::string& text, const vec2<float>& pos, const floa
 		}
 
 		stbtt_aligned_quad q;
-		stbtt_GetBakedQuad(this->cdata, this->atlas_width, this->atlas_height,
+		stbtt_GetBakedQuad((stbtt_bakedchar*)this->cdata, this->atlas_width, this->atlas_height,
 				c - 32, &x, &y, &q, 1);
 
 		// Apply scale if needed
