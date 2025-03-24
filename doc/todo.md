@@ -1,6 +1,10 @@
 # Note
 I wrote most of the things here very tired, sorry for any english mistake
 
+# stuff i dont know if still working
+- Collision
+- Bounding box
+
 # TODO library
 - [x] Use my vectores instead of glm
 	- matrix still glm ones tho
