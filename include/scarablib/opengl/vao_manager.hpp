@@ -162,11 +162,9 @@ VAOManager::VAOData VAOManager::create_vao(const std::vector<T>& vertices, const
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(T), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	// T is only a Vertex or a vec3<float>
-	// if(sizeof(T) == sizeof(Vertex)) {
+	// If T is a Vertex, add the other attributes
 	if constexpr (std::is_same<T, Vertex>::value) {
-		// Vertex texuv is now vec3
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(T), (void*)offsetof(T, texuv));
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(T), (void*)offsetof(T, texuv));
 		glEnableVertexAttribArray(1);
 
 		// Format texid
