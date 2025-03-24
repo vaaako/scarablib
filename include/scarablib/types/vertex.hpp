@@ -1,7 +1,7 @@
 #pragma once
 
 #include "scarablib/typedef.hpp"
-#include <vector> // For hash
+#include <functional>
 
 // Mesh data uploaded to the GPU
 struct Vertex {
