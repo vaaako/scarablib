@@ -16,7 +16,7 @@ TextureArray::TextureArray(const uint32 width, const uint32 height, const uint32
 	glTexStorage3D(
 		GL_TEXTURE_2D_ARRAY,
 		1, // Mipmap level
-		GL_RGB8,
+		GL_RGBA8,
 		static_cast<GLint>(width), static_cast<GLint>(height),
 		static_cast<GLint>(num_textures)
 	);
