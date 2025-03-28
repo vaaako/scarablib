@@ -13,6 +13,7 @@
 #include "scarablib/utils/math.hpp"
 #include "scarablib/window/window.hpp"
 #include "scarablib/input/keycode.hpp"
+#include "scarablib/network/nethost.hpp"
 #include <cstdio>
 
 #include <sys/sysinfo.h>
@@ -115,7 +116,6 @@ int main() {
 	Scene2D scene2d = Scene2D(camera2d);
 	Scene3D scene3d = Scene3D(camera);
 
-
 	// WARNING: FONTS ARE NOT COMPLETED YET, I WILL UPDATE IT LATER
 	Font msgothic = Font(camera2d, "test/assets/fonts/msgothic.ttf", 32);
 
@@ -182,6 +182,13 @@ int main() {
 	// auto cube1_later = scene3d.get_by_key<Cube>("cube1");
 	// cube1_later->set_color(Colors::CHIROYELLOW);
 
+
+	// NetHost server = NetHost(7777, 32, true);
+	// server.thread_gather_events(1000, [](const std::vector<NetHost::Packet>& packets){
+	// 	if(packets.empty()) {
+	// 		LOG_INFO("no packets");
+	// 	}
+	// });
 
 	bool debug_mode = false;
 	bool envsync = true;
