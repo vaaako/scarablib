@@ -7,7 +7,7 @@ TextureArray::TextureArray(const uint32 width, const uint32 height, const uint32
 	GLint max_layers;
 	glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS, &max_layers);
 	if(num_textures > static_cast<uint32>(max_layers)) {
-		throw ScarabError("The maximum number of textures in a texture array is %d, but the limit is %d", num_textures, max_layers);
+		throw ScarabError("You passed a number of textures of %i, but the limit is %i", num_textures, max_layers);
 	}
 
 	// Generate and bind texture

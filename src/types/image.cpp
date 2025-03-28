@@ -2,7 +2,7 @@
 
 // STB entry point
 #define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+#include <stb/stb_image.h>
 
 
 Image::Image(const char* path, const bool flip_vertically, const bool flip_horizontally) noexcept : path(path) {

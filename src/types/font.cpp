@@ -6,7 +6,7 @@
 #include "scarablib/utils/file.hpp"
 
 #define STB_TRUETYPE_IMPLEMENTATION
-#include <stb_truetype.h>
+#include <stb/stb_truetype.h>
 
 // WARNING: NOT FINISHED YET. STILL DONT WORKING PROPERLY
 // TODO: Optimize. More characters

@@ -15,7 +15,7 @@ if [ "$1" = "-s" ]; then
 	valgrind --leak-check=full \
 		--show-leak-kinds=all \
 		--track-origins=yes \
-		--suppressions=valgrind.supp \
+		--suppressions=./valgrind.supp \
 		--log-file="$FILE" "$TARGET"
 		# --gen-suppressions=all --log-file=memcheck.log "$TARGET"
 else
@@ -24,5 +24,4 @@ else
 		--show-leak-kinds=all \
 		--track-origins=yes \
 		--log-file="$FILE" "$TARGET"
-		# --gen-suppressions=all --log-file=memcheck.log "$TARGET"
 fi

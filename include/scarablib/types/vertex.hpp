@@ -15,6 +15,7 @@ struct Vertex {
 	// Set the index of the texture to use for this vertex.
 	// Should be the same for all faces.
 	// If some vertex of the mesh has this field not in range (0-255), this field will not be uploaded for any face
+	// WARNING: Convert this value to float BEFORE PASSING to fragment shader (otherwise it will not work properly)
 	int16 texid = -1; // 2 bytes (optional)
 
 	// Value: 0.0-1.0 (ignored if not in this range)

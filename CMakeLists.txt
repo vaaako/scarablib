@@ -29,22 +29,20 @@ if(USE_STATIC_LIBS)
 		include/external
 		include/external/SDL2 # SDL_mixer includes SDL_stdinc
 		include/external/SDL_mixer
-		include/external/tinyobjloader
-		include/external/stb
 	)
 
 	link_directories(
 		lib/GLEW
 		lib/SDL2
 		lib/SDL2_mixer
-		lib/freetype
+		lib/enet
 	)
 
 	# Define the paths to static libraries
 	set(LIB_GLEW "${CMAKE_SOURCE_DIR}/lib/GLEW/libGLEW.a")
 	set(LIB_SDL2 "${CMAKE_SOURCE_DIR}/lib/SDL2/libSDL2.a")
 	set(LIB_SDL2_MIXER "${CMAKE_SOURCE_DIR}/lib/SDL2_mixer/libSDL2_mixer.a")
-	set(LIB_FREETYPE "${CMAKE_SOURCE_DIR}/lib/freetype/libfreetype.a")
+	set(LIB_ENET "${CMAKE_SOURCE_DIR}/lib/enet/libenet.a")
 
 	# Link static libraries
 	target_link_libraries(scarablib_dev 
@@ -52,11 +50,10 @@ if(USE_STATIC_LIBS)
 		${LIB_GLEW}
 		${LIB_SDL2}
 		${LIB_SDL2_MIXER}
-		${LIB_FREETYPE}
+		${LIB_ENET}
 	)
 
 else()
-
 	# Set to modern OpenGL
 	set(OpenGL_GL_PREFERENCE "GLVND")
 
@@ -66,8 +63,6 @@ else()
 		include/external
 		include/external/SDL2 # SDL_mixer includes SDL_stdinc
 		include/external/SDL_mixer
-		include/external/tinyobjloader
-		include/external/stb
 	)
 
 	# Find shared libraries
@@ -76,6 +71,7 @@ else()
 	find_library(SDL2_LIBRARY SDL2 PATHS ${CMAKE_SOURCE_DIR}/lib/SDL2)
 	find_library(SDL2_MIXER_LIBRARY SDL2_mixer PATHS ${CMAKE_SOURCE_DIR}/lib/SDL2_mixer)
 	find_library(GLEW_LIBRARY GLEW PATHS ${CMAKE_SOURCE_DIR}/lib/GLEW)
+	find_library(ENET_LIBRARY enet PATHS ${CMAKE_SOURCE_DIR}/lib/enet)
 
 	# Link shared libraries
 	target_link_libraries(scarablib_dev 
@@ -83,6 +79,7 @@ else()
 		${GLEW_LIBRARY}
 		${SDL2_LIBRARY}
 		${SDL2_MIXER_LIBRARY}
+		${ENET_LIBRARY}
 	)
 endif()
 

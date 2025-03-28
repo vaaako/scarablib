@@ -1,10 +1,9 @@
 CXX = clang++
 CXXFLAGS = -std=c++20 -O3 \
 		   -I./include \
+		   -I./include/external \
 		   -I./include/external/SDL2 \
 		   -I./include/external/SDL_mixer \
-		   -Iinclude/external/tinyobjloader \
-		   -Iinclude/external/stb
 # -I./include/external/SDL2 -> SDL_mixer
 
 # Default to 'static' if not specified
@@ -15,12 +14,14 @@ ifeq ($(LIBRARY_TYPE), static)
 	LDFLAGS = ./lib/GLEW/libGLEW.a \
 			  ./lib/SDL2/libSDL2.a \
 			  ./lib/SDL2_mixer/libSDL2_mixer.a \
+			  ./lib/enet/libenet.a \
 			  -lGL -ldl -lpthread -lm
 else ifeq ($(LIBRARY_TYPE), shared)
 	LDFLAGS = -L./lib/GLEW \
 			  -L./lib/SDL2 \
 			  -L./lib/SDL2_mixer \
-			  -lGL -lGLEW -lSDL2 -lSDL2main -lSDL2_mixer
+			  -L./enet/enet \
+			  -lGL -lGLEW -lSDL2 -lSDL2main -lSDL2_mixer -lenet
 endif
 
 # Dirs
