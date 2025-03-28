@@ -52,7 +52,7 @@ class VAOManager {
 		struct VAOData {
 			GLuint vao_id;
 			GLuint vbo_id;
-			GLuint ebo_id;
+			GLuint ebo_id = 0; // Sometimes ebo is not used, pass a default value so when is deleted it won't cause any warning
 		};
 
 		// Keep track of how many models are using the same VAO.
