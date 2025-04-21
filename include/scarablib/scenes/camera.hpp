@@ -9,44 +9,25 @@
 
 class Camera {
 	public:
+		// Real camera's position.
+		// This is a public member for easy access.
+		// To move the camera using a unit vector, use Camera::move
+		vec3<float> position = vec3<float>(0.0f);
+		// Horizontal rotation.
+		// To rotate camera using the mouse, use Camera::rotate
+		float yaw = -90.0f;
+		// Vertical rotation
+		// To rotate camera using the mouse, use Camera::rotate
+		float pitch = 0.0f;
+
 		enum Zoom : bool {
-			OUT = 0,
-			IN = 1
+			OUT,
+			IN
 		};
 
 		Camera(const Window& window, const float fov = 45.0f, const float sensitivity = 0.1f) noexcept;
 
 		// GETTERS
-
-		// Returns camera position
-		inline vec3<float> get_position() const noexcept {
-			return this->position;
-		}
-
-		// Returns current X position
-		inline float get_x() const noexcept {
-			return this->position.x;
-		}
-
-		// Returns current Y position
-		inline float get_y() const noexcept {
-			return this->position.y;
-		}
-
-		// Returns current Z position
-		inline float get_z() const noexcept {
-			return this->position.z;
-		}
-
-		// Returns current yaw. Horizontal rotation
-		inline float get_yaw() const noexcept {
-			return this->yaw;
-		}
-
-		// Returns current pitch. Vertical rotation
-		inline float get_pitch() const noexcept {
-			return this->pitch;
-		}
 
 		// Returns camera view matrix
 		inline glm::mat4 get_view_matrix() const noexcept {
@@ -81,8 +62,8 @@ class Camera {
 				LOG_ERROR("new \"near plane\" value can't be higher than \"far plane\" current value");
 				return;
 			}
-			this->near_plane = near_plane;
 
+			this->near_plane = near_plane;
 			this->update_proj_matrix();
 		}
 
@@ -92,8 +73,8 @@ class Camera {
 				LOG_ERROR("new \"far plane\" value can't be lower than \"near plane\" current value");
 				return;
 			}
-			this->far_plane = far_plane;
 
+			this->far_plane = far_plane;
 			this->update_proj_matrix();
 		}
 
@@ -103,8 +84,8 @@ class Camera {
 				LOG_ERROR("new \"fov\" value must be between \"near plane\" and \"far plane\" current values");
 				return;
 			}
-			this->fov = fov;
 
+			this->fov = fov;
 			this->update_proj_matrix();
 		}
 
@@ -114,6 +95,7 @@ class Camera {
 				LOG_ERROR("new \"min fov\" value can't be higher than \"max fov\" current value");
 				return;
 			}
+
 			this->min_fov = min_fov;
 		}
 
@@ -123,6 +105,7 @@ class Camera {
 				LOG_ERROR("new \"max fov\" value can't be lower than \"min fov\" current value");
 				return;
 			}
+
 			this->max_fov = max_fov;
 		}
 
@@ -163,17 +146,10 @@ class Camera {
 
 		// MOVEMENT
 
-		// Gets a vec3 contanining the direction the camera has moved.
+		// Move the camera using a unit vector.
 		// Where X is front/back, Y is up/down and Z is left/right.
 		// Example: [1, 0, -1] means the camera moved to Front-Left
-		inline void move(const vec3<float>& dir, const float dt) noexcept {
-			// Normalize for diagonal movement and if any value is >1.0 or <-1.0
-			vec3<float> mov = this->forward * dir.x +
-							  this->up      * dir.y +
-							  this->left    * dir.z;
-			// Apply speed and delta time
-			this->position += mov * this->speed * dt;
-		}
+		void move(const vec3<float>& dir, const float dt) noexcept;
 
 		// Use mouse moved direction to rotate the camera
 		void rotate(const MouseHandler& mouse) noexcept;
@@ -208,10 +184,8 @@ class Camera {
 		// Movement
 		// bool firstclick = true;
 		// -90 in yaw prevents camera from jumping on the first click
-		float yaw = -90.0f; // Horizontal rotation
-		float pitch = 0.0f; // Vertical rotation
 
-		vec3<float> position    = { 0.0f, 0.0f,  2.0f }; // Real camera's position
+
 		vec3<float> up          = { 0.0f, 1.0f,  0.0f };
 		vec3<float> forward     = { 0.0f, 0.0f, -1.0f };
 		vec3<float> left        = { -1.0f, 0.0f, 0.0f };
