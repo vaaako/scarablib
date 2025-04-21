@@ -30,11 +30,24 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [x] Shader from Scene3D and Scene2D use shader manager
 - [ ] make transparency work without `if(tex.a == 0.0)`
 
-- [ ] Having problems with shaders, when compiling to executable
-- [ ] Shader mvp calculation to `Scene3D::draw`
+- [x] Having problems with shaders, when compiling to executable
+	+ not happy with the solution, since it stores shaders forever in memory
 
 - [ ] Discord RPC support?
-- [ ] In Window::rotate i didnt have to clear the rotation before, why do i need it now? (last commit: https://github.com/vaaako/scarablib/commit/d2a5717958a1f73fde39dafbd6640e2c19dab076)
+- [ ] In Window::rotate i didnt have to clear the rotation before, why do i need it now? ([last commit]( https://github.com/vaaako/scarablib/commit/d2a5717958a1f73fde39dafbd6640e2c19dab076))
+- [ ] Make a struct named `Result` for methods that may return an error, containing the following members: `const bool is_ok`, `const char* message`
+	+ Error must only be emitted if the result will break something (like some library not iniating properly)
+	+ Also replace `LOG_ERROR` with `Result`
+	+ `LOG_WARNING` can stay
+
+- [ ] Use bitwise flags when fits (like in Texture for flags)
+- [ ] Use `string_view` instead of `string` when possible (when string manipulation isnt necessary)
+- [ ] Class members that dont need any treatment or additional code in a setter method, should be public (when this is the case a setter method for this member is not necessary)
+- [ ] Change methods description to use "\`\`" for parameters
+
+
+# TODO Network
+- [ ] Send message when client is disconnected
 
 # TODO Bug
 - [x] Memory leak somewhere (i don't know if is in my code or in some library, but is not dangerous)
@@ -58,6 +71,8 @@ I wrote most of the things here very tired, sorry for any english mistake
 	+ [x] Texture Array (not really used by anything currently)
 - [x] Batch rendering
 - [x] Use the same font object for different texts
+- [ ] Shader support
+	+ Define shader object, methods like `load_from_file` and be able to use this custom shader
 
 # TODO Shapes
 - [x] Make a Model Factory instead of static `get vao` and a struct for each model
@@ -77,7 +92,11 @@ I wrote most of the things here very tired, sorry for any english mistake
 	- [ ] make member of "current texture array index" and use it in the shader when drawing a model that uses a texture_array
 - [ ] Make a new static struct called `ModelFields` that returns `Vertex`'s fields to `ModelFactory` (and the user can use that for easy manipulation)
 	+ Like in vakraft, make a helper method for easy change faces values
-- [ ] Be able to change `texid` and `shading` fields in `ModelFactory` for each face
+- [x] Be able to change `texid` and `shading` fields in `ModelFactory` for each face
+
+- [ ] Check how SFML uses shader and draw objects
+	+ Individual draw default
+	+ Batch draw when added to scene
 
 # TODO 2D
 - [x] Unify shader and `shader_texture` somehow
@@ -97,6 +116,7 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [x] If possible, use mesh.hpp for 2D shapes
 - [x] Remove `SCARAB_2D_AND_3D`
 - [ ] Make it work with CULL_FACE
+- [ ] Finish font
 
 # TODO 3D
 - [ ] Camera
@@ -142,6 +162,7 @@ I wrote most of the things here very tired, sorry for any english mistake
 	+ How to pass shader then?
 - [ ] Different texture for each face (the other method that is not cubemap)
 - [ ] In `ModelFactory::create_cube` add option to change Z of each face
+- [ ] Shader mvp calculation to `Scene3D::draw`
 
 # Features for later
 - Sprite atlas
