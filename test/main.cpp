@@ -13,7 +13,7 @@
 #include "scarablib/utils/math.hpp"
 #include "scarablib/window/window.hpp"
 #include "scarablib/input/keycode.hpp"
-#include "scarablib/network/nethost.hpp"
+#include "scarablib/network/network.hpp"
 #include <cstdio>
 
 #include <sys/sysinfo.h>
@@ -183,8 +183,8 @@ int main() {
 	// cube1_later->set_color(Colors::CHIROYELLOW);
 
 
-	// NetHost server = NetHost(7777, 32, true);
-	// server.thread_gather_events(1000, [](const std::vector<NetHost::Packet>& packets){
+	// Network server = Network(7777, 32, true);
+	// server.threaded_gather_events(1000, [](std::vector<Network::Packet> packets){
 	// 	if(packets.empty()) {
 	// 		LOG_INFO("no packets");
 	// 	}
@@ -209,7 +209,7 @@ int main() {
 
 		// Resize support
 		// (OpenGL viewport is updated automatically)
-		window.on_event(Event::WINDOW_RESIZED, [&](){
+		window.on_event(Event::WINDOW_RESIZED, [&]() {
 			scene2d.update_viewport(window);
 			scene3d.update_viewport(window);
 		});
@@ -227,8 +227,7 @@ int main() {
 		cube2->set_position(ScarabMath::orbitate_y(cowpos, rotation, 5.0f));
 		cube3->set_position(ScarabMath::orbitate_z(cowpos, -rotation, 5.0f));
 
-		bill->relative_angle(camera.get_position());
-
+		bill->relative_angle(camera.position);
 		// LOG_DEBUG("Cardinal: %s", camera.get_cardinal_direction().c_str());
 
 		// Draw
@@ -253,7 +252,7 @@ int main() {
 			uint32 current = window.timenow();
 			if(current - timer >= 1000) {
 				timer = current; // Reset timer
-				LOG_INFO("Camera position: %f, %f, %f", camera.get_x(), camera.get_y(), camera.get_z());
+				LOG_INFO("Camera position: %f, %f, %f", camera.position.x, camera.position.y, camera.position.z);
 				LOG_DEBUG("Delta time: %f", window.dt());
 			}
 		}
@@ -274,7 +273,7 @@ int main() {
 		rotation += rotation_speed * window.dt();
 		rotation = std::fmod(rotation, 360.0f); // Wrap around (if goes above 360.0f change to 0.0f) (if goes above 360.0f change to 0.0f)
 
-		// window.frame_capping(75);
+		// window.frame_capping(60.0f);
 		window.swap_buffers(); // NOTE -- ~14mb RAM
 	}
 
