@@ -1,6 +1,7 @@
 #pragma once
 
 #include "scarablib/typedef.hpp"
+#include "scarablib/utils/math.hpp"
 #include <functional>
 
 // Mesh data uploaded to the GPU
@@ -25,9 +26,9 @@ struct Vertex {
 
 	bool operator==(const Vertex& other) const noexcept {
 		return position == other.position &&
-			   texuv == other.texuv &&
-			   texid == other.texid &&
-			   shading == other.shading;
+			   this->texuv == other.texuv &&
+			   this->texid == other.texid &&
+			   ScarabMath::compare_floats(this->shading, other.shading);
 	}
 };
 
