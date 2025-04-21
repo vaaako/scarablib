@@ -14,12 +14,12 @@ Window::Window(const Window::Config& config)
 
 	// Initialize SDL (video and audio)
 	// NOTE: Memory leak happening here
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
+	if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
 		throw ScarabError("Failed to init SDL: %s", SDL_GetError());
 	}
 
 	// Initialize SDL_mixer
-	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) != 0) {
+	if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) != 0) {
 		Mix_CloseAudio();
 		SDL_CloseAudio();
 		SDL_Quit();
@@ -34,7 +34,7 @@ Window::Window(const Window::Config& config)
 		SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE
 	);
 
-	if (!this->window) {
+	if(!this->window) {
 		Mix_CloseAudio();
 		SDL_CloseAudio();
 		SDL_Quit();
@@ -47,7 +47,7 @@ Window::Window(const Window::Config& config)
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 
 	this->glContext = SDL_GL_CreateContext(window);
-	if (!this->glContext) {
+	if(!this->glContext) {
 		SDL_DestroyWindow(this->window);
 		Mix_CloseAudio();
 		SDL_CloseAudio();
@@ -58,7 +58,7 @@ Window::Window(const Window::Config& config)
 	// Initialize GLEW
 	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
-	if (err != GLEW_OK) {
+	if(err != GLEW_OK) {
 		SDL_GL_DeleteContext(this->glContext);
 		SDL_DestroyWindow(this->window);
 		Mix_CloseAudio();
@@ -75,13 +75,12 @@ Window::Window(const Window::Config& config)
 
 	glEnable(GL_DEPTH_TEST);
 
-	// 2D and Skybox support
+	// 2D and Skybox support with depth test
 	// glDepthFunc(GL_ALWAYS);
 	glDepthFunc(GL_LEQUAL);
 
 	// Cull Face
-	// glEnable(GL_CULL_FACE);
-	// glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
 
 	// SDL Configurations
 	SDL_SetWindowResizable(this->window, (SDL_bool)config.resizable);
@@ -123,6 +122,7 @@ Window::~Window() noexcept {
 	ShaderManager::get_instance().cleanup();
 }
 
+// private
 void Window::calc_fps_and_dt() noexcept {
 	const uint64 now = SDL_GetPerformanceCounter();
 	const uint64 elapsed = now - this->last_update;
@@ -131,17 +131,35 @@ void Window::calc_fps_and_dt() noexcept {
 	// note: elapsed may be multiplied by 1000.0f to get milliseconds
 }
 
-void Window::frame_capping(const uint32 fps) const noexcept {
-	const double desired = 1.0 / fps;
-	const double actual = this->dt();
+void Window::frame_capping(const float fps) const noexcept {
+	assert(fps > 0.0f && "fps parameter must be greater than 0.0f");
+
+	const float desired = 1.0f / fps;
+	const float actual = this->dt();
 
 	// If not synchronized
 	if(actual < desired) {
 		// Delay to make it synchronized
-		uint32 remaining = static_cast<Uint32>((desired - actual) * 1000);
+		const uint32 remaining = static_cast<uint32>((desired - actual) * 1000);
 		SDL_Delay(remaining);
 	}
 	// If actual >= desired, the frame is already running slower than desired, so no delay is needed
+}
+
+
+void Window::set_size(const vec2<uint32>& size) noexcept {
+	this->width = size.x;
+	this->height = size.y;
+
+	this->half_width  = static_cast<float>(size.x) * 0.5f;
+	this->half_height = static_cast<float>(size.y) * 0.5f;
+
+	// Update window size
+	SDL_SetWindowSize(this->window, (int)size.x, (int)size.y);
+	glViewport(0, 0, (GLsizei)size.x, (GLsizei)size.y);
+
+	// Trigger event
+	this->frame_events.emplace(Event::WINDOW_RESIZED);
 }
 
 void Window::process_events() noexcept {

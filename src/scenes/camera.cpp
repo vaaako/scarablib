@@ -33,3 +33,17 @@ void Camera::update_camera_vectors() noexcept {
 	this->left = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), this->forward));
 	this->up = glm::normalize(glm::cross(this->forward, this->left));
 }
+
+
+void Camera::move(const vec3<float>& dir, const float dt) noexcept {
+	// Combine movement direction
+	vec3<float> move = this->forward * dir.x + this->up * dir.y + this->left * dir.z;
+
+	// Normalize only horizontal (XZ) to prevent faster diagonal movement
+	if(dir.x != 0.0f || dir.z != 0.0f) {
+		move = glm::normalize(move);
+	}
+
+	// Update position
+	this->position += move * this->speed * dt;
+}

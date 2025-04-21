@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.0)
-project(scarablib_dev VERSION 0.0.1)
+cmake_minimum_required(VERSION 3.5)
+project(scarablib_dev VERSION 0.1.0)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
