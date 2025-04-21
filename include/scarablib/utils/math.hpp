@@ -5,7 +5,9 @@
 
 // Helper namespace with methods related to string manipulation
 namespace ScarabMath {
-	constexpr float EPSILON = 1e-6f; // Small tolerance value for floating-point comparison
+	namespace {
+		constexpr float EPSILON = 1e-6f; // Small tolerance value for floating-point comparison
+	}
 
 	// Initialize arrays
 	// inline void initialize() noexcept {
@@ -37,20 +39,21 @@ namespace ScarabMath {
 
 	// Calculate horizontal orbit (around z-axis) around a center position
 	[[nodiscard]] inline vec3<float> orbitate_z(const vec3<float> center_position, const float velocity, const float radius = 5.0f) {
-		float angle = ScarabMath::radians(velocity);
+		const float angle = ScarabMath::radians(velocity);
 		return center_position + vec3<float>(radius * std::cos(angle), 0.0f, radius * std::sin(angle));
 	}
 
 	// Calculate vertical orbit (around x-axis) around a center position
 	[[nodiscard]] inline vec3<float> orbitate_x(const vec3<float> center_position, const float velocity, const float radius = 5.0f) {
-		float angle = ScarabMath::radians(velocity);
+		const float angle = ScarabMath::radians(velocity);
 		return center_position + vec3<float>(0.0f, radius * std::cos(angle), radius * std::sin(angle));
 	}
 
 	// Calculate orbit around the y-axis (xz-plane)
 	[[nodiscard]] inline vec3<float> orbitate_y(const vec3<float> center_position, const float velocity, const float radius = 5.0f) {
-		float angle = ScarabMath::radians(velocity);
-		return center_position + vec3<float>(radius * std::cos(angle), radius * std::sin(angle), radius * std::sin(angle));
+		const float angle = ScarabMath::radians(velocity);
+		const float sin_angle = std::sin(angle);
+		return center_position + vec3<float>(radius * std::cos(angle), radius * sin_angle, radius * sin_angle);
 	}
 
 	// Return the distance between two positions
