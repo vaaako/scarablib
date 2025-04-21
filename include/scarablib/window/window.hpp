@@ -151,22 +151,17 @@ class Window {
 			}
 		}
 
+		inline void enable_cullface(const bool state) noexcept {
+			if(state) {
+				glEnable(GL_CULL_FACE);
+			} else {
+				glDisable(GL_CULL_FACE);
+			}
+		}
+
 		// Set the window's size using the provided width and height values.
 		// This also adjusts the OpenGL viewport to match the new window size.
-		inline void set_size(const vec2<uint32>& size) noexcept {
-			this->width = size.x;
-			this->height = size.y;
-
-			this->half_width  = static_cast<float>(size.x) * 0.5f;
-			this->half_height = static_cast<float>(size.y) * 0.5f;
-
-			// Update window size
-			SDL_SetWindowSize(this->window, (int)size.x, (int)size.y);
-			glViewport(0, 0, (GLsizei)size.x, (GLsizei)size.y);
-
-			// Trigger event
-			this->frame_events.emplace(Event::WINDOW_RESIZED);
-		}
+		void set_size(const vec2<uint32>& size) noexcept;
 
 
 		// CHECKERS //
@@ -237,8 +232,9 @@ class Window {
 			return this->delta_time;
 		}
 
-		// Stabilize the FPS and tries to limit the frame rate
-		void frame_capping(const uint32 fps) const noexcept;
+		// Stabilize the FPS and tries to limit the frame rate.
+		// Frame capping will not work if VSync is enabled
+		void frame_capping(const float fps) const noexcept;
 
 		// Optional `time` parameter adjusts the time scale (default: 1000.0 for seconds).
 		// Get the number of milliseconds that have passed since the SDL library was initialized.
