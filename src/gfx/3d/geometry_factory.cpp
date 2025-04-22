@@ -1,7 +1,7 @@
-#include "scarablib/gfx/3d/model_factory.hpp"
+#include "scarablib/gfx/geometry_factory.hpp"
 
-Cube* ModelFactory::create_cube() noexcept {
-	std::vector<Vertex> vertices = {
+std::vector<Vertex> GeometryFactory::make_cube_vertices() noexcept {
+	return {
 		// Vertices: 24
 		// Front face
 		Vertex { .position = glm::vec3(-0.5f, -0.5f, 0.5f), .texuv = glm::vec2(0.0f, 0.0f) }, // Bottom left
@@ -39,72 +39,32 @@ Cube* ModelFactory::create_cube() noexcept {
 		Vertex { .position = glm::vec3(-0.5f,  0.5f,  0.5f), .texuv = glm::vec2(1.0f, 1.0f) }, // 22
 		Vertex { .position = glm::vec3(-0.5f,  0.5f, -0.5f), .texuv = glm::vec2(0.0f, 1.0f) }  // 23
 	};
-
-	std::vector<uint32> indices = {
-		// Front face
-		0, 1, 2,
-		0, 2, 3,
-
-		// Back face
-		4, 5, 6,
-		4, 6, 7,
-
-		// Top face
-		8, 9, 10,
-		8, 10, 11,
-
-		// Bottom face
-		12, 13, 14,
-		12, 14, 15,
-
-		// Left face
-		16, 17, 18,
-		16, 18, 19,
-
-		// Right face
-		20, 21, 22,
-		20, 22, 23
-	};
-
-	// Returns created cube
-	return new Cube(vertices, indices); // The vao is made by mesh
 }
 
-Plane* ModelFactory::create_plane() noexcept {
-	std::vector<Vertex> vertices = {
+std::vector<Vertex> GeometryFactory::make_plane_vertices() noexcept {
+	return {
 		// Front face
 		Vertex { .position = glm::vec3(-0.5f, -0.5f, 0.0f), .texuv = glm::vec2(0.0f, 0.0f) }, // Bottom left
 		Vertex { .position = glm::vec3( 0.5f, -0.5f, 0.0f), .texuv = glm::vec2(1.0f, 0.0f) }, // Bottom right
 		Vertex { .position = glm::vec3( 0.5f,  0.5f, 0.0f), .texuv = glm::vec2(1.0f, 1.0f) }, // Top right
 		Vertex { .position = glm::vec3(-0.5f,  0.5f, 0.0f), .texuv = glm::vec2(0.0f, 1.0f) }, // Top left
 	};
-
-	std::vector<uint32> indices = {
-		// Front face
-		0, 1, 2,
-		0, 2, 3,
-	};
-
-	// Returns created Plane
-	return new Plane(vertices, indices); // The vao is made by mesh
 }
 
 
-Billboard* ModelFactory::create_billboard() noexcept {
-	std::vector<Vertex> vertices = {
-		// Front face
-		Vertex { .position = glm::vec3(-0.5f, -0.5f, 0.0f), .texuv = glm::vec2(0.0f, 0.0f) }, // Bottom left
-		Vertex { .position = glm::vec3( 0.5f, -0.5f, 0.0f), .texuv = glm::vec2(1.0f, 0.0f) }, // Bottom right
-		Vertex { .position = glm::vec3( 0.5f,  0.5f, 0.0f), .texuv = glm::vec2(1.0f, 1.0f) }, // Top right
-		Vertex { .position = glm::vec3(-0.5f,  0.5f, 0.0f), .texuv = glm::vec2(0.0f, 1.0f) }, // Top left
+std::vector<Vertex> GeometryFactory::make_rectangle_vertices() noexcept {
+	return {
+		Vertex { .position = glm::vec3(0.0f, 0.0f, 0.0f), .texuv = glm::vec2(0.0f, 1.0f) }, // Bottom Left
+		Vertex { .position = glm::vec3(1.0f, 0.0f, 0.0f), .texuv = glm::vec2(1.0f, 1.0f) }, // Bottom Right
+		Vertex { .position = glm::vec3(1.0f, 1.0f, 0.0f), .texuv = glm::vec2(1.0f, 0.0f) }, // Top Right
+		Vertex { .position = glm::vec3(0.0f, 1.0f, 0.0f), .texuv = glm::vec2(0.0f, 0.0f) }, // Top Left
 	};
+}
 
-	std::vector<uint32> indices = {
-		// Front face
-		0, 1, 2,
-		0, 2, 3,
+std::vector<Vertex> GeometryFactory::make_triangle_vertices() noexcept {
+	return {
+		Vertex { .position = glm::vec3(1.0f, 1.0f, 0.0f), .texuv = glm::vec2(1.0f, 0.0f) }, // Bottom Right
+		Vertex { .position = glm::vec3(0.0f, 1.0f, 0.0f), .texuv = glm::vec2(0.0f, 0.0f) }, // Bottom Left
+		Vertex { .position = glm::vec3(0.5f, 0.0f, 0.0f), .texuv = glm::vec2(0.5f, 1.0f) }  // Middle
 	};
-
-	// Return created billboard
-	return new Billboard(vertices, indices); // The vao is made by mesh
 }

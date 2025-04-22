@@ -1,22 +1,28 @@
 #include "scarablib/gfx/3d/boundingbox.hpp"
 #include "scarablib/gfx/mesh.hpp"
 #include "scarablib/proper/error.hpp"
+#include "scarablib/proper/log.hpp"
 #include "scarablib/utils/string.hpp"
+#include <algorithm>
 #include <unordered_map>
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tinyobjloader/tiny_obj_loader.h>
 
-Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept
-		: indices_length(static_cast<GLsizei>(indices.size())) {
 
-	this->bundle.make_vao_with_manager(vertices, indices);
-
-	this->boxsize = BoundingBox::calculate_size_from_vertices(vertices);
-}
+// Used to convert vectors after loading model
+template <typename OUT, typename INP>
+std::vector<OUT> convert_to(const std::vector<INP>& indices) {
+	std::vector<OUT> output;
+	output.reserve(indices.size());
+	for(INP val : indices) {
+		output.push_back(static_cast<OUT>(val));
+	}
+	return output;
+};
 
 Mesh::Mesh(const std::vector<Vertex>& vertices) noexcept {
-	this->bundle.make_vao_with_manager(vertices, {});
+	this->bundle.make_vao_with_manager(vertices, std::vector<uint8> {});
 
 	// Is not indices, but will have a similar use
 	this->indices_length = static_cast<GLsizei>(vertices.size());
@@ -100,11 +106,30 @@ Mesh::Mesh(const char* path) {
 		}
 	}
 
-	this->boxsize = BoundingBox::calculate_size_from_vertices(vertices);
+	// I think this will never be the case
+	if(indices.empty()) {
+		throw ScarabError("Failed to load/parse (%s) file. Indices are empty", path);
+	}
 
+	this->boxsize = BoundingBox::calculate_size_from_vertices(vertices);
 	this->indices_length = static_cast<GLsizei>(indices.size());
 
-	this->bundle.make_vao_with_manager(vertices, indices);
+	// Check which indice type fits
+	// Then convert vector to that type and upload to VAO
+	const uint32 max_val = *std::max_element(indices.begin(), indices.end());
+	if(max_val <= UINT8_MAX) {
+		this->indices_type = GL_UNSIGNED_BYTE;
+		this->bundle.make_vao_with_manager(vertices, convert_to<uint8>(indices));
+
+	} else if(max_val <= UINT16_MAX) {
+		this->indices_type = GL_UNSIGNED_SHORT;
+		this->bundle.make_vao_with_manager(vertices, convert_to<uint16>(indices));
+
+	// Is uint32 or uint64, use existing indices
+	} else {
+		this->indices_type = GL_UNSIGNED_INT;
+		this->bundle.make_vao_with_manager(vertices, indices);
+	}
 
 	// Free memory
 	attrib.vertices.clear();

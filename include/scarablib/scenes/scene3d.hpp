@@ -15,6 +15,10 @@ class Scene3D : public IScene<Model> {
 		Scene3D(Scene3D&&) = delete;
 		Scene3D& operator=(Scene3D&&) = delete;
 
+		// Draw a single model.
+		// If model was added to the scene, it will be drawn twice
+		void draw(Model& model) const noexcept override;
+
 		// Draw all models added to the scene
 		void draw_all() const noexcept override;
 

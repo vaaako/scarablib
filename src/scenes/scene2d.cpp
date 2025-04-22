@@ -7,6 +7,11 @@
 Scene2D::Scene2D(Camera2D& camera) noexcept
 	: IScene(), camera(camera) {}
 
+
+void Scene2D::draw(Sprite& model) const noexcept {
+	model.draw(this->camera, *this->shader);
+}
+
 void Scene2D::draw_all() const noexcept {
 	// Cache shader and camera
 	Shader* shader   = this->shader;

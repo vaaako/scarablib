@@ -30,13 +30,13 @@ class VAOManager {
 		// If T is a vec3<float> it will make a VAO with only the position field.
 		// usage is an optional parameter, default is GL_STATIC_DRAW, you can pass GL_DYNAMIC_DRAW optionally
 		// WARNING: Use this method only one time per Mesh, since it keep track of how many Meshes are using the same VAO, and using it again will mess up the reference count
-		template<typename T>
-		GLuint get_or_make_vao(const std::vector<T>& vertices, const std::vector<uint32>& indices = {}, const GLenum usage = GL_STATIC_DRAW);
+		template<typename T, typename U>
+		GLuint get_or_make_vao(const std::vector<T>& vertices, const std::vector<U>& indices = {}, const GLenum usage = GL_STATIC_DRAW);
 
 		// Generate a new unique hash based on the vertices and indices.
 		// Indices is an optional parameter, you can pass an empty vector.
-		template<typename T>
-		size_t compute_hash(const std::vector<T>& vertices, const std::vector<uint32>& indices = {}) const noexcept;
+		template<typename T, typename U>
+		size_t compute_hash(const std::vector<T>& vertices, const std::vector<U>& indices = {}) const noexcept;
 
 		// Get the VAO's ID from its hash
 		GLuint get_vao(const size_t hash) const noexcept;
@@ -66,14 +66,21 @@ class VAOManager {
 
 		// Make the VAO, VBO and EBO.
 		// Indices is optional
-		template<typename T>
-		VAOManager::VAOData create_vao(const std::vector<T>& vertices, const std::vector<uint32>& indices, const GLenum usage) const;
+		template<typename T, typename U>
+		VAOManager::VAOData create_vao(const std::vector<T>& vertices, const std::vector<U>& indices, const GLenum usage) const;
 };
 
-template<typename T>
-GLuint VAOManager::get_or_make_vao(const std::vector<T>& vertices, const std::vector<uint32>& indices, const GLenum usage) {
+template<typename T, typename U>
+GLuint VAOManager::get_or_make_vao(const std::vector<T>& vertices, const std::vector<U>& indices, const GLenum usage) {
 	static_assert(std::is_same<T, vec3<float>>::value || std::is_same<T, Vertex>::value,
 			"Only vec3<float> and Vertex types for vertices are accepted");
+
+	static_assert(
+		std::is_same_v<U, uint32> ||
+		std::is_same_v<U, uint16> ||
+		std::is_same_v<U, uint8>,
+		"Only uint32, uint16 and uint8 types for indices are accepted");
+
 	if(vertices.empty()) {
 		throw ScarabError("Vertices vector is empty");
 	}
@@ -103,10 +110,16 @@ GLuint VAOManager::get_or_make_vao(const std::vector<T>& vertices, const std::ve
 }
 
 // Specialized hash function for better distribution
-template <typename T>
-size_t VAOManager::compute_hash(const std::vector<T>& vertices, const std::vector<uint32>& indices) const noexcept {
+template <typename T, typename U>
+size_t VAOManager::compute_hash(const std::vector<T>& vertices, const std::vector<U>& indices) const noexcept {
 	static_assert(std::is_same<T, vec3<float>>::value || std::is_same<T, Vertex>::value,
 			"Only vec3<float> and Vertex types for vertices are accepted");
+
+	static_assert(
+		std::is_same_v<U, uint32> ||
+		std::is_same_v<U, uint16> ||
+		std::is_same_v<U, uint8>,
+		"Only uint32, uint16 and uint8 types for indices are accepted");
 
 	// Use FNV-1a hash for better distribution
 	constexpr size_t FNV_PRIME = 1099511628211ULL;
@@ -118,7 +131,7 @@ size_t VAOManager::compute_hash(const std::vector<T>& vertices, const std::vecto
 	const auto* data = reinterpret_cast<const char*>(vertices.data());
 	const size_t vertex_bytes = vertices.size() * sizeof(T);
 	
-	for (size_t i = 0; i < vertex_bytes; i++) {
+	for(size_t i = 0; i < vertex_bytes; i++) {
 		hash ^= static_cast<size_t>(data[i]);
 		hash *= FNV_PRIME;
 	}
@@ -138,9 +151,10 @@ size_t VAOManager::compute_hash(const std::vector<T>& vertices, const std::vecto
 }
 
 
-template<typename T>
-VAOManager::VAOData VAOManager::create_vao(const std::vector<T>& vertices, const std::vector<uint32>& indices, const GLenum usage) const {
+template<typename T, typename U>
+VAOManager::VAOData VAOManager::create_vao(const std::vector<T>& vertices, const std::vector<U>& indices, const GLenum usage) const {
 	// dont need static assert here, since it was already checked in make_vao
+
 	VAOData data;
 
 	// Gen VAO
@@ -151,7 +165,7 @@ VAOManager::VAOData VAOManager::create_vao(const std::vector<T>& vertices, const
 	if(!indices.empty()) {
 		glGenBuffers(1, &data.ebo_id);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, data.ebo_id);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizei>(indices.size() * sizeof(uint32)), indices.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizei>(indices.size() * sizeof(U)), indices.data(), GL_STATIC_DRAW);
 	}
 
 	// Gen and bind VBO

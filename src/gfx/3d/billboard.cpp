@@ -1,13 +1,13 @@
 #include "scarablib/gfx/3d/billboard.hpp"
+#include "scarablib/gfx/geometry_factory.hpp"
 #include "scarablib/gfx/3d/model.hpp"
 #include "scarablib/proper/log.hpp"
 #include <algorithm>
 #include <cstddef>
 #include <cstdlib>
 
-
-Billboard::Billboard(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept
-	: Model(vertices, indices) {}
+Billboard::Billboard() noexcept
+	: Model(GeometryFactory::make_plane_vertices(), std::vector<uint8> { 0, 1, 2, 0, 2, 3 }) {}
 
 // Overrided from Mesh, so is needed to release the vao_mesh
 // This is overrided because if not, it wouldn't be possible to clean the textures
@@ -41,7 +41,7 @@ void Billboard::draw(const Camera& camera, const Shader& shader) noexcept {
 	shader.set_color("shapeColor", this->color);
 
 	this->texture->bind();
-	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(this->indices_length), GL_UNSIGNED_INT, (void*)0);
+	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(this->indices_length), GL_UNSIGNED_BYTE, (void*)0);
 	this->texture->unbind();
 }
 

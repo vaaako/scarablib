@@ -1,6 +1,7 @@
 #include "scarablib/gfx/3d/plane.hpp"
+#include "scarablib/gfx/geometry_factory.hpp"
 #include "scarablib/gfx/3d/model.hpp"
 
-Plane::Plane(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept
-	: Model(vertices, indices) {}
+Plane::Plane() noexcept
+	: Model(GeometryFactory::make_plane_vertices(), std::vector<uint8> { 0, 1, 2, 0, 2, 3 }) {}
 

@@ -4,10 +4,9 @@
 #include "scarablib/opengl/shader_manager.hpp"
 #include "scarablib/opengl/shaders.hpp"
 
-// Class for circle sprite
+// Represents an ellipse
 struct Circle : public Sprite {
-	// WARNING: Do not use this constructor, use SpriteFactory
-	Circle(const std::vector<Vertex>& vertices) noexcept;
+	Circle() noexcept;
 
 	void draw(const Camera2D& camera, const Shader& shader) noexcept override;
 

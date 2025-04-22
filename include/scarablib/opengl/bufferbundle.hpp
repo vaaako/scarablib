@@ -45,17 +45,17 @@ class BufferBundle {
 
 		// Creates the VAO and you are responsible for managing.
 		// Indices is an optional parameter, you can pass an empty vector.
-		void make_vao(const std::vector<Vertex>& vertices, std::vector<uint32>& indices) noexcept;
+		template <typename T>
+		void make_vao(const std::vector<Vertex>& vertices, std::vector<T>& indices) noexcept;
 
 		// Uses the VAO Manager to create the VAO.
 		// Vertices may be of type vec3<float> or Vertex.
 		// The VBO and EBO are managed by the VAO Manager.
 		// Indices is an optional parameter, you can pass an empty vector.
 		// WARNING: If you are using this method do not build the VBO and EBO yourself or use make_vao
-		template <typename T>
-		inline void make_vao_with_manager(const std::vector<T>& vertices, const std::vector<uint32>& indices) noexcept {
-			static_assert(std::is_same<T, vec3<float>>::value || std::is_same<T, Vertex>::value,
-					"Only vec3<float> and Vertex types for vertices are accepted");
+		template <typename T, typename U>
+		inline void make_vao_with_manager(const std::vector<T>& vertices, const std::vector<U>& indices) noexcept {
+			// Asserts are done inside VAOManager methods
 
 			this->vao_hash = VAOManager::get_instance().compute_hash(vertices, indices);
 			this->vao_id = VAOManager::get_instance().get_or_make_vao(
@@ -67,3 +67,38 @@ class BufferBundle {
 		size_t vao_hash = 0; // Only used for VAOManager
 		uint32 vao_id   = 0;
 };
+
+template <typename T>
+void BufferBundle::make_vao(const std::vector<Vertex>& vertices, std::vector<T>& indices) noexcept {
+	static_assert(
+		std::is_same_v<T, uint32> ||
+		std::is_same_v<T, uint16> ||
+		std::is_same_v<T, uint8>,
+		"Only uint32, uint16 and uint8 types for indices are accepted");
+
+	bool has_indices = !indices.empty();
+
+	glGenVertexArrays(1, &this->vao_id);
+	glBindVertexArray(this->vao_id);
+
+	if(has_indices) {
+		this->ebo = new EBO(indices);
+	}
+
+	// Make VBO
+	this->vbo =  new VBO();
+	this->vbo->bind();
+	this->vbo->alloc_data(vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
+
+	// Link Position and texuv
+	this->vbo->link_attrib(0, 3, sizeof(Vertex), 0);
+	this->vbo->link_attrib(1, 2, sizeof(Vertex), offsetof(Vertex, texuv));
+
+	// Unbind all
+	glBindVertexArray(0);
+	this->vbo->unbind();
+
+	if(has_indices) {
+		this->ebo->unbind();
+	}
+}

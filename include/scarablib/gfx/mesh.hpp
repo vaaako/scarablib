@@ -13,7 +13,8 @@ class Mesh {
 	public:
 		// Build Mesh using object's vertices and indices
 		// This is used for custom models
-		Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept;
+		template <typename T>
+		Mesh(const std::vector<Vertex>& vertices, const std::vector<T>& indices) noexcept;
 		// Build Mesh using only vertices.
 		// This is manly used for 2D Shapes. It will not make a collider
 		Mesh(const std::vector<Vertex>& vertices) noexcept;
@@ -27,6 +28,7 @@ class Mesh {
 			this->texture = (texture != nullptr) ? texture : &Texture::default_texture();
 		}
 
+		// Get texture currently in use
 		inline Texture& get_texture() const noexcept {
 			return *this->texture;
 		}
@@ -36,6 +38,7 @@ class Mesh {
 			this->texture = &Texture::default_texture();
 		}
 
+		// Get VAO bundle
 		inline BufferBundle& get_bundle() noexcept {
 			return this->bundle;
 		}
@@ -49,6 +52,7 @@ class Mesh {
 		// OpenGL
 		BufferBundle bundle;    // Bundle of VAO, VBO and EBO
 		GLsizei indices_length; // For drawing (in 2D this is not the indices size, but i dont know how to call it)
+		GLenum indices_type; // For drawing (not used for 2D shapes)
 
 		// Bounding box
 		// I wish this wasnt in this class, but i need vertices and dont want to store it, because is a waste of memory
@@ -59,3 +63,15 @@ class Mesh {
 		// This will always be a shared pointer to other texture
 		Texture* texture = &Texture::default_texture(); // Default texture
 };
+
+
+template <typename T>
+Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<T>& indices) noexcept
+	: indices_length(static_cast<GLsizei>(indices.size())),
+	  indices_type(
+		(std::is_same_v<T, uint32>) ? GL_UNSIGNED_INT :
+		(std::is_same_v<T, uint16>) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_BYTE) {
+
+	this->bundle.make_vao_with_manager(vertices, indices);
+	this->boxsize = BoundingBox::calculate_size_from_vertices(vertices);
+}

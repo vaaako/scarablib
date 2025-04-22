@@ -1,5 +1,6 @@
 #include "scarablib/gfx/2d/triangle.hpp"
+#include "scarablib/gfx/geometry_factory.hpp"
 
-Triangle::Triangle(const std::vector<Vertex>& vertices) noexcept
-	: Sprite(vertices) {}
+Triangle::Triangle() noexcept
+	: Sprite(GeometryFactory::make_triangle_vertices()) {}
 

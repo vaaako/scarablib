@@ -11,7 +11,6 @@
 #define M_PI2 6.283185307179586f
 
 // Class for billboard model
-// WARNING: Do not use this class directly, use ModelFactory::create_billboard()
 struct Billboard : public Model {
 	enum Direction : uint8 {
 		EAST,
@@ -29,8 +28,7 @@ struct Billboard : public Model {
 		EIGHT_SECTORS = 8
 	};
 
-	// WARNING: Do not use this constructor, use ModelFactory
-	Billboard(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept;
+	Billboard() noexcept;
 	// This is overrided because if not, it wouldn't be possible to clean the textures
 	~Billboard() noexcept override;
 

@@ -1,10 +1,10 @@
-#include "scarablib/gfx/2d/sprite_factory.hpp"
+#include "scarablib/gfx/2d/rectangle.hpp"
+#include "scarablib/gfx/3d/billboard.hpp"
 #include "scarablib/scenes/camera.hpp"
 #include "scarablib/scenes/camera2d.hpp"
 #include "scarablib/scenes/scene2d.hpp"
 #include "scarablib/scenes/scene3d.hpp"
 #include "scarablib/gfx/3d/cube.hpp"
-#include "scarablib/gfx/3d/model_factory.hpp"
 #include "scarablib/types/color.hpp"
 #include "scarablib/proper/log.hpp"
 #include "scarablib/gfx/skybox.hpp"
@@ -136,21 +136,21 @@ int main() {
 	scene3d.add_to_scene("cow", cow);
 
 	// Make shapecollision
-	Cube* cube = ModelFactory::create_cube();
+	Cube* cube = new Cube();
 	scene3d.add_to_scene("cube1", cube);
 	cube->set_position({ -10.0f, 1.0f, -10.0f }); // Cube position doesnt matter because will change later
 	cube->set_texture(&tex1);
 
-	Cube* cube2 = ModelFactory::create_cube();
+	Cube* cube2 = new Cube();
 	cube2->set_texture(&tex2);
 	scene3d.add_to_scene("cube2", cube2);
 
-	Cube* cube3 = ModelFactory::create_cube();
+	Cube* cube3 = new Cube();
 	cube3->set_texture(&tex3);
 	scene3d.add_to_scene("cube3", cube3);
 
 	// BUG: Memory leak somewhere in billboard class
-	Billboard* bill = ModelFactory::create_billboard();
+	Billboard* bill = new Billboard();
 	bill->set_position({ -5.0f, 1.0f, -10.0f });
 	bill->set_scale(vec4<float>(4.0f));
 	// Front-right and Right are unecessary since they are the same texture but flipped
@@ -169,12 +169,12 @@ int main() {
 	// testcube->set_position(cow->get_center_position());
 	// scene3d.add_to_scene("testcube", testcube);
 
-	Rectangle* sprite = SpriteFactory::create_rectangle();
-	sprite->set_position({ 10.0f, 10.0f });
-	sprite->set_size({ 100.0f, 100.0f });
-	sprite->set_color(Colors::PINK);
-	sprite->set_texture(&tex1);
-	scene2d.add_to_scene("rec", sprite);
+	// Rectangle* sprite = new Rectangle();
+	// sprite->set_position({ 10.0f, 10.0f });
+	// sprite->set_size({ 100.0f, 100.0f });
+	// sprite->set_color(Colors::PINK);
+	// sprite->set_texture(&tex1);
+	// scene2d.add_to_scene("rec", sprite);
 
 	LOG_INFO("Scene3d length %d", scene3d.length());
 
@@ -196,6 +196,9 @@ int main() {
 
 	float rotation = 0.0f;
 	float rotation_speed = 1.0f * DELTATIME_MODIFIER;
+
+
+	// window.enable_cullface(false);
 
 	// TODO: Bounding box collision not tested
 	while(window.is_open()) {
@@ -267,7 +270,7 @@ int main() {
 
 		// msgothic.draw_text("Hello world", { 10.0f, 10.0f });
 		// msgothic.draw_all(); // drop fps i think
-		scene2d.draw_all();
+		// scene2d.draw_all();
 
 		// Update rotation
 		rotation += rotation_speed * window.dt();

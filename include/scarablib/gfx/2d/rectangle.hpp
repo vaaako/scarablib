@@ -4,6 +4,5 @@
 
 // Class for rectangle sprite
 struct Rectangle : public Sprite {
-	// WARNING: Do not use this constructor, use SpriteFactory
-	Rectangle(const std::vector<Vertex>& vertices) noexcept;
+	Rectangle() noexcept;
 };

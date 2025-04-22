@@ -55,7 +55,7 @@ Skybox::Skybox(const Camera& camera, const std::vector<const char*>& faces) : ca
 		{  1.0f, -1.0f,  1.0f }
 	};
 
-	this->bundle.make_vao_with_manager(vertices, {});
+	this->bundle.make_vao_with_manager(vertices, std::vector<uint8> {});
 
 	// Gen texture cube map
 	glGenTextures(1, &this->texid);

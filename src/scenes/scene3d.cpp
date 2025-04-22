@@ -4,6 +4,11 @@
 Scene3D::Scene3D(Camera& camera) noexcept
 	: IScene(), camera(camera) {}
 
+
+void Scene3D::draw(Model& model) const noexcept {
+	model.draw(this->camera, *this->shader);
+}
+
 void Scene3D::draw_all() const noexcept {
 	// Cache shader and camera
 	Shader* shader = this->shader;

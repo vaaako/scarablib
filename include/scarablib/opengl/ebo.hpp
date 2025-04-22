@@ -12,6 +12,7 @@ class EBO {
 		// Make an EBO using a vector of indices
 		EBO(const std::vector<uint32>& indices) noexcept;
 		EBO(const std::vector<uint16>& indices) noexcept;
+		EBO(const std::vector<uint8>& indices) noexcept;
 		~EBO() noexcept;
 
 		// Disable copy and moving

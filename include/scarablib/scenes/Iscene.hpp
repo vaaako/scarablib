@@ -64,6 +64,10 @@ class IScene {
 		// Remove object by key
 		void remove_by_key(const std::string_view& key);
 
+		// Draw a single model.
+		// If model was added to the scene, it will be drawn twice
+		virtual void draw(T& model) const noexcept = 0;
+
 		// Draw all objects added to the scene
 		virtual void draw_all() const noexcept = 0;
 

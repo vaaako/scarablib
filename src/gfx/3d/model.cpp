@@ -1,8 +1,5 @@
 #include "scarablib/gfx/3d/model.hpp"
 
-Model::Model(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept
-	: Mesh(vertices, indices) {}
-
 Model::Model(const char* path) noexcept : Mesh(path) {}
 
 void Model::set_rotation(const float angle, const vec3<bool>& axis) noexcept {
@@ -65,6 +62,6 @@ void Model::draw(const Camera& camera, const Shader& shader) noexcept {
 	shader.set_matrix4f("mvp", (camera.get_proj_matrix() * camera.get_view_matrix()) * this->model);
 
 	this->texture->bind();
-	glDrawElements(GL_TRIANGLES, this->indices_length, GL_UNSIGNED_INT, (void*)0);
+	glDrawElements(GL_TRIANGLES, this->indices_length, this->indices_type, (void*)0);
 	this->texture->unbind();
 }

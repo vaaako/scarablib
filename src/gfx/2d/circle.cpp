@@ -1,7 +1,8 @@
 #include "scarablib/gfx/2d/circle.hpp"
+#include "scarablib/gfx/geometry_factory.hpp"
 
-Circle::Circle(const std::vector<Vertex>& vertices) noexcept
-	: Sprite(vertices) {}
+Circle::Circle() noexcept
+	: Sprite(GeometryFactory::make_rectangle_vertices()) {}
 
 void Circle::draw(const Camera2D& camera, const Shader& shader) noexcept {
 	this->update_model_matrix();

@@ -27,6 +27,11 @@ class Scene2D : public IScene<Sprite> {
 		Scene2D(Scene2D&&) = delete;
 		Scene2D& operator=(Scene2D&&) = delete;
 
+
+		// Draw a single model.
+		// If model was added to the scene, it will be drawn twice
+		void draw(Sprite& model) const noexcept override;
+
 		// Draw all models added to the scene
 		void draw_all() const noexcept override;
 

@@ -10,9 +10,10 @@
 class Camera {
 	public:
 		// Real camera's position.
-		// This is a public member for easy access.
 		// To move the camera using a unit vector, use Camera::move
 		vec3<float> position = vec3<float>(0.0f);
+		// Camera's sensitivity
+		float sensitivity;
 		// Horizontal rotation.
 		// To rotate camera using the mouse, use Camera::rotate
 		float yaw = -90.0f;
@@ -124,15 +125,6 @@ class Camera {
 			this->speed = speed / 10.0f;
 		}
 
-		// Set camera's position
-		inline void set_posiion(const vec3<float>& position) noexcept {
-			this->position = position;
-		}
-
-		inline void set_sensitivity(const float sensitivity) noexcept {
-			this->sensitivity = sensitivity;
-		}
-
 		// Changes the camera rotation using yaw and pitch angles.
 		// Yaw is horizontal rotation, Pitch is vertical
 		inline void set_rotation(const float yaw, const float pitch) noexcept {
@@ -171,7 +163,6 @@ class Camera {
 		uint32 width;
 		uint32 height;
 
-		float sensitivity;
 		float speed = 0.1f;
 
 		float fov;

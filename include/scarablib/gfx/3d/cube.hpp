@@ -4,6 +4,5 @@
 
 // Class for cube model
 struct Cube : public Model {
-	// WARNING: Do not use this constructor, use ModelFactory
-	Cube(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept;
+	Cube() noexcept;
 };

@@ -21,7 +21,8 @@ class Model : public Mesh {
 		// To make a model use ModelFactory.
 		// Init model using custom config and pre-defined VAO.
 		// Vertices and Indices will be used to gerate VBO and EBO in this VAO
-		Model(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) noexcept;
+		template <typename T>
+		Model(const std::vector<Vertex>& vertices, const std::vector<T>& indices) noexcept;
 		// Make a model using a wavefront .obj file
 		Model(const char* path) noexcept;
 
@@ -216,3 +217,7 @@ class Model : public Mesh {
 		void update_model_matrix() noexcept;
 };
 
+
+template <typename T>
+Model::Model(const std::vector<Vertex>& vertices, const std::vector<T>& indices) noexcept
+	: Mesh(vertices, indices) {}
