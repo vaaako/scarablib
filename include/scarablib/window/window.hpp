@@ -147,17 +147,43 @@ class Window {
 		// Enable or disable vertical sync (VSync).
 		// VSync synchronizes the frame rate with monitor's refresh rate.
 		// Disable it for potentially higher frame rates.
-		inline void set_vsync(const bool state) noexcept {
+		inline void set_vsync(const bool state) const noexcept {
 			if(SDL_GL_SetSwapInterval(state) < 0) {
 				LOG_ERROR("Failed to enable vsync: %s", SDL_GetError());
 			}
 		}
 
-		inline void enable_cullface(const bool state) noexcept {
+		// Sets the polygon drawing mode for both front and back faces.
+		// This makes 3D render more optimized but 2D rendering will not work
+		inline void set_cullface(const bool state) const noexcept {
 			if(state) {
 				glEnable(GL_CULL_FACE);
 			} else {
 				glDisable(GL_CULL_FACE);
+			}
+		}
+
+		// Sets the depth test to always pass.
+		// If false, sets to LEQUAL (default).
+		// This prevents 2D rendering from blending with 3D meshes.
+		// But 3D rendering will not work properly
+		inline void set_depthtest_always(const bool state) const noexcept {
+			if(state) {
+				glDepthFunc(GL_ALWAYS);
+			} else {
+				glDepthFunc(GL_LEQUAL);
+			}
+		}
+
+		// Disabled cull face and sets depth test to always pass.
+		// This makes 2D rendering more optimized accurate but 3D rendering will not work properly
+		inline void set_2dmode(const bool state) const noexcept {
+			if(state) {
+				glDisable(GL_CULL_FACE);
+				glDepthFunc(GL_ALWAYS);
+			} else {
+				glEnable(GL_CULL_FACE);
+				glDepthFunc(GL_LEQUAL);
 			}
 		}
 

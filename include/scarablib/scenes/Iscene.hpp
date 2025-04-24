@@ -4,110 +4,112 @@
 #include "scarablib/opengl/shader_manager.hpp"
 #include "scarablib/opengl/shaders.hpp"
 #include "scarablib/proper/error.hpp"
-#include "scarablib/utils/file.hpp"
 #include "scarablib/window/window.hpp"
 #include <algorithm>
+#include <memory>
 
 // Different modes of drawing shapes
-// `OUTLINEMODE` draws the outline of the shape
-// `FILLMODE` draws the shape as normal
+// - `OUTLINEMODE`: draws the outline of the shape
+// - `FILLMODE`: draws the shape as normal
 enum DrawMode : uint32 {
 	OUTLINEMODE = GL_LINE,
 	FILLMODE = GL_FILL
 };
 
-// Avoid foward declaration
-class Sprite;
-
 // Virtual class used to make Scene2D and Scene3D
-template <typename T>
+template <typename T> // NOTE: Mesh always default?
 class IScene {
-	// Only Sprite and Model are accepted
-	static_assert(std::is_same<T, Sprite>::value || std::is_same<T, Model>::value,
-			"Scene can only be instantiated with Sprite or Mesh");
-
 	public:
-		// Build scene object using the window object for viewport
+		// Build scene object using the window object for viewport.
 		IScene() noexcept;
-		virtual ~IScene() noexcept {
-			this->scene.clear();
-			this->vao_groups.clear();
-		}
+		virtual ~IScene() noexcept;
 
 		// Add a shape to the scene.
 		// Do not pass a pointer of a non allocated model or a temporary object.
-		// The poiter passed is transformed into a shared pointer, so it will be automatically deleted.
-		// Do not manually deleted or a double free will occur
+		// The pointer passed is transformed into a shared pointer, so it will be automatically deleted.
+		// Do not manually delete or a double free will occur
 		virtual void add_to_scene(const std::string_view& key, T* mesh);
 
 		// You are trying to pass a temporary object to the scene.
-		// Use the add_to_scene(const std::string_view& key, T* mesh) function
+		// Use the `add_to_scene(const std::string_view& key, T* mesh)` function
 		void add_to_scene(const std::string_view& key, T&& mesh);
 
-		// Get a object by key and dynamically convert it
+		// Returns an object by key and dynamically convert it.
 		template <typename U>
-		std::shared_ptr<U> get_by_key(const std::string_view& key) noexcept {
-			auto it = this->scene.find(key);
-			if(it == this->scene.end()) {
-				LOG_ERROR("Object '%s' is not added to the scene", key.data());
-				return nullptr;
-			}
-
-			auto casted_ptr = std::dynamic_pointer_cast<U>(it->second);
-			if(!casted_ptr) {
-				throw ScarabError("Failed to cast object with key '%s' to type", key.data());
-			}
-
-			return casted_ptr;
-		}
+		std::shared_ptr<U> get_by_key(const std::string_view& key) noexcept;
 
 		// Remove object by key
 		void remove_by_key(const std::string_view& key);
 
 		// Draw a single model.
-		// If model was added to the scene, it will be drawn twice
+		// If the model was added to the scene, it will be drawn twice
 		virtual void draw(T& model) const noexcept = 0;
 
 		// Draw all objects added to the scene
 		virtual void draw_all() const noexcept = 0;
 
-		// Update the scene viewport using the window object
+		// Update viewport using window object
 		virtual inline void update_viewport(const Window& window) noexcept = 0;
 
-		// Update the scene viewport using a custom width and height values
+		// Update viewport using custom width and height
 		virtual void update_viewport(const uint32 width, const uint32 height) noexcept = 0;
 
-		// Returns the default shader used by the scene
+		// Returns a reference to the scene's default shader.
 		inline Shader& get_shader() {
 			return *this->shader;
 		}
 
-		// Set drawmode to the following shapes
+		// Sets the polygon drawing mode for both front and back faces
 		inline void set_drawmode(const DrawMode drawmode) noexcept {
 			glPolygonMode(GL_FRONT_AND_BACK, drawmode);
 		}
 
-		// Get the number of objects in scene
+		// Returns the number of objects in the scene
 		inline uint64 length() noexcept {
 			return this->scene.size();
 		}
 
 	protected:
-		// Objects added to the scene
+		// Objects added to the scene, stored as shared pointers for automatic memory management.
 		std::unordered_map<std::string_view, std::shared_ptr<T>> scene;
-		// Use VAO as ID to track and batch draw meshes with the same VAO
+		// Use VAO as ID to track and batch draw meshes with the same VAO.
 		std::unordered_map<GLuint, std::vector<std::shared_ptr<T>>> vao_groups;
 
 		Shader* shader = ShaderManager::get_instance().get_or_load_shader(
-			"scene",
-			Shaders::DEFAULT_VERTEX,
-			Shaders::DEFAULT_FRAGMENT
-		);
+			"scene",                     // Shader name.
+			Shaders::DEFAULT_VERTEX,     // Default vertex shader source.
+			Shaders::DEFAULT_FRAGMENT    // Default fragment shader source.
+		);  // Pointer to the default shader used by the scene.
 };
 
 
 template <typename T>
 IScene<T>::IScene() noexcept {}
+
+template <typename T>
+IScene<T>::~IScene() noexcept {
+	this->scene.clear();
+	this->vao_groups.clear();
+}
+
+
+template <typename T>
+template <typename U>
+std::shared_ptr<U> IScene<T>::get_by_key(const std::string_view& key) noexcept {
+	auto it = this->scene.find(key);
+	if (it == this->scene.end()) {
+		LOG_ERROR("Object '%s' is not added to the scene", key.data());
+		return nullptr;
+	}
+
+	// Try to cast the object to the requested type
+	auto casted_ptr = std::dynamic_pointer_cast<U>(it->second);
+	if (!casted_ptr) {
+		throw ScarabError("Failed to cast object with key '%s' to type", key.data());
+	}
+
+	return casted_ptr;
+}
 
 template <typename T>
 void IScene<T>::remove_by_key(const std::string_view& key) {
@@ -120,8 +122,8 @@ void IScene<T>::remove_by_key(const std::string_view& key) {
 
 template <typename T>
 void IScene<T>::add_to_scene(const std::string_view& key, T* mesh) {
-	static_assert(std::is_same<T, Sprite>::value || std::is_same<T, Model>::value,
-			"Scene can only be instantiated with Sprite or Mesh");
+	static_assert(std::is_base_of<Mesh, T>::value,
+			"Scene can only be instantiated with Mesh");
 
 	if(!mesh) {
 		throw ScarabError("Attempted to add a null mesh to the scene with key '%s'", key.data());

@@ -13,6 +13,7 @@ class MouseHandler {
 	friend Window;
 
 	public:
+		// Mouse buttons
 		enum class Button : uint8 {
 			NONE  = 0,
 			LMB   = 1,
@@ -22,11 +23,13 @@ class MouseHandler {
 			SIDE2 = 5
 		};
 
+		// State of a button
 		enum class State : uint8 {
 			RELEASED,
 			PRESSED
 		};
 
+		// Scroll direction
 		enum class Scroll : uint8 {
 			NONE,
 			UP,
@@ -57,7 +60,7 @@ class MouseHandler {
 			return this->moved_dir;
 		}
 
-		// Returns the button last event
+		// Returns a button last event
 		inline MouseHandler::State get_last_event(const MouseHandler::Button button) const noexcept {
 			return this->buttonstate[static_cast<uint32>(button)];
 		}
@@ -69,27 +72,27 @@ class MouseHandler {
 			return mov;
 		}
 
-		// Check if button is clicking
+		// Checks if a button is clicking
 		inline bool isclick(const MouseHandler::Button button) const noexcept {
 			return this->buttonstate[static_cast<uint32>(button)] == MouseHandler::State::PRESSED;
 		}
 
-		// Check if button is up
+		// Checks if a button is released
 		inline bool isup(const MouseHandler::Button button) const noexcept {
 			return this->buttonstate[static_cast<uint32>(button)] == MouseHandler::State::RELEASED;
 		}
 
-		// Get the state of a key
+		// Checks the state of a button
 		inline MouseHandler::State get_keystate(const MouseHandler::Button button) const {
 			return this->buttonstate[static_cast<uint32>(button)];
 		}
 
-		// Change the state of a key
+		// Changes the state of a button
 		inline void set_keystate(const MouseHandler::Button button, const MouseHandler::State state) noexcept {
 			this->buttonstate[static_cast<uint32>(button)] = state;
 		}
 
-		// Change cursor position in window
+		// Changes cursor position in window
 		void set_cursor_position(const Window& window, const uint32 x, const uint32 y) noexcept;
 
 	private:
@@ -106,7 +109,7 @@ class MouseHandler {
 		Scroll scroll = Scroll::NONE;
 
 		// Store all actions in frame to handle later
-		//
+
 		// Click position  (X: 0 -> width / Y: 0 -> height)
 		vec2<uint32> click_pos;
 		// Motion position (X: 0 -> width / Y: 0 -> height)

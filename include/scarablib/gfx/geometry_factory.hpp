@@ -2,6 +2,7 @@
 
 #include "scarablib/types/vertex.hpp"
 
+// Functions that returns the vertices for different geometries
 namespace GeometryFactory {
 	// Returns the vertices for all faces of a cube
 	std::vector<Vertex> make_cube_vertices() noexcept;

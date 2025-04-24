@@ -11,42 +11,39 @@
 #endif
 
 // This is a class that handles the creation and management of unique Vertex Array Objects (VAO).
-// This class prevents duplicate VAOs from being created (duplicate vertices and indices).
-// It is used a get_instance approach so it can be easily accessed from anywhere
+// This class prevents duplicate VAOs from being created
 class VAOManager {
 	public:
-		// Get the instance of the VAOManager so is possible to use it's methods
+		// Get the singleton instance of the VAOManager reference
 		static VAOManager& get_instance() {
 			static VAOManager instance;
 			return instance;
 		}
 
-		// Check if the vertices and indices alredy has a VAO.
-		// Indices is an optional parameter, you can pass an empty vector.
-		// This will make a unique hash based on the vertices and indices.
-		// If has is not found in the map, it will create a new VAO and an entry.
-		// At the end, it will return the VAO's ID.
-		// If T is Vertex it will make a VAO will all Vertex fields.
-		// If T is a vec3<float> it will make a VAO with only the position field.
-		// usage is an optional parameter, default is GL_STATIC_DRAW, you can pass GL_DYNAMIC_DRAW optionally
-		// WARNING: Use this method only one time per Mesh, since it keep track of how many Meshes are using the same VAO, and using it again will mess up the reference count
+		// Retrieves or creates a VAO for the given vertices and indices.
+		// - `vertices`: The vertex data. Uses all vertex fields if T is Vertex, or only position if T is vec3<float>.
+		// - `indices`: (Optional) The index data. Can be an empty vector.
+		// - `usage`: (Optional) The buffer usage (e.g., GL_STATIC_DRAW, GL_DYNAMIC_DRAW). Default is GL_STATIC_DRAW.
+		// Returns: The ID of the VAO. Creates a new VAO if one doesn't exist
 		template<typename T, typename U>
 		GLuint get_or_make_vao(const std::vector<T>& vertices, const std::vector<U>& indices = {}, const GLenum usage = GL_STATIC_DRAW);
 
-		// Generate a new unique hash based on the vertices and indices.
-		// Indices is an optional parameter, you can pass an empty vector.
+		// Computes a unique hash based on the provided vertices and indices.
+		// This hash should be created and stored before making the VAO. So it's possible to delete it.
+		// - `vertices`: The vertex data.
+		// - `indices`: (Optional) The index data.
+		// Returns: A unique size_t hash
 		template<typename T, typename U>
 		size_t compute_hash(const std::vector<T>& vertices, const std::vector<U>& indices = {}) const noexcept;
 
-		// Get the VAO's ID from its hash
+		// Returns a VAO's ID by its hash
 		GLuint get_vao(const size_t hash) const noexcept;
 
-		// Remove a VAO from the map.
-		// The method will check if any other model is using the VAO and then release
+		// Releases a VAO from the manager, using its hash.
 		void release_vao(const size_t hash) noexcept;
 
-		// Clean up all VAOs.
-		// WARNING: This is called when a window is destroyed, don't call it manually
+		// Cleans up all VAOs.
+		// WARNING: This is called when a window is destroyed. DO NOT call it manually
 		void cleanup() noexcept;
 	private:
 		struct VAOData {

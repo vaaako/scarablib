@@ -4,15 +4,12 @@
 #include <vector>
 #include "scarablib/typedef.hpp"
 
-// OpenGL Element Array Buffer wrapped object.
-// This class handles the creation and management of an Element Buffer Object (EBO),
-// which is used to specify indices for drawing elements in OpenGL.
+// OpenGL Element Array Buffer object
 class EBO {
 	public:
 		// Make an EBO using a vector of indices
-		EBO(const std::vector<uint32>& indices) noexcept;
-		EBO(const std::vector<uint16>& indices) noexcept;
-		EBO(const std::vector<uint8>& indices) noexcept;
+		template <typename T>
+		EBO(const std::vector<T>& indices) noexcept;
 		~EBO() noexcept;
 
 		// Disable copy and moving
@@ -21,11 +18,12 @@ class EBO {
 		EBO(EBO&&) noexcept = delete;
 		EBO& operator=(EBO&&) noexcept = delete;
 
+		// Activates the EBO in the OpenGL context
 		inline void bind() const noexcept {
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->id);
 		}
 
-		// This effectively disables the EBO
+		// Disabled the EBO in the OpenGL context
 		inline void unbind() const noexcept {
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		}
@@ -34,3 +32,15 @@ class EBO {
 		GLuint id;
 };
 
+template <typename T>
+EBO::EBO(const std::vector<T>& indices) noexcept {
+	static_assert(
+		std::is_same_v<T, uint32> ||
+		std::is_same_v<T, uint16> ||
+		std::is_same_v<T, uint8>,
+		"Only uint32, uint16 and uint8 types for indices are accepted");
+
+	glGenBuffers(1, &this->id);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->id);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizei>(indices.size() * sizeof(uint32)), indices.data(), GL_STATIC_DRAW);
+}

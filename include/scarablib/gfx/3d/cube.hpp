@@ -2,7 +2,7 @@
 
 #include "scarablib/gfx/3d/model.hpp"
 
-// Class for cube model
+// Cube model object
 struct Cube : public Model {
 	Cube() noexcept;
 };

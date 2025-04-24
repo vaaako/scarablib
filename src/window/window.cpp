@@ -77,11 +77,11 @@ Window::Window(const Window::Config& config)
 	glEnable(GL_DEPTH_TEST);
 
 	// 2D and Skybox support with depth test
-	// glDepthFunc(GL_ALWAYS);
+	// glDepthFunc(GL_ALWAYS); // This makes 2D not blend in 3D meshes
 	glDepthFunc(GL_LEQUAL);
 
 	// Cull Face
-	glEnable(GL_CULL_FACE);
+	// glEnable(GL_CULL_FACE); // Disabled by default
 
 	// SDL Configurations
 	SDL_SetWindowResizable(this->window, (SDL_bool)config.resizable);

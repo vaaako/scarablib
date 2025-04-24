@@ -1,7 +1,7 @@
 #pragma once
 
-#include "scarablib/scenes/camera.hpp"
 #include "scarablib/scenes/Iscene.hpp"
+#include "scarablib/scenes/camera.hpp"
 
 // Scene object used for managing 3D objects
 class Scene3D : public IScene<Model> {
@@ -16,34 +16,24 @@ class Scene3D : public IScene<Model> {
 		Scene3D& operator=(Scene3D&&) = delete;
 
 		// Draw a single model.
-		// If model was added to the scene, it will be drawn twice
+		// If the model was added to the scene, it will be drawn twice
 		void draw(Model& model) const noexcept override;
 
-		// Draw all models added to the scene
+		// Draw all objects added to the scene
 		void draw_all() const noexcept override;
 
-		// If enabled it will draw the collision of every model.
-		// You can also enable for invidual models
-		inline void draw_all_collider(const bool draw) noexcept {
-			this->draw_every_box = draw;
-		}
-
-		// Update the scene viewport using the window object
+		// Update viewport using window object
 		inline void update_viewport(const Window& window) noexcept override {
 			this->camera.update_viewport(window);
 		}
 
-		// Update the scene viewport using a custom width and height values
+		// Update viewport using custom width and height
 		inline void update_viewport(const uint32 width, const uint32 height) noexcept override {
 			this->camera.update_viewport(width, height);
 		}
 
 
 	private:
-		// Check to draw all colliders
-		bool draw_every_box = false;
-
-		// Reference to camera, to change viewport
 		Camera& camera;
 };
 

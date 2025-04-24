@@ -117,7 +117,7 @@ struct Color {
 		);
 	}
 
-	// Darken the current color using a value
+	// Darks the current color using a value
 	inline constexpr Color darken(const float factor) const noexcept {
 		return Color(
 			static_cast<uint8_t>(this->red   * factor),
@@ -127,7 +127,7 @@ struct Color {
 		);
 	}
 
-	// Lighten the current color using a value
+	// Lights the current color using a value
 	inline constexpr Color lighten(const float factor) const noexcept {
 		return Color(
 			static_cast<uint8_t>(this->red   + (255 - this->red)   * factor),

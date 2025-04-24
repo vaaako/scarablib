@@ -1,13 +1,10 @@
 #include "scarablib/gfx/skybox.hpp"
-#include "scarablib/opengl/vbo.hpp"
 #include "scarablib/proper/error.hpp"
 #include "scarablib/typedef.hpp"
 #include "scarablib/types/image.hpp"
 
-Skybox::Skybox(const Camera& camera, const std::vector<const char*>& faces) : camera(camera) {
-	if(faces.size() != 6) {
-		throw ScarabError("Skybox needs 6 faces in the following order: right, left, top, bottom, front and back");
-	}
+Skybox::Skybox(const Camera& camera, const std::array<const char*, 6>& faces)
+	: camera(camera) {
 
 	// All cube faces
 	// NOTE: Dont make static since a skybox will created only one or two times, so its a waste of memory
@@ -62,9 +59,10 @@ Skybox::Skybox(const Camera& camera, const std::vector<const char*>& faces) : ca
 	glBindTexture(GL_TEXTURE_CUBE_MAP, this->texid);
 
 	for(uint16 i = 0; i < 6; i++) {
-		Image* image = new Image(faces.at(i), true); // why when i set this to false the skybox bugs? (true actually makes the textures NOT flip on load, see image.cpp)
+		// why when i set this to false the skybox bugs? (true actually makes the textures NOT flip on load, see image.cpp)
+		Image* image = new Image(faces.at(i), true);
 		if(image->data == nullptr) {
-			throw ScarabError("Image (%s) was not found", image->path);
+			throw ScarabError("Image (%s) in skybox was not found", image->path);
 		}
 
 		// Order: Right > Left > Top > Bottom > Back > Front
@@ -92,6 +90,7 @@ void Skybox::draw() noexcept {
 
 	this->shader->use();
 	glBindTexture(GL_TEXTURE_CUBE_MAP, this->texid);
+
 	this->shader->set_matrix4f("view", glm::mat3(camera.get_view_matrix())); // Conversion: Remove translation
 	this->shader->set_matrix4f("proj", camera.get_proj_matrix());
 

@@ -4,21 +4,12 @@
 
 // Namespace with methods used for logging
 namespace Log {
+	// Returns date formatteed as YYYY-MM-DD
 	std::string get_date() noexcept;
+	// Returns time formatted as HH:MM:SS
 	std::string get_time() noexcept;
+	// Returns date and time formatted as YYYY-MM-DD HH:MM:SS
 	std::string get_date_and_time() noexcept;
-
-	// Simplest log, just print a message
-	// void log(const char* fmt, ...);
-
-
-	// I wanted to mnake (const char* fmt, const char* level, ...) but i cant (it will get an error)
-
-	// Log with flag
-	// void log(const char* level, const char* fmt, ...);
-
-	// Log with time
-	// void log_time(const char* level, const char* fmt, ...);
 
 	// Implementation
 	void log_impl(const char* level, const char* func, bool include_time, const char* fmt, ...) noexcept;

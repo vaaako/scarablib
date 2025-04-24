@@ -1,5 +1,4 @@
 #include "scarablib/input/mouse.hpp"
-#include "scarablib/proper/log.hpp"
 #include "scarablib/window/window.hpp"
 
 void MouseHandler::handle_event(const SDL_Event& event) noexcept {
@@ -13,9 +12,9 @@ void MouseHandler::handle_event(const SDL_Event& event) noexcept {
 		// Click location
 		this->click_pos = { button.x, button.y };
 
-		#ifdef SCARAB_DEBUG_MOUSE
-		LOG_DEBUG("Mouse Down: Button %d at (%d, %d)", button.button, button.x, button.y);
-		#endif
+		// #ifdef SCARAB_DEBUG_MOUSE
+		// LOG_DEBUG("Mouse Down: Button %d at (%d, %d)", button.button, button.x, button.y);
+		// #endif
 
 	} else if(event.type == SDL_MOUSEBUTTONUP) {
 		// Reset button down
@@ -31,10 +30,10 @@ void MouseHandler::handle_event(const SDL_Event& event) noexcept {
 		this->motion = { motion.x, motion.y };
 		this->moved_dir = { event.motion.xrel, event.motion.yrel };
 
-		#ifdef SCARAB_DEBUG_MOUSE_MOTION
-		std::printf("Mouse Motion: %i : %i\n", event.motion.x, event.motion.y);
-		std::printf("Mouse dir: %i : %i\n", event.motion.xrel, event.motion.yrel);
-		#endif
+		// #ifdef SCARAB_DEBUG_MOUSE_MOTION
+		// std::printf("Mouse Motion: %i : %i\n", event.motion.x, event.motion.y);
+		// std::printf("Mouse dir: %i : %i\n", event.motion.xrel, event.motion.yrel);
+		// #endif
 	}
 
 

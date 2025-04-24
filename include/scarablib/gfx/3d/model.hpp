@@ -1,11 +1,9 @@
 #pragma once
 
 #include <GL/glew.h>
-#include <cassert>
 #include "scarablib/gfx/3d/boundingbox.hpp"
 #include "scarablib/gfx/mesh.hpp"
 #include "scarablib/opengl/shader.hpp"
-#include "scarablib/proper/log.hpp"
 #include "scarablib/scenes/camera.hpp"
 #include "scarablib/typedef.hpp"
 #include "scarablib/types/vertex.hpp"
@@ -31,40 +29,15 @@ class Model : public Mesh {
 		// 	return Model(*this);
 		// }
 
-		// Draw current Model.
-		// It needs a camera object and a shader
+		// Draws current Model
 		virtual void draw(const Camera& camera, const Shader& shader) noexcept;
-
-
-
-		// This returns nullptr since by default is used shader is located in Scene3D.
-		// This is a method that is overrided by models using a different shader.
-		// Scene3D then checks if the shader is nullptr and if it is, it uses the default shader
-		virtual inline Shader* get_shader() const noexcept {
-			return nullptr;
-		}
-
-		// Returns current X position
-		inline float get_x() const noexcept {
-			return this->position.x;
-		}
-
-		// Returns current Y position
-		inline float get_y() const noexcept {
-			return this->position.y;
-		}
-
-		// Returns current Z position
-		inline float get_z() const noexcept {
-			return this->position.z;
-		}
 
 		// Returns current position
 		inline vec3<float> get_position() const noexcept {
 			return this->position;
 		}
 
-		// Returns current scale of each axis
+		// Returns current scale
 		inline vec3<float> get_scale() const noexcept {
 			return this->scale;
 		}
@@ -79,77 +52,76 @@ class Model : public Mesh {
 			return this->angle;
 		}
 
-		// Returns the model bounding box
-		inline const BoundingBox& get_bounding_box() const noexcept {
-			return this->bbox;
-		}
-
 		// SETTERS //
 
-		// Draw the bounding box of the model
+		// Draws the bounding box of the model.
+		// If the bounding box is in world origin (0, 0, 0) you need to call `set_transform()`
 		void draw_collider(const Camera& camera, const Color& color = Colors::RED, const bool stripped = false) noexcept;
 
-		// Apply the transformations of the model until this moment.
-		// This is one time only, for dynamic transformation use `set_dynamic_transform(bool)`.
-		// If any calculation is made with the bounding box but
-		// `set_transform` was not called, the calculation will be wrong.
-		// This is used to apply initial transformations into a model
+		// Applies the model's transformations to the bounding box.
+		// For dynamic transformations, use `set_dynamic_transform(bool)`.
+		// Important: Call this *before* any bounding box calculations, otherwise, results will be incorrect.
 		void set_transform() {
 			this->update_model_matrix(); // Needs updated matrix
 			this->bbox.update_world_bounds(this->model);
 		}
 
-		// Set the bounding box to be recalculated when necessary.
-		// This is usefull for dynamic models
+		// Sets whether the bounding box should be dynamically recalculated
 		void set_dynamic_transform(const bool value) noexcept {
 			this->dynamic_bounding = value;
 			this->set_transform(); // Just in case
 		}
 
-		// Set a new position using a vector
+		// Sets a new position using a 3D vector
 		inline void set_position(const vec3<float>& position) noexcept {
 			this->position = position;
 			this->isdirty = true;
 		}
 
-		// Set a new X position
+		// Sets a new X position
 		inline void set_x(const float newx) noexcept {
 			this->position.x = newx;
 			this->isdirty = true;
 		}
 
-		// Set a new Y position
+		// Sets a new Y position
 		inline void set_y(const float newy) noexcept {
 			this->position.y = newy;
 			this->isdirty = true;
 		}
 
-		// Set a new Z position
+		// Sets a new Z position
 		inline void set_z(const float newz) noexcept {
 			this->position.z = newz;
 			this->isdirty = true;
 		}
 
-		// Scale the shape using a different value for each axis.
-		// e.g., `size.x = size.x * scale.x`, `size.y = size.y * scale.y` and `size.z = size.z * scale.z`
+		// Moves the sprite using a 3D vector
+		inline void move(const vec3<float>& offset) noexcept {
+			this->position += offset;
+			this->isdirty = true;
+		}
+
+		// Sets a new scale using a 3D vector
 		inline void set_scale(const vec3<float>& scale) noexcept {
 			this->scale = scale;
 			this->isdirty = true;
 		}
 
-		// Set a new color.
-		// If using a texture and a color at the same time, the texture will be colorized using the color defined
+		// Sets a new color.
+		// New color affects texture color if a texture is in use
 		inline void set_color(const Color& color) noexcept {
 			this->color = color;
 		}
 
-		// Set a new rotation angle in degrees.
-		// Axis is wich axis the angle will be applied (XYZ)
+		// Sets a new rotation angle.
+		// - `angle`: should be in degrees
+		// - `axis`: which axis the angle will be applied (x, y, z)
 		void set_rotation(const float angle, const vec3<bool>& axis) noexcept;
 
-		// Set a new orientation to the Model in degrees.
-		// Orientation is the "default" angle of the Model.
-		// The rotation will be applied using the orientation as base
+		// Sets a new orientation to the model.
+		// - `angle`: should be in degrees
+		// - `axis`: which axis the orientation will be applied (x, y, z)
 		void set_orientation(const float angle, const vec3<bool>& axis) noexcept;
 
 	protected:

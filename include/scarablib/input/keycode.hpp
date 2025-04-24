@@ -25,6 +25,7 @@
 
 #pragma once
 
+// Enum for all keys
 enum class Keycode : unsigned int {
 	UNKNOWN = 0,
 

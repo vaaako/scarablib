@@ -9,21 +9,17 @@
 
 class Camera {
 	public:
-		// Real camera's position.
-		// To move the camera using a unit vector, use Camera::move
+		// Camera's position.
+		// To move the camera using a unit vector, use `Camera::move(const vec3<float>& dir, const float dt)`
 		vec3<float> position = vec3<float>(0.0f);
 		// Camera's sensitivity
 		float sensitivity;
 		// Horizontal rotation.
-		// To rotate camera using the mouse, use Camera::rotate
+		// To rotate camera using the mouse, use `Camera::rotate(const MouseHandler& mouse)`
 		float yaw = -90.0f;
 		// Vertical rotation
-		// To rotate camera using the mouse, use Camera::rotate
+		// To rotate camera using the mouse, use `Camera::rotate(const MouseHandler& mouse)`
 		float pitch = 0.0f;
-		// Camera's projection width
-		uint32 width;
-		// Camera's projection height
-		uint32 height;
 
 		enum Zoom : bool {
 			OUT,
@@ -44,17 +40,17 @@ class Camera {
 			return this->proj;
 		}
 
-		// Retuns camera's unit direction vector
+		// Retuns camera unit direction vector
 		inline vec3<float> get_forward() const noexcept {
 			return this->forward;
 		}
 
-		// Returns camera's unit up vector
+		// Returns camera unit up vector
 		inline vec3<float> get_up() const noexcept {
 			return this->up;
 		}
 
-		// Returns camera's current fov
+		// Returns camera current fov
 		inline float get_fov() const noexcept {
 			return this->fov;
 		}
@@ -68,19 +64,21 @@ class Camera {
 			return this->far_plane;
 		}
 
-		// SETTERS
+		// SETTERS //
+
+		// Update viewport using window object
 		inline void update_viewport(const Window& window) noexcept {
 			this->update_viewport(window.get_width(), window.get_height());
 		}
 
+		// Update viewport using custom width and height
 		inline void update_viewport(const uint32 width, const uint32 height) noexcept {
 			this->width = width;
 			this->height = height;
-			// Opengl update
-			this->update_proj_matrix();
+			this->update_proj_matrix(); // OpenGL viewport update
 		}
 
-		// Set camera's near plane. How near to render
+		// Sets camera near plane. How near to render
 		inline void set_near_plane(const float near_plane) noexcept {
 			if(near_plane > this->far_plane) {
 				LOG_ERROR("new \"near plane\" value can't be higher than \"far plane\" current value");
@@ -91,11 +89,7 @@ class Camera {
 			this->update_proj_matrix();
 		}
 
-		// Legacy OpenGL is used for debug draw and basic rendering.
-		// This update the view and projection matrices for drawing with legacy OpenGL
-		void update_legacy_view_projection() const noexcept;
-
-		// Set camera's far plane. How far to render
+		// Sets camera far plane. How far to render
 		inline void set_far_plane(const float far_plane) noexcept {
 			if(far_plane < this->near_plane) {
 				LOG_ERROR("new \"far plane\" value can't be lower than \"near plane\" current value");
@@ -106,7 +100,7 @@ class Camera {
 			this->update_proj_matrix();
 		}
 
-		// Set camera's fov
+		// Sets camera fov
 		inline void set_fov(const float fov) noexcept {
 			if(fov < this->near_plane || fov > this->far_plane) {
 				LOG_ERROR("new \"fov\" value must be between \"near plane\" and \"far plane\" current values");
@@ -117,7 +111,7 @@ class Camera {
 			this->update_proj_matrix();
 		}
 
-		// Set camera's minimum amount of fov (used for zoom out)
+		// Sets minimum amount of fov. Used for zoom out
 		inline void set_min_fov(const float min_fov) noexcept {
 			if(min_fov < this->max_fov) {
 				LOG_ERROR("new \"min fov\" value can't be higher than \"max fov\" current value");
@@ -127,7 +121,7 @@ class Camera {
 			this->min_fov = min_fov;
 		}
 
-		// Set camera's maximum amount of fov (used for zoom in)
+		// Sets maximum amount of fov. Used for zoom in
 		inline void set_max_fov(const float max_fov) noexcept {
 			if(max_fov < this->min_fov) {
 				LOG_ERROR("new \"max fov\" value can't be lower than \"min fov\" current value");
@@ -138,7 +132,6 @@ class Camera {
 		}
 
 		// Zoom in or out the camera using an speed value
-		// Use Camera::Zoom::IN or Camera::Zoom::OUT
 		inline void zoom(const float speed, const Camera::Zoom zoom_dir) noexcept {
 			this->fov = (zoom_dir == Zoom::IN)
 				? std::max(fov - speed, min_fov)
@@ -147,7 +140,7 @@ class Camera {
 			this->update_proj_matrix();
 		}
 
-		// Set camera's movement speed
+		// Sets camera movement speed
 		inline void set_speed(const float speed) noexcept {
 			this->speed = speed / 10.0f;
 		}
@@ -165,7 +158,7 @@ class Camera {
 
 		// MOVEMENT
 
-		// Move the camera using a unit vector.
+		// Moves the camera using a unit vector.
 		// Where X is front/back, Y is up/down and Z is left/right.
 		// Example: [1, 0, -1] means the camera moved to Front-Left
 		void move(const vec3<float>& dir, const float dt) noexcept;
@@ -173,6 +166,7 @@ class Camera {
 		// Use mouse moved direction to rotate the camera
 		void rotate(const MouseHandler& mouse) noexcept;
 
+		// Returns a string with the cardinal direction the camera is facing based on its yaw
 		static std::string get_cardinal_direction(const float yaw) {
 			// Define the cardinal directions
 			static std::vector<std::string> directions = {
@@ -182,11 +176,13 @@ class Camera {
 
 			// Determine the sector index
 			size_t sector = static_cast<size_t>((yaw + 45.0f / 2.0f) / 45.0f) % 8;
-
 			return directions[sector];
 		}
 
 	private:
+		uint32 width;
+		uint32 height;
+
 		float speed = 0.1f;
 
 		float fov;
@@ -199,7 +195,6 @@ class Camera {
 		// Movement
 		// bool firstclick = true;
 		// -90 in yaw prevents camera from jumping on the first click
-
 
 		vec3<float> up          = { 0.0f, 1.0f,  0.0f };
 		vec3<float> forward     = { 0.0f, 0.0f, -1.0f };

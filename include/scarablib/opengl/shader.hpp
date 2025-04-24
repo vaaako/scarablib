@@ -7,9 +7,9 @@
 #include "scarablib/typedef.hpp"
 #include "scarablib/types/color.hpp"
 
-// OpenGL shader struct
+// OpenGL shader object
 struct Shader {
-		// Construct a shader using vertex and fragment shaders content
+		// Construct a shader using vertex and fragment shaders code
 		Shader(const char* vertex_source, const char* fragment_source);
 		~Shader() noexcept;
 
@@ -19,17 +19,17 @@ struct Shader {
 		Shader(Shader&&) noexcept = delete;
 		Shader& operator=(Shader&&) noexcept = delete;
 
-		// Get shader's ID
+		// Returns shader ID
 		inline GLuint get_id() const noexcept {
 			return this->id;
 		}
 
-		// Enable shader
+		// Enable shader program
 		inline void use() const noexcept {
 			glUseProgram(this->id);
 		}
 
-		// Unbind shader program
+		// Disable shader program
 		inline void unbind() const noexcept {
 			glUseProgram(0);
 		}

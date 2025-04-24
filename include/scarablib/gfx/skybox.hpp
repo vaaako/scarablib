@@ -5,21 +5,20 @@
 #include "scarablib/opengl/shaders.hpp"
 #include "scarablib/scenes/camera.hpp"
 #include "scarablib/typedef.hpp"
-#include <vector>
 
 struct Skybox {
 	// Uses a vector of 6 image paths as faces.
 	// The order must be the following: Right, Left, Top, Bottom, Back and Front
-	Skybox(const Camera& camera, const std::vector<const char*>& faces);
+	Skybox(const Camera& camera, const std::array<const char*, 6>& faces);
 	~Skybox() noexcept = default;
 
 	void draw() noexcept;
 
 	private:
-		uint32 texid;
 		const Camera& camera;
 
 		BufferBundle bundle;
+		uint32 texid;
 
 		Shader* shader = ShaderManager::get_instance().get_or_load_shader(
 			"skybox",

@@ -172,12 +172,12 @@ int main() {
 	// testcube->set_position(cow->get_center_position());
 	// scene3d.add_to_scene("testcube", testcube);
 
-	// Rectangle* sprite = new Rectangle();
-	// sprite->set_position({ 10.0f, 10.0f });
-	// sprite->set_size({ 100.0f, 100.0f });
-	// sprite->set_color(Colors::PINK);
-	// sprite->set_texture(&tex1);
-	// scene2d.add_to_scene("rec", sprite);
+	Rectangle* sprite = new Rectangle();
+	sprite->set_position({ 10.0f, 10.0f });
+	sprite->set_size({ 100.0f, 100.0f });
+	sprite->set_color(Colors::PINK);
+	sprite->set_texture(&tex1);
+	scene2d.add_to_scene("rec", sprite);
 
 	LOG_INFO("Scene3d length %d", scene3d.length());
 
@@ -201,7 +201,7 @@ int main() {
 	float rotation_speed = 1.0f * DELTATIME_MODIFIER;
 
 
-	// window.enable_cullface(false);
+	window.set_cullface(false);
 
 	// TODO: Bounding box collision not tested
 	while(window.is_open()) {
@@ -275,7 +275,7 @@ int main() {
 
 		// msgothic.draw_text("Hello world", { 10.0f, 10.0f });
 		// msgothic.draw_all(); // drop fps i think
-		// scene2d.draw_all();
+		scene2d.draw_all();
 
 		// Update rotation
 		rotation += rotation_speed * window.dt();

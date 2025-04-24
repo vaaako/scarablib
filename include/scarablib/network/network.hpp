@@ -50,8 +50,8 @@ class Network {
 			size_t data_size;
 
 			// Automatically allocates data for packet.
-			// `data` is a pointer to the data. (this will be copied and allocated to the packet)
-			// `data_size` is the size of this data (use sizeof)
+			// - `data`: is a pointer to the data. (this will be copied and allocated to the packet)
+			// - `data_size`: is the size of this data (use sizeof)
 			Packet(const void* data, const size_t data_size);
 
 			// Delete packet
@@ -87,11 +87,11 @@ class Network {
 
 		// Try to connect to a server.
 		// If failed return false, return true otherwise.
-		// `timeout_ms` (5ms default) is the time in milliseconds to wait for the connection attempt to succeed
+		// `timeout_ms` (5ms default) time in milliseconds to wait for the connection attempt to succeed
 		Result connect_to_server(const char* ipaddress, const uint16 port, const uint32 timeout_ms = 5000);
 
 		// Try to disconnect from server.
-		// `timeout_ms` (5ms default) is the time in milliseconds to wait for the disconnection attempt to succeed
+		// `timeout_ms` (5ms default) time in milliseconds to wait for the disconnection attempt to succeed
 		void disconnect_from_server(const uint32 timeout_ms = 5000) noexcept;
 
 		// Send a packet to the server.
@@ -117,7 +117,8 @@ class Network {
 		// Stop the thread
 		Result stop() noexcept;
 
-		// How many clients are currently connected
+		// How many clients are currently connected.
+		// Always 0 if object is a client
 		inline uint32 get_connected_clients() const noexcept {
 			return this->connected_clients;
 		}

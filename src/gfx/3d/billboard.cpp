@@ -107,15 +107,15 @@ void Billboard::config_directional_textures(const std::vector<const char*> paths
 	this->num_sectors = this->textures.size();
 }
 
-void Billboard::update_facing_texture(const vec3<float>& target_pos) noexcept {
+void Billboard::update_facing_texture(const vec3<float>& point_pos) noexcept {
 	// Use radians in this case is more accurate
 	const float angle_step = M_PI2 / (float)this->num_sectors;
 
 	const float angle_to_target = std::atan2(
 		// This is inverted to get the result that i want
 		// Invert back if the intention is the billboard change relative to some external object
-		target_pos.x - this->position.x,
-		target_pos.z - this->position.z
+		point_pos.x - this->position.x,
+		point_pos.z - this->position.z
 	);
 
 	const float cur_dir = this->directions[this->cur_dir];

@@ -1,8 +1,8 @@
 #include "scarablib/proper/log.hpp"
+#include "scarablib/typedef.hpp"
 
 #include <cstdarg>
 #include <ctime>
-#include <mutex>
 #include <sstream>
 #include <vector>
 
@@ -39,21 +39,6 @@ std::string Log::get_date_and_time() noexcept {
 	return oss.str();
 }
 
-//
-// void Log::log(const char* level, const char* fmt, ...) {
-// 	va_list args;
-// 	va_start(args, fmt);
-// 	log_impl(fmt, level, nullptr, args);
-// 	va_end(args);
-// }
-
-// void Log::log_time(const char* level, const char* fmt, ...) {
-// 	va_list args;
-// 	va_start(args, fmt);
-// 	log_impl(fmt, level, nullptr, args, true);
-// 	va_end(args);
-// }
-
 void Log::log_impl(const char* level, const char* func, bool include_time, const char* fmt, ...) noexcept {
 	std::vector<char> buffer = std::vector<char>(1024);
 
@@ -68,7 +53,7 @@ void Log::log_impl(const char* level, const char* func, bool include_time, const
 
 	// Resize buffer if the formatted string is too large
 	if (needed >= static_cast<int>(buffer.size())) {
-		buffer.resize(needed + 1);
+		buffer.resize(static_cast<uint64>(needed + 1));
 		vsnprintf(buffer.data(), buffer.size(), fmt, args);
 	}
 	va_end(args);

@@ -45,6 +45,13 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [ ] Class members that dont need any treatment or additional code in a setter method, should be public (when this is the case a setter method for this member is not necessary)
 - [ ] Change methods description to use "\`\`" for parameters
 
+# TODO Quick Fixes
+- [ ] Better texture constructor
+	+ Use bitwise paramters
+	+ Paramter to choose between RGB and RGBA manually (check inside if image is really RGBA)
+	+ Organize constructors
+	+ Feature: change texture alpha
+
 
 # TODO Network
 - [ ] Send message when client is disconnected
@@ -102,6 +109,7 @@ I wrote most of the things here very tired, sorry for any english mistake
 	+ World calculation might not be working correctly (debug drawing not drawing when dynamic transform is enabled)
 	+ Not work fully as i want
 	+ Not tested
+	+ Should also work for 2D shapes and be built in Mesh constructor that uses vertices only
 	+ Skipping this because i have more important stuff to do
 
 # TODO 2D
