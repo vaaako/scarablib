@@ -16,8 +16,8 @@ struct Circle : public Sprite {
 	}
 
 	// Set a new blur value around the circle
-	inline void set_blur(const float blur) {
-		this->blur = blur;
+	inline void set_blur(const float value) {
+		this->blur = value;
 	}
 
 	// Circle has a different shader

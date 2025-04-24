@@ -135,6 +135,9 @@ int main() {
 	cow->set_orientation(90.0f, { false, false, true });
 	scene3d.add_to_scene("cow", cow);
 
+	cow->set_transform();
+	// cow->set_dynamic_transform(true);
+
 	// Make shapecollision
 	Cube* cube = new Cube();
 	scene3d.add_to_scene("cube1", cube);
@@ -225,13 +228,15 @@ int main() {
 
 		// Rotate models
 		vec3<float> cowpos = cow->get_position();
-		// cow->set_rotation(rotation, { true, true, true });
+		cow->set_rotation(rotation, { true, true, true });
 		// cube->set_position(ScarabMath::orbitate_x(cowpos, -rotation, 5.0f));
 		cube2->set_position(ScarabMath::orbitate_y(cowpos, rotation, 5.0f));
 		cube3->set_position(ScarabMath::orbitate_z(cowpos, -rotation, 5.0f));
 
-		bill->relative_angle(camera.position);
+		bill->update_facing_texture(camera.position);
 		// LOG_DEBUG("Cardinal: %s", camera.get_cardinal_direction().c_str());
+
+		cow->draw_collider(camera, Colors::RED, false);
 
 		// Draw
 		skybox.draw();

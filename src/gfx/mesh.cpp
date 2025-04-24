@@ -1,7 +1,5 @@
-#include "scarablib/gfx/3d/boundingbox.hpp"
 #include "scarablib/gfx/mesh.hpp"
 #include "scarablib/proper/error.hpp"
-#include "scarablib/proper/log.hpp"
 #include "scarablib/utils/string.hpp"
 #include <algorithm>
 #include <unordered_map>
@@ -21,6 +19,8 @@ std::vector<OUT> convert_to(const std::vector<INP>& indices) {
 	return output;
 };
 
+// Indices attributes are not needed to set here
+// I will not make Bounding Box here because this is probably a 2D model
 Mesh::Mesh(const std::vector<Vertex>& vertices) noexcept {
 	this->bundle.make_vao_with_manager(vertices, std::vector<uint8> {});
 
@@ -111,7 +111,7 @@ Mesh::Mesh(const char* path) {
 		throw ScarabError("Failed to load/parse (%s) file. Indices are empty", path);
 	}
 
-	this->boxsize = BoundingBox::calculate_size_from_vertices(vertices);
+	this->bbox = BoundingBox(vertices);
 	this->indices_length = static_cast<GLsizei>(indices.size());
 
 	// Check which indice type fits

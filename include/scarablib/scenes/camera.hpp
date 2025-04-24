@@ -20,6 +20,10 @@ class Camera {
 		// Vertical rotation
 		// To rotate camera using the mouse, use Camera::rotate
 		float pitch = 0.0f;
+		// Camera's projection width
+		uint32 width;
+		// Camera's projection height
+		uint32 height;
 
 		enum Zoom : bool {
 			OUT,
@@ -45,6 +49,25 @@ class Camera {
 			return this->forward;
 		}
 
+		// Returns camera's unit up vector
+		inline vec3<float> get_up() const noexcept {
+			return this->up;
+		}
+
+		// Returns camera's current fov
+		inline float get_fov() const noexcept {
+			return this->fov;
+		}
+
+		// Returns near plane
+		inline float get_near_plane() const noexcept {
+			return this->near_plane;
+		}
+		// Returns far plane
+		inline float get_far_plane() const noexcept {
+			return this->far_plane;
+		}
+
 		// SETTERS
 		inline void update_viewport(const Window& window) noexcept {
 			this->update_viewport(window.get_width(), window.get_height());
@@ -67,6 +90,10 @@ class Camera {
 			this->near_plane = near_plane;
 			this->update_proj_matrix();
 		}
+
+		// Legacy OpenGL is used for debug draw and basic rendering.
+		// This update the view and projection matrices for drawing with legacy OpenGL
+		void update_legacy_view_projection() const noexcept;
 
 		// Set camera's far plane. How far to render
 		inline void set_far_plane(const float far_plane) noexcept {
@@ -160,9 +187,6 @@ class Camera {
 		}
 
 	private:
-		uint32 width;
-		uint32 height;
-
 		float speed = 0.1f;
 
 		float fov;

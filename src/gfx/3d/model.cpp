@@ -45,8 +45,8 @@ void Model::update_model_matrix() noexcept {
 	this->isdirty = false;
 
 	// Update the bounding box in world space
-	if(this->calc_enabled) {
-		this->bounding->update_world_bounding_box(this->model);
+	if(this->dynamic_bounding) {
+		this->bbox.update_world_bounds(this->model);
 	}
 }
 
@@ -57,11 +57,67 @@ void Model::draw(const Camera& camera, const Shader& shader) noexcept {
 
 	this->update_model_matrix();
 
-	// NOTE: "is dirty" for color wouldn't work because would set the last color updated for all Modeles (using this later maybe)
+	// NOTE: is_dirty for color wouldn't work because would set this color to the next meshes
 	shader.set_color("shapeColor", this->color);
 	shader.set_matrix4f("mvp", (camera.get_proj_matrix() * camera.get_view_matrix()) * this->model);
 
 	this->texture->bind();
 	glDrawElements(GL_TRIANGLES, this->indices_length, this->indices_type, (void*)0);
 	this->texture->unbind();
+}
+
+
+void Model::draw_collider(const Camera& camera, const Color& color, const bool stripped) noexcept {
+	// Switch to fixed-function pipeline
+	glBindVertexArray(0);
+	glUseProgram(0);
+
+	// Update camera for legacy opengl
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadMatrixf(glm::value_ptr(camera.get_proj_matrix()));
+
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadMatrixf(glm::value_ptr(camera.get_view_matrix()));
+	// glLoadMatrixf(glm::value_ptr(camera.get_view_matrix() * this->model));
+
+	if(stripped) {
+		glEnable(GL_LINE_STIPPLE);
+		glLineStipple(1, 0x00FF);
+	}
+
+	glColor4f(color.red / 255.0f, color.green / 255.0f, color.blue / 255.0f, color.alpha / 255.0f);
+	glLineWidth(1.0f);
+
+	vec3<float>& max = this->bbox.max;
+	vec3<float>& min = this->bbox.min;
+	glBegin(GL_LINES);
+		// Bottom face
+		glVertex3f(min.x, min.y, min.z); glVertex3f(max.x, min.y, min.z);
+		glVertex3f(max.x, min.y, min.z); glVertex3f(max.x, min.y, max.z);
+		glVertex3f(max.x, min.y, max.z); glVertex3f(min.x, min.y, max.z);
+		glVertex3f(min.x, min.y, max.z); glVertex3f(min.x, min.y, min.z);
+		
+		// Top face
+		glVertex3f(min.x, max.y, min.z); glVertex3f(max.x, max.y, min.z);
+		glVertex3f(max.x, max.y, min.z); glVertex3f(max.x, max.y, max.z);
+		glVertex3f(max.x, max.y, max.z); glVertex3f(min.x, max.y, max.z);
+		glVertex3f(min.x, max.y, max.z); glVertex3f(min.x, max.y, min.z);
+		
+		// Vertical edges
+		glVertex3f(min.x, min.y, min.z); glVertex3f(min.x, max.y, min.z);
+		glVertex3f(max.x, min.y, min.z); glVertex3f(max.x, max.y, min.z);
+		glVertex3f(max.x, min.y, max.z); glVertex3f(max.x, max.y, max.z);
+		glVertex3f(min.x, min.y, max.z); glVertex3f(min.x, max.y, max.z);
+	glEnd();
+
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+
+	if(stripped) {
+		glDisable(GL_LINE_STIPPLE);
+	}
 }

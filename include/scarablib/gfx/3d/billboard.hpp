@@ -7,11 +7,9 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/vector_angle.hpp>
 
-// PI * 2
-#define M_PI2 6.283185307179586f
-
 // Class for billboard model
 struct Billboard : public Model {
+	// Directions the billboard can face
 	enum Direction : uint8 {
 		EAST,
 		NORTHEAST,
@@ -23,6 +21,7 @@ struct Billboard : public Model {
 		SOUTHEAST
 	};
 
+	// Supported sectors
 	enum : uint8 {
 		FOUR_SECTORS = 4,
 		EIGHT_SECTORS = 8
@@ -33,18 +32,17 @@ struct Billboard : public Model {
 	~Billboard() noexcept override;
 
 	// This will add multiple textures that changes depending on the angle of the camera relative to the billboard.
-	// The first element is the path of the texture.
-	// and the second element is the textures to be flipped (0 = flip none).
-	// If the texture is flipped, it will be used in the opposite direction.
-	// Example: 123 will flip the respective textures to 567.
-	// The vector MUST have minimum of 4 elements and maximum of 8 elements
-	// WARNING: Please use this method just at the creation of the billboard, if you want to change a texture
+	// - `paths` is a vector of paths to the textures
+	// - `flip` is the textures to be flipped (Starting index is 1. Pass 0 to flip none).
+	// If the texture is set to flip, the flipped version will be added in the opposite order
+	// Example: `123` will flip the respective textures to `567`.
+	// The vector MUST have a minimum of 4 elements and a maximum of 8 elements
+	// WARNING: Please use this method just at the creation of the billboard
 	void config_directional_textures(const std::vector<const char*> paths, uint32 flip);
 
-	// The directional texture is changed relative to the direction the billboard is facing.
-	// num_sectors is the number of textures set in the billboard, please choose either 4 or 8.
-	// *WARNING:* This method DOES NOT check if textures was set correctly, you will have a error if don't
-	void relative_angle(const vec3<float>& camera_pos, const uint8 num_sectors = 8) noexcept;
+	// This changes the texture based on the angle of the camera.
+	// - `camera_pos` is the position of the camera.
+	void update_facing_texture(const vec3<float>& camera_pos) noexcept;
 	// First arg isnt camera object to give some freedom
 
 	// Returns the current direction the billboard is facing
@@ -53,12 +51,11 @@ struct Billboard : public Model {
 	}
 
 	// Set a new direction to the billboard face.
-	// This is used in relative_angle
 	inline void set_direction(const Billboard::Direction dir) {
 		this->cur_dir = dir;
 	}
 
-	// Set a texture from the directional textures
+	// Replace a diretional texture
 	inline void set_dir_texture(const uint32 index) noexcept {
 		if(index > this->textures.size()) {
 			LOG_ERROR_FN("Index out of range");
@@ -67,14 +64,13 @@ struct Billboard : public Model {
 		this->set_texture(this->textures[index]);
 	}
 
-	// Returns the shader used by billboard
+	// Returns the billboard shader
 	inline Shader* get_shader() const noexcept override {
 		return this->shader;
 	};
 
 	private:
 		// Precalculated directions
-		// M_PI is a predefined macro
 		const float directions[8] = {
 			0.0f,                // [  0°] EAST        (RIGHT)
 			M_PI_4f,             // [ 45°] NORTHEAST   (UP-RIGHT)
@@ -85,15 +81,13 @@ struct Billboard : public Model {
 			4.71238898038469f,   // [270°] SOUTH       (DOWN)        3.0f * M_PI_2f
 			5.497787143782138f   // [315°] SOUTHEAST   (DOWN-RIGHT)  7.0f * M_PI_4f
 		};
+		static constexpr float M_PI2 = M_PIf * 2.0f;
+		std::vector<Texture*> textures; // Directional textures
+		size_t num_sectors = 0; // Either 4 or 8 (is the number of directional textures)
+		Billboard::Direction cur_dir = Billboard::Direction::EAST; // Only used inside `relative_angle`
+		uint32 cur_sector = 9; // Unbounded value to change the first time
 
-
-		// Directional textures
-		std::vector<Texture*> textures;
-		Billboard::Direction cur_dir = Billboard::Direction::EAST; // Only used inside relative_angle
-		// Save to check and only change texture if needed
-		uint32 cur_sector = 9; // This value so that it will always change in first change
-
-		// Store and get one time only (deleted inside window destructor)
+		// Store one time only (deleted inside window destructor)
 		Shader* shader = ShaderManager::get_instance().get_or_load_shader(
 			"billboard",
 			Shaders::BILLBOARD_VERTEX,

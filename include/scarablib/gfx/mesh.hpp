@@ -43,21 +43,16 @@ class Mesh {
 			return this->bundle;
 		}
 
-		// This will create a collider for the mesh.
-		// If your mesh is not static, you should also enable the calculation with the method `calc_collision(bool)`
-		// WARNING: Call this method ONLY AFTER configuring the model
-		virtual inline void make_collider() noexcept = 0;
-
 	protected:
 		// OpenGL
 		BufferBundle bundle;    // Bundle of VAO, VBO and EBO
 		GLsizei indices_length; // For drawing (in 2D this is not the indices size, but i dont know how to call it)
-		GLenum indices_type; // For drawing (not used for 2D shapes)
+		GLenum indices_type;    // For drawing (not used for 2D shapes)
 
 		// Bounding box
 		// I wish this wasnt in this class, but i need vertices and dont want to store it, because is a waste of memory
 		// This makes a little more "processor expensive" for creating a model, but, i wont have to store vertices for each model which consumes much memory
-		BoundingBox::Size boxsize = {};
+		BoundingBox bbox;
 
 		// Current texture being used
 		// This will always be a shared pointer to other texture
@@ -67,11 +62,10 @@ class Mesh {
 
 template <typename T>
 Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<T>& indices) noexcept
-	: indices_length(static_cast<GLsizei>(indices.size())),
-	  indices_type(
+	: indices_length(static_cast<GLsizei>(indices.size())), indices_type(
 		(std::is_same_v<T, uint32>) ? GL_UNSIGNED_INT :
-		(std::is_same_v<T, uint16>) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_BYTE) {
+		(std::is_same_v<T, uint16>) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_BYTE),
+	  bbox(vertices) {
 
 	this->bundle.make_vao_with_manager(vertices, indices);
-	this->boxsize = BoundingBox::calculate_size_from_vertices(vertices);
 }

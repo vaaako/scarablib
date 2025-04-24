@@ -17,14 +17,12 @@ Billboard::~Billboard() noexcept {
 	// VAOManager::get_instance().release_vao(vao_hash);
 
 	// Clear directional textures if any
-	if(!this->textures.empty()) {
-		for(const Texture* tex : this->textures) {
-			if(tex != nullptr) {
-				delete tex;
-			}
+	for(const Texture* tex : this->textures) {
+		if(tex != nullptr) {
+			delete tex;
 		}
-		this->textures.clear();
 	}
+	this->textures.clear();
 }
 
 
@@ -105,14 +103,13 @@ void Billboard::config_directional_textures(const std::vector<const char*> paths
 			throw ScarabError("Bad Configuration: The texture at index %zu is nullptr. The final quantity of textures must be 4 or 8. This might be due to flipped texture bad configuration", i);
 		}
 	}
+
+	this->num_sectors = this->textures.size();
 }
 
-void Billboard::relative_angle(const vec3<float>& target_pos, const uint8 num_sectors) noexcept {
-	// assert((target_pos != vec3<float>(0.0f)) && "The target position can't be zero");
-	assert((num_sectors == 4 || num_sectors == 8) && "The number of sectors must be 4 or 8");
-
+void Billboard::update_facing_texture(const vec3<float>& target_pos) noexcept {
 	// Use radians in this case is more accurate
-	const float angle_step = M_PI2 / num_sectors;
+	const float angle_step = M_PI2 / (float)this->num_sectors;
 
 	const float angle_to_target = std::atan2(
 		// This is inverted to get the result that i want
@@ -121,9 +118,11 @@ void Billboard::relative_angle(const vec3<float>& target_pos, const uint8 num_se
 		target_pos.z - this->position.z
 	);
 
-	const float cur_dir = this->directions[static_cast<uint8>(this->cur_dir)];
+	const float cur_dir = this->directions[this->cur_dir];
 	const float relative_angle = std::fmod(angle_to_target - cur_dir + M_PI2, M_PI2);
-	const uint32 sector = static_cast<uint32>(relative_angle / angle_step) % num_sectors;
+	const uint32 sector = static_cast<uint32>(relative_angle / angle_step) % this->num_sectors;
+
+	// Only change if the sector is different
 	if(sector != this->cur_sector) {
 		this->cur_sector = sector;
 		this->set_texture(this->textures[sector]);

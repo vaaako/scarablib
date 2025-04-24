@@ -3,8 +3,8 @@
 #include "scarablib/window/window.hpp"
 
 Camera::Camera(const Window& window, const float fov, const float sensitivity) noexcept
-	: width(window.get_width()), height(window.get_height()),
-	  sensitivity(sensitivity), fov(fov), max_fov(fov) {
+	: sensitivity(sensitivity), width(window.get_width()),
+	  height(window.get_height()), fov(fov), max_fov(fov) {
 
 	this->update_proj_matrix();
 }

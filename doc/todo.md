@@ -28,11 +28,11 @@ I wrote most of the things here very tired, sorry for any english mistake
 
 - [x] Move `Scene3D::add_to_scene` to interface IScene
 - [x] Shader from Scene3D and Scene2D use shader manager
-- [ ] make transparency work without `if(tex.a == 0.0)`
 
 - [x] Having problems with shaders, when compiling to executable
 	+ not happy with the solution, since it stores shaders forever in memory
 
+- [ ] make transparency work without `if(tex.a == 0.0)`
 - [ ] Discord RPC support?
 - [ ] In Window::rotate i didnt have to clear the rotation before, why do i need it now? ([last commit]( https://github.com/vaaako/scarablib/commit/d2a5717958a1f73fde39dafbd6640e2c19dab076))
 - [ ] Make a struct named `Result` for methods that may return an error, containing the following members: `const bool is_ok`, `const char* message`
@@ -98,6 +98,12 @@ I wrote most of the things here very tired, sorry for any english mistake
 	+ Individual draw default
 	+ Batch draw when added to scene
 
+- [ ] Bounding box was not tested
+	+ World calculation might not be working correctly (debug drawing not drawing when dynamic transform is enabled)
+	+ Not work fully as i want
+	+ Not tested
+	+ Skipping this because i have more important stuff to do
+
 # TODO 2D
 - [x] Unify shader and `shader_texture` somehow
 	+ Use a blank texture as default (texture made in code)
@@ -156,8 +162,8 @@ I wrote most of the things here very tired, sorry for any english mistake
 	+ isnt really necessary
 - [x] Currently bounding box is always created, make it optional
 	+ now needs to calll a method to create it, also the draw is now correct
-- [x] Better BoundingBox, not happy with the current state, dont know what to do
 
+- [x] Better BoundingBox, not happy with the current state, dont know what to do
 - [ ] Show bounding box: When enabled to show all or a specific bounding box, add to the scene map with some sufix like `cube_boundingbox`, when removed, just remove the bounding box from the map, this will prevent the if-else
 	+ How to pass shader then?
 - [ ] Different texture for each face (the other method that is not cubemap)

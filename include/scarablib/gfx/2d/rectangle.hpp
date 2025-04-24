@@ -2,7 +2,7 @@
 
 #include "scarablib/gfx/2d/sprite.hpp"
 
-// Class for rectangle sprite
+// Represents a rectangle object
 struct Rectangle : public Sprite {
 	Rectangle() noexcept;
 };

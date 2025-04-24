@@ -28,11 +28,12 @@ void Sprite::update_model_matrix() noexcept {
 	// Collision calculation will be here
 }
 
-// I could just need to provide the mvp just if any of the matrix changes, because the value is stored
+// I could just provide mvp if any of the matrix changes, because the value is stored in memory.
+// But i just know when model changes, and camera matrix is likely to change everytime
 void Sprite::draw(const Camera2D& camera, const Shader& shader) noexcept {
 	this->update_model_matrix();
 
-	// NOTE: "is dirty" for color wouldn't work because would set the last color updated for all Modeles (using this later maybe)
+	// NOTE: is_dirty for color wouldn't work because would set this color to the next meshes
 	shader.set_color("shapeColor", this->color);
 	shader.set_matrix4f("mvp", (camera.get_proj_matrix() * camera.get_view_matrix()) * this->model);
 

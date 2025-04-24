@@ -41,12 +41,6 @@ void Scene3D::draw_all() const noexcept {
 
 			// Draw model
 			model->draw(camera, *cur_shader);
-
-			// Draw bounding box
-			if((this->draw_every_box || model->draw_box) && model->bounding) {
-				model->bounding->draw(camera, *shader);
-				glBindVertexArray(vao); // Rebind the model's VAO (since bounding box unbinds VAO)
-			}
 		}
 	}
 

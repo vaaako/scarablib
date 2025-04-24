@@ -64,11 +64,6 @@ class Model : public Mesh {
 			return this->position;
 		}
 
-		// Returns the center of the model
-		inline vec3<float> get_center_position() const noexcept {
-		return this->boxsize.min + (this->boxsize.size * 0.5f);	
-		}
-
 		// Returns current scale of each axis
 		inline vec3<float> get_scale() const noexcept {
 			return this->scale;
@@ -84,70 +79,32 @@ class Model : public Mesh {
 			return this->angle;
 		}
 
-
-		// Returns minimum corner of the bounding box (AABB)
-		inline vec3<float> get_min() const noexcept {
-			return this->bounding->boxsize.min;
-		}
-
-		// Returns maximum corner of the bounding box (AABB)
-		inline vec3<float> get_max() const noexcept {
-			return this->bounding->boxsize.max;
-		}
-
-		// Returns the difference of the bounding box min and max.
-		// This represents the size of the model
-		inline vec3<float> get_size() const noexcept {
-			return this->bounding->boxsize.size;
-		}
-
-
-		// Checks if the model has created a collider
-		inline bool has_collider() const noexcept {
-			return this->bounding != nullptr;
-		}
-
-		// Uses AABB to check if two models are colliding
-		static inline bool check_collision(const Model& a, const Model& b) noexcept {
-			return (a.bounding->boxsize.max.x >= b.bounding->boxsize.min.x &&
-					a.bounding->boxsize.min.x <= b.bounding->boxsize.max.x &&
-					a.bounding->boxsize.max.y >= b.bounding->boxsize.min.y &&
-					a.bounding->boxsize.min.y <= b.bounding->boxsize.max.y &&
-					a.bounding->boxsize.max.z >= b.bounding->boxsize.min.z &&
-					a.bounding->boxsize.min.z <= b.bounding->boxsize.max.z);
+		// Returns the model bounding box
+		inline const BoundingBox& get_bounding_box() const noexcept {
+			return this->bbox;
 		}
 
 		// SETTERS //
 
-		// This will create a collider for the mesh.
-		// NOTE: If your mesh is NOT static, you should also enable the calculation with the method `update_collider(bool)`
-		// WARNING: Call this method ONLY AFTER configuring the model
-		virtual inline void make_collider() noexcept override {
-			this->update_model_matrix();
-			this->bounding = new BoundingBox(this->boxsize, this->model);
-			this->bounding->update_world_bounding_box(this->model);
+		// Draw the bounding box of the model
+		void draw_collider(const Camera& camera, const Color& color = Colors::RED, const bool stripped = false) noexcept;
+
+		// Apply the transformations of the model until this moment.
+		// This is one time only, for dynamic transformation use `set_dynamic_transform(bool)`.
+		// If any calculation is made with the bounding box but
+		// `set_transform` was not called, the calculation will be wrong.
+		// This is used to apply initial transformations into a model
+		void set_transform() {
+			this->update_model_matrix(); // Needs updated matrix
+			this->bbox.update_world_bounds(this->model);
 		}
 
-		// This will enable the collider to update every time the model is updated.
-		inline void update_collider(const bool enable) noexcept {
-			if(this->bounding == nullptr) {
-				LOG_ERROR("Make the collider to be able to calculate it");
-			}
-
-			this->calc_enabled = enable;
+		// Set the bounding box to be recalculated when necessary.
+		// This is usefull for dynamic models
+		void set_dynamic_transform(const bool value) noexcept {
+			this->dynamic_bounding = value;
+			this->set_transform(); // Just in case
 		}
-
-		// Show or hide the collider
-		inline void show_collider(const bool draw_box) noexcept {
-			if(this->bounding == nullptr) {
-				LOG_ERROR("Please make the collider to be able to show it");
-			}
-
-			this->draw_box = draw_box;
-		}
-
-
-
 
 		// Set a new position using a vector
 		inline void set_position(const vec3<float>& position) noexcept {
@@ -209,10 +166,7 @@ class Model : public Mesh {
 		bool isdirty; // Calculate matrix if anything changed
 		glm::mat4 model = glm::mat4(1.0f);
 
-		// Collission
-		BoundingBox* bounding = nullptr;
-		bool draw_box         = false;
-		bool calc_enabled     = false;
+		bool dynamic_bounding = false;
 
 		void update_model_matrix() noexcept;
 };

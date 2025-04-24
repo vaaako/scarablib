@@ -35,12 +35,13 @@ class Window {
 		~Window() noexcept;
 
 		// Handle any events or inputs (e.g., keyboard, mouse) that occurred during the frame.
-		// This function should be called once at the beginning of each frame to process input events.
+		// Also calculates FPS and delta time.
+		// This function should be called once at the beginning of each frame.
 		void process_events() noexcept;
 
 		// Will call the callback function for each SDL event, passing SDL_Event as a parameter.
 		// This is generally used for ImGui process events.
-		// Example: window.raw_events([](SDL_Event event) { ImGui_ImplSDL2_ProcessEvent(&event); });
+		// Example: `window.raw_events([](SDL_Event event) { ImGui_ImplSDL2_ProcessEvent(&event); });`
 		template<typename T>
 		void raw_events(T&& callback) noexcept {
 			SDL_Event event;
@@ -57,6 +58,7 @@ class Window {
 		}
 
 		// Swap the front and back buffers at the end of each frame.
+		// Also clears events buffer.
 		// This should be called at the end of each frame
 		// to display the newly rendered frame to the screen
 		inline void swap_buffers() noexcept {
@@ -289,7 +291,7 @@ class Window {
 		KeyboardHandler keyboard_handler = KeyboardHandler();
 		MouseHandler mouse_handler = MouseHandler(); // To not have the same name as the "mouse" function
 
-		// Called at the beggining of the frame
+		// Called at the beggining of the frame.
 		void calc_fps_and_dt() noexcept;
 
 		// Set the viewport to the provided size.

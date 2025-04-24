@@ -2,7 +2,7 @@
 
 #include "scarablib/gfx/2d/sprite.hpp"
 
-// Class for Triangle sprite
+// Represents a rectangle object
 struct Triangle : public Sprite {
 	Triangle() noexcept;
 };
