@@ -6,6 +6,7 @@
 enum class Colors : uint {
 	WHITE    = 0xffffff,
 	BLACK    = 0x000000,
+	ALMOSTBLACK = 0x222222,
 
 	YELLOW   = 0xffff00,
 	ORANGE   = 0xf08000,
@@ -85,6 +86,12 @@ struct Color {
 	Color(Color&&) noexcept = default;
 	Color& operator=(Color&&) noexcept = default;
 
+
+	// Sets the alpha value
+	inline constexpr void set_alpha(const uint8 alpha) noexcept {
+		this->alpha = alpha;
+	}
+
 	// Check if all color components are equal to 0
 	inline constexpr bool isempty() const noexcept {
 		return (this->red == 0) && (this->green == 0) && (this->blue == 0) && (this->alpha == 0);
@@ -106,6 +113,18 @@ struct Color {
 			this->alpha * 0.004f
 		};
 	}
+
+	// TODO: Instead of returning new color, modify current color
+
+	// Returns the distance between two colors.
+	// The smaller the distance, the closer the colors are
+	inline constexpr float distance_to(const Color& other) const noexcept {
+		const int dr = this->red - other.red;
+		const int dg = this->green - other.green;
+		const int db = this->blue - other.blue;
+		return std::sqrtf((float)(dr * dr + dg * dg + db * db));
+	}
+
 
 	// Blend current color with another color
 	inline constexpr Color blend(const Color& other, float t) const noexcept {
