@@ -28,8 +28,8 @@ class Sprite : public Mesh {
 			return this->size;
 		}
 
-		// Returns current color
-		inline Color get_color() const noexcept {
+		// Returns color reference
+		inline Color& get_color() noexcept {
 			return this->color;
 		}
 

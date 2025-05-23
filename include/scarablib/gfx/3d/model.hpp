@@ -43,7 +43,7 @@ class Model : public Mesh {
 		}
 
 		// Returns current color
-		inline Color get_color() const noexcept {
+		inline Color& get_color() noexcept {
 			return this->color;
 		}
 
