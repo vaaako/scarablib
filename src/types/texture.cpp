@@ -26,6 +26,7 @@ Texture::Texture(const Texture::Config& config) {
 	// STB use
 	Image* image = new Image(config.path, config.flip_vertically, config.flip_horizontally);
 	if(image->data == nullptr) {
+		delete image;
 		throw ScarabError("Image (%s) was not found", image->path);
 	}
 
