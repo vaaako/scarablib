@@ -6,7 +6,12 @@ Scene3D::Scene3D(Camera& camera) noexcept
 
 
 void Scene3D::draw(Model& model) const noexcept {
-	model.draw(this->camera, *this->shader);
+	this->shader->use();
+	model.get_bundle().bind_vao();
+	model.draw(this->camera,
+		(model.get_shader() != nullptr) ? *model.get_shader() : *this->shader
+	);
+	this->shader->unbind();
 }
 
 void Scene3D::draw_all() const noexcept {

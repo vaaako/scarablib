@@ -1,15 +1,19 @@
 #include "scarablib/scenes/scene2d.hpp"
 #include "scarablib/gfx/2d/sprite.hpp"
 #include <cstdio>
-#include <memory>
 
 // No need to set width and height here, since it will be set in update_viewport
 Scene2D::Scene2D(Camera2D& camera) noexcept
 	: IScene(), camera(camera) {}
 
 
-void Scene2D::draw(Sprite& model) const noexcept {
-	model.draw(this->camera, *this->shader);
+void Scene2D::draw(Sprite& shape) const noexcept {
+	this->shader->use();
+	shape.get_bundle().bind_vao();
+	shape.draw(this->camera,
+		(shape.get_shader() != nullptr) ? *shape.get_shader() : *this->shader
+	);
+	this->shader->unbind();
 }
 
 void Scene2D::draw_all() const noexcept {
