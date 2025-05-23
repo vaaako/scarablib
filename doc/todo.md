@@ -44,6 +44,10 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [ ] Use `string_view` instead of `string` when possible (when string manipulation isnt necessary)
 - [ ] Class members that dont need any treatment or additional code in a setter method, should be public (when this is the case a setter method for this member is not necessary)
 - [ ] Change methods description to use "\`\`" for parameters
+- [ ] Support legacy opengl
+	+ Draw 2D and 3D shapes
+	+ Sprite support
+	+ 2D and 3D cutomizable camera
 
 # TODO Quick Fixes
 - [ ] Better texture constructor
@@ -174,6 +178,7 @@ I wrote most of the things here very tired, sorry for any english mistake
 - [x] Better BoundingBox, not happy with the current state, dont know what to do
 - [ ] Show bounding box: When enabled to show all or a specific bounding box, add to the scene map with some sufix like `cube_boundingbox`, when removed, just remove the bounding box from the map, this will prevent the if-else
 	+ How to pass shader then?
+	+ Collider drawing almost working, some fixes needed
 - [ ] Different texture for each face (the other method that is not cubemap)
 - [ ] In `ModelFactory::create_cube` add option to change Z of each face
 - [ ] Shader mvp calculation to `Scene3D::draw`
