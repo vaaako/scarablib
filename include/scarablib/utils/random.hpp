@@ -27,12 +27,14 @@ namespace ScarabRandom {
 
 	// Choose a random integer in a given range
 	[[nodiscard]] inline int inrange(const int min, const int max) noexcept {
-		return rand() % (max - min + 1) + min;
+		std::uniform_int_distribution<> dis(min, max);
+		return dis(gen);
 	};
 
 	// Choose a random float in a given range
 	[[nodiscard]] inline float inrangef(const float min, const float max) noexcept {
-		return min + static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * (max - min);
+		std::uniform_real_distribution<> dis(min, max);
+		return (float)dis(gen);
 	};
 };
 
