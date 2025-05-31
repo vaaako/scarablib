@@ -56,6 +56,8 @@ I wrote most of the things here very tired, sorry for any english mistake
 	+ Organize constructors
 	+ Feature: change texture alpha
 
+- [ ] Simplify Keyboard and Mouse input and put all that in Window class
+
 
 # TODO Network
 - [ ] Send message when client is disconnected

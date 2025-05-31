@@ -133,7 +133,9 @@ void Window::calc_fps_and_dt() noexcept {
 }
 
 void Window::frame_capping(const float fps) const noexcept {
-	assert(fps > 0.0f && "fps parameter must be greater than 0.0f");
+	if(fps == 0.0f) {
+		return;
+	}
 
 	const float desired = 1.0f / fps;
 	const float actual = this->dt();

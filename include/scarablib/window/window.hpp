@@ -34,12 +34,11 @@ class Window {
 		Window(const Window::Config& windowconf);
 		~Window() noexcept;
 
-		// Handle any events or inputs (e.g., keyboard, mouse) that occurred during the frame.
-		// Also calculates FPS and delta time.
-		// This function should be called once at the beginning of each frame.
+		// Handle any events occurring in the window.
+		// Also calculates FPS and Delta time
 		void process_events() noexcept;
 
-		// Will call the callback function for each SDL event, passing SDL_Event as a parameter.
+		// Call the callback function for each handled SDL event, passing SDL_Event as a parameter.
 		// This is generally used for ImGui process events.
 		// Example: `window.raw_events([](SDL_Event event) { ImGui_ImplSDL2_ProcessEvent(&event); });`
 		template<typename T>
@@ -234,9 +233,7 @@ class Window {
 			SDL_SetRelativeMouseMode(static_cast<SDL_bool>(grab));
 
 			// BUG:? I HADNT TO DO THIS BEFORE WHY DO I NEED IT NOW?????? WTF????
-			// Grab Cursor -> Move based on last mouse position
-			// If this is not done, the cursor will jump to the last location
-			// This is way is only need when the cursor is locked
+			// If this isnt't done, the camera will "jump"
 			if(grab) {
 				int dummy_x, dummy_y;
 				SDL_GetRelativeMouseState(&dummy_x, &dummy_y);
@@ -256,7 +253,7 @@ class Window {
 		}
 
 		// Get the time elapsed between the current and last frame, in seconds.
-		constexpr inline float dt() const noexcept {
+		inline float dt() const noexcept {
 			return this->delta_time;
 		}
 
@@ -298,7 +295,7 @@ class Window {
 		float half_width        = 0;
 		float half_height       = 0;
 		bool show_debug_info    = false;
-		vec4<float> clear_color = vec4<float>(1.0f); // Outside conf for better access
+		vec4<float> clear_color = vec4<float>(0.0f, 0.0f, 0.0f, 1.0f);
 		bool window_open        = true;
 
 		// Buffer to store all events to be processed each frame
@@ -315,7 +312,7 @@ class Window {
 
 		// KEYS
 		KeyboardHandler keyboard_handler = KeyboardHandler();
-		MouseHandler mouse_handler = MouseHandler(); // To not have the same name as the "mouse" function
+		MouseHandler mouse_handler = MouseHandler();
 
 		// Called at the beggining of the frame.
 		void calc_fps_and_dt() noexcept;

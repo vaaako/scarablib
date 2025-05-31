@@ -26,67 +26,65 @@ Scarablib 🪲 is a C++ library designed to simplify graphical development, offe
 >You can find the licenses for these libraries in the [`licenses/`](licenses/) directory
 
 # Roadmap
-- **Lighting:** Implementation of light sources
+- **Light:** Implementation of light sources
 - **Networking:** Adding network support for multiplayer or distributed applications
-- **Built-in Optimization:** Methods for frustum-culling, terrain generation and etc, for improved performance.
+
+# Documentation
+Currently there is no documentation. But each method is documented in the source code as a comment above it. If you are using a LSP you can easily view it
 
 # Example
-The following code snippet demonstrates how to create a simple scene with Scarablib:
-
-![example.gif](medias/example.gif)
-
-Outside main loop:
+This example creates a 3D scene with a rotating cube -5 Z units from the camera.
 ```cpp
-// Position will change later, so dont need to intialize here
-Cube* cube = ModelFactory::create_cube();
+#include <scarablib/window/window.hpp>
+#include <scarablib/input/keycode.hpp>
 
-// Above is the same as passing nothing
-Cube* cube2 = ModelFactory::create_cube();
+int main() {
+	// Window setup
+	Window window = Window({
+		.width = 800,
+		.height = 600,
+		.title = "Hello World"
+	});
 
-// Set textures
-cube1->set_texture(&tex1);
-cube2->set_texture(&tex2);
+	// Scene3D Setup
+	Scene3D scene3d = Scene3D(camera);
 
-// Add to the scene
-scene3d.add_to_scene("cube1", cube); // Models added to scene must be pointers (this will be automatically deleted)
-scene3d.add_to_scene("cube2", cube2);
+	// Model setup
+	Cube cube = Cube();
+	cube.set_position({ 0.0f, 0.0f, -5.0f });
+	cube.set_color(Colors::MAGENTA);
 
-// Rectangle object
-const float AIM_WIDTH = 10.0f;
-const float AIM_HEIGHT = 10.0f;
+	// Used to rotate the cube
+	float angle = 0.0f;
 
-Rectangle* aim = SpriteFactory::create_rectangle();
-aim->set_position({
-	window.get_half_width()  - AIM_WIDTH  / 2,
-	window.get_half_height() - AIM_HEIGHT / 2
-});
-aim->set_size({ AIM_WIDTH, AIM_HEIGHT });
+	// Main loop
+	while(window.is_open()) {
+		// Window stuff
+		window.clear();
+		window.process_events();
 
-scene2d.add_to_scene("aim", aim);
-```
+		// Handle events
+		if(window.has_event(Event::WINDOW_QUIT)) {
+			window.close();
+		}
 
-Inside the main loop:
-```cpp
-// Modify cube
-//                                        center,               angle, radius
-cube2.set_position(ScarabMath::orbitate_y(cube1.get_position(), rotation, 2.0f));
+		// Change cube's angle
+		//                angle    axis (x, y, z)
+		cube.set_rotation(angle, { true, true, false });
+		// Draw single model
+		scene.draw(cube);
 
-// Draw all 3D shapes
-scene3d.draw_all();
+		// Change cube's angle
+		angle += 1.0f;
+		if(angle >= 360.0f) {
+			angle = 0.0f;
+		}
 
-// Draw font
-msgothic.draw_text("FPS: " + std::to_string(window.fps()), { 0.0f, 0.0f });
-
-// Draw all 2D shapes
-scene2d.draw_all();
-
-// Update rotation
-rotation += rotation_speed;
-if(rotation >= 360.0f) {
-	rotation = 0.0f; // Keep the angle within 0-360 degrees
+		// Swap buffers
+		window.swap_buffers();
+	}
 }
 ```
-
 
 
 # Building and run
@@ -107,6 +105,16 @@ The default target will generate a static library in the `build/` directory.
 The static target will use the static dependencies libraries located in the `lib/` directory
 ```
 make
+```
+
+Installing this library is done by running
+```sh
+sudo make install
+```
+
+You can then compile your own project linking the library and OpenGL. Example:
+```sh
+clang++ main.cpp -lGL -lscarablib -o mygame
 ```
 
 You can change the target to generate a shared library instead.
