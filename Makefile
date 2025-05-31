@@ -39,6 +39,8 @@ TARGET = scarablib
 TARGET_STATIC = $(BUILD_DIR)/lib$(TARGET).a
 TARGET_SHARED = $(BUILD_DIR)/lib$(TARGET).so
 
+INSTALL_INCLUDE_DIR = /usr/local/include/$(TARGET)
+
 all: $(LIBRARY_TYPE)
 
 # Static library
@@ -78,6 +80,13 @@ $(DEPS_DIR)/%.d: src/%.cpp
 
 # Include dependencies
 -include $(DEPS)
+
+# Install
+install: $(TARGET_STATIC)
+	@echo "Installing $(TARGET_STATIC) to /usr/local/lib and /usr/local/include"
+	@mkdir -p $(INSTALL_INCLUDE_DIR)
+	@cp -r include/$(TARGET) $(INSTALL_INCLUDE_DIR)
+	@cp $(TARGET_STATIC) /usr/local/lib
 
 
 # Test with static
