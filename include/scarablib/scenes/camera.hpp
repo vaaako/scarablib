@@ -161,7 +161,7 @@ class Camera {
 		// Moves the camera using a unit vector.
 		// Where X is front/back, Y is up/down and Z is left/right.
 		// Example: [1, 0, -1] means the camera moved to Front-Left
-		void move(const vec3<float>& dir, const float dt) noexcept;
+		void move(const vec3<int8>& dir, const float dt) noexcept;
 
 		// Use mouse moved direction to rotate the camera
 		void rotate(const MouseHandler& mouse) noexcept;
@@ -196,9 +196,9 @@ class Camera {
 		// bool firstclick = true;
 		// -90 in yaw prevents camera from jumping on the first click
 
-		vec3<float> up          = { 0.0f, 1.0f,  0.0f };
-		vec3<float> forward     = { 0.0f, 0.0f, -1.0f };
-		vec3<float> left        = { -1.0f, 0.0f, 0.0f };
+		vec3<float> up          = vec3<float>(0.0f, 1.0f, 0.0f);
+		vec3<float> forward     = vec3<float>(0.0f, 0.0f, -1.0f);
+		vec3<float> right       = vec3<float>(1.0f, 0.0f, 0.0f);
 
 		glm::mat4 proj;
 

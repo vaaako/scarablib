@@ -25,24 +25,24 @@ void camera_movement(Window& window, Camera& camera, KeyboardHandler& keyboard) 
 	const float dt = window.dt();
 	// LOG_DEBUG("Camera dt: %f", dt);
 
-	vec3<float> direction = vec3<float>(0.0f);
+	vec3<int8> direction = vec3<int8>(0.0f);
 
 	if(keyboard.isdown(Keycode::W)) {
-		direction.x = 1.0f;
+		direction.z = 1;
 	} else if (keyboard.isdown(Keycode::S)) {
-		direction.x = -1.0f;
+		direction.z = -1;
 	}
 
 	if(keyboard.isdown(Keycode::A)) {
-		direction.z = 1.0f;
+		direction.x = -1;
 	} else if (keyboard.isdown(Keycode::D)) {
-		direction.z = -1.0f;
+		direction.x = 1;
 	}
 
 	if(keyboard.isdown(Keycode::SPACE)) {
-		direction.y = 1.0f;
+		direction.y = 1;
 	} else if(keyboard.isdown(Keycode::LSHIFT)) {
-		direction.y = -1.0f;
+		direction.y = -1;
 	}
 
 	// FIX: Diagonal movement acceleration

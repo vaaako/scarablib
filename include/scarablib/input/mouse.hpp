@@ -66,8 +66,8 @@ class MouseHandler {
 		}
 
 		// Returns mouse movent since last call
-		inline vec2<int32> relative_move() const noexcept {
-			vec2<int32> mov;
+		inline vec2<int> relative_move() const noexcept {
+			vec2<int> mov;
 			SDL_GetRelativeMouseState(&mov.x, &mov.y);
 			return mov;
 		}
