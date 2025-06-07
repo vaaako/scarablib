@@ -1,24 +1,25 @@
 #pragma once
 
-#include "scarablib/window/events.hpp"
-#include "scarablib/input/keyboard.hpp"
-#include "scarablib/input/mouse.hpp"
+#include "scarablib/proper/log.hpp"
 #include "scarablib/proper/log.hpp"
 #include "scarablib/typedef.hpp"
 #include "scarablib/types/color.hpp"
-#include "scarablib/proper/log.hpp"
+#include "scarablib/window/buttoncode.hpp"
+#include "scarablib/window/events.hpp"
+#include "scarablib/window/keycode.hpp"
 
 #include <GL/glew.h>
+#include <SDL2/SDL_events.h>
+#include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_video.h>
 
 #include <string>
 #include <unordered_set>
+#include <vector>
 
 // Main object of the library, used for making and managing a window and events
 class Window {
 	public:
-		// Events related to the window
-
 		struct Config {
 			// Required values
 			uint32 width;
@@ -96,28 +97,6 @@ class Window {
 		// Return the height of the window in pixels.
 		inline uint32 get_height() const noexcept {
 			return this->height;
-		}
-
-		// Return the half width of the window in pixels.
-		inline float get_half_width() const noexcept {
-			return this->half_width;
-		}
-
-		// Return the half height of the window in pixels.
-		inline float get_half_height() const noexcept {
-			return this->half_height;
-		}
-
-		// Return a pointer to the keyboard handler object.
-		// This allows access to input handling for the keyboard.
-		inline KeyboardHandler& keyboard() noexcept {
-			return this->keyboard_handler;
-		}
-
-		// Return a pointer to the mouse handler object.
-		// This allows access to input handling for the mouse.
-		inline MouseHandler& mouse() noexcept {
-			return this->mouse_handler;
 		}
 
 
@@ -269,6 +248,80 @@ class Window {
 		}
 
 
+		// INPUT HANDLERS //
+
+		// Returns true if a key is being pressed
+		inline bool isdown(const Keycode key) const noexcept {
+			return (this->keystate.at(static_cast<uint32>(key)) == Keystate::DOWN);
+		}
+
+		// Returns true if a key is up
+		inline bool isup(const Keycode key) const noexcept {
+			return (this->keystate.at(static_cast<uint32>(key)) == Keystate::RELEASED);
+		}
+
+		// Return true if a key was pressed
+		bool ispressed(const Keycode key) noexcept;
+
+		// Returns the state of a key
+		inline Keystate get_keystate(const Keycode key) const noexcept {
+			return this->keystate[static_cast<uint32>(key)];
+		}
+
+		// Changes the state of a key
+		inline void set_keystate(const Keycode key, const Keystate state) noexcept {
+			this->keystate[static_cast<uint32>(key)] = state;
+		}
+
+		// MOUSE
+
+		// Returns cursor click position
+		inline vec2<uint32> get_click_pos() const noexcept {
+			return this->click_pos;
+		}
+
+		// Returns cursor motion/position
+		inline vec2<uint32> get_position() const noexcept {
+			return this->position;
+		}
+
+		// Returns mouse moved direction (e.g. -1, 1 = Left Down)
+		inline vec2<int16> get_moved_dir() const noexcept {
+			return this->moved_dir;
+		}
+
+		// Returns mouse movent since last call
+		inline vec2<int> relative_move() const noexcept {
+			vec2<int> mov;
+			SDL_GetRelativeMouseState(&mov.x, &mov.y);
+			return mov;
+		}
+
+		// Returns true if a button was clicked
+		inline bool isclick(const Buttoncode button) const noexcept {
+			return this->buttonstate[static_cast<uint32>(button)] == Buttonstate::PRESSED;
+		}
+
+		// Checks if a button is released
+		inline bool isbup(const Buttonstate button) const noexcept {
+			return this->buttonstate[static_cast<uint32>(button)] == Buttonstate::RELEASED;
+		}
+
+		// Changes the state of a button
+		inline void set_buttonstate(const Buttoncode button, const Buttonstate state) noexcept {
+			this->buttonstate[static_cast<uint32>(button)] = state;
+		}
+
+		// Checks the state of a button
+		inline Buttonstate get_keystate(const Buttoncode button) const {
+			return this->buttonstate[static_cast<uint32>(button)];
+		}
+
+		// Changes cursor position in window
+		inline void set_cursor_position(const uint32 x, const uint32 y) noexcept {
+			SDL_WarpMouseInWindow(this->window, (int)x, (int)y);
+		}
+
 
 		// STATIC //
 
@@ -292,14 +345,12 @@ class Window {
 		// Window information
 		uint32 width;
 		uint32 height;
-		float half_width        = 0;
-		float half_height       = 0;
 		bool show_debug_info    = false;
 		vec4<float> clear_color = vec4<float>(0.12f, 0.12f, 0.12f, 1.0f);
 		bool window_open        = true;
 
 		// Buffer to store all events to be processed each frame
-		std::unordered_set<uint32> frame_events; // unordered_set is faster for look-up
+		std::unordered_set<uint32> frame_events;
 
 		// SDL2
 		SDL_Window* window;
@@ -310,9 +361,28 @@ class Window {
 		float delta_time   = 1.0f;
 		uint64 last_update = 0; // Updated on swap_buffers (frame end)
 
-		// KEYS
-		KeyboardHandler keyboard_handler = KeyboardHandler();
-		MouseHandler mouse_handler = MouseHandler();
+		// INPUT HANDLERS
+		// MouseHandler mouse_handler = MouseHandler();
+
+		// Keyboard events in this frame
+		// Init vector with the size of SDL scancodes
+		std::vector<Keystate> keystate
+			= std::vector<Keystate>((uint32)Keycode::NUM_SCANCODES, Keystate::RELEASED);
+
+
+		// Store the state of all mouse buttons (LMB, MMB, RMB, SIDE1, SIDE2)
+		std::vector<Buttonstate> buttonstate
+			= std::vector<Buttonstate>(6, Buttonstate::RELEASED);
+
+		uint32 clicks = 0;      // Clicks made
+		int scroll = 0;         // Scroll direction and amount
+		// Store all actions in frame to handle later
+		vec2<uint32> click_pos; // Click position  (X: 0 -> width / Y: 0 -> height)
+		vec2<uint32> position;  // Motion position (X: 0 -> width / Y: 0 -> height)
+		vec2<int16> moved_dir;  // Normaalized moved_dir
+		// xrel yrel
+
+
 
 		// Called at the beggining of the frame.
 		void calc_fps_and_dt() noexcept;
@@ -322,9 +392,6 @@ class Window {
 		inline void set_viewport(const vec2<uint32>& size) noexcept {
 			this->width  = size.x;
 			this->height = size.y;
-
-			this->half_width  = static_cast<float>(size.x) * 0.5f;
-			this->half_height = static_cast<float>(size.y) * 0.5f;
 			glViewport(0, 0, (GLsizei)size.x, (GLsizei)size.y);
 		}
 };

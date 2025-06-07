@@ -9,7 +9,7 @@ Camera::Camera(const Window& window, const float fov, const float sensitivity) n
 	this->update_proj_matrix();
 }
 
-void Camera::rotate(const MouseHandler& mouse) noexcept {
+void Camera::rotate(const Window& mouse) noexcept {
 	const vec2<int> move = mouse.relative_move();
 
 	this->yaw   += static_cast<float>(move.x) * this->sensitivity;

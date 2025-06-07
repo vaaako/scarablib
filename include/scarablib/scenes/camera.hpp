@@ -164,7 +164,8 @@ class Camera {
 		void move(const vec3<int8>& dir, const float dt) noexcept;
 
 		// Use mouse moved direction to rotate the camera
-		void rotate(const MouseHandler& mouse) noexcept;
+		// void rotate(const MouseHandler& mouse) noexcept;
+		void rotate(const Window& mouse) noexcept;
 
 		// Returns a string with the cardinal direction the camera is facing based on its yaw
 		static std::string get_cardinal_direction(const float yaw) {

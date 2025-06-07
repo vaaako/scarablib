@@ -9,52 +9,49 @@
 #include "scarablib/proper/log.hpp"
 #include "scarablib/gfx/skybox.hpp"
 #include "scarablib/types/font.hpp"
-#include "scarablib/types/texture_array.hpp"
 #include "scarablib/utils/math.hpp"
+#include "scarablib/window/buttoncode.hpp"
 #include "scarablib/window/window.hpp"
-#include "scarablib/input/keycode.hpp"
-#include "scarablib/network/network.hpp"
-#include <cstdio>
 
 #include <sys/sysinfo.h>
 #include <sys/resource.h>
 
 bool mouse_captured = false;
 
-void camera_movement(Window& window, Camera& camera, KeyboardHandler& keyboard) {
+void camera_movement(Window& window, Camera& camera) {
 	const float dt = window.dt();
 	// LOG_DEBUG("Camera dt: %f", dt);
 
 	vec3<int8> direction = vec3<int8>(0.0f);
 
-	if(keyboard.isdown(Keycode::W)) {
+	if(window.isdown(Keycode::W)) {
 		direction.z = 1;
-	} else if (keyboard.isdown(Keycode::S)) {
+	} else if (window.isdown(Keycode::S)) {
 		direction.z = -1;
 	}
 
-	if(keyboard.isdown(Keycode::A)) {
+	if(window.isdown(Keycode::A)) {
 		direction.x = -1;
-	} else if (keyboard.isdown(Keycode::D)) {
+	} else if (window.isdown(Keycode::D)) {
 		direction.x = 1;
 	}
 
-	if(keyboard.isdown(Keycode::SPACE)) {
+	if(window.isdown(Keycode::SPACE)) {
 		direction.y = 1;
-	} else if(keyboard.isdown(Keycode::LSHIFT)) {
+	} else if(window.isdown(Keycode::LSHIFT)) {
 		direction.y = -1;
 	}
 
 	// FIX: Diagonal movement acceleration
 	camera.move(direction, dt);
 
-	if(mouse_captured && keyboard.ispressed(Keycode::ESCAPE)) {
+	if(mouse_captured && window.ispressed(Keycode::ESCAPE)) {
 		mouse_captured = false;
 		window.grab_cursor(false);
 	}
 }
 
-void rotate_camera(Window& window, Camera& camera, MouseHandler& mouse) {
+void rotate_camera(Window& window, Camera& camera) {
 	// Ignore if mouse event was in imgui window
 	// if (ImGui::GetIO().WantCaptureMouse) {
 	// 	return;
@@ -62,7 +59,7 @@ void rotate_camera(Window& window, Camera& camera, MouseHandler& mouse) {
 
 	// ROTATION LOGIC //
 	// Only rotate when click on screen
-	if(!mouse_captured && mouse.isclick(MouseHandler::Button::LMB)) {
+	if(!mouse_captured && window.isclick(Buttoncode::LMB)) {
 		LOG_INFO("Clicked");
 		mouse_captured = true;
 		window.grab_cursor(true);
@@ -70,7 +67,7 @@ void rotate_camera(Window& window, Camera& camera, MouseHandler& mouse) {
 
 	// Rotate camera
 	if(mouse_captured) {
-		camera.rotate(mouse);
+		camera.rotate(window);
 	}
 }
 
@@ -208,8 +205,9 @@ int main() {
 		window.clear(); // NOTE -- ~14mb RAM itself
 		window.process_events(); // Process all events
 
+
 		// Quit if ESC or Q is pressed
-		if((!mouse_captured && window.keyboard().ispressed(Keycode::ESCAPE)) || window.has_event(Event::WINDOW_QUIT)) {
+		if((!mouse_captured && window.ispressed(Keycode::ESCAPE)) || window.has_event(Event::WINDOW_QUIT)) {
 			window.close();
 		}
 
@@ -221,8 +219,8 @@ int main() {
 		});
 
 		// Handle camera keyboard inputs
-		camera_movement(window, camera, window.keyboard());
-		rotate_camera(window, camera, window.mouse());
+		camera_movement(window, camera);
+		rotate_camera(window, camera);
 
 		// WARNING: When drawing 3D and 2D shapes together, draw 3D shapes first
 
@@ -243,11 +241,11 @@ int main() {
 		scene3d.draw_all();
 
 		// Toggle debug mode
-		if(window.keyboard().ispressed(Keycode::F3)) {
+		if(window.ispressed(Keycode::F3)) {
 			debug_mode = !debug_mode;
 		}
 
-		if(window.keyboard().ispressed(Keycode::V)) {
+		if(window.ispressed(Keycode::V)) {
 			envsync = !envsync;
 			LOG_INFO("VSync: %d", envsync);
 			window.set_vsync(envsync);

@@ -6,6 +6,10 @@ Doxyfile
 build/
 *.o
 
+# Testing
+resources/
+test/
+
 # Workspaces
 *.sublime-*
 *.vim

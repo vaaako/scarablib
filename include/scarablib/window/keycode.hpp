@@ -20,10 +20,19 @@
 
 
 // WARNING -- This is NOT my code. This code is from https://github.com/libsdl-org/SDL/blob/main/include/SDL3/SDL_scancode.h
-// Changes: Removed "SDL" prefix
+// Changes:
+// - Removed "SDL" prefix
+// - Added Keystate enum
 
 
 #pragma once
+
+
+enum class Keystate : unsigned char {
+	RELEASED,
+	DOWN,
+	PRESSED // Called it one time only
+};
 
 // Enum for all keys
 enum class Keycode : unsigned int {

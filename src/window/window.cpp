@@ -3,14 +3,13 @@
 #include "scarablib/opengl/vao_manager.hpp"
 #include "scarablib/proper/error.hpp"
 #include "scarablib/proper/log.hpp"
+#include <SDL2/SDL.h>
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_video.h>
 #include <SDL2/SDL_mixer.h>
 
 Window::Window(const Window::Config& config)
-	: width(config.width), height(config.height),
-	half_width(static_cast<float>(config.width) * 0.5f),
-	half_height(static_cast<float>(config.height) * 0.5f), show_debug_info(config.debug_info) {
+	: width(config.width), height(config.height), show_debug_info(config.debug_info) {
 
 	// Initialize SDL (video and audio)
 	// NOTE: Memory leak happening here
@@ -154,9 +153,6 @@ void Window::set_size(const vec2<uint32>& size) noexcept {
 	this->width = size.x;
 	this->height = size.y;
 
-	this->half_width  = static_cast<float>(size.x) * 0.5f;
-	this->half_height = static_cast<float>(size.y) * 0.5f;
-
 	// Update window size
 	SDL_SetWindowSize(this->window, (int)size.x, (int)size.y);
 	glViewport(0, 0, (GLsizei)size.x, (GLsizei)size.y);
@@ -164,6 +160,24 @@ void Window::set_size(const vec2<uint32>& size) noexcept {
 	// Trigger event
 	this->frame_events.emplace(Event::WINDOW_RESIZED);
 }
+
+
+bool Window::ispressed(const Keycode key) noexcept {
+	uint32 scancode = static_cast<uint32>(key);
+	if (scancode >= keystate.size()) {
+		return false;
+	}
+
+	// If is down, change state to "pressed"
+	if(this->keystate[scancode] == Keystate::DOWN) {
+		this->keystate[scancode] = Keystate::PRESSED;
+		return true;
+	}
+
+	// If key is pressed, then return as false, since pressed checks one time only
+	return false;
+}
+
 
 void Window::process_events() noexcept {
 	// Frame beggining calculations
@@ -178,17 +192,49 @@ void Window::process_events() noexcept {
 		switch (event.type) {
 			// Keyboard events
 			case SDL_KEYDOWN:
-			case SDL_KEYUP:
-				this->keyboard_handler.handle_event(event);
+			case SDL_KEYUP: {
+				const uint32 scancode = event.key.keysym.scancode;
+				// If key is pressed, don't change until is released (avoid changing to down)
+				if(event.key.state != 0 && this->keystate[scancode] == Keystate::PRESSED) {
+					return;
+				}
+				this->keystate[scancode] = static_cast<Keystate>(event.key.state);
 				break;
+			}
 
 			// Mouse eventsevent
 			case SDL_MOUSEBUTTONDOWN:
 			case SDL_MOUSEBUTTONUP:
 			case SDL_MOUSEMOTION:
-			case SDL_MOUSEWHEEL:
-				this->mouse_handler.handle_event(event);
+			case SDL_MOUSEWHEEL: {
+				// CLICK //
+				if(event.type == SDL_MOUSEBUTTONDOWN) {
+					const SDL_MouseButtonEvent button = event.button;
+					this->set_buttonstate((Buttoncode)button.button, Buttonstate::PRESSED);
+					this->clicks = button.clicks;
+					this->click_pos = vec2<float>(button.x, button.y);
+				}
+
+				if(event.type == SDL_MOUSEBUTTONUP) {
+					// Reset all
+					this->set_buttonstate((Buttoncode)event.button.button, Buttonstate::RELEASED);
+					this->clicks = 0;
+					this->click_pos = vec3<uint32>(0);
+				}
+
+				// MOTION //
+				if(event.type == SDL_MOUSEMOTION) {
+					const SDL_MouseMotionEvent motion = event.motion;
+					this->position  = vec2<float>(motion.x, motion.y);
+					this->moved_dir = vec2<float>(motion.xrel, motion.yrel);
+				}
+
+				// SCROLL //
+				if(event.type == SDL_MOUSEWHEEL) {
+					this->scroll = event.wheel.y > 0;
+				}
 				break;
+			}
 
 			case SDL_WINDOWEVENT: {
 				// Store all window events in this frame
