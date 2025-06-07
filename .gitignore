@@ -1,5 +1,7 @@
 .git
 
+Doxyfile
+
 # Build
 build/
 *.o
@@ -25,9 +27,6 @@ valgrind_output.txt.core.*
 backup/
 bakups/
 *.bak
-
-# Not ready yet
-features.md
 
 # Other
 *.ini

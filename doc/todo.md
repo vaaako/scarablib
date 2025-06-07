@@ -5,6 +5,13 @@ I wrote most of the things here very tired, sorry for any english mistake
 - Collision
 - Bounding box
 
+# Currently working on
+Stuff that are in progress and i need to finish
+
+- Legacy Mode
+- Timer
+- Bounding Box debug draw
+
 # TODO library
 - [x] Use my vectores instead of glm
 	- matrix still glm ones tho
@@ -57,7 +64,7 @@ I wrote most of the things here very tired, sorry for any english mistake
 	+ Feature: change texture alpha
 
 - [ ] Simplify Keyboard and Mouse input and put all that in Window class
-
+- [ ] Unify bundle and VAOManger somehow idk get rid of bundle
 
 # TODO Network
 - [ ] Send message when client is disconnected

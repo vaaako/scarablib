@@ -295,7 +295,7 @@ class Window {
 		float half_width        = 0;
 		float half_height       = 0;
 		bool show_debug_info    = false;
-		vec4<float> clear_color = vec4<float>(0.0f, 0.0f, 0.0f, 1.0f);
+		vec4<float> clear_color = vec4<float>(0.12f, 0.12f, 0.12f, 1.0f);
 		bool window_open        = true;
 
 		// Buffer to store all events to be processed each frame
