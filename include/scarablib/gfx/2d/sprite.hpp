@@ -90,9 +90,6 @@ class Sprite : public Mesh {
 		Color color      = Colors::WHITE;
 		float angle      = 0.0f;
 
-		bool isdirty = false; // Re-calculates model matrix if anything has changed
-		glm::mat4 model = glm::mat4(1.0f);
-
-		void update_model_matrix() noexcept;
+		void update_model_matrix() noexcept override;
 };
 

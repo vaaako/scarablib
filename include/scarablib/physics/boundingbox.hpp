@@ -1,17 +1,22 @@
 #pragma once
 
+#include "scarablib/scenes/camera.hpp"
 #include "scarablib/typedef.hpp"
 #include "scarablib/types/vertex.hpp"
 
 // This class is a AABB of a 3D model.
 // It can be used for hitbox and collision detection
 struct BoundingBox {
-	// Minimum corner of the bounding box
-	vec3<float> size = vec3<float>(0.0f);
-	// Maximum corner of the bounding box
+	// Minimum corner of the bounding box in local space
+	vec3<float> local_min = vec3<float>(FLT_MAX);
+	// Minimum corner of the bounding box in local space
+	vec3<float> local_max = vec3<float>(FLT_MAX);
+	// Maximum corner of the bounding box in world space
 	vec3<float> min = vec3<float>(FLT_MAX);
 	// Size of the bounding box (max - min)
 	vec3<float> max = vec3<float>(-FLT_MAX);
+	// Minimum corner of the bounding box in world space
+	vec3<float> size = vec3<float>(0.0f);
 
 	// If using this constructor, please initialize the bounding box with `calculate_local_bounds`
 	BoundingBox() noexcept = default;
@@ -60,20 +65,29 @@ struct BoundingBox {
 		return distance <= radius;
 	}
 
+	// Draws the bounding box of the model in local space.
+	// This is only intented to be used as a debug tool
+	void draw_local_bounds(const Camera& camera, const Color& color = Colors::RED, const bool stripped = false) noexcept;
+	// Draws the bounding box of the model in world space.
+	// This is only intented to be used as a debug tool
+	void draw_world_bounds(const Camera& camera, const Color& color = Colors::RED, const bool stripped = false) noexcept;
 
 	// Returns the 8 corners of the bounding box in world space.
 	// These corners are used for rendering, collision detection, and transformations
-	inline std::vector<vec3<float>> get_bounding_corners() const noexcept {
-		return {
-			{ this->min.x, this->min.y, this->min.z },
-			{ this->max.x, this->min.y, this->min.z },
-			{ this->max.x, this->min.y, this->max.z },
-			{ this->min.x, this->min.y, this->max.z },
-			{ this->min.x, this->max.y, this->min.z },
-			{ this->max.x, this->max.y, this->min.z },
-			{ this->max.x, this->max.y, this->max.z },
-			{ this->min.x, this->max.y, this->max.z }
-		};
-	}
+	// inline std::vector<vec3<float>> get_bounding_corners() const noexcept {
+	// 	return {
+	// 		{ this->min.x, this->min.y, this->min.z },
+	// 		{ this->max.x, this->min.y, this->min.z },
+	// 		{ this->max.x, this->min.y, this->max.z },
+	// 		{ this->min.x, this->min.y, this->max.z },
+	// 		{ this->min.x, this->max.y, this->min.z },
+	// 		{ this->max.x, this->max.y, this->min.z },
+	// 		{ this->max.x, this->max.y, this->max.z },
+	// 		{ this->min.x, this->max.y, this->max.z }
+	// 	};
+	// }
+
+	private:
+		void draw(const bool world, const Camera& camera, const Color& color, const bool stripped) noexcept;
 };
 

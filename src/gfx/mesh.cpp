@@ -140,5 +140,6 @@ Mesh::Mesh(const char* path) {
 }
 
 
-// Mesh::~Mesh() noexcept {
-// }
+Mesh::~Mesh() noexcept {
+	delete this->physics;
+}

@@ -4,9 +4,9 @@
 Cube::Cube(const uint8 face_mask) noexcept
 	: Model() {
 
-	const std::vector<Vertex> vertices = GeometryFactory::make_cube_vertices();
 	std::vector<uint8> indices;
 
+	// Indices for one face
 	constexpr uint8 indices_index[6] = { 0, 1, 2, 0, 2, 3 };
 
 	// Offset of one mesh to another
@@ -18,7 +18,7 @@ Cube::Cube(const uint8 face_mask) noexcept
 		if((face_mask & (1 << v)) == 0) {
 			continue;
 		}
-
+		// Build indices
 		for(int i = 0; i < 6; i++) {
 			indices.push_back(static_cast<uint8>(indices_index[i] + vertex_offset));
 		}
@@ -26,5 +26,5 @@ Cube::Cube(const uint8 face_mask) noexcept
 		vertex_offset += 4;
 	}
 
-	this->set_geometry(vertices, indices);
+	this->set_geometry(GeometryFactory::make_cube_vertices(), indices);
 }

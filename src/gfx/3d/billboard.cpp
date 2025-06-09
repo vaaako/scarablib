@@ -1,7 +1,6 @@
 #include "scarablib/gfx/3d/billboard.hpp"
 #include "scarablib/gfx/geometry_factory.hpp"
 #include "scarablib/gfx/3d/model.hpp"
-#include "scarablib/proper/log.hpp"
 #include <algorithm>
 #include <cstddef>
 #include <cstdlib>
@@ -12,9 +11,9 @@ Billboard::Billboard() noexcept
 // Overrided from Mesh, so is needed to release the vao_mesh
 // This is overrided because if not, it wouldn't be possible to clean the textures
 Billboard::~Billboard() noexcept {
-	// Release current vao
+	// Release physics
 	// Mesh does this, but this is a overrided destructor
-	// VAOManager::get_instance().release_vao(vao_hash);
+	delete this->physics;
 
 	// Clear directional textures if any
 	for(const Texture* tex : this->textures) {

@@ -57,24 +57,6 @@ class Model : public Mesh {
 
 		// SETTERS //
 
-		// Draws the bounding box of the model.
-		// If the bounding box is in world origin (0, 0, 0) you need to call `set_transform()`
-		void draw_collider(const Camera& camera, const Color& color = Colors::RED, const bool stripped = false) noexcept;
-
-		// Applies the model's transformations to the bounding box.
-		// For dynamic transformations, use `set_dynamic_transform(bool)`.
-		// Important: Call this *before* any bounding box calculations, otherwise, results will be incorrect.
-		void set_transform() {
-			this->update_model_matrix(); // Needs updated matrix
-			this->bbox.update_world_bounds(this->model);
-		}
-
-		// Sets whether the bounding box should be dynamically recalculated
-		void set_dynamic_transform(const bool value) noexcept {
-			this->dynamic_bounding = value;
-			this->set_transform(); // Just in case
-		}
-
 		// Sets a new position using a 3D vector
 		inline void set_position(const vec3<float>& position) noexcept {
 			this->position = position;
@@ -137,13 +119,7 @@ class Model : public Mesh {
 		float angle             = 0.0f;                 // Rotation based on orientation
 		vec3<float> axis        = { 1.0f, 0.0f, 0.0f }; // Need to have at least one axis to work, even if angle is 0.0
 
-		// Matrix
-		bool isdirty; // Calculate matrix if anything changed
-		glm::mat4 model = glm::mat4(1.0f);
-
-		bool dynamic_bounding = false;
-
-		void update_model_matrix() noexcept;
+		void update_model_matrix() noexcept override;
 };
 
 

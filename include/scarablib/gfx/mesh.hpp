@@ -23,8 +23,7 @@ class Mesh {
 		// and i need it to build a bounding box
 
 		// Physics component
-		PhysicsComponent physics;
-
+		PhysicsComponent* physics = nullptr;
 
 		// Mesh is not build, you should provide vertices and indices with `set_geometry` method
 		Mesh() noexcept = default;
@@ -37,7 +36,7 @@ class Mesh {
 		// Build Mesh using a wavefront .obj file
 		Mesh(const char* path);
 
-		virtual ~Mesh() noexcept = default;
+		virtual ~Mesh() noexcept;
 
 		template <typename T>
 		void set_geometry(const std::vector<Vertex>& vertices, const std::vector<T>& indices);
@@ -66,6 +65,33 @@ class Mesh {
 			return nullptr;
 		}
 
+
+		// Enables physics components for the mesh.
+		// Both values are optional.
+		// `Mass` (1.0f) is in kilograms.
+		// `isstatic` (false) is whether the mesh is affected by gravity or not
+		inline void enable_physics(const float mass = 1.0f, const bool isstatic = false) noexcept {
+			this->physics = new PhysicsComponent();
+			this->physics->mass = mass;
+			this->physics->isstatic = isstatic;
+		}
+
+		// Applies the model's transformations (the moment is called) to the bounding box.
+		// For dynamic transformations, use `set_dynamic_transform(bool)`
+		void set_transform() {
+			this->update_model_matrix(); // Needs updated matrix
+			this->bbox.update_world_bounds(this->model);
+		}
+
+		// Sets whether the bounding box should be dynamically recalculated.
+		// This will transform the bounding box with the model matrix
+		void set_dynamic_transform(const bool value) noexcept {
+			this->dynamic_bounding = value;
+			this->set_transform(); // Just in case
+		}
+
+		virtual void update_model_matrix() noexcept = 0;
+
 	protected:
 		// OpenGL
 		GLsizei indices_length = 0; // For drawing (in 2D this is vertices size instead, but i dont know how to call it)
@@ -74,6 +100,12 @@ class Mesh {
 		// Current texture being used
 		// This will always be a shared pointer to other texture
 		Texture* texture = &Texture::default_texture(); // Default texture
+
+		// Matrix
+		bool isdirty; // Calculate matrix if anything changed
+		glm::mat4 model = glm::mat4(1.0f);
+
+		bool dynamic_bounding = false;
 };
 
 

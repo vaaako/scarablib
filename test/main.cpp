@@ -57,15 +57,15 @@ void camera_movement(Window& window, Camera& camera, const float dt) {
 }
 
 void update_gravity(Model& model, const float dt, const float ground_y = 0.0f) {
-	if(model.physics.on_ground) {
+	if(model.physics->on_ground) {
 		return;
 	}
 
 	// Apply earth's gravity
-	model.physics.velocity.y += -9.8f * dt; // Since it accumulates, longer it falls the faster
+	model.physics->velocity.y += -9.8f * dt; // Since it accumulates, longer it falls the faster
 
 	// Move model
-	model.set_position(model.get_position() + model.physics.velocity * dt);
+	model.set_position(model.get_position() + model.physics->velocity * dt);
 
 	// Collision check with ground
 	if(model.get_position().y <= ground_y) {
@@ -73,8 +73,8 @@ void update_gravity(Model& model, const float dt, const float ground_y = 0.0f) {
 		model.set_y(ground_y);
 
 		// Setop falling
-		model.physics.velocity.y = 0.0f;
-		model.physics.on_ground = true;
+		model.physics->velocity.y = 0.0f;
+		model.physics->on_ground = true;
 	}
 }
 
@@ -103,8 +103,8 @@ int main() {
 	cow->set_position({ 0.0f, 0.0f, -20.0f });
 	cow->set_color(Colors::CHIROYELLOW);
 	cow->set_orientation(90.0f, { false, false, true });
-	cow->set_transform(); // Apply changes to the bounding box
-	// cow->set_dynamic_transform(true); // Update bounding box with the model matrix
+	// cow->set_transform(); // Update local bounds
+	cow->set_dynamic_transform(true); // Update bounding box with the model matrix
 
 	Rectangle* rect = scene2d.add<Rectangle>("rect");
 	rect->set_position({ 100.0f, 100.0f });
@@ -114,7 +114,7 @@ int main() {
 	Cube* cube = scene3d.add<Cube>("cube", Cube::Face::FRONT | Cube::Face::BACK);
 	cube->set_position({ 0.0f, 0.0f, -5.0f });
 	cube->set_scale(vec3<float>(2.0f));
-	// cube->enable_physics(mass: 1.0f, gravity: true)
+	cube->enable_physics(1.0f, true);
 	// Then PhysicsComponent is nullptr until enabled
 	// Physics component may have apply_gravity member
 	// Scene3D may have a update_physics method that calls all physics components of all models in map
@@ -141,11 +141,13 @@ int main() {
 			window.close();
 		}
 
-		// LOG_DEBUG("Cube position: %f %f %f", cube->get_position().x, cube->get_position().y, cube->get_position().z);
 		window.set_title("FPS: " + std::to_string(window.fps()));
 
 		cow->set_rotation(angle, { true, false, true });
-		cow->draw_collider(camera, Colors::RED, false);
+
+		// Debug draw bounds
+		cow->bbox.draw_local_bounds(camera, Colors::GREEN, true);
+		cow->bbox.draw_world_bounds(camera, Colors::RED, false);
 
 		while(accumulator >= FIXED_DT) {
 			// update_gravity(*cube, FIXED_DT);
