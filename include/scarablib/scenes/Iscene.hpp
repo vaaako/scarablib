@@ -26,12 +26,12 @@ class IScene {
 		virtual ~IScene() noexcept;
 
 		// Add a shape to the scene
-		template <typename U>
-		U* add(const std::string_view& key);
+		template <typename U, typename... Args>
+		U* add(const std::string_view& key, Args&&... args);
 
 		// Add a model to the scene
-		template <typename U>
-		U* add(const std::string_view& key, const char* path);
+		// template <typename U>
+		// U* add(const std::string_view& key, const char* path);
 
 		// You are trying to pass a temporary object to the scene.
 		// Use the `add_to_scene(const std::string_view& key, T* mesh)` function
@@ -132,6 +132,13 @@ void IScene<T>::remove_by_key(const std::string_view& key) {
 
 template <typename T>
 void IScene<T>::add_to_scene(const std::string_view& key, const std::shared_ptr<T>& mesh) {
+
+}
+
+
+template <typename T>
+template <typename U, typename... Args>
+U* IScene<T>::add(const std::string_view& key, Args&&... args) {
 	static_assert(std::is_base_of_v<Mesh, T>,
 			"Scene can only be instantiated with Mesh types");
 
@@ -139,13 +146,14 @@ void IScene<T>::add_to_scene(const std::string_view& key, const std::shared_ptr<
 		throw ScarabError("Key '%s' already exists", key.data());
 	}
 
-	this->scene.emplace(key, mesh); // Used be get_by_key()
+	std::shared_ptr<T> mesh_ptr = std::make_shared<U>(std::forward<Args>(args)...); // Create new mesh
+	this->scene.emplace(key, mesh_ptr); // Used be get_by_key()
 
-	auto& vao_groups = this->vao_groups[mesh->bundle.get_vao_id()];
+	auto& vao_groups = this->vao_groups[mesh_ptr->bundle.get_vao_id()];
 
 	// Sort shaders to minimize shader changes
 	// Find the correct position for insertion
-	auto it = std::lower_bound(vao_groups.begin(), vao_groups.end(), mesh,
+	auto it = std::lower_bound(vao_groups.begin(), vao_groups.end(), mesh_ptr,
 		[](const std::shared_ptr<T>& a, const std::shared_ptr<T>& b) {
 
 		auto sa = a->get_shader();
@@ -171,22 +179,7 @@ void IScene<T>::add_to_scene(const std::string_view& key, const std::shared_ptr<
 	});
 
 	// Insert the model in the correct place
-	vao_groups.insert(it, mesh);
-}
-
-template <typename T>
-template <typename U>
-U* IScene<T>::add(const std::string_view& key) {
-	std::shared_ptr<T> mesh_ptr = std::make_shared<U>(); // Create new mesh
-	this->add_to_scene(key, mesh_ptr);
-	return static_cast<U*>(mesh_ptr.get());
-}
-
-template <typename T>
-template <typename U>
-U* IScene<T>::add(const std::string_view& key, const char* path) {
-	std::shared_ptr<T> mesh_ptr = std::make_shared<U>(path); // Create new mesh
-	this->add_to_scene(key, mesh_ptr);
+	vao_groups.insert(it, mesh_ptr);
 	return static_cast<U*>(mesh_ptr.get());
 }
 

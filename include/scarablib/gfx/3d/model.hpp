@@ -15,6 +15,8 @@ class Model : public Mesh {
 	friend Scene3D;
 
 	public:
+		// Model is not build, you should provide vertices and indices with `set_geometry` method
+		Model() noexcept = default;
 		// To make a model use ModelFactory.
 		// Init model using custom config and pre-defined VAO.
 		// Vertices and Indices will be used to gerate VBO and EBO in this VAO

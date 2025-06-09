@@ -69,7 +69,7 @@ class VAOManager {
 
 template<typename T, typename U>
 GLuint VAOManager::get_or_make_vao(const std::vector<T>& vertices, const std::vector<U>& indices, const GLenum usage) {
-	static_assert(std::is_same<T, vec3<float>>::value || std::is_same<T, Vertex>::value,
+	static_assert(std::is_same_v<T, vec3<float>> || std::is_same_v<T, Vertex>,
 			"Only vec3<float> and Vertex types for vertices are accepted");
 
 	static_assert(
@@ -109,7 +109,7 @@ GLuint VAOManager::get_or_make_vao(const std::vector<T>& vertices, const std::ve
 // Specialized hash function for better distribution
 template <typename T, typename U>
 size_t VAOManager::compute_hash(const std::vector<T>& vertices, const std::vector<U>& indices) const noexcept {
-	static_assert(std::is_same<T, vec3<float>>::value || std::is_same<T, Vertex>::value,
+	static_assert(std::is_same_v<T, vec3<float>> || std::is_same_v<T, Vertex>,
 			"Only vec3<float> and Vertex types for vertices are accepted");
 
 	static_assert(

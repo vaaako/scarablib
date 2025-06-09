@@ -91,7 +91,7 @@ int main() {
 	});
 
 	Camera camera = Camera(window);
-	camera.position = { -1.0f, 20.0f, 60.0f };
+	// camera.position = { -1.0f, 20.0f, 60.0f };
 	camera.set_speed(1.0f * 100.0f);
 
 	Camera2D camera2d = Camera2D(window);
@@ -111,8 +111,8 @@ int main() {
 	rect->set_size({ 50.0f, 50.0f });
 	rect->set_color(Colors::RED);
 
-	Cube* cube = scene3d.add<Cube>("cube");
-	cube->set_position({ 0.0f, 100.0f, -5.0f });
+	Cube* cube = scene3d.add<Cube>("cube", Cube::Face::FRONT | Cube::Face::BACK);
+	cube->set_position({ 0.0f, 0.0f, -5.0f });
 	cube->set_scale(vec3<float>(2.0f));
 	// cube->enable_physics(mass: 1.0f, gravity: true)
 	// Then PhysicsComponent is nullptr until enabled
@@ -141,14 +141,14 @@ int main() {
 			window.close();
 		}
 
-		LOG_DEBUG("Cube position: %f %f %f", cube->get_position().x, cube->get_position().y, cube->get_position().z);
+		// LOG_DEBUG("Cube position: %f %f %f", cube->get_position().x, cube->get_position().y, cube->get_position().z);
 		window.set_title("FPS: " + std::to_string(window.fps()));
 
 		cow->set_rotation(angle, { true, false, true });
 		cow->draw_collider(camera, Colors::RED, false);
 
 		while(accumulator >= FIXED_DT) {
-			update_gravity(*cube, FIXED_DT);
+			// update_gravity(*cube, FIXED_DT);
 			camera_movement(window, camera, FIXED_DT);
 			accumulator -= FIXED_DT;
 		}

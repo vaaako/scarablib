@@ -1,5 +1,4 @@
 #include "scarablib/opengl/vao_manager.hpp"
-#include "scarablib/proper/log.hpp"
 
 GLuint VAOManager::get_vao(const size_t hash) const noexcept {
 	auto it = vao_map.find(hash);

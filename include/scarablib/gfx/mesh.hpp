@@ -26,6 +26,8 @@ class Mesh {
 		PhysicsComponent physics;
 
 
+		// Mesh is not build, you should provide vertices and indices with `set_geometry` method
+		Mesh() noexcept = default;
 		// Build Mesh using vertices and indices
 		template <typename T>
 		Mesh(const std::vector<Vertex>& vertices, const std::vector<T>& indices) noexcept;
@@ -36,6 +38,9 @@ class Mesh {
 		Mesh(const char* path);
 
 		virtual ~Mesh() noexcept = default;
+
+		template <typename T>
+		void set_geometry(const std::vector<Vertex>& vertices, const std::vector<T>& indices);
 
 		// Gets a reference to the current texture
 		inline Texture& get_texture() const noexcept {
@@ -63,8 +68,8 @@ class Mesh {
 
 	protected:
 		// OpenGL
-		GLsizei indices_length; // For drawing (in 2D this is vertices size instead, but i dont know how to call it)
-		GLenum indices_type;    // For drawing (not used for 2D shapes)
+		GLsizei indices_length = 0; // For drawing (in 2D this is vertices size instead, but i dont know how to call it)
+		GLenum indices_type    = 0; // For drawing (not used for 2D shapes)
 
 		// Current texture being used
 		// This will always be a shared pointer to other texture
@@ -73,11 +78,17 @@ class Mesh {
 
 
 template <typename T>
-Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<T>& indices) noexcept
-	: bbox(vertices), indices_length(static_cast<GLsizei>(indices.size())),
-	  indices_type(
-		(std::is_same_v<T, uint32>) ? GL_UNSIGNED_INT :
-		(std::is_same_v<T, uint16>) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_BYTE) {
+Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<T>& indices) noexcept {
+	this->set_geometry(vertices, indices);
+}
+
+
+template <typename T>
+void Mesh::set_geometry(const std::vector<Vertex>& vertices, const std::vector<T>& indices) {
+	this->bbox = BoundingBox(vertices);
+	this->indices_length = static_cast<GLsizei>(indices.size()),
+	this->indices_type = (std::is_same_v<T, uint32>) ? GL_UNSIGNED_INT :
+		(std::is_same_v<T, uint16>) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_BYTE;
 
 	this->bundle.make_vao_with_manager(vertices, indices);
 }
