@@ -7,6 +7,7 @@
 #include "scarablib/window/window.hpp"
 #include <algorithm>
 #include <memory>
+#include <string_view>
 
 // Different modes of drawing shapes
 // - `OUTLINEMODE`: draws the outline of the shape
@@ -24,15 +25,17 @@ class IScene {
 		IScene() noexcept;
 		virtual ~IScene() noexcept;
 
-		// Add a shape to the scene.
-		// Do not pass a pointer of a non allocated model or a temporary object.
-		// The pointer passed is transformed into a shared pointer, so it will be automatically deleted.
-		// Do not manually delete or a double free will occur
-		virtual void add_to_scene(const std::string_view& key, T* mesh);
+		// Add a shape to the scene
+		template <typename U>
+		U* add(const std::string_view& key);
+
+		// Add a model to the scene
+		template <typename U>
+		U* add(const std::string_view& key, const char* path);
 
 		// You are trying to pass a temporary object to the scene.
 		// Use the `add_to_scene(const std::string_view& key, T* mesh)` function
-		void add_to_scene(const std::string_view& key, T&& mesh);
+		// void add(const std::string_view& key, T&& mesh);
 
 		// Returns an object by key and dynamically convert it.
 		template <typename U>
@@ -80,6 +83,10 @@ class IScene {
 			Shaders::DEFAULT_VERTEX,     // Default vertex shader source.
 			Shaders::DEFAULT_FRAGMENT    // Default fragment shader source.
 		);  // Pointer to the default shader used by the scene.
+
+	private:
+		// Auxiliary method to add a model to the scene
+		void add_to_scene(const std::string_view& key, const std::shared_ptr<T>& mesh);
 };
 
 
@@ -120,38 +127,43 @@ void IScene<T>::remove_by_key(const std::string_view& key) {
 	this->scene.erase(it);
 }
 
-template <typename T>
-void IScene<T>::add_to_scene(const std::string_view& key, T* mesh) {
-	static_assert(std::is_base_of<Mesh, T>::value,
-			"Scene can only be instantiated with Mesh");
 
-	if(!mesh) {
-		throw ScarabError("Attempted to add a null mesh to the scene with key '%s'", key.data());
+
+
+template <typename T>
+void IScene<T>::add_to_scene(const std::string_view& key, const std::shared_ptr<T>& mesh) {
+	static_assert(std::is_base_of_v<Mesh, T>,
+			"Scene can only be instantiated with Mesh types");
+
+	if(this->scene.find(key) != this->scene.end()) {
+		throw ScarabError("Key '%s' already exists", key.data());
 	}
 
-	std::shared_ptr<T> shared_mesh = std::shared_ptr<T>(mesh);
-	this->scene.emplace(key, shared_mesh); // Used be get_by_key()
+	this->scene.emplace(key, mesh); // Used be get_by_key()
 
-	auto& vao_groups = this->vao_groups[mesh->get_bundle().get_vao_id()];
+	auto& vao_groups = this->vao_groups[mesh->bundle.get_vao_id()];
 
 	// Sort shaders to minimize shader changes
 	// Find the correct position for insertion
-	auto it = std::lower_bound(vao_groups.begin(), vao_groups.end(), shared_mesh,
+	auto it = std::lower_bound(vao_groups.begin(), vao_groups.end(), mesh,
 		[](const std::shared_ptr<T>& a, const std::shared_ptr<T>& b) {
 
-		// If a has no shader (default) and b has a shader, put a before b
-		if(a->get_shader() == nullptr && b->get_shader() != nullptr) {
+		auto sa = a->get_shader();
+		auto sb = b->get_shader();
+
+		// If A has no shader (default) and B has a shader, put a before B
+		if(!sa && sb) {
 			return true;
 		}
 
-		// If a has a shader and b has no shader (default), put b before a
-		if(a->get_shader() != nullptr && b->get_shader() == nullptr) {
+		// If A has a shader and B has no shader (default), put B before A
+		if(sa && !sb) {
 			return false;
 		}
 
 		// Fallback: Sort by shader ID
-		if(a->get_shader() != nullptr && b->get_shader() != nullptr) {
-			return a->get_shader()->get_id() < b->get_shader()->get_id();
+		if(sa && sb) {
+			return sa->get_id() < sb->get_id();
 		}
 
 		// Fallback: If both have no shaders, maintain original order
@@ -159,12 +171,28 @@ void IScene<T>::add_to_scene(const std::string_view& key, T* mesh) {
 	});
 
 	// Insert the model in the correct place
-	vao_groups.insert(it, shared_mesh);
+	vao_groups.insert(it, mesh);
 }
-
 
 template <typename T>
-void IScene<T>::add_to_scene(const std::string_view& key, T&& mesh)  {
-	mesh; // Prevent unused parameter warning
-	throw ScarabError("You are trying to add a mesh to the scene, but %s is a temporary object, which is not allowed", key.data());
+template <typename U>
+U* IScene<T>::add(const std::string_view& key) {
+	std::shared_ptr<T> mesh_ptr = std::make_shared<U>(); // Create new mesh
+	this->add_to_scene(key, mesh_ptr);
+	return static_cast<U*>(mesh_ptr.get());
 }
+
+template <typename T>
+template <typename U>
+U* IScene<T>::add(const std::string_view& key, const char* path) {
+	std::shared_ptr<T> mesh_ptr = std::make_shared<U>(path); // Create new mesh
+	this->add_to_scene(key, mesh_ptr);
+	return static_cast<U*>(mesh_ptr.get());
+}
+
+
+// template <typename T>
+// void IScene<T>::add_to_scene(const std::string_view& key, T&& mesh)  {
+// 	mesh; // Prevent unused parameter warning
+// 	throw ScarabError("You are trying to add a mesh to the scene, but %s is a temporary object, which is not allowed", key.data());
+// }

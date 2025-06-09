@@ -88,6 +88,11 @@ install: $(TARGET_STATIC)
 	@cp -r include/$(TARGET) $(INSTALL_INCLUDE_DIR)
 	@cp $(TARGET_STATIC) /usr/local/lib
 
+# Uninstall
+uninstall:
+	@echo "Uninstalling $(TARGET_STATIC) from /usr/local/lib and /usr/local/include"
+	@rm -rf $(INSTALL_INCLUDE_DIR)
+	@rm -f /usr/local/lib/$(TARGET_STATIC)
 
 # Test with static
 # TODO -- change to shared later

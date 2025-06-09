@@ -73,16 +73,16 @@ struct Billboard : public Model {
 	private:
 		// Precalculated directions
 		const float directions[8] = {
-			0.0f,                // [  0°] EAST        (RIGHT)
-			M_PI_4f,             // [ 45°] NORTHEAST   (UP-RIGHT)
-			M_PI_2f,             // [ 90°] NORTH       (UP)
-			2.356194490192345f,  // [135°] NORTHWEST   (UP-LEFT)     3.0f * M_PI_4f
-			M_PIf,               // [180°] WEST        (LEFT)
-			3.9269908169872414f, // [225°] SOUTHWEST   (DOWN-LEFT)   5.0f * M_PI_4f
-			4.71238898038469f,   // [270°] SOUTH       (DOWN)        3.0f * M_PI_2f
-			5.497787143782138f   // [315°] SOUTHEAST   (DOWN-RIGHT)  7.0f * M_PI_4f
+			0.0f,           // [  0°] EAST        (RIGHT)
+			M_PI_4f,        // [ 45°] NORTHEAST   (UP-RIGHT)
+			M_PI_2f,        // [ 90°] NORTH       (UP)
+			3.0f * M_PI_4f, // [135°] NORTHWEST   (UP-LEFT)
+			M_PIf,          // [180°] WEST        (LEFT)
+			5.0f * M_PI_4f, // [225°] SOUTHWEST   (DOWN-LEFT)
+			3.0f * M_PI_2f, // [270°] SOUTH       (DOWN)
+			7.0f * M_PI_4f  // [315°] SOUTHEAST   (DOWN-RIGHT)
 		};
-		// Inside use macro
+		// Scoped macro
 		static constexpr float M_PI2 = M_PIf * 2.0f;
 
 		// Directional textures

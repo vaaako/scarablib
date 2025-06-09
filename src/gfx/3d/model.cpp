@@ -67,7 +67,7 @@ void Model::draw(const Camera& camera, const Shader& shader) noexcept {
 }
 
 
-// TODO: Not working and some changes needed
+// TODO: Not working correctly and some changes needed
 void Model::draw_collider(const Camera& camera, const Color& color, const bool stripped) noexcept {
 	// Switch to fixed-function pipeline
 	glBindVertexArray(0);

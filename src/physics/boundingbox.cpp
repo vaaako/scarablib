@@ -1,4 +1,4 @@
-#include "scarablib/gfx/3d/boundingbox.hpp"
+#include "scarablib/physics/boundingbox.hpp"
 
 BoundingBox::BoundingBox(const std::vector<Vertex>& vertices) noexcept {
 	this->calculate_local_bounds(vertices);
@@ -30,5 +30,7 @@ void BoundingBox::update_world_bounds(const glm::mat4& model_matrix) noexcept {
 		this->min = glm::min(this->min, world_pos);
 		this->max = glm::max(this->max, world_pos);
 	}
+
+	this->size = this->max - this->min;
 }
 

@@ -227,8 +227,15 @@ class Window {
 		// TIMER //
 
 		// Window FPS per second
-		inline float fps() const noexcept {
+		inline float fps() noexcept {
+			if(this->delta_time <= 0.0f) {
+				return 0.0f;
+			}
 			return 1.0f / this->delta_time;
+
+			// const float alpha = 0.1f; // Smoothing factor
+			// this->smooth_fps = this->smooth_fps * (1.0f - alpha) + (1.0f / this->delta_time) * alpha;
+			// return this->smooth_fps;
 		}
 
 		// Get the time elapsed between the current and last frame, in seconds.
@@ -251,17 +258,17 @@ class Window {
 		// INPUT HANDLERS //
 
 		// Returns true if a key is being pressed
-		inline bool isdown(const Keycode key) const noexcept {
+		inline bool iskeydown(const Keycode key) const noexcept {
 			return (this->keystate.at(static_cast<uint32>(key)) == Keystate::DOWN);
 		}
 
 		// Returns true if a key is up
-		inline bool isup(const Keycode key) const noexcept {
+		inline bool iskeyup(const Keycode key) const noexcept {
 			return (this->keystate.at(static_cast<uint32>(key)) == Keystate::RELEASED);
 		}
 
 		// Return true if a key was pressed
-		bool ispressed(const Keycode key) noexcept;
+		bool iskeypressed(const Keycode key) noexcept;
 
 		// Returns the state of a key
 		inline Keystate get_keystate(const Keycode key) const noexcept {
@@ -362,13 +369,10 @@ class Window {
 		uint64 last_update = 0; // Updated on swap_buffers (frame end)
 
 		// INPUT HANDLERS
-		// MouseHandler mouse_handler = MouseHandler();
-
 		// Keyboard events in this frame
 		// Init vector with the size of SDL scancodes
 		std::vector<Keystate> keystate
 			= std::vector<Keystate>((uint32)Keycode::NUM_SCANCODES, Keystate::RELEASED);
-
 
 		// Store the state of all mouse buttons (LMB, MMB, RMB, SIDE1, SIDE2)
 		std::vector<Buttonstate> buttonstate
@@ -385,7 +389,7 @@ class Window {
 
 
 		// Called at the beggining of the frame.
-		void calc_fps_and_dt() noexcept;
+		void calc_dt() noexcept;
 
 		// Set the viewport to the provided size.
 		// This won't change the window's size

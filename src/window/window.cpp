@@ -123,12 +123,17 @@ Window::~Window() noexcept {
 }
 
 // private
-void Window::calc_fps_and_dt() noexcept {
+void Window::calc_dt() noexcept {
 	const uint64 now = SDL_GetPerformanceCounter();
 	const uint64 elapsed = now - this->last_update;
 	this->last_update = now;
 	this->delta_time = static_cast<float>(elapsed) / static_cast<float>(SDL_GetPerformanceFrequency());
 	// note: elapsed may be multiplied by 1000.0f to get milliseconds
+
+	// Ignore bad frame times (first frame, context switch, GPU stall, etc)
+	if(this->delta_time <= 0.0f || this->delta_time >= 0.2f) {
+		this->delta_time = 0.0f;
+	}
 }
 
 void Window::frame_capping(const float fps) const noexcept {
@@ -138,12 +143,12 @@ void Window::frame_capping(const float fps) const noexcept {
 
 	const float desired = 1.0f / fps;
 	const float actual = this->dt();
+	const float remaining = desired - actual;
 
 	// If not synchronized
-	if(actual < desired) {
-		// Delay to make it synchronized
-		const uint32 remaining = static_cast<uint32>((desired - actual) * 1000);
-		SDL_Delay(remaining);
+	if(remaining > 0.0f) {
+		// Convert to milliseconds, clamp minimum delay to avoid 0ms inaccuracies
+		SDL_Delay(static_cast<uint32>(remaining * 1000));
 	}
 	// If actual >= desired, the frame is already running slower than desired, so no delay is needed
 }
@@ -162,7 +167,7 @@ void Window::set_size(const vec2<uint32>& size) noexcept {
 }
 
 
-bool Window::ispressed(const Keycode key) noexcept {
+bool Window::iskeypressed(const Keycode key) noexcept {
 	uint32 scancode = static_cast<uint32>(key);
 	if (scancode >= keystate.size()) {
 		return false;
@@ -181,7 +186,7 @@ bool Window::ispressed(const Keycode key) noexcept {
 
 void Window::process_events() noexcept {
 	// Frame beggining calculations
-	this->calc_fps_and_dt();
+	this->calc_dt();
 
 	SDL_Event event;
 	while(SDL_PollEvent(&event)) {

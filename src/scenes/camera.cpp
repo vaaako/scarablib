@@ -36,11 +36,11 @@ void Camera::update_camera_vectors() noexcept {
 }
 
 
-void Camera::move(const vec3<int8>& dir, const float dt) noexcept {
+void Camera::move(const vec3<float>& dir, const float dt) noexcept {
 	// Combine movement direction
-	vec3<float> move = this->forward * (float)dir.z +
-					   this->up * (float)dir.y +
-					   this->right * (float)dir.x;
+	vec3<float> move = this->forward * dir.z +
+					   this->up      * dir.y +
+					   this->right   * dir.x;
 
 	// Normalize only horizontal (XZ) to prevent faster diagonal movement
 	if(dir.x != 0.0f || dir.z != 0.0f) {

@@ -4,6 +4,9 @@
 #include <string_view>
 #include <unordered_map>
 
+// Manages all loaded shaders.
+// This exists for the same reason as the VAO manager.
+// To different instances with same shader don't re-load the shader every new instance
 class ShaderManager {
 	public:
 		static ShaderManager& get_instance() {

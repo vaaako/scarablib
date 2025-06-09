@@ -1,7 +1,6 @@
 #pragma once
 
 #include <GL/glew.h>
-#include "scarablib/gfx/3d/boundingbox.hpp"
 #include "scarablib/gfx/mesh.hpp"
 #include "scarablib/opengl/shader.hpp"
 #include "scarablib/scenes/camera.hpp"
@@ -29,7 +28,9 @@ class Model : public Mesh {
 		// 	return Model(*this);
 		// }
 
-		// Draws current Model
+		// This method does not draw the model to the screen, as it does not bind the VAO and Shader.
+		// This is a auxiliary method used by Scene3D. It does not bind VAO and Shader because of batch rendering.
+		// This is the default draw method and a different model may have a overrided draw method (like billboard)
 		virtual void draw(const Camera& camera, const Shader& shader) noexcept;
 
 		// Returns current position

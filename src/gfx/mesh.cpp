@@ -13,11 +13,11 @@ template <typename OUT, typename INP>
 std::vector<OUT> convert_to(const std::vector<INP>& indices) {
 	std::vector<OUT> output;
 	output.reserve(indices.size());
-	for(INP val : indices) {
+	for (INP val : indices) {
 		output.push_back(static_cast<OUT>(val));
 	}
 	return output;
-};
+}
 
 // Indices attributes are not needed to set here
 // I will not make Bounding Box here because this is probably a 2D model

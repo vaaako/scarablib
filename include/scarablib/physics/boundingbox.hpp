@@ -25,11 +25,11 @@ struct BoundingBox {
 		return this->min + (this->size * 0.5f);
 	}
 
-	// Computes the bounding box in local space using the model's vertices.
+	// Computes the center of bounding box in local space using the model's vertices.
 	// Generally used when creating a new bounding box
 	void calculate_local_bounds(const std::vector<Vertex>& vertices) noexcept;
 
-	// Updates the bounding box in world space using the model's transformation matrix.
+	// Updates the center of bounding box in world space using the model's transformation matrix.
 	// This ensures the bounding box aligns with the model's position, scale, and rotation
 	void update_world_bounds(const glm::mat4& model_matrix) noexcept;
 

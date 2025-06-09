@@ -3,7 +3,6 @@
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/trigonometric.hpp"
-#include "scarablib/input/mouse.hpp"
 #include "scarablib/proper/log.hpp"
 #include "scarablib/window/window.hpp"
 
@@ -15,10 +14,10 @@ class Camera {
 		// Camera's sensitivity
 		float sensitivity;
 		// Horizontal rotation.
-		// To rotate camera using the mouse, use `Camera::rotate(const MouseHandler& mouse)`
+		// To rotate camera using the mouse, use `Camera::rotate(const Window& window)`
 		float yaw = -90.0f;
 		// Vertical rotation
-		// To rotate camera using the mouse, use `Camera::rotate(const MouseHandler& mouse)`
+		// To rotate camera using the mouse, use `Camera::rotate(const Window& window)`
 		float pitch = 0.0f;
 
 		enum Zoom : bool {
@@ -161,7 +160,7 @@ class Camera {
 		// Moves the camera using a unit vector.
 		// Where X is front/back, Y is up/down and Z is left/right.
 		// Example: [1, 0, -1] means the camera moved to Front-Left
-		void move(const vec3<int8>& dir, const float dt) noexcept;
+		void move(const vec3<float>& dir, const float dt) noexcept;
 
 		// Use mouse moved direction to rotate the camera
 		// void rotate(const MouseHandler& mouse) noexcept;
