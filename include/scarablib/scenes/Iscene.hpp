@@ -124,16 +124,12 @@ void IScene<T>::remove_by_key(const std::string_view& key) {
 	if(it == this->scene.end()) {
 		throw ScarabError("Key '%s' was not found", key.data());
 	}
+	// Remove from the scene key map
 	this->scene.erase(it);
+	// Remove from the scene vao map
+	this->vao_groups.erase(it->second->bundle.get_vao_id());
 }
 
-
-
-
-template <typename T>
-void IScene<T>::add_to_scene(const std::string_view& key, const std::shared_ptr<T>& mesh) {
-
-}
 
 
 template <typename T>

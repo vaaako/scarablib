@@ -76,18 +76,16 @@ class Mesh {
 			this->physics->isstatic = isstatic;
 		}
 
-		// Applies the model's transformations (the moment is called) to the bounding box.
-		// For dynamic transformations, use `set_dynamic_transform(bool)`
-		void set_transform() {
+		// Updates the bounding box based on the transformations of the Model.
+		// For dynamic transformations, use `set_dynamic_bbox_update(bool)`
+		void update_bbox() {
 			this->update_model_matrix(); // Needs updated matrix
 			this->bbox.update_world_bounds(this->model);
 		}
 
-		// Sets whether the bounding box should be dynamically recalculated.
-		// This will transform the bounding box with the model matrix
-		void set_dynamic_transform(const bool value) noexcept {
+		// Sets whether the bounding box should be dynamically transformed
+		void set_dynamic_bbox_update(const bool value) noexcept {
 			this->dynamic_bounding = value;
-			this->set_transform(); // Just in case
 		}
 
 		virtual void update_model_matrix() noexcept = 0;

@@ -38,7 +38,6 @@ struct BoundingBox {
 	// This ensures the bounding box aligns with the model's position, scale, and rotation
 	void update_world_bounds(const glm::mat4& model_matrix) noexcept;
 
-
 	// Check collision with another AABB
 	inline bool collides_with(const BoundingBox& other) const noexcept {
 		return (
@@ -72,20 +71,20 @@ struct BoundingBox {
 	// This is only intented to be used as a debug tool
 	void draw_world_bounds(const Camera& camera, const Color& color = Colors::RED, const bool stripped = false) noexcept;
 
-	// Returns the 8 corners of the bounding box in world space.
+	// Returns the 8 corners of the bounding box in local space.
 	// These corners are used for rendering, collision detection, and transformations
-	// inline std::vector<vec3<float>> get_bounding_corners() const noexcept {
-	// 	return {
-	// 		{ this->min.x, this->min.y, this->min.z },
-	// 		{ this->max.x, this->min.y, this->min.z },
-	// 		{ this->max.x, this->min.y, this->max.z },
-	// 		{ this->min.x, this->min.y, this->max.z },
-	// 		{ this->min.x, this->max.y, this->min.z },
-	// 		{ this->max.x, this->max.y, this->min.z },
-	// 		{ this->max.x, this->max.y, this->max.z },
-	// 		{ this->min.x, this->max.y, this->max.z }
-	// 	};
-	// }
+	inline std::vector<vec3<float>> get_local_corners() const noexcept {
+		return {
+			{ this->local_min.x, this->local_min.y, this->local_min.z },
+			{ this->local_max.x, this->local_min.y, this->local_min.z },
+			{ this->local_max.x, this->local_min.y, this->local_max.z },
+			{ this->local_min.x, this->local_min.y, this->local_max.z },
+			{ this->local_min.x, this->local_max.y, this->local_min.z },
+			{ this->local_max.x, this->local_max.y, this->local_min.z },
+			{ this->local_max.x, this->local_max.y, this->local_max.z },
+			{ this->local_min.x, this->local_max.y, this->local_max.z }
+		};
+	}
 
 	private:
 		void draw(const bool world, const Camera& camera, const Color& color, const bool stripped) noexcept;

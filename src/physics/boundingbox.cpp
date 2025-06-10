@@ -21,23 +21,11 @@ void BoundingBox::calculate_local_bounds(const std::vector<Vertex>& vertices) no
 }
 
 void BoundingBox::update_world_bounds(const glm::mat4& model_matrix) noexcept {
-	// Transform all 8 corners of the local bounding box
-	const std::vector<vec3<float>> corners = {
-		{ this->local_min.x, this->local_min.y, this->local_min.z },
-		{ this->local_max.x, this->local_min.y, this->local_min.z },
-		{ this->local_max.x, this->local_min.y, this->local_max.z },
-		{ this->local_min.x, this->local_min.y, this->local_max.z },
-		{ this->local_min.x, this->local_max.y, this->local_min.z },
-		{ this->local_max.x, this->local_max.y, this->local_min.z },
-		{ this->local_max.x, this->local_max.y, this->local_max.z },
-		{ this->local_min.x, this->local_max.y, this->local_max.z }
-	};
-
 	// Compute new world-space bounding box
 	this->min = vec3<float>(FLT_MAX);
 	this->max = vec3<float>(-FLT_MAX);
 
-	for(const vec3<float>& corner : corners) {
+	for(const vec3<float>& corner : this->get_local_corners()) {
 		const vec3<float> world_pos = model_matrix * vec4<float>(corner, 1.0f);
 		this->min = glm::min(this->min, world_pos);
 		this->max = glm::max(this->max, world_pos);
@@ -46,8 +34,6 @@ void BoundingBox::update_world_bounds(const glm::mat4& model_matrix) noexcept {
 	this->size = this->max - this->min;
 }
 
-
-// TODO: Not working correctly and some changes needed
 void BoundingBox::draw_local_bounds(const Camera& camera, const Color& color, const bool stripped) noexcept {
 	this->draw(false, camera, color, stripped);
 }
@@ -58,7 +44,7 @@ void BoundingBox::draw_world_bounds(const Camera& camera, const Color& color, co
 
 
 void BoundingBox::draw(const bool world, const Camera& camera, const Color& color, const bool stripped) noexcept {
-	// Switch to fixed-function pipeline
+	// Unbind any shader or vao
 	glBindVertexArray(0);
 	glUseProgram(0);
 

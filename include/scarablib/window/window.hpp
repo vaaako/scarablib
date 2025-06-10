@@ -259,7 +259,7 @@ class Window {
 
 		// General purpose state check for Keyboard and Mouse
 		template<typename StateEnum, typename CodeEnum>
-		inline bool is_state(const std::vector<StateEnum>& states, CodeEnum code, StateEnum expected) const noexcept {
+		inline bool is_state(const std::vector<StateEnum>& states, const CodeEnum code, const StateEnum expected) const noexcept {
 			return states[static_cast<uint32>(code)] == expected;
 		}
 

@@ -222,7 +222,7 @@ void Window::process_events() noexcept {
 
 				if(event.type == SDL_MOUSEBUTTONUP) {
 					// Reset all
-					this->set_buttonstate((Buttoncode)event.button.button, Buttonstate::DOWN);
+					this->set_buttonstate((Buttoncode)event.button.button, Buttonstate::UP);
 					this->clicks = 0;
 					this->click_pos = vec3<uint32>(0);
 				}
