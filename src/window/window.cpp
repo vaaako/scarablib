@@ -215,14 +215,14 @@ void Window::process_events() noexcept {
 				// CLICK //
 				if(event.type == SDL_MOUSEBUTTONDOWN) {
 					const SDL_MouseButtonEvent button = event.button;
-					this->set_buttonstate((Buttoncode)button.button, Buttonstate::PRESSED);
+					this->set_buttonstate((Buttoncode)button.button, Buttonstate::DOWN);
 					this->clicks = button.clicks;
 					this->click_pos = vec2<float>(button.x, button.y);
 				}
 
 				if(event.type == SDL_MOUSEBUTTONUP) {
 					// Reset all
-					this->set_buttonstate((Buttoncode)event.button.button, Buttonstate::RELEASED);
+					this->set_buttonstate((Buttoncode)event.button.button, Buttonstate::DOWN);
 					this->clicks = 0;
 					this->click_pos = vec3<uint32>(0);
 				}

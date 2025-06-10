@@ -257,17 +257,24 @@ class Window {
 
 		// INPUT HANDLERS //
 
-		// Returns true if a key is being pressed
+		// General purpose state check for Keyboard and Mouse
+		template<typename StateEnum, typename CodeEnum>
+		inline bool is_state(const std::vector<StateEnum>& states, CodeEnum code, StateEnum expected) const noexcept {
+			return states[static_cast<uint32>(code)] == expected;
+		}
+
+		// Returns true while the key is down
 		inline bool iskeydown(const Keycode key) const noexcept {
-			return (this->keystate.at(static_cast<uint32>(key)) == Keystate::DOWN);
+			return this->is_state(this->keystate, key, Keystate::DOWN);
 		}
 
 		// Returns true if a key is up
 		inline bool iskeyup(const Keycode key) const noexcept {
-			return (this->keystate.at(static_cast<uint32>(key)) == Keystate::RELEASED);
+			return this->is_state(this->keystate, key, Keystate::UP);
 		}
 
-		// Return true if a key was pressed
+		// Return true if a key is pressed.
+		// Like iskeydown, but returns only once
 		bool iskeypressed(const Keycode key) noexcept;
 
 		// Returns the state of a key
@@ -305,13 +312,13 @@ class Window {
 		}
 
 		// Returns true if a button was clicked
-		inline bool isclick(const Buttoncode button) const noexcept {
-			return this->buttonstate[static_cast<uint32>(button)] == Buttonstate::PRESSED;
+		inline bool isbtndown(const Buttoncode button) const noexcept {
+			return this->is_state(this->buttonstate, button, Buttonstate::DOWN);
 		}
 
 		// Checks if a button is released
-		inline bool isbup(const Buttonstate button) const noexcept {
-			return this->buttonstate[static_cast<uint32>(button)] == Buttonstate::RELEASED;
+		inline bool isbtnup(const Buttonstate button) const noexcept {
+			return this->is_state(this->buttonstate, button, Buttonstate::UP);
 		}
 
 		// Changes the state of a button
@@ -372,11 +379,11 @@ class Window {
 		// Keyboard events in this frame
 		// Init vector with the size of SDL scancodes
 		std::vector<Keystate> keystate
-			= std::vector<Keystate>((uint32)Keycode::NUM_SCANCODES, Keystate::RELEASED);
+			= std::vector<Keystate>((uint32)Keycode::NUM_SCANCODES, Keystate::UP);
 
 		// Store the state of all mouse buttons (LMB, MMB, RMB, SIDE1, SIDE2)
 		std::vector<Buttonstate> buttonstate
-			= std::vector<Buttonstate>(6, Buttonstate::RELEASED);
+			= std::vector<Buttonstate>(6, Buttonstate::UP);
 
 		uint32 clicks = 0;      // Clicks made
 		int scroll = 0;         // Scroll direction and amount

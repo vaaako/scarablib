@@ -3,8 +3,8 @@
 #include "scarablib/typedef.hpp"
 
 enum class Buttonstate : uint8 {
-	RELEASED,
-	PRESSED
+	UP,
+	DOWN
 };
 
 enum class Buttoncode : uint8 {

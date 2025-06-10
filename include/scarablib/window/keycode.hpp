@@ -29,7 +29,7 @@
 
 
 enum class Keystate : unsigned char {
-	RELEASED,
+	UP,
 	DOWN,
 	PRESSED // Called it one time only
 };

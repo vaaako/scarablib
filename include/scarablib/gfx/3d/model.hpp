@@ -7,13 +7,8 @@
 #include "scarablib/typedef.hpp"
 #include "scarablib/types/vertex.hpp"
 
-class Scene3D;
-
 // An object used for as a base for 3D Shapes
 class Model : public Mesh {
-	// Access bounding object and model matrix without using get method (less memory override)
-	friend Scene3D;
-
 	public:
 		// Model is not build, you should provide vertices and indices with `set_geometry` method
 		Model() noexcept = default;

@@ -58,6 +58,7 @@ Stuff that are in progress and i need to finish
 	+ Draw 2D and 3D shapes
 	+ Sprite support
 	+ 2D and 3D cutomizable camera
+- [x] Fix forward declarations
 
 # TODO Quick Fixes
 - [ ] Better texture constructor

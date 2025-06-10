@@ -9,18 +9,18 @@
 #include <memory>
 #include <string_view>
 
-// Different modes of drawing shapes
-// - `OUTLINEMODE`: draws the outline of the shape
-// - `FILLMODE`: draws the shape as normal
-enum DrawMode : uint32 {
-	OUTLINEMODE = GL_LINE,
-	FILLMODE = GL_FILL
-};
-
 // Virtual class used to make Scene2D and Scene3D
 template <typename T> // NOTE: Mesh always default?
 class IScene {
 	public:
+		// Different modes of drawing shapes
+		// - `OUTLINEMODE`: draws the outline of the shape
+		// - `FILLMODE`: draws the shape as normal
+		enum DrawMode : uint32 {
+			OUTLINEMODE = GL_LINE,
+			FILLMODE = GL_FILL
+		};
+
 		// Build scene object using the window object for viewport.
 		IScene() noexcept;
 		virtual ~IScene() noexcept;
@@ -62,7 +62,7 @@ class IScene {
 			return *this->shader;
 		}
 
-		// Sets the polygon drawing mode for both front and back faces
+		// Sets the polygon drawing mode
 		inline void set_drawmode(const DrawMode drawmode) noexcept {
 			glPolygonMode(GL_FRONT_AND_BACK, drawmode);
 		}
