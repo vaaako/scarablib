@@ -35,11 +35,11 @@ void Billboard::draw(const Camera& camera, const Shader& shader) noexcept {
 	shader.set_vector3f("billboardPos", this->position);
 	shader.set_float("billboardSize", this->scale.x);
 
-	shader.set_color("shapeColor", this->color);
+	shader.set_color("shapeColor", this->material.color);
 
-	this->texture->bind();
+	this->material.texture->bind();
 	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(this->indices_length), GL_UNSIGNED_BYTE, (void*)0);
-	this->texture->unbind();
+	this->material.texture->unbind();
 }
 
 
@@ -124,7 +124,7 @@ void Billboard::update_facing_texture(const vec3<float>& point_pos) noexcept {
 	// Only change if the sector is different
 	if(sector != this->cur_sector) {
 		this->cur_sector = sector;
-		this->set_texture(this->textures[sector]);
+		this->material.set_texture(this->textures[sector]);
 	}
 
 	#ifdef SCARAB_DEBUG_BILLBOARD_ANGLE

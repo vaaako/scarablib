@@ -1,18 +1,20 @@
 #pragma once
 
-#include "scarablib/physics/boundingbox.hpp"
+#include "scarablib/components/boundingbox.hpp"
+#include "scarablib/components/materialcomponent.hpp"
+#include "scarablib/components/physicscomponent.hpp"
 #include "scarablib/opengl/bufferbundle.hpp"
 #include "scarablib/opengl/shader.hpp"
-#include "scarablib/physics/physicscomponent.hpp"
 #include "scarablib/typedef.hpp"
 #include "scarablib/types/texture.hpp"
-#include "scarablib/types/vertex.hpp"
 #include <GL/glew.h>
-#include <vector>
 
 // Basic data for 3D and 2D shapes
 class Mesh {
 	public:
+		// Color and texture of the mesh
+		MaterialComponent material;
+
 		// Bundle for VAO, VBO and EBO
 		BufferBundle bundle;
 		// This is kinda wrong, because each instance of a Mesh will have copied bundle (but same VAO at least)
@@ -38,32 +40,9 @@ class Mesh {
 
 		virtual ~Mesh() noexcept;
 
+		// Build Mesh using vertices and indices
 		template <typename T>
 		void set_geometry(const std::vector<Vertex>& vertices, const std::vector<T>& indices);
-
-		// Gets a reference to the current texture
-		inline Texture& get_texture() const noexcept {
-			return *this->texture;
-		}
-
-		// Sets a new texture.
-		// If `texture` is nullptr, the default texture will be used instead
-		inline void set_texture(Texture* texture) noexcept {
-			this->texture = (texture != nullptr) ? texture : &Texture::default_texture();
-		}
-
-		// Removes the mesh's texture, reverting to the default texture.
-		// The default texture is a solid white texture
-		inline void remove_texture() noexcept {
-			this->texture = &Texture::default_texture();
-		}
-
-		// Returns nullptr, as the default shader from Scene2D is used.
-		// Overridden by models using custom shaders.
-		// Scene2D checks for nullptr, if so, uses default shader, otherwise, uses this method's shader.
-		virtual inline Shader* get_shader() const noexcept {
-			return nullptr;
-		}
 
 
 		// Enables physics components for the mesh.
@@ -90,14 +69,16 @@ class Mesh {
 
 		virtual void update_model_matrix() noexcept = 0;
 
+		// Returns nullptr, as the default shader from Scene2D is used.
+		// Overridden by models using custom shaders
+		virtual inline Shader* get_shader() const noexcept {
+			return nullptr;
+		}
+
 	protected:
 		// OpenGL
 		GLsizei indices_length = 0; // For drawing (in 2D this is vertices size instead, but i dont know how to call it)
 		GLenum indices_type    = 0; // For drawing (not used for 2D shapes)
-
-		// Current texture being used
-		// This will always be a shared pointer to other texture
-		Texture* texture = &Texture::default_texture(); // Default texture
 
 		// Matrix
 		bool isdirty; // Calculate matrix if anything changed

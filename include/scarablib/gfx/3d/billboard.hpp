@@ -62,7 +62,7 @@ struct Billboard : public Model {
 			LOG_ERROR_FN("Index out of range");
 			return;
 		}
-		this->set_texture(this->textures[index]);
+		this->material.set_texture(this->textures[index]);
 	}
 
 	// Returns the sahder used by the billboard

@@ -4,7 +4,6 @@
 #include "scarablib/gfx/mesh.hpp"
 #include "scarablib/opengl/shader.hpp"
 #include "scarablib/scenes/camera2d.hpp"
-#include "scarablib/types/color.hpp"
 #include "scarablib/types/vertex.hpp"
 
 // Renderable 2D object with transform/state
@@ -26,11 +25,6 @@ class Sprite : public Mesh {
 		// Returns current size
 		inline vec2<float> get_size() const noexcept {
 			return this->size;
-		}
-
-		// Returns color reference
-		inline Color& get_color() noexcept {
-			return this->color;
 		}
 
 		// Returns current rotation angle
@@ -70,12 +64,6 @@ class Sprite : public Mesh {
 			this->isdirty = true;
 		}
 
-		// Sets a new color.
-		// New color affects texture color if a texture is in use
-		inline void set_color(const Color& color) noexcept {
-			this->color = color;
-		}
-
 		// Sets a new rotation angle.
 		// `angle` should be in degrees
 		inline void set_angle(const float angle) noexcept {
@@ -85,10 +73,9 @@ class Sprite : public Mesh {
 
 	protected:
 		// Attributes
-		vec2<float> position;
-		vec2<float> size = vec2<float>(1.0f, 1.0f);
-		Color color      = Colors::WHITE;
-		float angle      = 0.0f;
+		vec2<float> position = vec2<float>(0.0f);
+		vec2<float> size     = vec2<float>(1.0f, 1.0f);
+		float angle          = 0.0f;
 
 		void update_model_matrix() noexcept override;
 };

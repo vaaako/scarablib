@@ -1,5 +1,6 @@
 #include "scarablib/gfx/2d/rectangle.hpp"
 #include "scarablib/gfx/3d/cube.hpp"
+#include "scarablib/gfx/skybox.hpp"
 #include "scarablib/proper/log.hpp"
 #include "scarablib/scenes/camera.hpp"
 #include "scarablib/scenes/camera2d.hpp"
@@ -33,14 +34,9 @@ void camera_movement(Window& window, Camera& camera, const float dt) {
 	// FIX: Diagonal movement acceleration
 	camera.move(direction, dt);
 
-	// if (direction.length_squared() > 0.0f) {
-	// 	direction = normalize(direction);
-	// 	camera.move(direction, dt);
-	// }
-
 	// ROTATION LOGIC //
 	// Only rotate when click on screen
-	if(!mouse_captured && window.isclick(Buttoncode::LMB)) {
+	if(!mouse_captured && window.isbtndown(Buttoncode::LMB)) {
 		LOG_INFO("Clicked");
 		mouse_captured = true;
 		window.grab_cursor(true);
@@ -49,7 +45,7 @@ void camera_movement(Window& window, Camera& camera, const float dt) {
 	// Rotate camera
 	if(mouse_captured) {
 		camera.rotate(window);
-		if(window.iskeypressed(Keycode::ESCAPE)) {
+		if(window.iskeypressed(Keycode::ESCAPE) || window.iskeypressed(Keycode::TAB)) {
 			mouse_captured = false;
 			window.grab_cursor(false);
 		}
@@ -91,46 +87,57 @@ int main() {
 	});
 
 	Camera camera = Camera(window);
-	// camera.position = { -1.0f, 20.0f, 60.0f };
-	camera.set_speed(1.0f * 100.0f);
+	camera.set_speed(200.0f);
 
 	Camera2D camera2d = Camera2D(window);
 
 	Scene2D scene2d = Scene2D(camera2d);
 	Scene3D scene3d = Scene3D(camera);
 
+	Skybox skybox = Skybox(camera, {
+		"test/assets/images/skybox/right.jpg",
+		"test/assets/images/skybox/left.jpg",
+		"test/assets/images/skybox/top.jpg",
+		"test/assets/images/skybox/bottom.jpg",
+		"test/assets/images/skybox/front.jpg",
+		"test/assets/images/skybox/back.jpg"
+	});
+
 	Model* cow = scene3d.add<Model>("cow", "test/assets/objs/cow.obj");
 	cow->set_position({ 0.0f, 0.0f, -20.0f });
-	cow->set_color(Colors::CHIROYELLOW);
+	cow->material.color = Colors::CHIROYELLOW;
 	cow->set_orientation(90.0f, { false, false, true });
-	// cow->set_transform(); // Update local bounds
-	cow->set_dynamic_transform(true); // Update bounding box with the model matrix
+	// cow->update_bbox(); // Update local bounds
+	cow->set_dynamic_bbox_update(true); // Update bounding box with the model matrix
 
 	Rectangle* rect = scene2d.add<Rectangle>("rect");
 	rect->set_position({ 100.0f, 100.0f });
 	rect->set_size({ 50.0f, 50.0f });
-	rect->set_color(Colors::RED);
+	rect->material.color = Colors::RED;
 
 	Cube* cube = scene3d.add<Cube>("cube", Cube::Face::FRONT | Cube::Face::BACK);
-	cube->set_position({ 0.0f, 0.0f, -5.0f });
+	cube->set_position({ 0.0f, 100.0f, -5.0f });
 	cube->set_scale(vec3<float>(2.0f));
 	cube->enable_physics(1.0f, true);
 	// Then PhysicsComponent is nullptr until enabled
 	// Physics component may have apply_gravity member
 	// Scene3D may have a update_physics method that calls all physics components of all models in map
 
+	// scene3d.remove_by_key("cube");
+	scene2d.remove_by_key("rect");
+
 	float dt = 0.0f;
 	float angle = 0.0f;
 
-	float accumulator = 0.0f;
-	const float FIXED_DT = 1.0f / 75.0f;
+	bool should_fall = false;
 
 	while(window.is_open()) {
-		window.clear();
+		window.clear(); // Draw start
+
+		// WINDOW EVENTS //
 		window.process_events();
 
 		dt = window.dt();
-		accumulator += dt;
 
 		window.on_event(Event::WINDOW_RESIZED, [&]() {
 			camera.update_viewport(window);
@@ -141,20 +148,35 @@ int main() {
 			window.close();
 		}
 
-		window.set_title("FPS: " + std::to_string(window.fps()));
+		if(window.iskeypressed(Keycode::F)) {
+			cube->physics->on_ground = false;
+			cube->set_y(100.0f);
+			should_fall = true;
+		}
 
+
+		window.set_title("FPS: " + std::to_string(window.fps()));
+		// WINDOW EVENTS //
+
+		// MODELS UPDATE //
 		cow->set_rotation(angle, { true, false, true });
+
+		if(should_fall) {
+			update_gravity(*cube, dt);
+			if(cube->get_position().y == 0.0f) {
+				should_fall = false;
+			}
+		}
 
 		// Debug draw bounds
 		cow->bbox.draw_local_bounds(camera, Colors::GREEN, true);
 		cow->bbox.draw_world_bounds(camera, Colors::RED, false);
+		// MODELS UPDATE //
 
-		while(accumulator >= FIXED_DT) {
-			// update_gravity(*cube, FIXED_DT);
-			camera_movement(window, camera, FIXED_DT);
-			accumulator -= FIXED_DT;
-		}
+		// OTHER EVENTS //
+		camera_movement(window, camera, dt);
 
+		skybox.draw();
 		scene2d.draw_all();
 		scene3d.draw_all();
 
@@ -163,7 +185,8 @@ int main() {
 		}
 
 		angle += 90.0f * dt; // 90 degrees per second
+		// OTHER EVENTS //
 
-		window.swap_buffers();
+		window.swap_buffers(); // Draw end
 	}
 }

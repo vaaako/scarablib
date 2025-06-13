@@ -1,4 +1,4 @@
-#include "scarablib/physics/boundingbox.hpp"
+#include "scarablib/components/boundingbox.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
 BoundingBox::BoundingBox(const std::vector<Vertex>& vertices) noexcept {

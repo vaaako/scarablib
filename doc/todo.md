@@ -60,6 +60,8 @@ Stuff that are in progress and i need to finish
 	+ 2D and 3D cutomizable camera
 - [x] Fix forward declarations
 
+- [ ] Material component and put in Model
+
 # TODO Quick Fixes
 - [ ] Better texture constructor
 	+ Use bitwise paramters

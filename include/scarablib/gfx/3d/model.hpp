@@ -20,11 +20,6 @@ class Model : public Mesh {
 		// Make a model using a wavefront .obj file
 		Model(const char* path) noexcept;
 
-		// Make a copy of this model
-		// inline Model make_instance() const noexcept {
-		// 	return Model(*this);
-		// }
-
 		// This method does not draw the model to the screen, as it does not bind the VAO and Shader.
 		// This is a auxiliary method used by Scene3D. It does not bind VAO and Shader because of batch rendering.
 		// This is the default draw method and a different model may have a overrided draw method (like billboard)
@@ -38,11 +33,6 @@ class Model : public Mesh {
 		// Returns current scale
 		inline vec3<float> get_scale() const noexcept {
 			return this->scale;
-		}
-
-		// Returns current color
-		inline Color& get_color() noexcept {
-			return this->color;
 		}
 
 		// Returns current angle
@@ -88,12 +78,6 @@ class Model : public Mesh {
 			this->isdirty = true;
 		}
 
-		// Sets a new color.
-		// New color affects texture color if a texture is in use
-		inline void set_color(const Color& color) noexcept {
-			this->color = color;
-		}
-
 		// Sets a new rotation angle.
 		// - `angle`: should be in degrees
 		// - `axis`: which axis the angle will be applied (x, y, z)
@@ -108,11 +92,10 @@ class Model : public Mesh {
 		// Attributes
 		vec3<float> position    = vec3<float>(0.0f);
 		vec3<float> scale       = vec3<float>(1.0f);
-		Color color             = Colors::WHITE;
 		float orient_angle      = 0.0f;
-		vec3<float> orient_axis = { 1.0f, 0.0f, 0.0f }; // Axis where the orientation angle will be applied
-		float angle             = 0.0f;                 // Rotation based on orientation
-		vec3<float> axis        = { 1.0f, 0.0f, 0.0f }; // Need to have at least one axis to work, even if angle is 0.0
+		vec3<float> orient_axis = vec3<float>(1.0f, 0.0f, 0.0f); // Axis where the orientation angle will be applied
+		float angle             = 0.0f;                          // Rotation based on orientation
+		vec3<float> axis        = vec3<float>(1.0f, 0.0f, 0.0f); // Need to have at least one axis to work, even if angle is 0.0
 
 		void update_model_matrix() noexcept override;
 };
