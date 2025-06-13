@@ -33,7 +33,7 @@ Scarablib 🪲 is a C++ library designed to simplify graphical development, offe
 Currently there is no documentation. But each method is documented in the source code as a comment above it. If you are using a LSP you can easily view it
 
 # Example
-This example creates a 3D scene with a rotating cube -5 Z units from the camera.
+This example creates a 3D scene with a rotating cube
 ```cpp
 #include <scarablib/window/window.hpp>
 #include <scarablib/input/keycode.hpp>
@@ -50,9 +50,9 @@ int main() {
 	Scene3D scene3d = Scene3D(camera);
 
 	// Model setup
-	Cube cube = Cube();
-	cube.set_position({ 0.0f, 0.0f, -5.0f });
-	cube.set_color(Colors::MAGENTA);
+	Cube* cube = scene3d.add<Cube>("cube");
+	cube->set_position({ 0.0f, 0.0f, -5.0f });
+	cube->set_color(Colors::MAGENTA);
 
 	// Used to rotate the cube
 	float angle = 0.0f;
@@ -70,9 +70,9 @@ int main() {
 
 		// Change cube's angle
 		//                angle    axis (x, y, z)
-		cube.set_rotation(angle, { true, true, false });
+		cube->set_rotation(angle, { true, true, false });
 		// Draw single model
-		scene.draw(cube);
+		scene.draw(*cube);
 
 		// Change cube's angle
 		angle += 1.0f;
