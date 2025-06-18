@@ -1,7 +1,6 @@
 #include "scarablib/gfx/3d/billboard.hpp"
 #include "scarablib/gfx/geometry_factory.hpp"
 #include "scarablib/gfx/3d/model.hpp"
-#include <algorithm>
 #include <cstddef>
 #include <cstdlib>
 
@@ -16,16 +15,11 @@ Billboard::~Billboard() noexcept {
 	delete this->physics;
 
 	// Clear directional textures if any
-	for(const Texture* tex : this->textures) {
-		if(tex != nullptr) {
-			delete tex;
-		}
-	}
-	this->textures.clear();
+	this->clear_textures();
 }
 
 
-void Billboard::draw(const Camera& camera, const Shader& shader) noexcept {
+void Billboard::draw_logic(const Camera& camera, const Shader& shader) noexcept {
 	this->update_model_matrix();
 
 	shader.set_matrix4f("proj", camera.get_proj_matrix());
@@ -43,73 +37,50 @@ void Billboard::draw(const Camera& camera, const Shader& shader) noexcept {
 }
 
 
-void Billboard::config_directional_textures(const std::vector<const char*> paths, uint32 flip) {
-	// Get length fron int
-	const size_t fliplength = (flip == 0) ? 0 : static_cast<size_t>(std::log10(std::abs(static_cast<int>(flip))) + 1);
-	const size_t final_size = paths.size() + fliplength; // Track opposite length
-
-	if(paths.size() < 4 && paths.size() > 8) {
-		throw ScarabError("The number of images must be at least 4 or at most 8");
+void Billboard::set_directional_textures(const std::vector<const char*> paths, const uint32 flip) {
+	if(paths.size() < 4 || paths.size() > 8) {
+		throw ScarabError("Minimum of 4 and maximum of 8 images are supported");
 	}
 
-	if(fliplength > paths.size()) {
-		throw ScarabError("Can't flip %i images, since there are only %zu images", fliplength, paths.size());
-	}
+	const uint8 final_size = (paths.size() <= 4) ? 4 : 8;
 
-	if(final_size != 4 && final_size != 8) {
-		throw ScarabError("The total number of textures after flip must be 4 or 8. You passed %zu images and %zu images to flip.", paths.size(), fliplength);
-	}
-
-	// Extract digits from flip
-	std::vector<size_t> digits;
-	while(flip > 0) {
-		digits.push_back(flip % 10); // Push last
-		flip /= 10; // Remove last
-	}
-	// Sort crescent
-	std::sort(digits.begin(), digits.end());
+	this->clear_textures(); // This method can be called multiple times
 
 	// Resize and init values with nullptr so i can check if a index has a texture already
 	this->textures.resize(final_size, nullptr);
 
 	for(size_t i = 0; i < paths.size(); i++) {
-		// Add current config
-		this->textures[i] = new Texture({
-			.path = paths.at(i),
-			.flip_horizontally = false
-		});
+		// Add base texture
+		this->textures[i] = new Texture(paths[i], false);
 
-		// If index is in digits, flip and add to configs
-		if(digits.size() > 0 && digits.front() == i + 1) {
+		// Check if should be flipped
+		if(flip & (1 << i)) {
 			const size_t opposite_index = final_size - i;
-			#ifdef SCARAB_DEBUG_BILLBOARD_TEXTURE
+
+			// #ifdef SCARAB_DEBUG_BILLBOARD_TEXTURE
 			LOG_DEBUG("Flipping %zu and placing at %zu", i, opposite_index);
-			#endif
+			// #endif
 
-			// Add config for opposite texture
-			this->textures[opposite_index] = new Texture({
-				.path = paths.at(i),
-				.flip_horizontally = true
-			});
-
-			digits.erase(digits.begin());
+			this->textures[opposite_index] = new Texture(paths[i], true);
 		}
 	}
 
 	// Check if its all correct
 	for(size_t i = 0; i < this->textures.size(); i++) {
 		if(this->textures[i] == nullptr) {
-			throw ScarabError("Bad Configuration: The texture at index %zu is nullptr. The final quantity of textures must be 4 or 8. This might be due to flipped texture bad configuration", i);
+			throw ScarabError(
+				"Texture configuration error: Missing texture at index %zu. "
+				"The final texture count must be %u. Check flip configuration.",
+				i, final_size
+			);
 		}
 	}
 
 	this->num_sectors = this->textures.size();
+	this->angle_step = M_PI2 / (float)this->num_sectors;
 }
 
 void Billboard::update_facing_texture(const vec3<float>& point_pos) noexcept {
-	// Use radians in this case is more accurate
-	const float angle_step = M_PI2 / (float)this->num_sectors;
-
 	const float angle_to_target = std::atan2(
 		// This is inverted to get the result that i want
 		// Invert back if the intention is the billboard change relative to some external object
@@ -117,14 +88,17 @@ void Billboard::update_facing_texture(const vec3<float>& point_pos) noexcept {
 		point_pos.z - this->position.z
 	);
 
-	const float cur_dir = this->directions[this->cur_dir];
-	const float relative_angle = std::fmod(angle_to_target - cur_dir + M_PI2, M_PI2);
-	const uint32 sector = static_cast<uint32>(relative_angle / angle_step) % this->num_sectors;
+	const float forward_angle = this->directions[this->base_dir];
+	// Angle of point relative to billboard's front.
+	// + M_PI2 ensures the result of the substraction is positive
+	const float relative_angle = std::fmod(angle_to_target - forward_angle + M_PI2, M_PI2);
+	// Calculate the sector index
+	const uint32 sector = static_cast<uint32>(relative_angle / this->angle_step);
 
-	// Only change if the sector is different
+	// Only change if is a new sector
 	if(sector != this->cur_sector) {
 		this->cur_sector = sector;
-		this->material.set_texture(this->textures[sector]);
+		this->material.texture = this->textures[sector];
 	}
 
 	#ifdef SCARAB_DEBUG_BILLBOARD_ANGLE
@@ -132,75 +106,13 @@ void Billboard::update_facing_texture(const vec3<float>& point_pos) noexcept {
 	#endif
 }
 
-// void Billboard::set_directional_textures(const std::vector<const char*> paths, uint32 flip) {
-// 	// How many to flip
-// 	const size_t fliplength = flip == 0 ? 0 : static_cast<size_t>(std::log10(std::abs(static_cast<int>(flip))) + 1);
-// 	const size_t final_size = paths.size() + fliplength; // Track opposite length
-//
-// 	if(paths.size() < 4 && paths.size() > 8) {
-// 		throw ScarabError("The number of images must be at least 4 or at most 8");
-// 	}
-//
-// 	if(fliplength > paths.size()) {
-// 		throw ScarabError("Can't flip %i images, since there are only %zu images", fliplength, paths.size());
-// 	}
-//
-// 	if(final_size != 4 && final_size != 8) {
-// 		throw ScarabError("The total number of textures after flip must be 4 or 8. You passed %zu images and %zu images to flip.", paths.size(), fliplength);
-// 	}
-//
-// 	// Extract digits from flip
-// 	std::vector<size_t> digits;
-// 	while(flip > 0) {
-// 		digits.push_back(flip % 10); // Push last
-// 		flip /= 10; // Remove last
-// 	}
-// 	// Sort crescent
-// 	std::sort(digits.begin(), digits.end());
-//
-// 	// Will be used to make the TextureArray
-// 	std::vector<TextureArray::Config> configs;
-// 	// Resize and init values with nullptr so i can check if a index has a texture already
-// 	configs.resize(final_size, {});
-//
-// 	for(size_t i = 0; i < paths.size(); i++) {
-// 		// Add current config
-// 		configs[i] = TextureArray::Config {
-// 			.path = paths.at(i),
-// 			.flip_horizontally = false
-// 		};
-//
-// 		// If number is in digits, flip and add to configs
-// 		if(digits.size() > 0 && digits.front() == i + 1) {
-// 			const size_t opposite_index = final_size - i - 1;
-// 			#ifdef SCARAB_DEBUG_BILLBOARD_TEXTURE
-// 			LOG_DEBUG("Flipping %zu and placing at %zu", i, opposite_index);
-// 			#endif
-//
-// 			// Add config for opposite texture
-// 			configs[opposite_index] = TextureArray::Config {
-// 				.path = paths.at(i),
-// 				.flip_horizontally = true
-// 			};
-//
-// 			digits.erase(digits.begin());
-// 		}
-// 	}
-//
-// 	#ifdef SCARAB_DEBUG_BILLBOARD_TEXTURE
-// 	for(size_t i = 0; i < configs.size(); i++) {
-// 		LOG_DEBUG("[%zu]: %s", i, configs.at(i).path);
-// 	}
-// 	#endif
-//
-// 	// Check if is all correct
-// 	for(const TextureArray::Config& conf : configs) {
-// 		// Will be null because all configs are inited as {}
-// 		if(conf.path == NULL) {
-// 			throw ScarabError("Bad Configuration: The final quantity of textures must be 4 or 8. This might be due to flipped texture bad configuration");
-// 		}
-// 	}
-//
-// 	this->texture_array = new TextureArray(configs);
-// }
 
+
+void Billboard::clear_textures() noexcept {
+	for(const Texture* tex : this->textures) {
+		if(tex != nullptr) {
+			delete tex;
+		}
+	}
+	this->textures.clear();
+}

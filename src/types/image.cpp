@@ -5,7 +5,7 @@
 #include <stb/stb_image.h>
 
 
-Image::Image(const char* path, const bool flip_vertically, const bool flip_horizontally) noexcept : path(path) {
+Image::Image(const char* path, const bool flip_horizontally, const bool flip_vertically) noexcept : path(path) {
 	// Opposite because stbi acts the opposite
 	stbi_set_flip_vertically_on_load(!flip_vertically);
 

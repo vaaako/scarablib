@@ -30,7 +30,7 @@ void Sprite::update_model_matrix() noexcept {
 
 // I could just provide mvp if any of the matrix changes, because the value is stored in memory.
 // But i just know when model changes, and camera matrix is likely to change everytime
-void Sprite::draw(const Camera2D& camera, const Shader& shader) noexcept {
+void Sprite::draw_logic(const Camera2D& camera, const Shader& shader) noexcept {
 	this->update_model_matrix();
 
 	// NOTE: is_dirty for color wouldn't work because would set this color to the next meshes

@@ -12,7 +12,7 @@ class Sprite : public Mesh {
 		Sprite(const std::vector<Vertex>& vertices) noexcept;
 
 		// Draws the shape
-		virtual void draw(const Camera2D& camera, const Shader& shader) noexcept;
+		virtual void draw_logic(const Camera2D& camera, const Shader& shader) noexcept;
 
 
 		// GETTERS //

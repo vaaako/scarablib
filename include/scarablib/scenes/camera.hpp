@@ -5,6 +5,7 @@
 #include "glm/trigonometric.hpp"
 #include "scarablib/proper/log.hpp"
 #include "scarablib/window/window.hpp"
+#include <array>
 
 class Camera {
 	public:
@@ -15,7 +16,7 @@ class Camera {
 		float sensitivity;
 		// Horizontal rotation.
 		// To rotate camera using the mouse, use `Camera::rotate(const Window& window)`
-		float yaw = -90.0f;
+		float yaw = -90.0f; // Looking to where is -Z (WEST)
 		// Vertical rotation
 		// To rotate camera using the mouse, use `Camera::rotate(const Window& window)`
 		float pitch = 0.0f;
@@ -167,16 +168,15 @@ class Camera {
 		void rotate(const Window& mouse) noexcept;
 
 		// Returns a string with the cardinal direction the camera is facing based on its yaw
-		static std::string get_cardinal_direction(const float yaw) {
+		static std::string_view get_cardinal_direction(const float yaw) {
 			// Define the cardinal directions
-			static std::vector<std::string> directions = {
-				"North", "Northeast", "East", "Southeast",
-				"South", "Southwest", "West", "Northwest"
+			static  std::array<std::string_view, 8> directions = {
+				"North (-Z)", "Northeast", "East (+X)", "Southeast",
+				"South (+Z)", "Southwest", "West (-X)", "Northwest"
 			};
 
-			// Determine the sector index
-			size_t sector = static_cast<size_t>((yaw + 45.0f / 2.0f) / 45.0f) % 8;
-			return directions[sector];
+			// Determine the sector index. Normalizing yaw to [0, 360]
+			return directions[static_cast<size_t>((std::fmod((yaw + 360.0f), 360.0f) + 22.5f) / 45.0f) % 8];
 		}
 
 	private:

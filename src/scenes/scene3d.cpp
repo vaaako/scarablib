@@ -8,7 +8,7 @@ Scene3D::Scene3D(Camera& camera) noexcept
 void Scene3D::draw(Model& model) const noexcept {
 	this->shader->use();
 	model.bundle.bind_vao();
-	model.draw(this->camera,
+	model.draw_logic(this->camera,
 		(model.get_shader() != nullptr) ? *model.get_shader() : *this->shader
 	);
 	this->shader->unbind();
@@ -45,7 +45,7 @@ void Scene3D::draw_all() const noexcept {
 			}
 
 			// Draw model
-			model->draw(camera, *cur_shader);
+			model->draw_logic(camera, *cur_shader);
 		}
 	}
 

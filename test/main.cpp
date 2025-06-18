@@ -1,4 +1,5 @@
 #include "scarablib/gfx/2d/rectangle.hpp"
+#include "scarablib/gfx/3d/billboard.hpp"
 #include "scarablib/gfx/3d/cube.hpp"
 #include "scarablib/gfx/skybox.hpp"
 #include "scarablib/proper/log.hpp"
@@ -86,6 +87,8 @@ int main() {
 		.debug_info = true
 	});
 
+	// CAMERAS AND SCENES //
+
 	Camera camera = Camera(window);
 	camera.set_speed(200.0f);
 
@@ -93,6 +96,11 @@ int main() {
 
 	Scene2D scene2d = Scene2D(camera2d);
 	Scene3D scene3d = Scene3D(camera);
+
+	// CAMERAS AND SCENES //
+
+	// ASSETS //
+	Texture kuromi = Texture("test/assets/images/kuromi.png");
 
 	Skybox skybox = Skybox(camera, {
 		"test/assets/images/skybox/right.jpg",
@@ -103,19 +111,24 @@ int main() {
 		"test/assets/images/skybox/back.jpg"
 	});
 
+	// ASSETS //
+
+	// MODELS //
+
 	Model* cow = scene3d.add<Model>("cow", "test/assets/objs/cow.obj");
-	cow->set_position({ 0.0f, 0.0f, -20.0f });
 	cow->material.color = Colors::CHIROYELLOW;
+	cow->set_position({ 0.0f, 0.0f, -20.0f });
 	cow->set_orientation(90.0f, { false, false, true });
 	// cow->update_bbox(); // Update local bounds
 	cow->set_dynamic_bbox_update(true); // Update bounding box with the model matrix
 
 	Rectangle* rect = scene2d.add<Rectangle>("rect");
+	rect->material.color = Colors::RED;
 	rect->set_position({ 100.0f, 100.0f });
 	rect->set_size({ 50.0f, 50.0f });
-	rect->material.color = Colors::RED;
 
 	Cube* cube = scene3d.add<Cube>("cube", Cube::Face::FRONT | Cube::Face::BACK);
+	cube->material.texture = &kuromi;
 	cube->set_position({ 0.0f, 100.0f, -5.0f });
 	cube->set_scale(vec3<float>(2.0f));
 	cube->enable_physics(1.0f, true);
@@ -123,12 +136,26 @@ int main() {
 	// Physics component may have apply_gravity member
 	// Scene3D may have a update_physics method that calls all physics components of all models in map
 
+	Billboard* bill = scene3d.add<Billboard>("bill");
+	bill->set_position({ -5.0f, 1.0f, -10.0f });
+	bill->set_scale(vec4<float>(4.0f));
+	bill->set_directional_textures({
+		"test/assets/images/directions/pinky/0.png", // FRONT
+		"test/assets/images/directions/pinky/1.png", // FRONTRIGHT
+		"test/assets/images/directions/pinky/2.png", // RIGHT
+		"test/assets/images/directions/pinky/3.png", // BACKRIGHT
+		"test/assets/images/directions/pinky/4.png"  // BACK
+	}, Billboard::FRONTRIGHT | Billboard::RIGHT | Billboard::BACKRIGHT); // Flip textures
+
+
+
 	// scene3d.remove_by_key("cube");
 	scene2d.remove_by_key("rect");
 
+	// MODELS //
+
 	float dt = 0.0f;
 	float angle = 0.0f;
-
 	bool should_fall = false;
 
 	while(window.is_open()) {
@@ -154,11 +181,14 @@ int main() {
 			should_fall = true;
 		}
 
+		// LOG_DEBUG("Camera Position: (%f, %f, %f)", camera.position.x, camera.position.y, camera.position.z);
 
 		window.set_title("FPS: " + std::to_string(window.fps()));
 		// WINDOW EVENTS //
 
 		// MODELS UPDATE //
+		bill->update_facing_texture(camera.position);
+
 		cow->set_rotation(angle, { true, false, true });
 
 		if(should_fall) {

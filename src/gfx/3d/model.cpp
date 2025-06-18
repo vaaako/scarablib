@@ -52,7 +52,7 @@ void Model::update_model_matrix() noexcept {
 
 // I just need to provide the mvp just if any of the matrix changes, because the value is stored
 // but i dont know how to do it currently (and i am lazy)
-void Model::draw(const Camera& camera, const Shader& shader) noexcept {
+void Model::draw_logic(const Camera& camera, const Shader& shader) noexcept {
 	// Shader is binded outside for batch rendering
 
 	this->update_model_matrix();

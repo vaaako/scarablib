@@ -9,7 +9,7 @@ Scene2D::Scene2D(Camera2D& camera) noexcept
 void Scene2D::draw(Sprite& shape) const noexcept {
 	this->shader->use();
 	shape.bundle.bind_vao();
-	shape.draw(this->camera,
+	shape.draw_logic(this->camera,
 		(shape.get_shader() != nullptr) ? *shape.get_shader() : *this->shader
 	);
 	this->shader->unbind();
@@ -43,7 +43,7 @@ void Scene2D::draw_all() const noexcept {
 			}
 
 			// Draw sprite
-			sprite->draw(camera, *cur_shader);
+			sprite->draw_logic(camera, *cur_shader);
 		}
 	}
 

@@ -23,7 +23,7 @@ class Model : public Mesh {
 		// This method does not draw the model to the screen, as it does not bind the VAO and Shader.
 		// This is a auxiliary method used by Scene3D. It does not bind VAO and Shader because of batch rendering.
 		// This is the default draw method and a different model may have a overrided draw method (like billboard)
-		virtual void draw(const Camera& camera, const Shader& shader) noexcept;
+		virtual void draw_logic(const Camera& camera, const Shader& shader) noexcept;
 
 		// Returns current position
 		inline vec3<float> get_position() const noexcept {

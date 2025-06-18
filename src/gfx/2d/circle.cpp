@@ -4,7 +4,7 @@
 Circle::Circle() noexcept
 	: Sprite(GeometryFactory::make_rectangle_vertices()) {}
 
-void Circle::draw(const Camera2D& camera, const Shader& shader) noexcept {
+void Circle::draw_logic(const Camera2D& camera, const Shader& shader) noexcept {
 	this->update_model_matrix();
 
 	shader.set_matrix4f("mvp", (camera.get_proj_matrix() * camera.get_view_matrix()) * this->model);

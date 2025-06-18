@@ -22,9 +22,9 @@ Texture::Texture(const Color& color) noexcept {
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-Texture::Texture(const Texture::Config& config) {
+Texture::Texture(const char* path, const bool flip_horizontally, const bool flip_vertically) {
 	// STB use
-	Image* image = new Image(config.path, config.flip_vertically, config.flip_horizontally);
+	Image* image = new Image(path, flip_horizontally, flip_vertically);
 	if(image->data == nullptr) {
 		delete image;
 		throw ScarabError("Image (%s) was not found", image->path);
@@ -43,12 +43,12 @@ Texture::Texture(const Texture::Config& config) {
 
 	// Set filter parameters
 	// Nearest: Pixelate / Linear: Blur
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, (GLint)config.filter);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, (GLint)config.filter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	// Repeat, Mirrored Repeat, Clamp to Edge, Clamp to Border (then use array of RGBA to color the border)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, (GLint)config.wrap);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, (GLint)config.wrap);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 	// Generate
 	const GLenum format = Texture::extract_format(*image);
@@ -107,6 +107,28 @@ Texture::~Texture() noexcept {
 	if(this->id != 0) {
 		glDeleteTextures(1, &this->id);
 	}
+}
+
+
+void Texture::set_filter(const Texture::Filter filter) const noexcept {
+	this->bind();
+
+	// Nearest: Pixelate / Linear: Blur
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, (GLint)filter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, (GLint)filter);
+
+	this->unbind();
+}
+
+void Texture::set_wrap(const Texture::Wrap wrap) const noexcept {
+	this->bind();
+
+	// Repeat, Mirrored Repeat, Clamp to Edge, Clamp to Border (then use array of RGBA to color the border)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, (GLint)wrap);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, (GLint)wrap);
+
+	this->unbind();
+
 }
 
 

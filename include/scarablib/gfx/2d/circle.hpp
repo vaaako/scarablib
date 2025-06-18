@@ -8,7 +8,7 @@
 struct Circle : public Sprite {
 	Circle() noexcept;
 
-	void draw(const Camera2D& camera, const Shader& shader) noexcept override;
+	void draw_logic(const Camera2D& camera, const Shader& shader) noexcept override;
 
 	// Returns the current blur value
 	inline float get_blur() {
