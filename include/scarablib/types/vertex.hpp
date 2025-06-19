@@ -1,8 +1,8 @@
 #pragma once
 
 #include "scarablib/typedef.hpp"
-#include "scarablib/utils/math.hpp"
 #include <functional>
+#include <optional>
 
 // Mesh data uploaded to the GPU
 struct Vertex {
@@ -11,24 +11,22 @@ struct Vertex {
 	// Normalized texture coordinates
 	vec2<float> texuv;
 
-	// Value: 0-255 (ignored if not in this range)
+	// Value: 0-255
 	// Optional value, used for Texture Arrays.
 	// Set the index of the texture to use for this vertex.
 	// Should be the same for all faces.
-	// If some vertex of the mesh has this field not in range (0-255), this field will not be uploaded for any face
 	// WARNING: Convert this value to float BEFORE PASSING to fragment shader (otherwise it will not work properly)
-	int16 texid = -1; // 2 bytes (optional)
-
-	// Value: 0.0-1.0 (ignored if not in this range)
-	// Optional value, is used for simple shading.
-	// If some vertex of the mesh has this field not in range (0.0f-1.0f), this field will not be uploaded for any face
-	float shading = -1.0f; // 4 bytes (optional)
+	// std::optional<uint8> texid; // 2 bytes
+	//
+	// Value: 0-255
+	// Optional value, is used for simple shading
+	// std::optional<uint8> shading; // 2 bytes
 
 	bool operator==(const Vertex& other) const noexcept {
-		return position == other.position &&
-			   this->texuv == other.texuv &&
-			   this->texid == other.texid &&
-			   ScarabMath::compare_floats(this->shading, other.shading);
+		return this->position == other.position &&
+			   this->texuv    == other.texuv;
+			   // this->texid    == other.texid &&
+			   // this->shading  == other.shading;
 	}
 };
 
@@ -51,8 +49,8 @@ namespace std {
 			hash_combine(vertex.texuv.x);
 			hash_combine(vertex.texuv.y);
 
-			hash_combine(vertex.texid);
-			hash_combine(vertex.shading);
+			// hash_combine(vertex.texid);
+			// hash_combine(vertex.shading);
 
 			return seed;
 		}

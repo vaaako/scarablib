@@ -1,6 +1,6 @@
 #include "scarablib/window/window.hpp"
 #include "scarablib/opengl/shader_manager.hpp"
-#include "scarablib/opengl/vao_manager.hpp"
+#include "scarablib/opengl/vaomanager.hpp"
 #include "scarablib/proper/error.hpp"
 #include "scarablib/proper/log.hpp"
 #include <SDL2/SDL.h>

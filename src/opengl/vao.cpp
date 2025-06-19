@@ -1,10 +1,14 @@
 #include "scarablib/opengl/vao.hpp"
-#include "scarablib/proper/log.hpp"
 
-VAO::VAO() noexcept {
-#ifdef SCARAB_DEBUG_VAO
+VAO::VAO(const uint32 id) noexcept {
+	if(id != 0) {
+		this->id = id;
+		return;
+	}
+
+	#ifdef SCARAB_DEBUG_VAO
 	LOG_INFO_FN("VAO constructor");
-#endif
+	#endif
 	glGenVertexArrays(1, &this->id);
 }
 

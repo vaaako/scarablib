@@ -76,6 +76,7 @@ void update_gravity(Model& model, const float dt, const float ground_y = 0.0f) {
 }
 
 // TODO: Physics component
+// MEMORY LEAK SOMEWHERE
 
 int main() {
 	Window window = Window({
@@ -129,7 +130,7 @@ int main() {
 
 	Cube* cube = scene3d.add<Cube>("cube", Cube::Face::FRONT | Cube::Face::BACK);
 	cube->material.texture = &kuromi;
-	cube->set_position({ 0.0f, 100.0f, -5.0f });
+	cube->set_position({ 0.0f, 0.0f, -5.0f });
 	cube->set_scale(vec3<float>(2.0f));
 	cube->enable_physics(1.0f, true);
 	// Then PhysicsComponent is nullptr until enabled
@@ -148,9 +149,8 @@ int main() {
 	}, Billboard::FRONTRIGHT | Billboard::RIGHT | Billboard::BACKRIGHT); // Flip textures
 
 
-
 	// scene3d.remove_by_key("cube");
-	scene2d.remove_by_key("rect");
+	// scene2d.remove_by_key("rect");
 
 	// MODELS //
 

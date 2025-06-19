@@ -1,8 +1,8 @@
 #pragma once
 
-#include "scarablib/opengl/bufferbundle.hpp"
 #include "scarablib/opengl/shader_manager.hpp"
 #include "scarablib/opengl/shaders.hpp"
+#include "scarablib/opengl/vertexbuffercomponent.hpp"
 #include "scarablib/scenes/camera.hpp"
 #include "scarablib/typedef.hpp"
 
@@ -17,7 +17,7 @@ struct Skybox {
 	private:
 		const Camera& camera;
 
-		BufferBundle bundle;
+		VertexBufferComponent bundle;
 		uint32 texid;
 
 		Shader* shader = ShaderManager::get_instance().get_or_load_shader(

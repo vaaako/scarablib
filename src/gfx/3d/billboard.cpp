@@ -57,9 +57,9 @@ void Billboard::set_directional_textures(const std::vector<const char*> paths, c
 		if(flip & (1 << i)) {
 			const size_t opposite_index = final_size - i;
 
-			// #ifdef SCARAB_DEBUG_BILLBOARD_TEXTURE
+			#ifdef SCARAB_DEBUG_BILLBOARD_TEXTURE
 			LOG_DEBUG("Flipping %zu and placing at %zu", i, opposite_index);
-			// #endif
+			#endif
 
 			this->textures[opposite_index] = new Texture(paths[i], true);
 		}

@@ -22,7 +22,7 @@ std::vector<OUT> convert_to(const std::vector<INP>& indices) {
 // Indices attributes are not needed to set here
 // I will not make Bounding Box here because this is probably a 2D model
 Mesh::Mesh(const std::vector<Vertex>& vertices) noexcept {
-	this->bundle.make_vao_with_manager(vertices, std::vector<uint8> {});
+	this->bundle.make_vao(vertices, std::vector<uint8> {});
 
 	// Is not indices, but will have a similar use
 	this->indices_length = static_cast<GLsizei>(vertices.size());
@@ -119,16 +119,16 @@ Mesh::Mesh(const char* path) {
 	const uint32 max_val = *std::max_element(indices.begin(), indices.end());
 	if(max_val <= UINT8_MAX) {
 		this->indices_type = GL_UNSIGNED_BYTE;
-		this->bundle.make_vao_with_manager(vertices, convert_to<uint8>(indices));
+		this->bundle.make_vao(vertices, convert_to<uint8>(indices));
 
 	} else if(max_val <= UINT16_MAX) {
 		this->indices_type = GL_UNSIGNED_SHORT;
-		this->bundle.make_vao_with_manager(vertices, convert_to<uint16>(indices));
+		this->bundle.make_vao(vertices, convert_to<uint16>(indices));
 
 	// Is uint32 or uint64, use existing indices
 	} else {
 		this->indices_type = GL_UNSIGNED_INT;
-		this->bundle.make_vao_with_manager(vertices, indices);
+		this->bundle.make_vao(vertices, indices);
 	}
 
 	// Free memory

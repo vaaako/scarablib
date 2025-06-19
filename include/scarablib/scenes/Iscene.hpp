@@ -27,7 +27,7 @@ class IScene {
 
 		// Add a shape to the scene
 		template <typename U, typename... Args>
-		U* add(const std::string_view& key, Args&&... args);
+		U* add(const std::string& key, Args&&... args);
 
 		// Add a model to the scene
 		// template <typename U>
@@ -39,10 +39,10 @@ class IScene {
 
 		// Returns an object by key and dynamically convert it.
 		template <typename U>
-		std::shared_ptr<U> get_by_key(const std::string_view& key) noexcept;
+		std::shared_ptr<U> get_by_key(const std::string& key) noexcept;
 
 		// Remove object by key
-		void remove_by_key(const std::string_view& key);
+		void remove_by_key(const std::string& key);
 
 		// Draw a single model.
 		// If the model was added to the scene, it will be drawn twice
@@ -74,19 +74,15 @@ class IScene {
 
 	protected:
 		// Objects added to the scene, stored as shared pointers for automatic memory management.
-		std::unordered_map<std::string_view, std::shared_ptr<T>> scene;
+		std::unordered_map<std::string, std::shared_ptr<T>> scene;
 		// Use VAO as ID to track and batch draw meshes with the same VAO.
-		std::unordered_map<GLuint, std::vector<std::shared_ptr<T>>> vao_groups;
+		std::unordered_map<uint32, std::vector<std::shared_ptr<T>>> vao_groups;
 
 		Shader* shader = ShaderManager::get_instance().get_or_load_shader(
 			"scene",                     // Shader name.
 			Shaders::DEFAULT_VERTEX,     // Default vertex shader source.
 			Shaders::DEFAULT_FRAGMENT    // Default fragment shader source.
 		);  // Pointer to the default shader used by the scene.
-
-	private:
-		// Auxiliary method to add a model to the scene
-		void add_to_scene(const std::string_view& key, const std::shared_ptr<T>& mesh);
 };
 
 
@@ -102,9 +98,9 @@ IScene<T>::~IScene() noexcept {
 
 template <typename T>
 template <typename U>
-std::shared_ptr<U> IScene<T>::get_by_key(const std::string_view& key) noexcept {
+std::shared_ptr<U> IScene<T>::get_by_key(const std::string& key) noexcept {
 	auto it = this->scene.find(key);
-	if (it == this->scene.end()) {
+	if(it == this->scene.end()) {
 		LOG_ERROR("Object '%s' is not added to the scene", key.data());
 		return nullptr;
 	}
@@ -119,22 +115,23 @@ std::shared_ptr<U> IScene<T>::get_by_key(const std::string_view& key) noexcept {
 }
 
 template <typename T>
-void IScene<T>::remove_by_key(const std::string_view& key) {
+void IScene<T>::remove_by_key(const std::string& key) {
 	auto it = this->scene.find(key);
 	if(it == this->scene.end()) {
 		throw ScarabError("Key '%s' was not found", key.data());
 	}
+
 	// Remove from the scene key map
-	this->scene.erase(it);
+	this->scene.erase(key);
 	// Remove from the scene vao map
-	this->vao_groups.erase(it->second->bundle.get_vao_id());
+	this->vao_groups.erase(it->second->bundle.vao->get_id());
 }
 
 
 
 template <typename T>
 template <typename U, typename... Args>
-U* IScene<T>::add(const std::string_view& key, Args&&... args) {
+U* IScene<T>::add(const std::string& key, Args&&... args) {
 	static_assert(std::is_base_of_v<Mesh, T>,
 			"Scene can only be instantiated with Mesh types");
 
@@ -145,7 +142,7 @@ U* IScene<T>::add(const std::string_view& key, Args&&... args) {
 	std::shared_ptr<T> mesh_ptr = std::make_shared<U>(std::forward<Args>(args)...); // Create new mesh
 	this->scene.emplace(key, mesh_ptr); // Used be get_by_key()
 
-	auto& vao_groups = this->vao_groups[mesh_ptr->bundle.get_vao_id()];
+	auto& vao_groups = this->vao_groups[mesh_ptr->bundle.vao->get_id()];
 
 	// Sort shaders to minimize shader changes
 	// Find the correct position for insertion

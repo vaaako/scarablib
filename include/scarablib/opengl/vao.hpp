@@ -1,12 +1,13 @@
 #pragma once
 
+#include "scarablib/typedef.hpp"
 #include <GL/glew.h>
 
 // OpenGL Vertex Array Object object
 class VAO {
 	public:
 		// Creates a VAO and generates an OpenGL buffer ID
-		VAO() noexcept;
+		VAO(const uint32 id = 0) noexcept;
 		~VAO() noexcept;
 
 		// Disable copy and moving
@@ -26,10 +27,10 @@ class VAO {
 		}
 
 		// Returns the VAO id
-		inline GLuint get_id() const noexcept {
-			return id;
+		inline uint32 get_id() const noexcept {
+			return this->id;
 		}
 
 	private:
-		GLuint id;
+		uint32 id;
 };

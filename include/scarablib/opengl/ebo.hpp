@@ -7,6 +7,9 @@
 // OpenGL Element Array Buffer object
 class EBO {
 	public:
+		// Uses a existing EBO id and does not create a new one
+		EBO(const uint32 id) noexcept;
+
 		// Make an EBO using a vector of indices
 		template <typename T>
 		EBO(const std::vector<T>& indices) noexcept;
@@ -19,17 +22,22 @@ class EBO {
 		EBO& operator=(EBO&&) noexcept = delete;
 
 		// Activates the EBO in the OpenGL context
-		inline void bind() const noexcept {
+		void bind() noexcept {
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->id);
 		}
 
 		// Disabled the EBO in the OpenGL context
-		inline void unbind() const noexcept {
+		inline void unbind() noexcept {
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		}
 
+		// Returns the EBO id
+		inline uint32 get_id() const noexcept {
+			return this->id;
+		}
+
 	private:
-		GLuint id;
+		uint32 id;
 };
 
 template <typename T>
@@ -42,5 +50,6 @@ EBO::EBO(const std::vector<T>& indices) noexcept {
 
 	glGenBuffers(1, &this->id);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->id);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizei>(indices.size() * sizeof(uint32)), indices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizei>(indices.size() * sizeof(T)), indices.data(), GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }

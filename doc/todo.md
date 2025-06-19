@@ -69,7 +69,7 @@ Stuff that are in progress and i need to finish
 	+ Organize constructors
 	+ Feature: change texture alpha
 
-- [ ] Simplify Keyboard and Mouse input and put all that in Window class
+- [x] Simplify Keyboard and Mouse input and put all that in Window class
 - [ ] Unify bundle and VAOManger somehow idk get rid of bundle
 
 # TODO Network
@@ -119,10 +119,6 @@ Stuff that are in progress and i need to finish
 - [ ] Make a new static struct called `ModelFields` that returns `Vertex`'s fields to `ModelFactory` (and the user can use that for easy manipulation)
 	+ Like in vakraft, make a helper method for easy change faces values
 - [x] Be able to change `texid` and `shading` fields in `ModelFactory` for each face
-
-- [ ] Check how SFML uses shader and draw objects
-	+ Individual draw default
-	+ Batch draw when added to scene
 
 - [ ] Bounding box was not tested
 	+ World calculation might not be working correctly (debug drawing not drawing when dynamic transform is enabled)
@@ -191,12 +187,8 @@ Stuff that are in progress and i need to finish
 	+ now needs to calll a method to create it, also the draw is now correct
 
 - [x] Better BoundingBox, not happy with the current state, dont know what to do
-- [ ] Show bounding box: When enabled to show all or a specific bounding box, add to the scene map with some sufix like `cube_boundingbox`, when removed, just remove the bounding box from the map, this will prevent the if-else
-	+ How to pass shader then?
-	+ Collider drawing almost working, some fixes needed
+- [x] Show bounding box
 - [ ] Different texture for each face (the other method that is not cubemap)
-- [ ] In `ModelFactory::create_cube` add option to change Z of each face
-- [ ] Shader mvp calculation to `Scene3D::draw`
 
 # Features for later
 - Sprite atlas

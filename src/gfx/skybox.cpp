@@ -52,7 +52,7 @@ Skybox::Skybox(const Camera& camera, const std::array<const char*, 6>& faces)
 		{  1.0f, -1.0f,  1.0f }
 	};
 
-	this->bundle.make_vao_with_manager(vertices, std::vector<uint8> {});
+	this->bundle.make_vao(vertices, std::vector<uint8> {});
 
 	// Gen texture cube map
 	glGenTextures(1, &this->texid);
@@ -60,7 +60,7 @@ Skybox::Skybox(const Camera& camera, const std::array<const char*, 6>& faces)
 
 	for(uint16 i = 0; i < 6; i++) {
 		// why when i set this to false the skybox bugs? (true actually makes the textures NOT flip on load, see image.cpp)
-		Image* image = new Image(faces.at(i), true);
+		Image* image = new Image(faces.at(i), false, true);
 		if(image->data == nullptr) {
 			throw ScarabError("Image (%s) in skybox was not found", image->path);
 		}
@@ -94,9 +94,9 @@ void Skybox::draw() noexcept {
 	this->shader->set_matrix4f("view", glm::mat3(camera.get_view_matrix())); // Conversion: Remove translation
 	this->shader->set_matrix4f("proj", camera.get_proj_matrix());
 
-	this->bundle.bind_vao();
+	this->bundle.vao->bind();
 	glDrawArrays(GL_TRIANGLES, 0, 36);
-	this->bundle.unbind_vao();
+	this->bundle.vao->bind();
 
 	this->shader->unbind();
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);

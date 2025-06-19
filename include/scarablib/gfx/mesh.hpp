@@ -3,10 +3,9 @@
 #include "scarablib/components/boundingbox.hpp"
 #include "scarablib/components/materialcomponent.hpp"
 #include "scarablib/components/physicscomponent.hpp"
-#include "scarablib/opengl/bufferbundle.hpp"
 #include "scarablib/opengl/shader.hpp"
+#include "scarablib/opengl/vertexbuffercomponent.hpp"
 #include "scarablib/typedef.hpp"
-#include "scarablib/types/texture.hpp"
 #include <GL/glew.h>
 
 // Basic data for 3D and 2D shapes
@@ -16,7 +15,7 @@ class Mesh {
 		MaterialComponent material;
 
 		// Bundle for VAO, VBO and EBO
-		BufferBundle bundle;
+		VertexBufferComponent bundle;
 		// This is kinda wrong, because each instance of a Mesh will have copied bundle (but same VAO at least)
 
 		// Bounding box
@@ -101,5 +100,5 @@ void Mesh::set_geometry(const std::vector<Vertex>& vertices, const std::vector<T
 	this->indices_type = (std::is_same_v<T, uint32>) ? GL_UNSIGNED_INT :
 		(std::is_same_v<T, uint16>) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_BYTE;
 
-	this->bundle.make_vao_with_manager(vertices, indices);
+	this->bundle.make_vao(vertices, indices);
 }
