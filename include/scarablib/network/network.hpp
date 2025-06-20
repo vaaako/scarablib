@@ -97,10 +97,12 @@ class Network {
 		// Send a packet to the server.
 		// Will only work if object is a client.
 		// `flush` will force the packet to be sent immediately
-		Result send(const Network::Packet& packet, const bool flush = false, const Network::PacketFlag flag = Network::PacketFlag::RELIABLE) const;
+		Result send(const Network::Packet& packet,
+				const bool flush = false, const Network::PacketFlag flag = Network::PacketFlag::RELIABLE) const;
 
 		// Server broadcast packet to all connected clients
-		Result broadcast(const Network::Packet& packet, const Network::PacketFlag flag = Network::PacketFlag::RELIABLE) const;
+		Result broadcast(const Network::Packet& packet,
+				const Network::PacketFlag flag = Network::PacketFlag::RELIABLE) const;
 
 		// Gather all events coming from the client.
 		// `timeout_ms` (1ms default) is the maximum amount of time to wait for an event.

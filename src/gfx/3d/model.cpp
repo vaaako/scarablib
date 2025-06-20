@@ -2,9 +2,9 @@
 
 Model::Model(const char* path) noexcept : Mesh(path) {}
 
-void Model::set_rotation(const float angle, const vec3<bool>& axis) noexcept {
+void Model::set_rotation(const float angle, const vec3<float>& axis) noexcept {
 	// At least one axis need to be true to work
-	if(axis == vec3<bool>(false)) {
+	if(axis == vec3<float>(0.0f)) {
 		return; // Dont update
 	}
 
@@ -13,9 +13,9 @@ void Model::set_rotation(const float angle, const vec3<bool>& axis) noexcept {
 	this->isdirty = true;
 }
 
-void Model::set_orientation(const float angle, const vec3<bool>& axis) noexcept {
+void Model::set_orientation(const float angle, const vec3<float>& axis) noexcept {
 	// At least one axis need to be true to work
-	if(axis == vec3<bool>(false)) {
+	if(axis == vec3<float>(0.0f)) {
 		return;
 	}
 

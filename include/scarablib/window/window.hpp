@@ -13,6 +13,7 @@
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_video.h>
 
+#include <functional>
 #include <string>
 #include <unordered_set>
 #include <vector>
@@ -39,15 +40,15 @@ class Window {
 		// Also calculates FPS and Delta time
 		void process_events() noexcept;
 
-		// Call the callback function for each handled SDL event, passing SDL_Event as a parameter.
-		// This is generally used for ImGui process events.
-		// Example: `window.raw_events([](SDL_Event event) { ImGui_ImplSDL2_ProcessEvent(&event); });`
-		template<typename T>
-		void raw_events(T&& callback) noexcept {
+		// Returns a vector of SDL_Event from this frame.
+		// This is generally used for ImGui process events
+		std::vector<SDL_Event> raw_events() noexcept {
+			std::vector<SDL_Event> events;
 			SDL_Event event;
 			while(SDL_PollEvent(&event)) {
-				std::forward<T>(callback)(event);
+				events.push_back(event);
 			}
+			return events;
 		}
 
 		// WINDOW PROCESS //
@@ -186,7 +187,7 @@ class Window {
 
 		// Run a callback everytime a given event is present in the current frame's event buffer
 		template<typename T>
-		inline void on_event(const Event event, T&& callback) const noexcept {
+		inline void on_event(const Event event, const std::function<void()>& callback) const noexcept {
 			if(this->has_event(event)) {
 				std::forward<T>(callback)();
 			}

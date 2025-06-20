@@ -62,6 +62,12 @@ Stuff that are in progress and i need to finish
 
 - [ ] Material component and put in Model
 
+- [ ] REMOVE (almost) ALL INLINES
+	+ i just came to the conclusion that inline let the header file unreadable
+	+ may increase compile time
+	+ the compiler should optimize it anyway
+	+ i will let only single line methods in header as inline, this way the cpp and the header file will be more readable
+
 # TODO Quick Fixes
 - [ ] Better texture constructor
 	+ Use bitwise paramters

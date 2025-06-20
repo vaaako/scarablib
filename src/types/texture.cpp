@@ -7,16 +7,10 @@ Texture::Texture(const Color& color) noexcept {
 	glGenTextures(1, &this->id); // num of textures, pointer
 	glBindTexture(GL_TEXTURE_2D, this->id);
 
-	// Filter
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
 	const uint8 data[4] = { color.red, color.green, color.blue, color.alpha };
 
 	// Generate
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
 	// Unbind
 	glBindTexture(GL_TEXTURE_2D, 0);

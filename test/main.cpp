@@ -75,8 +75,7 @@ void update_gravity(Model& model, const float dt, const float ground_y = 0.0f) {
 	}
 }
 
-// TODO: Physics component
-// MEMORY LEAK SOMEWHERE
+// TODO: BoundingBox add SphereBox inside it
 
 int main() {
 	Window window = Window({
@@ -119,7 +118,7 @@ int main() {
 	Model* cow = scene3d.add<Model>("cow", "test/assets/objs/cow.obj");
 	cow->material.color = Colors::CHIROYELLOW;
 	cow->set_position({ 0.0f, 0.0f, -20.0f });
-	cow->set_orientation(90.0f, { false, false, true });
+	cow->set_orientation(90.0f, { 0.0f, 0.0f, 1.0f });
 	// cow->update_bbox(); // Update local bounds
 	cow->set_dynamic_bbox_update(true); // Update bounding box with the model matrix
 
@@ -128,14 +127,12 @@ int main() {
 	rect->set_position({ 100.0f, 100.0f });
 	rect->set_size({ 50.0f, 50.0f });
 
-	Cube* cube = scene3d.add<Cube>("cube", Cube::Face::FRONT | Cube::Face::BACK);
+	Cube* cube = scene3d.add<Cube>("cube", Cube::Face::FRONT | Cube::Face::BACK); // Render FRONT and BACK face
 	cube->material.texture = &kuromi;
 	cube->set_position({ 0.0f, 0.0f, -5.0f });
 	cube->set_scale(vec3<float>(2.0f));
 	cube->enable_physics(1.0f, true);
-	// Then PhysicsComponent is nullptr until enabled
-	// Physics component may have apply_gravity member
-	// Scene3D may have a update_physics method that calls all physics components of all models in map
+	// PhysicsComponent is nullptr until enabled
 
 	Billboard* bill = scene3d.add<Billboard>("bill");
 	bill->set_position({ -5.0f, 1.0f, -10.0f });
@@ -166,10 +163,11 @@ int main() {
 
 		dt = window.dt();
 
-		window.on_event(Event::WINDOW_RESIZED, [&]() {
-			camera.update_viewport(window);
-			camera2d.update_viewport(window);
-		});
+		// TODO: Callback should register once, outisde loop
+		// window.on_event(Event::WINDOW_RESIZED, [&]() {
+		// 	camera.update_viewport(window);
+		// 	camera2d.update_viewport(window);
+		// });
 
 		if(window.has_event(Event::WINDOW_QUIT) || window.iskeypressed(Keycode::ESCAPE)) {
 			window.close();
@@ -189,7 +187,7 @@ int main() {
 		// MODELS UPDATE //
 		bill->update_facing_texture(camera.position);
 
-		cow->set_rotation(angle, { true, false, true });
+		// cow->set_rotation(angle, { 0.5f, 0.0f, 0.0f });
 
 		if(should_fall) {
 			update_gravity(*cube, dt);

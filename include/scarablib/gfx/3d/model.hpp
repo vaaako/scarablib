@@ -66,7 +66,8 @@ class Model : public Mesh {
 			this->isdirty = true;
 		}
 
-		// Moves the sprite using a 3D vector
+		// Moves the model using a 3D vector.
+		// This essentially increased the position by the provided offset
 		inline void move(const vec3<float>& offset) noexcept {
 			this->position += offset;
 			this->isdirty = true;
@@ -79,14 +80,14 @@ class Model : public Mesh {
 		}
 
 		// Sets a new rotation angle.
-		// - `angle`: should be in degrees
-		// - `axis`: which axis the angle will be applied (x, y, z)
-		void set_rotation(const float angle, const vec3<bool>& axis) noexcept;
+		// - `angle`: Should be in degrees
+		// - `axis`: (must be normalized) Which axis the angle will be applied
+		void set_rotation(const float angle, const vec3<float>& axis) noexcept;
 
 		// Sets a new orientation to the model.
-		// - `angle`: should be in degrees
-		// - `axis`: which axis the orientation will be applied (x, y, z)
-		void set_orientation(const float angle, const vec3<bool>& axis) noexcept;
+		// - `angle`: Should be in degrees
+		// - `axis`: (must be normalized) Which axis the angle will be applied
+		void set_orientation(const float angle, const vec3<float>& axis) noexcept;
 
 	protected:
 		// Attributes
