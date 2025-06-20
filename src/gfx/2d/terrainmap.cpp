@@ -32,7 +32,7 @@ void TerrainMap::load_file(const char* path) {
 			// Loop through all terrain types (Ex: wall, water, grass...)
 			for(const auto& [type, ref_color] : this->terrain_colors) {
 				// Loop through all color tones of this type
-				for(const auto& color : ref_color) {
+				for(const Color& color : ref_color) {
 					// How close is the pixel to the color
 					const float distance = pixel.distance_to(color);
 					if(distance < best_distance) {

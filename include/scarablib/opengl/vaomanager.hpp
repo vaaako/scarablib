@@ -39,12 +39,7 @@ class VAOManager {
 		void new_entry(const size_t hash, VAOEntry entry) noexcept;
 
 		// Increases reference count of a hash
-		inline void increase_ref_count(const size_t hash) noexcept {
-			auto it = this->vao_map.find(hash);
-			if(it != this->vao_map.end()) {
-				it->second.ref_count++;
-			}
-		}
+		void increase_ref_count(const size_t hash) noexcept;
 
 		// Returns true if the hash is found and VAO already exists
 		inline bool vao_exists(const size_t hash) const noexcept {

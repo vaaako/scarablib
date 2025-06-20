@@ -40,16 +40,6 @@ class Window {
 		// Also calculates FPS and Delta time
 		void process_events() noexcept;
 
-		// Returns a vector of SDL_Event from this frame.
-		// This is generally used for ImGui process events
-		std::vector<SDL_Event> raw_events() noexcept {
-			std::vector<SDL_Event> events;
-			SDL_Event event;
-			while(SDL_PollEvent(&event)) {
-				events.push_back(event);
-			}
-			return events;
-		}
 
 		// WINDOW PROCESS //
 
@@ -62,19 +52,12 @@ class Window {
 		// Also clears events buffer.
 		// This should be called at the end of each frame
 		// to display the newly rendered frame to the screen
-		inline void swap_buffers() noexcept {
-			// Make operations that need to happen at the end of each frame
-			this->frame_events.clear(); // Clear events
-			SDL_GL_SwapWindow(this->window);
-		}
+		void swap_buffers() noexcept;
 
 		// Clear the screen by setting the background color and clearing the buffer.
 		// This should be called at the beginning of each frame to reset the drawing surface.
 		// It clears both the color and depth buffers.
-		inline void clear() const noexcept {
-			glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		}
+		void clear() const noexcept;
 
 
 		// GETTERS //
@@ -100,12 +83,18 @@ class Window {
 			return this->height;
 		}
 
+		// Return all events that occurred in the current frame.
+		// Convert it to SDL_Event enum or Event enum
+		inline std::unordered_set<uint32> get_events() noexcept {
+			return this->frame_events;
+		}
+
 
 		// SETTERS
 
 		// Change the window's title to the provided value.
-		inline void set_title(const std::string& title) noexcept {
-			SDL_SetWindowTitle(this->window, title.c_str());
+		inline void set_title(const std::string_view& title) noexcept {
+			SDL_SetWindowTitle(this->window, title.data());
 		}
 
 		// Set the window's clear color (background color) using the provided Color object.
@@ -135,11 +124,7 @@ class Window {
 		// Sets the polygon drawing mode for both front and back faces.
 		// This makes 3D render more optimized but 2D rendering will not work
 		inline void set_cullface(const bool state) const noexcept {
-			if(state) {
-				glEnable(GL_CULL_FACE);
-			} else {
-				glDisable(GL_CULL_FACE);
-			}
+			glCullFace(GL_FRONT + state); // true => 1028 + 1 = > 1029 (GL_BACK)
 		}
 
 		// Sets the depth test to always pass.
@@ -147,23 +132,14 @@ class Window {
 		// This prevents 2D rendering from blending with 3D meshes.
 		// But 3D rendering will not work properly
 		inline void set_depthtest_always(const bool state) const noexcept {
-			if(state) {
-				glDepthFunc(GL_ALWAYS);
-			} else {
-				glDepthFunc(GL_LEQUAL);
-			}
+			glDepthFunc(GL_LEQUAL + (state * 4)); // true => 1 * 4 => 515 + 4 => 519 (GL_ALWAYS)
 		}
 
 		// Disabled cull face and sets depth test to always pass.
 		// This makes 2D rendering more optimized accurate but 3D rendering will not work properly
 		inline void set_2dmode(const bool state) const noexcept {
-			if(state) {
-				glDisable(GL_CULL_FACE);
-				glDepthFunc(GL_ALWAYS);
-			} else {
-				glEnable(GL_CULL_FACE);
-				glDepthFunc(GL_LEQUAL);
-			}
+			(state) ? glDisable(GL_CULL_FACE) : glEnable(GL_CULL_FACE);
+			this->set_depthtest_always(state);
 		}
 
 		// Set the window's size using the provided width and height values.
@@ -209,16 +185,7 @@ class Window {
 		}
 
 		// Hides and grabs the cursor inside the window
-		inline void grab_cursor(const bool grab) const noexcept {
-			SDL_SetRelativeMouseMode(static_cast<SDL_bool>(grab));
-
-			// BUG:? I HADNT TO DO THIS BEFORE WHY DO I NEED IT NOW?????? WTF????
-			// If this isnt't done, the camera will "jump"
-			if(grab) {
-				int dummy_x, dummy_y;
-				SDL_GetRelativeMouseState(&dummy_x, &dummy_y);
-			}
-		}
+		void grab_cursor(const bool grab) const noexcept;
 
 		// Hide the cursor when it is inside the window.
 		inline void hide_cursor(const bool hide) const noexcept {
@@ -228,16 +195,7 @@ class Window {
 		// TIMER //
 
 		// Window FPS per second
-		inline float fps() noexcept {
-			if(this->delta_time <= 0.0f) {
-				return 0.0f;
-			}
-			return 1.0f / this->delta_time;
-
-			// const float alpha = 0.1f; // Smoothing factor
-			// this->smooth_fps = this->smooth_fps * (1.0f - alpha) + (1.0f / this->delta_time) * alpha;
-			// return this->smooth_fps;
-		}
+		float fps() noexcept;
 
 		// Get the time elapsed between the current and last frame, in seconds.
 		inline float dt() const noexcept {
@@ -306,11 +264,7 @@ class Window {
 		}
 
 		// Returns mouse movent since last call
-		inline vec2<int> relative_move() const noexcept {
-			vec2<int> mov;
-			SDL_GetRelativeMouseState(&mov.x, &mov.y);
-			return mov;
-		}
+		vec2<int> relative_move() const noexcept;
 
 		// Returns true if a button was clicked
 		inline bool isbtndown(const Buttoncode button) const noexcept {
@@ -340,21 +294,8 @@ class Window {
 
 		// STATIC //
 
-		// Get the current width of the window (static method).
-		// This retrieves the window size for the active OpenGL context.
-		static inline int static_width() noexcept {
-			int width;
-			SDL_GetWindowSize(SDL_GL_GetCurrentWindow(), &width, NULL);
-			return width;
-		}
-
-		// Get the current height of the window (static method).
-		// This retrieves the window size for the active OpenGL context.
-		static inline int static_height() noexcept {
-			int height;
-			SDL_GetWindowSize(SDL_GL_GetCurrentWindow(), NULL, &height);
-			return height;
-		}
+		// Get the current size of the window
+		static vec2<int> get_size() noexcept;
 
 	private:
 		// Window information
@@ -394,16 +335,10 @@ class Window {
 		vec2<int16> moved_dir;  // Normaalized moved_dir
 		// xrel yrel
 
-
-
 		// Called at the beggining of the frame.
 		void calc_dt() noexcept;
 
 		// Set the viewport to the provided size.
 		// This won't change the window's size
-		inline void set_viewport(const vec2<uint32>& size) noexcept {
-			this->width  = size.x;
-			this->height = size.y;
-			glViewport(0, 0, (GLsizei)size.x, (GLsizei)size.y);
-		}
+		void set_viewport(const vec2<uint32>& size) noexcept;
 };

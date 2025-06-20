@@ -9,6 +9,24 @@
 #include "scarablib/scenes/scene3d.hpp"
 #include "scarablib/window/window.hpp"
 
+// == DEBUG == //
+#include <fstream>
+double ram_usage() {
+	std::ifstream statm("/proc/self/statm");
+	if (!statm.is_open()) {
+		return 0.0;
+	}
+
+	size_t totalPages = 0;
+	size_t residentPages = 0;
+	statm >> totalPages >> residentPages;
+
+	long pageSize = sysconf(_SC_PAGESIZE); // bytes per page
+	size_t rss_kb = residentPages * (size_t)pageSize / 1024;
+	return static_cast<double>(rss_kb) / 1024.0; // Convert to MB
+}
+// == DEBUG == //
+
 void camera_movement(Window& window, Camera& camera, const float dt) {
 	static bool mouse_captured = false;
 
@@ -76,13 +94,15 @@ void update_gravity(Model& model, const float dt, const float ground_y = 0.0f) {
 }
 
 // TODO: BoundingBox add SphereBox inside it
+// - Model that is not a model and has position only
+//    + For collision and light
 
 int main() {
 	Window window = Window({
 		.width = 800,
 		.height = 600,
 		.title = "FPS: 0",
-		.vsync = true,
+		.vsync = false, // Lag when set to false ??
 		.resizable = true,
 		.debug_info = true
 	});
@@ -181,7 +201,8 @@ int main() {
 
 		// LOG_DEBUG("Camera Position: (%f, %f, %f)", camera.position.x, camera.position.y, camera.position.z);
 
-		window.set_title("FPS: " + std::to_string(window.fps()));
+		// window.set_title("FPS: " + std::to_string(window.fps()));
+		// window.set_title("FPS: " + std::to_string(window.fps()) + " / RAM: " + std::to_string(ram_usage()) + "MB");
 		// WINDOW EVENTS //
 
 		// MODELS UPDATE //
@@ -197,8 +218,8 @@ int main() {
 		}
 
 		// Debug draw bounds
-		cow->bbox.draw_local_bounds(camera, Colors::GREEN, true);
-		cow->bbox.draw_world_bounds(camera, Colors::RED, false);
+		// cow->bbox.draw_local_bounds(camera, Colors::GREEN, true);
+		// cow->bbox.draw_world_bounds(camera, Colors::RED, false);
 		// MODELS UPDATE //
 
 		// OTHER EVENTS //
@@ -216,5 +237,6 @@ int main() {
 		// OTHER EVENTS //
 
 		window.swap_buffers(); // Draw end
+		window.frame_capping(144.0f);
 	}
 }

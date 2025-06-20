@@ -1,4 +1,5 @@
 #include "scarablib/types/texture.hpp"
+#include "scarablib/proper/error.hpp"
 #include "scarablib/typedef.hpp"
 #include <SDL2/SDL_render.h>
 
@@ -6,13 +7,8 @@ Texture::Texture(const Color& color) noexcept {
 	// Generate and bind texture
 	glGenTextures(1, &this->id); // num of textures, pointer
 	glBindTexture(GL_TEXTURE_2D, this->id);
-
 	const uint8 data[4] = { color.red, color.green, color.blue, color.alpha };
-
-	// Generate
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-
-	// Unbind
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
@@ -45,7 +41,7 @@ Texture::Texture(const char* path, const bool flip_horizontally, const bool flip
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 	// Generate
-	const GLenum format = Texture::extract_format(*image);
+	const GLenum format = Texture::extract_format(*image, false);
 	glTexImage2D(
 		GL_TEXTURE_2D, 0,
 		static_cast<GLint>(format),
@@ -55,11 +51,8 @@ Texture::Texture(const char* path, const bool flip_horizontally, const bool flip
 		image->data
 	);
 
-	// Generate mipmap
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	// Unbind
-	glBindTexture(GL_TEXTURE_2D, 0);
+	glGenerateMipmap(GL_TEXTURE_2D); // Generate mipmap
+	glBindTexture(GL_TEXTURE_2D, 0); // Unbind
 
 	delete image;
 }
@@ -89,18 +82,12 @@ Texture::Texture(const void* data, const uint32 width, const uint32 height, cons
 		data
 	);
 
-	// Gen mipmap
 	glGenerateMipmap(GL_TEXTURE_2D);
-
-	// Unbind
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 Texture::~Texture() noexcept {
-	// Just in case
-	if(this->id != 0) {
-		glDeleteTextures(1, &this->id);
-	}
+	glDeleteTextures(1, &this->id);
 }
 
 
@@ -122,18 +109,20 @@ void Texture::set_wrap(const Texture::Wrap wrap) const noexcept {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, (GLint)wrap);
 
 	this->unbind();
-
 }
 
-
-// void Texture::update_data(const void* data, const GLenum format) {
-// 	if(data == nullptr) {
-// 		throw ScarabError("Texture data is null");
-// 	}
-//
-// 	glBindTexture(GL_TEXTURE_2D, this->id);
-// 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, static_cast<GLsizei>(this->width), static_cast<GLsizei>(this->height), format, GL_UNSIGNED_BYTE, data);
-// 	glGenerateMipmap(GL_TEXTURE_2D);
-// 	glBindTexture(GL_TEXTURE_2D, 0);
-// }
-
+GLuint Texture::extract_format(const Image& image, const bool internal) {
+	switch (image.nr_channels) {
+		case 1:
+			return (internal) ? GL_R8 : GL_RED;
+			break;
+		case 3:
+			return (internal) ? GL_RGB8 : GL_RGB;
+			break;
+		case 4:
+			return (internal) ? GL_RGBA8 : GL_RGBA;
+			break;
+		default:
+			throw ScarabError("Failed to load texture (%s). Unsupported format: %d channels", image.path, image.nr_channels);
+	}
+}

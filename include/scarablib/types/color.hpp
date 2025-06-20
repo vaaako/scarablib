@@ -39,13 +39,12 @@ struct Color {
 	uint8 blue = 255;
 	uint8 alpha = 255;
 
-	// Default constructor initializes the color to white (255, 255, 255, 255)
+	// Default constructor initializes the color to white
 	constexpr Color() noexcept = default;
 
-	// Initializes the color using an enum value from Colors.
-	// e.g., `Color color = Colors::MAGENTA;`
-	constexpr Color(const Colors color) noexcept : Color() {
-		int hex_value = static_cast<int>(color);
+	// Initializes the color using an enum value from Colors
+	constexpr Color(const Colors color) noexcept {
+		const int hex_value = static_cast<int>(color);
 
 		this->red = static_cast<uint8>((hex_value >> 16) & 0xFF);  // Extract red (bits 24-31)
 		this->green = static_cast<uint8>((hex_value >> 8) & 0xFF); // Extract green (bits 16-23)
@@ -54,107 +53,45 @@ struct Color {
 		this->alpha = 255;
 	}
 
-	// Initializes the color using a hex value.
-	// The hex value should be in the format 0xRRGGBB or 0xAARRGGBB
-	//
-	// Example:
-	// Color color1 = Color(0xFF5733);   // RGB (255, 87, 51) with alpha set to 255 .
-	// Color color2 = Color(0x80FF5733); // RGBA (128, 255, 87, 51) with alpha set to 128
-	explicit constexpr Color(const uint32 hex_value) noexcept {
+	// Initializes the color using a hex value
+	constexpr Color(const uint32 hex_value) noexcept {
 		this->red = static_cast<uint8>((hex_value >> 16) & 0xFF);  // Extract red (bits 24-31)
 		this->green = static_cast<uint8>((hex_value >> 8) & 0xFF); // Extract green (bits 16-23)
 		this->blue = static_cast<uint8>(hex_value & 0xFF);         // Extract blue (bits 8-15)
 
 		this->alpha = 255; // Default alpha to 255
 
-		// Check includes alpha
-		if ((hex_value >> 24) & 0xFF) {
+		// Check for alpha
+		if((hex_value >> 24) & 0xFF) {
 			this->alpha = static_cast<uint8>((hex_value >> 24) & 0xFF); // Extract alpha (bits 32-39)
 		}
 	}
 
-
 	// Initializes the color with specific RGBA values
-	inline constexpr Color(const uint8 red, const uint8 green, const uint8 blue, const uint8 alpha) noexcept
+	constexpr Color(const uint8 red, const uint8 green, const uint8 blue, const uint8 alpha) noexcept
 		: red(red), green(green), blue(blue), alpha(alpha) {}
 
-	// Copy constructor that initializes the color from another Color instance
-	// e.g., `Color color = Color({ 202, 23, 115 });`
 	Color(const Color&) noexcept = default;
 	Color& operator=(const Color&) noexcept = default;
-	// Move
 	Color(Color&&) noexcept = default;
 	Color& operator=(Color&&) noexcept = default;
 
-
-	// Sets the alpha value
-	inline constexpr void set_alpha(const uint8 alpha) noexcept {
-		this->alpha = alpha;
-	}
-
-	// Check if all color components are equal to 0
-	inline constexpr bool isempty() const noexcept {
-		return (this->red == 0) && (this->green == 0) && (this->blue == 0) && (this->alpha == 0);
-	}
-
-	// Convert the color to a vec4 of any type T.
-	inline vec4<float> to_vec4() const noexcept {
-		return vec4<float>(this->red, this->green, this->blue, this->alpha);
-	}
-
-	// Convert color component values to a normalized range (0-1) for OpenGL
+	// Normalize color values
 	inline const vec4<float> normalize() const noexcept {
-		// This is not optimized and i have no idea of how to make this optmized
-		// Multiplying by 0.004 gives an approximated result as dividing by 255
 		return {
-			this->red   * 0.004f,
-			this->green * 0.004f,
-			this->blue  * 0.004f,
-			this->alpha * 0.004f
+			this->red   / 255,
+			this->green / 255,
+			this->blue  / 255,
+			this->alpha / 255
 		};
 	}
 
-	// TODO: Instead of returning new color, modify current color
-
 	// Returns the distance between two colors.
 	// The smaller the distance, the closer the colors are
-	inline constexpr float distance_to(const Color& other) const noexcept {
-		const int dr = this->red - other.red;
-		const int dg = this->green - other.green;
-		const int db = this->blue - other.blue;
-		return std::sqrtf((float)(dr * dr + dg * dg + db * db));
-	}
+	float distance_to(const Color& other) const noexcept;
 
-
-	// Blend current color with another color
-	inline constexpr Color blend(const Color& other, float t) const noexcept {
-		return Color(
-			static_cast<uint8_t>(this->red   * (1 - t) + other.red   * t),
-			static_cast<uint8_t>(this->green * (1 - t) + other.green * t),
-			static_cast<uint8_t>(this->blue  * (1 - t) + other.blue  * t),
-			static_cast<uint8_t>(this->alpha * (1 - t) + other.alpha * t)
-		);
-	}
-
-	// Darks the current color using a value
-	inline constexpr Color darken(const float factor) const noexcept {
-		return Color(
-			static_cast<uint8_t>(this->red   * factor),
-			static_cast<uint8_t>(this->green * factor),
-			static_cast<uint8_t>(this->blue  * factor),
-			alpha
-		);
-	}
-
-	// Lights the current color using a value
-	inline constexpr Color lighten(const float factor) const noexcept {
-		return Color(
-			static_cast<uint8_t>(this->red   + (255 - this->red)   * factor),
-			static_cast<uint8_t>(this->green + (255 - this->green) * factor),
-			static_cast<uint8_t>(this->blue  + (255 - this->blue)  * factor),
-			alpha
-		);
-	}
+	// Blend with another color
+	// constexpr void blend(const Color& other, const float t) noexcept;
 
 	constexpr bool operator==(const Color& other) const noexcept {
 		return (this->red == other.red)

@@ -1,11 +1,7 @@
 #pragma once
 
-#include "glm/ext/matrix_clip_space.hpp"
-#include "glm/ext/matrix_transform.hpp"
-#include "glm/trigonometric.hpp"
-#include "scarablib/proper/log.hpp"
+#include <glm/ext/matrix_transform.hpp>
 #include "scarablib/window/window.hpp"
-#include <array>
 
 class Camera {
 	public:
@@ -72,87 +68,33 @@ class Camera {
 		}
 
 		// Update viewport using custom width and height
-		inline void update_viewport(const uint32 width, const uint32 height) noexcept {
-			this->width = width;
-			this->height = height;
-			this->update_proj_matrix(); // OpenGL viewport update
-		}
+		void update_viewport(const uint32 width, const uint32 height) noexcept;
 
 		// Sets camera near plane. How near to render
-		inline void set_near_plane(const float near_plane) noexcept {
-			if(near_plane > this->far_plane) {
-				LOG_ERROR("new \"near plane\" value can't be higher than \"far plane\" current value");
-				return;
-			}
-
-			this->near_plane = near_plane;
-			this->update_proj_matrix();
-		}
+		void set_near_plane(const float near_plane);
 
 		// Sets camera far plane. How far to render
-		inline void set_far_plane(const float far_plane) noexcept {
-			if(far_plane < this->near_plane) {
-				LOG_ERROR("new \"far plane\" value can't be lower than \"near plane\" current value");
-				return;
-			}
-
-			this->far_plane = far_plane;
-			this->update_proj_matrix();
-		}
+		void set_far_plane(const float far_plane);
 
 		// Sets camera fov
-		inline void set_fov(const float fov) noexcept {
-			if(fov < this->near_plane || fov > this->far_plane) {
-				LOG_ERROR("new \"fov\" value must be between \"near plane\" and \"far plane\" current values");
-				return;
-			}
-
-			this->fov = fov;
-			this->update_proj_matrix();
-		}
+		void set_fov(const float fov);
 
 		// Sets minimum amount of fov. Used for zoom out
-		inline void set_min_fov(const float min_fov) noexcept {
-			if(min_fov < this->max_fov) {
-				LOG_ERROR("new \"min fov\" value can't be higher than \"max fov\" current value");
-				return;
-			}
-
-			this->min_fov = min_fov;
-		}
+		void set_min_fov(const float min_fov);
 
 		// Sets maximum amount of fov. Used for zoom in
-		inline void set_max_fov(const float max_fov) noexcept {
-			if(max_fov < this->min_fov) {
-				LOG_ERROR("new \"max fov\" value can't be lower than \"min fov\" current value");
-				return;
-			}
-
-			this->max_fov = max_fov;
-		}
+		void set_max_fov(const float max_fov);
 
 		// Zoom in or out the camera using an speed value
-		inline void zoom(const float speed, const Camera::Zoom zoom_dir) noexcept {
-			this->fov = (zoom_dir == Zoom::IN)
-				? std::max(fov - speed, min_fov)
-				: std::min(fov + speed, max_fov);
+		void zoom(const float speed, const Camera::Zoom zoom_dir) noexcept;
 
-			this->update_proj_matrix();
-		}
+		// Changes the camera rotation using yaw and pitch angles.
+		// Yaw is horizontal rotation, Pitch is vertical
+		void set_rotation(const float yaw, const float pitch) noexcept;
 
 		// Sets camera movement speed
 		inline void set_speed(const float speed) noexcept {
 			this->speed = speed / 10.0f;
-		}
-
-		// Changes the camera rotation using yaw and pitch angles.
-		// Yaw is horizontal rotation, Pitch is vertical
-		inline void set_rotation(const float yaw, const float pitch) noexcept {
-			// Wrap yaw to stay within 360 range
-			this->yaw = std::fmod(yaw, 360.0f);
-			// Prevent gimbal lock
-			this->pitch = glm::clamp(pitch, -89.0f, 89.0f);
-			this->update_camera_vectors();
 		}
 
 
@@ -168,16 +110,7 @@ class Camera {
 		void rotate(const Window& mouse) noexcept;
 
 		// Returns a string with the cardinal direction the camera is facing based on its yaw
-		static std::string_view get_cardinal_direction(const float yaw) {
-			// Define the cardinal directions
-			static  std::array<std::string_view, 8> directions = {
-				"North (-Z)", "Northeast", "East (+X)", "Southeast",
-				"South (+Z)", "Southwest", "West (-X)", "Northwest"
-			};
-
-			// Determine the sector index. Normalizing yaw to [0, 360]
-			return directions[static_cast<size_t>((std::fmod((yaw + 360.0f), 360.0f) + 22.5f) / 45.0f) % 8];
-		}
+		static std::string_view get_cardinal_direction(const float yaw);
 
 	private:
 		uint32 width;
@@ -206,10 +139,5 @@ class Camera {
 		void update_camera_vectors() noexcept;
 
 		// Pre-calculate proj matrix, since it doesnt change much
-		inline void update_proj_matrix() noexcept {
-			this->proj = glm::mat4(1.0f);
-			this->proj = glm::perspective(glm::radians(this->fov),
-				(static_cast<float>(this->width) / static_cast<float>(this->height)),
-				this->near_plane, this->far_plane);
-		}
+		void update_proj_matrix() noexcept;
 };

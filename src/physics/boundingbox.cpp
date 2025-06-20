@@ -34,6 +34,14 @@ void BoundingBox::update_world_bounds(const glm::mat4& model_matrix) noexcept {
 	this->size = this->max - this->min;
 }
 
+
+bool BoundingBox::collides_with_sphere(const vec3<float>& center, const float radius) const noexcept {
+	// Find closest point on AABB to sphere center
+	const vec3<float> closest_point = glm::clamp(center, this->min, this->max);
+	const float distance = glm::length(center - closest_point);
+	return distance <= radius;
+}
+
 void BoundingBox::draw_local_bounds(const Camera& camera, const Color& color, const bool stripped) noexcept {
 	this->draw(false, camera, color, stripped);
 }
@@ -41,7 +49,6 @@ void BoundingBox::draw_local_bounds(const Camera& camera, const Color& color, co
 void BoundingBox::draw_world_bounds(const Camera& camera, const Color& color, const bool stripped) noexcept {
 	this->draw(true, camera, color, stripped);
 }
-
 
 void BoundingBox::draw(const bool world, const Camera& camera, const Color& color, const bool stripped) noexcept {
 	// Unbind any shader or vao

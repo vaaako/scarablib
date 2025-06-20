@@ -1,6 +1,5 @@
 #pragma once
 
-#include "scarablib/proper/error.hpp"
 #include "scarablib/typedef.hpp"
 #include "scarablib/types/color.hpp"
 #include "scarablib/types/image.hpp"
@@ -76,15 +75,6 @@ class Texture {
 		// Change the wrapping mode
 		void set_wrap(const Texture::Wrap wrap) const noexcept;
 
-
-
-
-
-
-		// NOTE: I wish this was a member, but i would have to initialize in window.hpp
-		// because i cant make a texture if the opengl context isnt ready yet
-		// so lazy load...
-
 		// Returns a default solid white texture
 		static Texture& default_texture() noexcept {
 			// I don't like data being statically allocated this way
@@ -92,37 +82,9 @@ class Texture {
 			return def_tex;
 		}
 
-		static GLuint extract_format(const Image& image) {
-			switch (image.nr_channels) {
-				case 1:
-					return GL_RED;
-					break;
-				case 3:
-					return GL_RGB;
-					break;
-				case 4:
-					return GL_RGBA;
-					break;
-				default:
-					throw ScarabError("Failed to load texture (%s). Unsupported format: %d channels", image.path, image.nr_channels);
-			}
-		}
-
-		static GLuint extract_internal_format(const Image& image) {
-			switch (image.nr_channels) {
-				case 1:
-					return GL_R8;
-					break;
-				case 3:
-					return GL_RGB8;
-					break;
-				case 4:
-					return GL_RGBA8;
-					break;
-				default:
-					throw ScarabError("Failed to load texture (%s). Unsupported format: %d channels", image.path, image.nr_channels);
-			}
-		}
+		// Extracts which color format a image has.
+		// If `internal` is true, returns enum for internal format
+		static GLuint extract_format(const Image& image, const bool internal);
 
 	private:
 		GLuint id;

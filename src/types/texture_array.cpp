@@ -56,7 +56,7 @@ TextureArray::TextureArray(const std::vector<TextureArray::Config>& textures, co
 	glBindTexture(GL_TEXTURE_2D_ARRAY, this->id);
 	glTexStorage3D(
 		GL_TEXTURE_2D_ARRAY, 1,
-		Texture::extract_internal_format(*image),
+		Texture::extract_format(*image, true),
 		image->width, image->height,
 		static_cast<GLint>(max_textures)
 	);
@@ -85,7 +85,7 @@ TextureArray::TextureArray(const std::vector<TextureArray::Config>& textures, co
 			0, 0, static_cast<GLint>(i), // x, y, layer (z)
 			image->width, image->height,
 			1, // Depth
-			Texture::extract_format(*image),
+			Texture::extract_format(*image, false),
 			GL_UNSIGNED_BYTE,
 			image->data
 		);

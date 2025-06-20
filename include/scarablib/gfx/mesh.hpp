@@ -46,13 +46,9 @@ class Mesh {
 
 		// Enables physics components for the mesh.
 		// Both values are optional.
-		// `Mass` (1.0f) is in kilograms.
-		// `isstatic` (false) is whether the mesh is affected by gravity or not
-		inline void enable_physics(const float mass = 1.0f, const bool isstatic = false) noexcept {
-			this->physics = new PhysicsComponent();
-			this->physics->mass = mass;
-			this->physics->isstatic = isstatic;
-		}
+		// `Mass`: (1.0f) is in kilograms.
+		// `isstatic`: (false) is whether the mesh is affected by gravity or not
+		void enable_physics(const float mass = 1.0f, const bool isstatic = false) noexcept;
 
 		// Updates the bounding box based on the transformations of the Model.
 		// For dynamic transformations, use `set_dynamic_bbox_update(bool)`

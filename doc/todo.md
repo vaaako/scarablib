@@ -4,6 +4,7 @@ I wrote most of the things here very tired, sorry for any english mistake
 # stuff i dont know if still working
 - Collision
 - Bounding box
+- VertexArray attributes
 
 # Currently working on
 Stuff that are in progress and i need to finish
@@ -11,6 +12,9 @@ Stuff that are in progress and i need to finish
 - Legacy Mode
 - Timer
 - Bounding Box debug draw
+- Terrain Map
+- Texture Array
+- Timer
 
 # TODO library
 - [x] Use my vectores instead of glm
@@ -60,7 +64,7 @@ Stuff that are in progress and i need to finish
 	+ 2D and 3D cutomizable camera
 - [x] Fix forward declarations
 
-- [ ] Material component and put in Model
+- [ ] Better Material Component and texture handling
 
 - [ ] REMOVE (almost) ALL INLINES
 	+ i just came to the conclusion that inline let the header file unreadable
@@ -195,6 +199,7 @@ Stuff that are in progress and i need to finish
 - [x] Better BoundingBox, not happy with the current state, dont know what to do
 - [x] Show bounding box
 - [ ] Different texture for each face (the other method that is not cubemap)
+- [ ] Ortographic camera
 
 # Features for later
 - Sprite atlas

@@ -82,7 +82,7 @@ class IScene {
 			"scene",                     // Shader name.
 			Shaders::DEFAULT_VERTEX,     // Default vertex shader source.
 			Shaders::DEFAULT_FRAGMENT    // Default fragment shader source.
-		);  // Pointer to the default shader used by the scene.
+		); // Pointer to the default shader used by the scene.
 };
 
 

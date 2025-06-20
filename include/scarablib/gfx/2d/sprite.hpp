@@ -11,9 +11,8 @@ class Sprite : public Mesh {
 	public:
 		Sprite(const std::vector<Vertex>& vertices) noexcept;
 
-		// Draws the shape
+		// This method does not draw the model to the screen, as it does not bind the VAO and Shader (batch rendering)
 		virtual void draw_logic(const Camera2D& camera, const Shader& shader) noexcept;
-
 
 		// GETTERS //
 
@@ -72,7 +71,6 @@ class Sprite : public Mesh {
 		}
 
 	protected:
-		// Attributes
 		vec2<float> position = vec2<float>(0.0f);
 		vec2<float> size     = vec2<float>(1.0f, 1.0f);
 		float angle          = 0.0f;

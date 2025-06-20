@@ -12,6 +12,7 @@ struct Skybox {
 	Skybox(const Camera& camera, const std::array<const char*, 6>& faces);
 	~Skybox() noexcept = default;
 
+	// Draw the skybox
 	void draw() noexcept;
 
 	private:

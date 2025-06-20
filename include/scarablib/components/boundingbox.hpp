@@ -57,12 +57,7 @@ struct BoundingBox {
 	}
 
 	// Check collision (AABB) with an sphere
-	inline bool collides_with_sphere(const vec3<float>& center, const float radius) const noexcept {
-		// Find closest point on AABB to sphere center
-		const vec3<float> closest_point = glm::clamp(center, this->min, this->max);
-		const float distance = glm::length(center - closest_point);
-		return distance <= radius;
-	}
+	bool collides_with_sphere(const vec3<float>& center, const float radius) const noexcept;
 
 	// Draws the bounding box of the model in local space.
 	// This is only intented to be used as a debug tool

@@ -143,3 +143,10 @@ Mesh::Mesh(const char* path) {
 Mesh::~Mesh() noexcept {
 	delete this->physics;
 }
+
+
+void Mesh::enable_physics(const float mass, const bool isstatic) noexcept {
+	this->physics = new PhysicsComponent();
+	this->physics->mass = mass;
+	this->physics->isstatic = isstatic;
+}

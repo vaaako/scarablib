@@ -9,15 +9,6 @@ namespace ScarabMath {
 		constexpr float EPSILON = 1e-6f; // Small tolerance value for floating-point comparison
 	}
 
-	// Initialize arrays
-	// inline void initialize() noexcept {
-	// 	for(uint32 i = 0; i < 360; i++) {
-	// 		angles[i]     = i * static_cast<float>(0.01745329251994329576923690768489);
-	// 		sin_angles[i] = std::sin(angles[i]);
-	// 		cos_angles[i] = std::cos(angles[i]);
-	// 	}
-	// }
-
 	// Convert degrees to radians
 	[[nodiscard]] constexpr inline float radians(const float degrees) noexcept {
 		return degrees * static_cast<float>(0.01745329251994329576923690768489);

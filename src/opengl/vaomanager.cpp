@@ -30,6 +30,13 @@ void VAOManager::new_entry(const size_t hash, VAOEntry entry) noexcept {
 	it->second.ref_count++;
 }
 
+void VAOManager::increase_ref_count(const size_t hash) noexcept {
+	auto it = this->vao_map.find(hash);
+	if(it != this->vao_map.end()) {
+		it->second.ref_count++;
+	}
+}
+
 void VAOManager::release_vao(const size_t hash) noexcept {
 	auto it = vao_map.find(hash);
 

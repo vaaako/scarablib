@@ -122,37 +122,38 @@ Window::~Window() noexcept {
 	ShaderManager::get_instance().cleanup();
 }
 
-// private
-void Window::calc_dt() noexcept {
-	const uint64 now = SDL_GetPerformanceCounter();
-	const uint64 elapsed = now - this->last_update;
-	this->last_update = now;
-	this->delta_time = static_cast<float>(elapsed) / static_cast<float>(SDL_GetPerformanceFrequency());
-	// note: elapsed may be multiplied by 1000.0f to get milliseconds
 
-	// Ignore bad frame times (first frame, context switch, GPU stall, etc)
-	if(this->delta_time <= 0.0f || this->delta_time >= 0.2f) {
-		this->delta_time = 0.0f;
-	}
+void Window::swap_buffers() noexcept {
+	// Make operations that need to happen at the end of each frame
+	this->frame_events.clear(); // Clear events
+	SDL_GL_SwapWindow(this->window);
 }
 
-void Window::frame_capping(const float fps) const noexcept {
-	if(fps == 0.0f) {
-		return;
-	}
-
-	const float desired = 1.0f / fps;
-	const float actual = this->dt();
-	const float remaining = desired - actual;
-
-	// If not synchronized
-	if(remaining > 0.0f) {
-		// Convert to milliseconds, clamp minimum delay to avoid 0ms inaccuracies
-		SDL_Delay(static_cast<uint32>(remaining * 1000));
-	}
-	// If actual >= desired, the frame is already running slower than desired, so no delay is needed
+void Window::clear() const noexcept {
+	glClearColor(this->clear_color.x, this->clear_color.y, this->clear_color.z, this->clear_color.w);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+
+void Window::grab_cursor(const bool grab) const noexcept {
+	// BUG:? I HADNT TO DO THIS BEFORE WHY DO I NEED IT NOW?????? WTF????
+	// If this isnt't done, the camera will "jump"
+	int dummy_x, dummy_y;
+	SDL_SetRelativeMouseMode(static_cast<SDL_bool>(grab));
+	SDL_GetRelativeMouseState(&dummy_x, &dummy_y);
+}
+
+
+float Window::fps() noexcept {
+	if(this->delta_time <= 0.0f) {
+		return 0.0f;
+	}
+	return 1.0f / this->delta_time;
+
+	// const float alpha = 0.1f; // Smoothing factor
+	// this->smooth_fps = this->smooth_fps * (1.0f - alpha) + (1.0f / this->delta_time) * alpha;
+	// return this->smooth_fps;
+}
 
 void Window::set_size(const vec2<uint32>& size) noexcept {
 	this->width = size.x;
@@ -183,6 +184,52 @@ bool Window::iskeypressed(const Keycode key) noexcept {
 	return false;
 }
 
+
+vec2<int> Window::relative_move() const noexcept {
+	vec2<int> mov;
+	SDL_GetRelativeMouseState(&mov.x, &mov.y);
+	return mov;
+}
+
+void Window::frame_capping(const float fps) const noexcept {
+	if(fps <= 0.0f) {
+		return;
+	}
+
+	const float duration = 1.0f / fps;
+	const uint64 now     = SDL_GetPerformanceCounter();
+	const float elapsed = static_cast<float>(now - this->last_update) / (float)SDL_GetPerformanceFrequency();
+
+	// If not synchronized
+	if(elapsed < duration) {
+		// Convert to milliseconds, clamp minimum delay to avoid 0ms inaccuracies
+		const uint32 delay_ms = static_cast<uint32>((duration - elapsed) * 1000.0f);
+		if(delay_ms > 0) {
+			SDL_Delay(delay_ms);
+		}
+	}
+}
+
+// private
+void Window::calc_dt() noexcept {
+	const uint64 now = SDL_GetPerformanceCounter();
+	const uint64 elapsed = now - this->last_update;
+	this->last_update = now;
+	this->delta_time = static_cast<float>(elapsed) / static_cast<float>(SDL_GetPerformanceFrequency());
+	// note: elapsed may be multiplied by 1000.0f to get milliseconds
+
+	// Ignore bad frame times (first frame, context switch, GPU stall, etc)
+	if(this->delta_time <= 0.0f || this->delta_time >= 0.2f) {
+		this->delta_time = 0.0f;
+	}
+}
+
+// private
+void Window::set_viewport(const vec2<uint32>& size) noexcept {
+	this->width  = size.x;
+	this->height = size.y;
+	glViewport(0, 0, (GLsizei)size.x, (GLsizei)size.y);
+}
 
 void Window::process_events() noexcept {
 	// Frame beggining calculations
@@ -269,3 +316,8 @@ void Window::process_events() noexcept {
 	}
 }
 
+vec2<int> Window::get_size() noexcept {
+	vec2<int> size;
+	SDL_GetWindowSize(SDL_GL_GetCurrentWindow(), &size.x, &size.y);
+	return size;
+}

@@ -20,9 +20,7 @@ class Model : public Mesh {
 		// Make a model using a wavefront .obj file
 		Model(const char* path) noexcept;
 
-		// This method does not draw the model to the screen, as it does not bind the VAO and Shader.
-		// This is a auxiliary method used by Scene3D. It does not bind VAO and Shader because of batch rendering.
-		// This is the default draw method and a different model may have a overrided draw method (like billboard)
+		// This method does not draw the model to the screen, as it does not bind the VAO and Shader (batch rendering)
 		virtual void draw_logic(const Camera& camera, const Shader& shader) noexcept;
 
 		// Returns current position
