@@ -3,6 +3,7 @@
 #include <GL/glew.h>
 #include "scarablib/gfx/mesh.hpp"
 #include "scarablib/opengl/shader.hpp"
+#include "scarablib/proper/dirtyproxy.hpp"
 #include "scarablib/scenes/camera.hpp"
 #include "scarablib/typedef.hpp"
 #include "scarablib/types/vertex.hpp"
@@ -10,6 +11,11 @@
 // An object used for as a base for 3D Shapes
 class Model : public Mesh {
 	public:
+		// Model's position in world space
+		DirtyProxy<vec3<float>> position = DirtyProxy(vec3<float>(0.0f), this->isdirty);
+		// Model's scale. Default is 1.0f
+		DirtyProxy<vec3<float>> scale    = DirtyProxy(vec3<float>(1.0f), this->isdirty);
+
 		// Model is not build, you should provide vertices and indices with `set_geometry` method
 		Model() noexcept = default;
 		// To make a model use ModelFactory.
@@ -23,58 +29,13 @@ class Model : public Mesh {
 		// This method does not draw the model to the screen, as it does not bind the VAO and Shader (batch rendering)
 		virtual void draw_logic(const Camera& camera, const Shader& shader) noexcept;
 
-		// Returns current position
-		inline vec3<float> get_position() const noexcept {
-			return this->position;
-		}
-
-		// Returns current scale
-		inline vec3<float> get_scale() const noexcept {
-			return this->scale;
-		}
-
 		// Returns current angle
 		inline float get_angle() const noexcept {
 			return this->angle;
 		}
 
-		// SETTERS //
-
-		// Sets a new position using a 3D vector
-		inline void set_position(const vec3<float>& position) noexcept {
-			this->position = position;
-			this->isdirty = true;
-		}
-
-		// Sets a new X position
-		inline void set_x(const float newx) noexcept {
-			this->position.x = newx;
-			this->isdirty = true;
-		}
-
-		// Sets a new Y position
-		inline void set_y(const float newy) noexcept {
-			this->position.y = newy;
-			this->isdirty = true;
-		}
-
-		// Sets a new Z position
-		inline void set_z(const float newz) noexcept {
-			this->position.z = newz;
-			this->isdirty = true;
-		}
-
-		// Moves the model using a 3D vector.
-		// This essentially increased the position by the provided offset
-		inline void move(const vec3<float>& offset) noexcept {
-			this->position += offset;
-			this->isdirty = true;
-		}
-
-		// Sets a new scale using a 3D vector
-		inline void set_scale(const vec3<float>& scale) noexcept {
-			this->scale = scale;
-			this->isdirty = true;
+		inline float get_orientation_angle() const noexcept {
+			return this->orient_angle;
 		}
 
 		// Sets a new rotation angle.
@@ -88,13 +49,14 @@ class Model : public Mesh {
 		void set_orientation(const float angle, const vec3<float>& axis) noexcept;
 
 	protected:
-		// Attributes
-		vec3<float> position    = vec3<float>(0.0f);
-		vec3<float> scale       = vec3<float>(1.0f);
+		// Axis where the orientation angle will be applied
 		float orient_angle      = 0.0f;
-		vec3<float> orient_axis = vec3<float>(1.0f, 0.0f, 0.0f); // Axis where the orientation angle will be applied
-		float angle             = 0.0f;                          // Rotation based on orientation
-		vec3<float> axis        = vec3<float>(1.0f, 0.0f, 0.0f); // Need to have at least one axis to work, even if angle is 0.0
+		// Rotation based on orientation
+		vec3<float> orient_axis = vec3<float>(1.0f, 0.0f, 0.0f);
+		// Rotation
+		float angle             = 0.0f;
+		// Need to have at least one axis to work, even if angle is 0.0
+		vec3<float> axis        = vec3<float>(1.0f, 0.0f, 0.0f);
 
 		void update_model_matrix() noexcept override;
 };

@@ -2,78 +2,26 @@
 
 #include "scarablib/gfx/mesh.hpp"
 #include "scarablib/opengl/shader.hpp"
+#include "scarablib/proper/dirtyproxy.hpp"
 #include "scarablib/scenes/camera2d.hpp"
 #include "scarablib/types/vertex.hpp"
 
 // Renderable 2D object with transform/state
 class Sprite : public Mesh {
 	public:
+		// Sprite's position
+		DirtyProxy<vec2<float>> position = DirtyProxy(vec2<float>(0.0f), this->isdirty);
+		// Sprite's size in pixels
+		DirtyProxy<vec2<float>> size = DirtyProxy(vec2<float>(1.0f), this->isdirty);
+		// Rotation angle
+		DirtyProxy<float> angle = DirtyProxy(0.0f, this->isdirty);
+
 		Sprite(const std::vector<Vertex>& vertices) noexcept;
 
 		// This method does not draw the model to the screen, as it does not bind the VAO and Shader (batch rendering)
 		virtual void draw_logic(const Camera2D& camera, const Shader& shader) noexcept;
 
-		// GETTERS //
-
-		// Returns current position
-		inline vec2<float> get_position() const noexcept {
-			return this->position;
-		}
-
-		// Returns current size
-		inline vec2<float> get_size() const noexcept {
-			return this->size;
-		}
-
-		// Returns current rotation angle
-		inline float get_angle() const noexcept {
-			return this->angle;
-		}
-
-		// SETTERS //
-
-		// Sets a new position using a 2D vector.
-		inline void set_position(const vec2<float>& position) noexcept {
-			this->position = position;
-			this->isdirty = true;
-		}
-
-		// Sets a new X position
-		inline void set_x(const float newx) noexcept {
-			this->position.x = newx;
-			this->isdirty = true;
-		}
-
-		// Sets a new Y position
-		inline void set_y(const float newy) noexcept {
-			this->position.y = newy;
-			this->isdirty = true;
-		}
-
-		// Moves the sprite using a 2D vector
-		inline void move(const vec2<float>& offset) noexcept {
-			this->position += offset;
-			this->isdirty = true;
-		}
-
-		// Set a new size using a 2D vector
-		inline void set_size(const vec2<float>& size) noexcept {
-			this->size = size;
-			this->isdirty = true;
-		}
-
-		// Sets a new rotation angle.
-		// `angle` should be in degrees
-		inline void set_angle(const float angle) noexcept {
-			this->angle = angle;
-			this->isdirty = true;
-		}
-
 	protected:
-		vec2<float> position = vec2<float>(0.0f);
-		vec2<float> size     = vec2<float>(1.0f, 1.0f);
-		float angle          = 0.0f;
-
 		void update_model_matrix() noexcept override;
 };
 

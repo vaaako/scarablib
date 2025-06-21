@@ -32,15 +32,13 @@ void Model::update_model_matrix() noexcept {
 
 	this->model = glm::mat4(1.0f);
 
-	// Calculate rotation matrices
-	const glm::mat4 rotation    = glm::rotate(this->model, glm::radians(this->angle), this->axis);
-	const glm::mat4 orientation = glm::rotate(this->model, glm::radians(this->orient_angle), this->orient_axis);
-
-	// Modify in place
+	// Translate
 	this->model = glm::translate(this->model, static_cast<const glm::vec3&>(this->position));
+	// Calculate rotation matrices
+	this->model = glm::rotate(this->model, glm::radians(this->orient_angle), this->orient_axis);
+	this->model = glm::rotate(this->model, glm::radians(this->angle), this->axis);
+	// Scale
 	this->model = glm::scale(this->model, static_cast<const glm::vec3&>(this->scale));
-	this->model *= orientation;
-	this->model *= rotation;
 
 	this->isdirty = false;
 
@@ -54,15 +52,12 @@ void Model::update_model_matrix() noexcept {
 // but i dont know how to do it currently (and i am lazy)
 void Model::draw_logic(const Camera& camera, const Shader& shader) noexcept {
 	// Shader is binded outside for batch rendering
-
 	this->update_model_matrix();
 
 	// NOTE: is_dirty for color wouldn't work because would set this color to the next meshes
 	shader.set_color("shapeColor", this->material.color);
 	shader.set_matrix4f("mvp", (camera.get_proj_matrix() * camera.get_view_matrix()) * this->model);
 
-	this->material.texture->bind();
 	glDrawElements(GL_TRIANGLES, this->indices_length, this->indices_type, (void*)0);
-	this->material.texture->unbind();
 }
 
