@@ -121,11 +121,18 @@ class Window {
 			}
 		}
 
-		// Sets the polygon drawing mode for both front and back faces.
+		// Hides the back face and sets the polygon drawing mode for front face.
 		// This makes 3D render more optimized but 2D rendering will not work
 		inline void set_cullface(const bool state) const noexcept {
-			glCullFace(GL_FRONT + state); // true => 1028 + 1 = > 1029 (GL_BACK)
+			(state) ? glEnable(GL_CULL_FACE) : glDisable(GL_CULL_FACE);
 		}
+
+		// Sets the polygon drawing mode for both front and back faces.
+		// Cullface must be enable to work.
+		// This makes 3D render more optimized but 2D rendering will not work
+		// inline void set_cullface_back(const bool state) const noexcept {
+		// 	glCullFace(GL_FRONT + state); // true => 1028 + 1 = > 1029 (GL_BACK)
+		// }
 
 		// Sets the depth test to always pass.
 		// If false, sets to LEQUAL (default).
@@ -138,7 +145,7 @@ class Window {
 		// Disabled cull face and sets depth test to always pass.
 		// This makes 2D rendering more optimized accurate but 3D rendering will not work properly
 		inline void set_2dmode(const bool state) const noexcept {
-			(state) ? glDisable(GL_CULL_FACE) : glEnable(GL_CULL_FACE);
+			this->set_cullface(state);
 			this->set_depthtest_always(state);
 		}
 

@@ -14,7 +14,6 @@ void Sprite::update_model_matrix() noexcept {
 
 	// Modify in place
 	this->model = glm::translate(this->model, glm::vec3(this->position, 0.0f));
-
 	// Origin from top-lef to center, to apply rotation
 	this->model = glm::translate(this->model, glm::vec3(0.5f * this->size.x, 0.5f * this->size.y, 0.0f));
 	// Rotate

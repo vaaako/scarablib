@@ -27,7 +27,7 @@ void Billboard::draw_logic(const Camera& camera, const Shader& shader) noexcept 
 
 	// Billboard stuff
 	shader.set_vector3f("billboardPos", this->position);
-	shader.set_float("billboardSize", this->scale.x);
+	shader.set_float("billboardSize", this->scale->x);
 
 	shader.set_color("shapeColor", this->material.color);
 
@@ -84,8 +84,8 @@ void Billboard::update_facing_texture(const vec3<float>& point_pos) noexcept {
 	const float angle_to_target = std::atan2(
 		// This is inverted to get the result that i want
 		// Invert back if the intention is the billboard change relative to some external object
-		point_pos.x - this->position.x,
-		point_pos.z - this->position.z
+		point_pos.x - this->position->x,
+		point_pos.z - this->position->z
 	);
 
 	const float forward_angle = this->directions[this->base_dir];
@@ -115,4 +115,5 @@ void Billboard::clear_textures() noexcept {
 		}
 	}
 	this->textures.clear();
+	this->textures.shrink_to_fit(); // Actually releases the allocated memory
 }

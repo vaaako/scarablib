@@ -58,6 +58,7 @@ class VertexBufferComponent {
 		inline void cleanup_attributes() noexcept {
 			// Clear attributes
 			this->attributes.clear();
+			this->attributes.shrink_to_fit(); // Actually releases the allocated memory
 			this->stride = sizeof(Vertex);
 		}
 };

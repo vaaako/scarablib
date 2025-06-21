@@ -1,12 +1,12 @@
 #pragma once
 
+#include <GL/glew.h>
 #include "scarablib/components/boundingbox.hpp"
 #include "scarablib/components/materialcomponent.hpp"
 #include "scarablib/components/physicscomponent.hpp"
 #include "scarablib/opengl/shader.hpp"
 #include "scarablib/opengl/vertexbuffercomponent.hpp"
 #include "scarablib/typedef.hpp"
-#include <GL/glew.h>
 
 // Basic data for 3D and 2D shapes
 class Mesh {

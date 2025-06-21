@@ -37,8 +37,8 @@ void Model::update_model_matrix() noexcept {
 	const glm::mat4 orientation = glm::rotate(this->model, glm::radians(this->orient_angle), this->orient_axis);
 
 	// Modify in place
-	this->model = glm::translate(this->model, this->position);
-	this->model = glm::scale(this->model, this->scale);
+	this->model = glm::translate(this->model, static_cast<const glm::vec3&>(this->position));
+	this->model = glm::scale(this->model, static_cast<const glm::vec3&>(this->scale));
 	this->model *= orientation;
 	this->model *= rotation;
 

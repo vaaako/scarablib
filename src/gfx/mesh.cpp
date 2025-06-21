@@ -137,6 +137,12 @@ Mesh::Mesh(const char* path) {
 	attrib.texcoords.clear();
 	shapes.clear();
 	materials.clear();
+	// Actually releases the allocated memory
+	attrib.vertices.shrink_to_fit();
+	attrib.normals.shrink_to_fit();
+	attrib.texcoords.shrink_to_fit();
+	shapes.shrink_to_fit();
+	materials.shrink_to_fit();
 }
 
 

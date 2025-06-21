@@ -1,5 +1,8 @@
 #include "scarablib/components/boundingbox.hpp"
-#include "glm/gtc/type_ptr.hpp"
+
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/vector_angle.hpp>
 
 BoundingBox::BoundingBox(const std::vector<Vertex>& vertices) noexcept {
 	this->calculate_local_bounds(vertices);
@@ -17,7 +20,6 @@ void BoundingBox::calculate_local_bounds(const std::vector<Vertex>& vertices) no
 
 	this->max = this->local_max;
 	this->min = this->local_min;
-	this->size = this->max - this->min;
 }
 
 void BoundingBox::update_world_bounds(const glm::mat4& model_matrix) noexcept {
@@ -30,27 +32,25 @@ void BoundingBox::update_world_bounds(const glm::mat4& model_matrix) noexcept {
 		this->min = glm::min(this->min, world_pos);
 		this->max = glm::max(this->max, world_pos);
 	}
-
-	this->size = this->max - this->min;
 }
 
 
 bool BoundingBox::collides_with_sphere(const vec3<float>& center, const float radius) const noexcept {
 	// Find closest point on AABB to sphere center
 	const vec3<float> closest_point = glm::clamp(center, this->min, this->max);
-	const float distance = glm::length(center - closest_point);
-	return distance <= radius;
+	const float distance_squared = glm::length2(center - closest_point);
+	return distance_squared <= (radius * radius);
 }
 
-void BoundingBox::draw_local_bounds(const Camera& camera, const Color& color, const bool stripped) noexcept {
+void BoundingBox::draw_local_bounds(const Camera& camera, const Color& color, const bool stripped) const noexcept {
 	this->draw(false, camera, color, stripped);
 }
 
-void BoundingBox::draw_world_bounds(const Camera& camera, const Color& color, const bool stripped) noexcept {
+void BoundingBox::draw_world_bounds(const Camera& camera, const Color& color, const bool stripped) const noexcept {
 	this->draw(true, camera, color, stripped);
 }
 
-void BoundingBox::draw(const bool world, const Camera& camera, const Color& color, const bool stripped) noexcept {
+void BoundingBox::draw(const bool world, const Camera& camera, const Color& color, const bool stripped) const noexcept {
 	// Unbind any shader or vao
 	glBindVertexArray(0);
 	glUseProgram(0);

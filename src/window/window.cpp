@@ -3,6 +3,7 @@
 #include "scarablib/opengl/vaomanager.hpp"
 #include "scarablib/proper/error.hpp"
 #include "scarablib/proper/log.hpp"
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_video.h>
@@ -18,6 +19,7 @@ Window::Window(const Window::Config& config)
 	}
 
 	// Initialize SDL_mixer
+	// NOTE: Reserves couple KBs depending on chunksize
 	if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) != 0) {
 		Mix_CloseAudio();
 		SDL_CloseAudio();
@@ -30,7 +32,7 @@ Window::Window(const Window::Config& config)
 		config.title.c_str(),
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 		(int)config.width, (int)config.height,
-		SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE
+		SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL
 	);
 
 	if(!this->window) {
@@ -41,13 +43,18 @@ Window::Window(const Window::Config& config)
 	}
 
 	// Initialize OpenGL context
-	// SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
-	// SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	// SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	// SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+	// SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
+	// SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
+	// SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 5);
+	// SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
+	// SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
+	// SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
 	this->glContext = SDL_GL_CreateContext(window);
-	if(!this->glContext) {
+	if(this->glContext == NULL) {
 		SDL_DestroyWindow(this->window);
 		Mix_CloseAudio();
 		SDL_CloseAudio();
@@ -56,7 +63,7 @@ Window::Window(const Window::Config& config)
 	}
 
 	// Initialize GLEW
-	glewExperimental = GL_TRUE;
+	glewExperimental = GL_FALSE;
 	GLenum err = glewInit();
 	if(err != GLEW_OK) {
 		SDL_GL_DeleteContext(this->glContext);
@@ -72,15 +79,12 @@ Window::Window(const Window::Config& config)
 	// Blending
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
-
+	// Depth
 	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL); // 2D and Skybox support with depth test
+	// Culling
+	// glEnable(GL_CULL_FACE);
 
-	// 2D and Skybox support with depth test
-	// glDepthFunc(GL_ALWAYS); // This makes 2D not blend in 3D meshes
-	glDepthFunc(GL_LEQUAL);
-
-	// Cull Face
-	// glEnable(GL_CULL_FACE); // Disabled by default
 
 	// SDL Configurations
 	SDL_SetWindowResizable(this->window, (SDL_bool)config.resizable);
