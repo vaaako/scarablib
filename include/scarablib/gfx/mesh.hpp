@@ -39,10 +39,13 @@ class Mesh {
 
 		virtual ~Mesh() noexcept;
 
+		// This method does not draw the Mesh to the screen.
+		// As it does not bind the VAO, Shader and Texture (batch rendering)
+		virtual void draw_logic(const Camera& camera, const Shader& shader) noexcept = 0;
+
 		// Build Mesh using vertices and indices
 		template <typename T>
 		void set_geometry(const std::vector<Vertex>& vertices, const std::vector<T>& indices);
-
 
 		// Enables physics components for the mesh.
 		// Both values are optional.

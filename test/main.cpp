@@ -5,6 +5,7 @@
 #include "scarablib/proper/log.hpp"
 #include "scarablib/scenes/camera.hpp"
 #include "scarablib/scenes/camera2d.hpp"
+#include "scarablib/scenes/perspectivecamera.hpp"
 #include "scarablib/scenes/scene2d.hpp"
 #include "scarablib/scenes/scene3d.hpp"
 #include "scarablib/window/window.hpp"
@@ -28,7 +29,7 @@ double ram_usage() {
 }
 // == DEBUG == //
 
-void camera_movement(Window& window, Camera& camera, const float dt) {
+void camera_movement(Window& window, PerspectiveCamera& camera, const float dt) {
 	static bool mouse_captured = false;
 
 	vec3<int8> direction = vec3<int8>(0.0f);
@@ -113,7 +114,7 @@ int main() {
 
 	// CAMERAS AND SCENES //
 
-	Camera camera = Camera(window);
+	PerspectiveCamera camera = PerspectiveCamera(window);
 	camera.set_speed(200.0f);
 
 	Camera2D camera2d = Camera2D(window);

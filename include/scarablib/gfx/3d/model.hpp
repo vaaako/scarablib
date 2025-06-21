@@ -27,7 +27,7 @@ class Model : public Mesh {
 		Model(const char* path) noexcept;
 
 		// This method does not draw the model to the screen, as it does not bind the VAO and Shader (batch rendering)
-		virtual void draw_logic(const Camera& camera, const Shader& shader) noexcept;
+		virtual void draw_logic(const Camera& camera, const Shader& shader) noexcept override;
 
 		// Returns current angle
 		inline float get_angle() const noexcept {

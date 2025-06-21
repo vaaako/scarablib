@@ -29,17 +29,14 @@ void Sprite::update_model_matrix() noexcept {
 
 // I could just provide mvp if any of the matrix changes, because the value is stored in memory.
 // But i just know when model changes, and camera matrix is likely to change everytime
-void Sprite::draw_logic(const Camera2D& camera, const Shader& shader) noexcept {
+void Sprite::draw_logic(const Camera& camera, const Shader& shader) noexcept {
 	this->update_model_matrix();
 
 	// NOTE: is_dirty for color wouldn't work because would set this color to the next meshes
 	shader.set_color("shapeColor", this->material.color);
 	shader.set_matrix4f("mvp", (camera.get_proj_matrix() * camera.get_view_matrix()) * this->model);
 
-	this->material.texture->bind();
-
 	// Not indices btw
 	glDrawArrays(GL_TRIANGLE_FAN, 0, this->indices_length);
-	this->material.texture->unbind();
 }
 

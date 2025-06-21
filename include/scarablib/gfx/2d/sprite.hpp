@@ -3,7 +3,6 @@
 #include "scarablib/gfx/mesh.hpp"
 #include "scarablib/opengl/shader.hpp"
 #include "scarablib/proper/dirtyproxy.hpp"
-#include "scarablib/scenes/camera2d.hpp"
 #include "scarablib/types/vertex.hpp"
 
 // Renderable 2D object with transform/state
@@ -19,7 +18,7 @@ class Sprite : public Mesh {
 		Sprite(const std::vector<Vertex>& vertices) noexcept;
 
 		// This method does not draw the model to the screen, as it does not bind the VAO and Shader (batch rendering)
-		virtual void draw_logic(const Camera2D& camera, const Shader& shader) noexcept;
+		virtual void draw_logic(const Camera& camera, const Shader& shader) noexcept override;
 
 	protected:
 		void update_model_matrix() noexcept override;
