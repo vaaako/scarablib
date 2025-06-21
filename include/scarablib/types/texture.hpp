@@ -48,6 +48,11 @@ class Texture {
 		inline uint32 get_id() const noexcept {
 			return this->id;
 		}
+		
+		// Returns the internal format of the texture
+		// inline GLenum get_type() const noexcept {
+		// 	return GL_TEXTURE_2D;
+		// }
 
 		// Returns the width of the texture
 		inline uint32 get_width() const noexcept {

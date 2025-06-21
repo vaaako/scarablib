@@ -149,26 +149,18 @@ U* IScene<T>::add(const std::string& key, Args&&... args) {
 	auto it = std::lower_bound(vao_groups.begin(), vao_groups.end(), mesh_ptr,
 		[](const std::shared_ptr<T>& a, const std::shared_ptr<T>& b) {
 
-		auto sa = a->get_shader();
-		auto sb = b->get_shader();
+		const Shader* sa = a->get_shader();
+		const Shader* sb = b->get_shader();
 
-		// If A has no shader (default) and B has a shader, put a before B
-		if(!sa && sb) {
-			return true;
+		// Primary sort key: shader pointer
+		// This handles null cases too
+		if(sa != sb) {
+			return sa < sb;
 		}
 
-		// If A has a shader and B has no shader (default), put B before A
-		if(sa && !sb) {
-			return false;
-		}
-
-		// Fallback: Sort by shader ID
-		if(sa && sb) {
-			return sa->get_id() < sb->get_id();
-		}
-
-		// Fallback: If both have no shaders, maintain original order
-		return false;
+		// Secondary sort key: texture pointer
+		// Only checked if the shaders are the same
+		return a->material.texture < b->material.texture;
 	});
 
 	// Insert the model in the correct place

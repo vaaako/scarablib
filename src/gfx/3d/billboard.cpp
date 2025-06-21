@@ -31,9 +31,7 @@ void Billboard::draw_logic(const Camera& camera, const Shader& shader) noexcept 
 
 	shader.set_color("shapeColor", this->material.color);
 
-	this->material.texture->bind();
 	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(this->indices_length), GL_UNSIGNED_BYTE, (void*)0);
-	this->material.texture->unbind();
 }
 
 

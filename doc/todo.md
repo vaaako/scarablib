@@ -51,17 +51,13 @@ Stuff that are in progress and i need to finish
 	+ Also replace `LOG_ERROR` with `Result`
 	+ `LOG_WARNING` can stay
 
-- [ ] Use bitwise flags when fits
+- [x] Use bitwise flags when fits
 	+ Textures
 	+ Billboard
 	+ Window?
-- [ ] Use `string_view` instead of `string` when possible (when string manipulation isnt necessary)
-- [ ] Class members that dont need any treatment or additional code in a setter method, should be public (when this is the case a setter method for this member is not necessary)
+- [x] Use `string_view` instead of `string` when possible (when string manipulation isnt necessary)
+- [x] Class members that dont need any treatment or additional code in a setter method, should be public (when this is the case a setter method for this member is not necessary)
 - [ ] Change methods description to use "\`\`" for parameters
-- [ ] Support legacy opengl
-	+ Draw 2D and 3D shapes
-	+ Sprite support
-	+ 2D and 3D cutomizable camera
 - [x] Fix forward declarations
 
 - [ ] Better Material Component and texture handling
@@ -205,6 +201,10 @@ Stuff that are in progress and i need to finish
 - Sprite atlas
 - Tick
 - Entity manager
+- Support legacy opengl
+	+ Draw 2D and 3D shapes
+	+ Sprite support
+	+ 2D and 3D cutomizable camera
 
 ## 3D features
 - Collision
