@@ -235,6 +235,16 @@ void Window::set_viewport(const vec2<uint32>& size) noexcept {
 	glViewport(0, 0, (GLsizei)size.x, (GLsizei)size.y);
 }
 
+// private
+void Window::dispatch_event(const uint32 event) const noexcept {
+	// If there is a callback registered for this event
+	// (better than a for loop)
+	auto it = this->callbacks.find(event);
+	if(it != this->callbacks.end()) {
+		it->second();
+	}
+}
+
 void Window::process_events() noexcept {
 	// Frame beggining calculations
 	this->calc_dt();
@@ -243,68 +253,60 @@ void Window::process_events() noexcept {
 	while(SDL_PollEvent(&event)) {
 		// Store all events in this frame
 		this->frame_events.emplace(event.type);
+		// Check if there is a callback
+		this->dispatch_event(event.type);
 
-		// Some events need to be handled
 		switch (event.type) {
-			// Keyboard events
+			// KEYBOARD //
 			case SDL_KEYDOWN:
 			case SDL_KEYUP: {
 				const uint32 scancode = event.key.keysym.scancode;
 				// If key is pressed, don't change until is released (avoid changing to down)
 				if(event.key.state != 0 && this->keystate[scancode] == Keystate::PRESSED) {
-					return;
+					continue;
 				}
 				this->keystate[scancode] = static_cast<Keystate>(event.key.state);
 				break;
 			}
 
-			// Mouse eventsevent
-			case SDL_MOUSEBUTTONDOWN:
-			case SDL_MOUSEBUTTONUP:
-			case SDL_MOUSEMOTION:
-			case SDL_MOUSEWHEEL: {
-				// CLICK //
-				if(event.type == SDL_MOUSEBUTTONDOWN) {
-					const SDL_MouseButtonEvent button = event.button;
-					this->set_buttonstate((Buttoncode)button.button, Buttonstate::DOWN);
-					this->clicks = button.clicks;
-					this->click_pos = vec2<float>(button.x, button.y);
-				}
-
-				if(event.type == SDL_MOUSEBUTTONUP) {
-					// Reset all
-					this->set_buttonstate((Buttoncode)event.button.button, Buttonstate::UP);
-					this->clicks = 0;
-					this->click_pos = vec3<uint32>(0);
-				}
-
-				// MOTION //
-				if(event.type == SDL_MOUSEMOTION) {
-					const SDL_MouseMotionEvent motion = event.motion;
-					this->position  = vec2<float>(motion.x, motion.y);
-					this->moved_dir = vec2<float>(motion.xrel, motion.yrel);
-				}
-
-				// SCROLL //
-				if(event.type == SDL_MOUSEWHEEL) {
-					this->scroll = event.wheel.y > 0;
-				}
+			// MOUSE //
+			case SDL_MOUSEBUTTONDOWN: {
+				const SDL_MouseButtonEvent button = event.button;
+				this->set_buttonstate((Buttoncode)button.button, Buttonstate::DOWN);
+				this->clicks = button.clicks;
+				this->click_pos = vec2<float>(button.x, button.y);
 				break;
 			}
+
+			case SDL_MOUSEBUTTONUP: {
+				// Reset all
+				this->set_buttonstate((Buttoncode)event.button.button, Buttonstate::UP);
+				this->clicks = 0;
+				this->click_pos = vec3<uint32>(0);
+				break;
+			}
+
+			case SDL_MOUSEMOTION: {
+				const SDL_MouseMotionEvent motion = event.motion;
+				this->position  = vec2<float>(motion.x, motion.y);
+				this->moved_dir = vec2<float>(motion.xrel, motion.yrel);
+				break;
+			}
+
+			case SDL_MOUSEWHEEL:
+				this->scroll = event.wheel.y > 0;
+				break;
+
+
 
 			case SDL_WINDOWEVENT: {
 				// Store all window events in this frame
 				this->frame_events.emplace(event.window.event);
 
-				switch (event.window.event) {
-					// // Focus lost
-					// case SDL_WINDOWEVENT_FOCUS_LOST:
-					// 	break;
-					//
-					// // Mouse leave window
-					// case SDL_WINDOWEVENT_LEAVE:
-					// 	break;
+				// Also query for window events
+				this->dispatch_event(event.window.event);
 
+				switch (event.window.event) {
 					case SDL_WINDOWEVENT_RESIZED:
 						this->set_viewport(vec2<uint32>(event.window.data1, event.window.data2));
 						break;

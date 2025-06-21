@@ -127,13 +127,6 @@ class Window {
 			(state) ? glEnable(GL_CULL_FACE) : glDisable(GL_CULL_FACE);
 		}
 
-		// Sets the polygon drawing mode for both front and back faces.
-		// Cullface must be enable to work.
-		// This makes 3D render more optimized but 2D rendering will not work
-		// inline void set_cullface_back(const bool state) const noexcept {
-		// 	glCullFace(GL_FRONT + state); // true => 1028 + 1 = > 1029 (GL_BACK)
-		// }
-
 		// Sets the depth test to always pass.
 		// If false, sets to LEQUAL (default).
 		// This prevents 2D rendering from blending with 3D meshes.
@@ -169,11 +162,8 @@ class Window {
 		}
 
 		// Run a callback everytime a given event is present in the current frame's event buffer
-		template<typename T>
-		inline void on_event(const Event event, const std::function<void()>& callback) const noexcept {
-			if(this->has_event(event)) {
-				std::forward<T>(callback)();
-			}
+		inline void on_event(const Event event, const std::function<void()> callback) noexcept {
+			this->callbacks.emplace(event, callback);
 		}
 
 		// Check if the provided X or Y coordinates are outside the window's bounds.
@@ -314,6 +304,8 @@ class Window {
 
 		// Buffer to store all events to be processed each frame
 		std::unordered_set<uint32> frame_events;
+		// Stores all registered callbacks and their events
+		std::unordered_map<uint32, const std::function<void()>> callbacks;
 
 		// SDL2
 		SDL_Window* window;
@@ -348,4 +340,7 @@ class Window {
 		// Set the viewport to the provided size.
 		// This won't change the window's size
 		void set_viewport(const vec2<uint32>& size) noexcept;
+
+		// Check if there is a callback registered for this event
+		void dispatch_event(const uint32 event) const noexcept;
 };

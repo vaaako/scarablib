@@ -32,7 +32,8 @@
 
 // Triggered events
 
-enum Event {
+#include "scarablib/typedef.hpp"
+enum Event : uint32 {
 	FIRSTEVENT     = 0,     /**< Unused (do not remove) */
 
 	// Window event value (5 - 236)
