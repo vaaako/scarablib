@@ -101,7 +101,7 @@ void update_gravity(Model& model, const float dt, const float ground_y = 0.0f) {
 //    + For collision and light
 
 // Library + SDL (blank window): ~15mb
-// OpenGL: ~150mb
+// OpenGL: ~140mb
 int main() {
 	Window window = Window({
 		.width = 800,
@@ -111,6 +111,7 @@ int main() {
 		.resizable = true,
 		.debug_info = true
 	});
+	window.set_cullface(true);
 
 	// CAMERAS AND SCENES //
 
@@ -152,8 +153,7 @@ int main() {
 	rect->position = { 100.0f, 100.0f };
 	rect->size = { 50.0f, 50.0f };
 
-	// Cube* cube = scene3d.add<Cube>("cube", Cube::Face::FRONT | Cube::Face::BACK); // Render FRONT and BACK face
-	Cube* cube = scene3d.add<Cube>("cube"); // Render FRONT and BACK face
+	Cube* cube = scene3d.add<Cube>("cube", Cube::Face::FRONT | Cube::Face::BACK); // Render FRONT and BACK face
 	cube->material.texture = &kuromi;
 	cube->position = { 0.0f, 0.0f, -5.0f };
 	cube->scale = vec3<float>(2.0f);
@@ -170,9 +170,6 @@ int main() {
 		"test/assets/images/directions/pinky/3.png", // BACKRIGHT
 		"test/assets/images/directions/pinky/4.png"  // BACK
 	}, Billboard::FRONTRIGHT | Billboard::RIGHT | Billboard::BACKRIGHT); // Flip textures
-
-
-	window.set_cullface(true);
 
 	// scene3d.remove_by_key("cube");
 	// scene2d.remove_by_key("rect");
