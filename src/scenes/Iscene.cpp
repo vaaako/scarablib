@@ -42,6 +42,10 @@ void IScene::draw_all() const noexcept {
 	GLuint cur_vao       = 0;
 	// GLenum texture_type = GL_TEXTURE_2D;
 
+	// Bind defaults
+	cur_shader->use();
+	cur_texture->bind();
+
 	for(const auto& [vao, models] : this->vao_groups) {
 		// Bind VAO if its a different from the currently bound
 		if(vao != cur_vao) {
