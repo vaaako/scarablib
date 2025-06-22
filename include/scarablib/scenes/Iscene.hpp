@@ -28,6 +28,7 @@ class IScene {
 		T* add(const std::string& key, Args&&... args);
 
 		// Returns an object by key and dynamically convert it.
+		// Returns nullptr if the key does not exist
 		template <typename T>
 		std::shared_ptr<T> get_by_key(const std::string& key) noexcept;
 
@@ -86,7 +87,6 @@ template <typename T>
 std::shared_ptr<T> IScene::get_by_key(const std::string& key) noexcept {
 	auto it = this->scene.find(key);
 	if(it == this->scene.end()) {
-		LOG_ERROR("Object '%s' is not added to the scene", key.data());
 		return nullptr;
 	}
 

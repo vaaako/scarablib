@@ -41,7 +41,6 @@ bool Sound::ispaused() const noexcept {
 
 void Sound::pause() const noexcept {
 	if(Mix_Playing(-1) == 0) {
-		LOG_ERROR("Sound is not playing");
 		return;
 	}
 	Mix_Pause(-1);
@@ -50,7 +49,6 @@ void Sound::pause() const noexcept {
 
 void Sound::resume() const noexcept {
 	if(Mix_Paused(-1) == 0) {
-		LOG_ERROR("Sound is not paused");
 		return;
 	}
 	Mix_Resume(-1);

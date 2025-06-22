@@ -48,7 +48,6 @@ bool Music::ispaused() const noexcept {
 
 void Music::pause() const noexcept {
 	if(Mix_Playing(-1) == 0) {
-		LOG_ERROR("Music is not playing");
 		return;
 	}
 	Mix_PauseMusic();
@@ -56,7 +55,6 @@ void Music::pause() const noexcept {
 
 void Music::resume() const noexcept {
 	if(Mix_Paused(-1) == 0) {
-		LOG_ERROR("Music is not playing");
 		return;
 	}
 	Mix_ResumeMusic();

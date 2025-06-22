@@ -57,9 +57,11 @@ struct Music : public IAudio {
 	bool isplaying() const noexcept override;
 	// Check if sound is paused
 	bool ispaused() const noexcept override;
-	// Pause current sound
+	// Pause current sound.
+	// Does nothing if sound is not playing
 	void pause() const noexcept override;
-	// Resume paused sound
+	// Resume paused sound.
+	// Does nothing if sound is not paused
 	void resume() const noexcept override;
 	// Re-play the music as it just started
 	void rewind() noexcept;

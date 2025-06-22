@@ -1,5 +1,6 @@
 #pragma once
 
+#include "scarablib/proper/error.hpp"
 #include "scarablib/proper/log.hpp"
 #include "scarablib/proper/log.hpp"
 #include "scarablib/typedef.hpp"
@@ -115,9 +116,9 @@ class Window {
 		// Enable or disable vertical sync (VSync).
 		// VSync synchronizes the frame rate with monitor's refresh rate.
 		// Disable it for potentially higher frame rates.
-		inline void set_vsync(const bool state) const noexcept {
+		inline void set_vsync(const bool state) const {
 			if(SDL_GL_SetSwapInterval(state) < 0) {
-				LOG_ERROR("Failed to enable vsync: %s", SDL_GetError());
+				throw ScarabError("Failed to enable vsync: %s", SDL_GetError());
 			}
 		}
 

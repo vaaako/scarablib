@@ -89,7 +89,7 @@ Window::Window(const Window::Config& config)
 	// SDL Configurations
 	SDL_SetWindowResizable(this->window, (SDL_bool)config.resizable);
 	if(SDL_GL_SetSwapInterval(config.vsync) < 0) {
-		LOG_ERROR("Failed to enable vsync: %s", SDL_GetError());
+		throw ScarabError("Failed to enable vsync: %s", SDL_GetError());
 	}
 
 	// Debug info
