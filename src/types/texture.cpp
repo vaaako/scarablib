@@ -3,11 +3,11 @@
 #include "scarablib/typedef.hpp"
 #include <SDL2/SDL_render.h>
 
-Texture::Texture(const Color& color) noexcept {
+Texture::Texture() noexcept {
 	// Generate and bind texture
 	glGenTextures(1, &this->id); // num of textures, pointer
 	glBindTexture(GL_TEXTURE_2D, this->id);
-	const uint8 data[4] = { color.red, color.green, color.blue, color.alpha };
+	const uint8 data[4] = { 255, 255, 255, 255 };
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 	glBindTexture(GL_TEXTURE_2D, 0);
 }

@@ -78,21 +78,30 @@ void Billboard::set_directional_textures(const std::vector<const char*> paths, c
 }
 
 void Billboard::update_facing_texture(const vec3<float>& point_pos) noexcept {
-	const float angle_to_target = std::atan2(
-		// This is inverted to get the result that i want
-		// Invert back if the intention is the billboard change relative to some external object
-		point_pos.x - this->position->x,
-		point_pos.z - this->position->z
-	);
+	const float dx = point_pos.x - this->position->x;
+	const float dz = point_pos.z - this->position->z;
 
+	// If camera is very close, avoid atan2(0, 0)
+	if(std::abs(dx) < 0.001f && std::abs(dz) < 0.001f) {
+		return;
+	}
+
+	// Angle of the camera relative to the world's positive Z-axis
+	// This is inverted to get the result that i want
+	// Invert back if the intention is the billboard change relative to some external object
+	const float angle_to_target = std::atan2(dx, dz);
+
+	// Get the billboard's forward-facing angle in radians
 	const float forward_angle = this->directions[this->base_dir];
-	// Angle of point relative to billboard's front.
-	// + M_PI2 ensures the result of the substraction is positive
+	// Calculate the angle of the camera relative to the billboard's front
+	// The result is the CCW angle from the billboard's front to the camera vector
 	const float relative_angle = std::fmod(angle_to_target - forward_angle + M_PI2, M_PI2);
-	// Calculate the sector index
-	const uint32 sector = static_cast<uint32>(relative_angle / this->angle_step);
+	// offset by half a sector to center the sprites in their viewing cone
+	const float centered_angle = std::fmod(relative_angle + (this->angle_step * 0.5f), M_PI2);
+	// Calculate the final sector indeex
+	const uint32 sector = static_cast<uint32>(centered_angle / this->angle_step);
 
-	// Only change if is a new sector
+	// Only update the current sector if it has changed
 	if(sector != this->cur_sector) {
 		this->cur_sector = sector;
 		this->material.texture = *this->textures[sector];

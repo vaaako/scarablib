@@ -32,6 +32,11 @@ void IScene::draw(Mesh& model) const noexcept {
 	this->shader->unbind();
 }
 
+// glUseProgram      - Most expensive change
+// glBindTexture     - Very expensive change
+// glBindVertexArray - Less expensive change
+// glUniform         - Cheapest change
+
 void IScene::draw_all() const noexcept {
 	// Cache shader and camera
 	Shader* shader = this->shader;

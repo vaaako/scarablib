@@ -3,7 +3,6 @@
 #include "scarablib/gfx/3d/cube.hpp"
 #include "scarablib/gfx/skybox.hpp"
 #include "scarablib/proper/log.hpp"
-#include "scarablib/scenes/camera.hpp"
 #include "scarablib/scenes/camera2d.hpp"
 #include "scarablib/scenes/perspectivecamera.hpp"
 #include "scarablib/scenes/scene2d.hpp"
@@ -204,6 +203,8 @@ int main() {
 		}
 
 		// LOG_DEBUG("Camera Position: (%f, %f, %f)", camera.position.x, camera.position.y, camera.position.z);
+
+		// LOG_DEBUG("Looking: %s", PerspectiveCamera::get_cardinal_direction(camera.yaw).data());
 		window.set_title("FPS: " + std::to_string(window.fps()) + " / RAM: " + std::to_string(ram_usage()) + "MB");
 		// WINDOW EVENTS //
 

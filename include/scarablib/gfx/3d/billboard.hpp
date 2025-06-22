@@ -78,14 +78,14 @@ struct Billboard : public Model {
 	private:
 		// Precalculated directions
 		const float directions[8] = {
-			M_PI_2f,        // [ 90°] NORTH       (UP)
-			M_PI_4f,        // [ 45°] NORTHEAST   (UP-RIGHT)
+			M_PI_2f,        // [ 90°] NORTH       (FROnT)
+			M_PI_4f,        // [ 45°] NORTHEAST   (FRONT-RIGHT)
 			0.0f,           // [  0°] EAST        (RIGHT)
-			7.0f * M_PI_4f, // [315°] SOUTHEAST   (DOWN-RIGHT)
-			3.0f * M_PI_2f, // [270°] SOUTH       (DOWN)
-			5.0f * M_PI_4f, // [225°] SOUTHWEST   (DOWN-LEFT)
+			7.0f * M_PI_4f, // [315°] SOUTHEAST   (BACK-RIGHT)
+			3.0f * M_PI_2f, // [270°] SOUTH       (BACK)
+			5.0f * M_PI_4f, // [225°] SOUTHWEST   (BACK-LEFT)
 			M_PIf,          // [180°] WEST        (LEFT)
-			3.0f * M_PI_4f, // [135°] NORTHWEST   (UP-LEFT)
+			3.0f * M_PI_4f, // [135°] NORTHWEST   (FRONT-LEFT)
 		};
 		// Scoped macro
 		static constexpr float M_PI2 = M_PIf * 2.0f;
@@ -94,7 +94,7 @@ struct Billboard : public Model {
 		std::vector<std::shared_ptr<Texture>> textures;
 		// Precalculated number of textures (either 4 or 8)
 		size_t num_sectors = 0;
-		// Billboard initial front direction
+		// Billboard relative front direction
 		Billboard::Direction base_dir = Billboard::Direction::EAST;
 		// Used to check if texture must change
 		uint32 cur_sector = 9; // Unbounded value to change the first time

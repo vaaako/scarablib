@@ -1,8 +1,6 @@
 #pragma once
 
 #include "scarablib/proper/error.hpp"
-#include "scarablib/proper/log.hpp"
-#include "scarablib/proper/log.hpp"
 #include "scarablib/typedef.hpp"
 #include "scarablib/types/color.hpp"
 #include "scarablib/window/buttoncode.hpp"

@@ -28,9 +28,8 @@ class Texture {
 			CLAMP_TO_EDGE = GL_CLAMP_TO_EDGE,
 		};
 
-		// This will make a empty solid color texture.
-		// Do not use this if you dont know what are you doing
-		Texture(const Color& color) noexcept;
+		// This will make an empty solid white texture.
+		Texture() noexcept;
 
 		// Constructor to create a texture from a file path with NEAREST filtering and REPEAT wrapping.
 		// `wrap`: Wrap type. Optional. Default: Texture::Wrap::REPEAT.
@@ -82,7 +81,7 @@ class Texture {
 		// Returns a default solid white texture
 		static std::shared_ptr<Texture> default_texture() noexcept {
 			// I don't like data being statically allocated this way
-			static std::shared_ptr<Texture> def_tex = std::make_shared<Texture>(Colors::WHITE);
+			static std::shared_ptr<Texture> def_tex = std::make_shared<Texture>();
 			return def_tex;
 		}
 

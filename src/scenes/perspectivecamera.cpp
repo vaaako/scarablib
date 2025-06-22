@@ -115,7 +115,7 @@ void PerspectiveCamera::move(const vec3<float>& dir, const float dt) noexcept {
 
 std::string_view PerspectiveCamera::get_cardinal_direction(const float yaw) {
 	// Define the cardinal directions
-	std::array<std::string_view, 8> directions = {
+	constexpr std::array<std::string_view, 8> directions = {
 		"North (-Z)", "Northeast", "East (+X)", "Southeast",
 		"South (+Z)", "Southwest", "West (-X)", "Northwest"
 	};

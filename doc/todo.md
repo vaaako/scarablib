@@ -73,7 +73,7 @@ Stuff that are in progress and i need to finish
 	+ Feature: change texture alpha
 
 - [x] Simplify Keyboard and Mouse input and put all that in Window class
-- [ ] Unify bundle and VAOManger somehow idk get rid of bundle
+- [x] Unify bundle and VAOManger somehow idk get rid of bundle
 
 # TODO Network
 - [ ] Send message when client is disconnected
@@ -179,13 +179,11 @@ Stuff that are in progress and i need to finish
 - [x] Don't store vertices, this makes the memory usage huge for each model
 	+ fixed, but is much more of a hack than a actual solution
 - [x] Billboarding logic to GPU (shaders)
-- [x] Billboard: Instead of making a new texture for each face, use a texture array
-	+ idea discarted, using a TEXTURE 2D or TEXTURE ARRAY makes no significant difference (in memory) just makes harder and more process for the CPU for deciding which shader use
-	+ Explaining better: My problem is that the front face will always be fixed, what would be the better way to change it?
 - [x] Billboard: Another approach for changing directional textures? How doom does it? How would a moving billboard work? Changing orientation?
 	+ Doom checks for the billboard direction and changes based in it (kinda)
 - [x] Billboard: Method to invert rotation
 	+ isnt really necessary
+- [ ] Billboard: Texture array
 - [x] Currently bounding box is always created, make it optional
 	+ now needs to calll a method to create it, also the draw is now correct
 
