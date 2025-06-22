@@ -24,12 +24,11 @@ void Billboard::draw_logic(const Camera& camera, const Shader& shader) noexcept 
 
 	shader.set_matrix4f("proj", camera.get_proj_matrix());
 	shader.set_matrix4f("view", camera.get_view_matrix());
+	shader.set_color("shapeColor", this->material.color);
 
 	// Billboard stuff
 	shader.set_vector3f("billboardPos", this->position);
 	shader.set_float("billboardSize", this->scale->x);
-
-	shader.set_color("shapeColor", this->material.color);
 
 	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(this->indices_length), GL_UNSIGNED_BYTE, (void*)0);
 }
@@ -49,7 +48,7 @@ void Billboard::set_directional_textures(const std::vector<const char*> paths, c
 
 	for(size_t i = 0; i < paths.size(); i++) {
 		// Add base texture
-		this->textures[i] = new Texture(paths[i], false);
+		this->textures[i] = std::make_shared<Texture>(paths[i], false);
 
 		// Check if should be flipped
 		if(flip & (1 << i)) {
@@ -59,7 +58,7 @@ void Billboard::set_directional_textures(const std::vector<const char*> paths, c
 			LOG_DEBUG("Flipping %zu and placing at %zu", i, opposite_index);
 			#endif
 
-			this->textures[opposite_index] = new Texture(paths[i], true);
+			this->textures[opposite_index] = std::make_shared<Texture>(paths[i], true);
 		}
 	}
 
@@ -96,7 +95,7 @@ void Billboard::update_facing_texture(const vec3<float>& point_pos) noexcept {
 	// Only change if is a new sector
 	if(sector != this->cur_sector) {
 		this->cur_sector = sector;
-		this->material.texture = this->textures[sector];
+		this->material.texture = *this->textures[sector];
 	}
 
 	#ifdef SCARAB_DEBUG_BILLBOARD_ANGLE
@@ -107,11 +106,6 @@ void Billboard::update_facing_texture(const vec3<float>& point_pos) noexcept {
 
 
 void Billboard::clear_textures() noexcept {
-	for(const Texture* tex : this->textures) {
-		if(tex != nullptr) {
-			delete tex;
-		}
-	}
 	this->textures.clear();
 	this->textures.shrink_to_fit(); // Actually releases the allocated memory
 }

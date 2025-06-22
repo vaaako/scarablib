@@ -1,7 +1,10 @@
 #pragma once
 
 template <typename T>
-class DirtyProxy {
+struct DirtyProxy {
+	private:
+		T value;
+		bool& isdirty;
 	public:
 		// Reference to value and isdirty (change one)
 		DirtyProxy(const T& value, bool& isdirty) noexcept;
@@ -82,10 +85,6 @@ class DirtyProxy {
 		constexpr T operator/(const U& rhs) const {
 			return this->value / rhs;
 		}
-
-	private:
-		T value;
-		bool& isdirty;
 };
 
 template <typename T>

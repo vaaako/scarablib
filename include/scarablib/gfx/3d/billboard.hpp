@@ -91,7 +91,7 @@ struct Billboard : public Model {
 		static constexpr float M_PI2 = M_PIf * 2.0f;
 
 		// Directional textures
-		std::vector<Texture*> textures;
+		std::vector<std::shared_ptr<Texture>> textures;
 		// Precalculated number of textures (either 4 or 8)
 		size_t num_sectors = 0;
 		// Billboard initial front direction

@@ -1,4 +1,6 @@
 #include "scarablib/scenes/Iscene.hpp"
+#include "scarablib/components/materialcomponent.hpp"
+#include "scarablib/proper/log.hpp"
 
 IScene::IScene(Camera& camera) noexcept : camera(camera) {}
 
@@ -9,15 +11,14 @@ IScene::~IScene() noexcept {
 
 
 void IScene::remove_by_key(const std::string& key) {
-	auto it = this->scene.find(key);
-	if(it == this->scene.end()) {
+	if(!this->scene.contains(key)) {
 		throw ScarabError("Key '%s' was not found", key.data());
 	}
 
 	// Remove from the scene key map
 	this->scene.erase(key);
 	// Remove from the scene vao map
-	this->vao_groups.erase(it->second->bundle.vao->get_id());
+	this->vao_groups.erase(this->scene.at(key)->bundle.vao->get_id());
 }
 
 void IScene::draw(Mesh& model) const noexcept {
@@ -37,9 +38,9 @@ void IScene::draw_all() const noexcept {
 	Camera& camera = this->camera;
 
 	// Track currently bound objects to avoid redundant bindings
-	Shader* cur_shader   = this->shader;
-	Texture* cur_texture = &Texture::default_texture();
-	GLuint cur_vao       = 0;
+	Shader* cur_shader = this->shader;
+	MaterialComponent::TextureHandle cur_texture;
+	GLuint cur_vao = 0;
 	// GLenum texture_type = GL_TEXTURE_2D;
 
 	// Bind defaults

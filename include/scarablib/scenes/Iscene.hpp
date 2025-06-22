@@ -85,13 +85,12 @@ class IScene {
 
 template <typename T>
 std::shared_ptr<T> IScene::get_by_key(const std::string& key) noexcept {
-	auto it = this->scene.find(key);
-	if(it == this->scene.end()) {
+	if(!this->scene.contains(key)) {
 		return nullptr;
 	}
 
 	// Try to cast the object to the requested type
-	auto casted_ptr = std::dynamic_pointer_cast<T>(it->second);
+	auto casted_ptr = std::dynamic_pointer_cast<T>(this->scene.at(key));
 	if (!casted_ptr) {
 		throw ScarabError("Failed to cast object with key '%s' to type", key.data());
 	}
@@ -104,7 +103,7 @@ T* IScene::add(const std::string& key, Args&&... args) {
 	static_assert(std::is_base_of_v<Mesh, T>,
 			"You can only add Mesh types to the scene");
 
-	if(this->scene.find(key) != this->scene.end()) {
+	if(this->scene.contains(key)) {
 		throw ScarabError("Key '%s' already exists", key.data());
 	}
 
@@ -129,10 +128,8 @@ T* IScene::add(const std::string& key, Args&&... args) {
 
 			// Secondary sort key: texture pointer
 			// Only checked if the shaders are the same
-			Texture* ta = a->material.texture;
-			Texture* tb = b->material.texture;
-
-			return std::less<const Texture*>()(ta, tb);
+			// Texture will never be nullptr in this case becaue is a TextureHandle
+			return a->material.texture->get_id() < b->material.texture->get_id();
 	});
 
 	// Insert the model in the correct place

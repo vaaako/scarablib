@@ -111,7 +111,7 @@ int main() {
 		.resizable = true,
 		.debug_info = true
 	});
-	window.set_cullface(true);
+	window.set_cullface(false);
 
 	// CAMERAS AND SCENES //
 
@@ -154,7 +154,7 @@ int main() {
 	rect->size = { 50.0f, 50.0f };
 
 	Cube* cube = scene3d.add<Cube>("cube", Cube::Face::FRONT | Cube::Face::BACK); // Render FRONT and BACK face
-	cube->material.texture = &kuromi;
+	cube->material.texture = kuromi;
 	cube->position = { 0.0f, 0.0f, -5.0f };
 	cube->scale = vec3<float>(2.0f);
 	cube->enable_physics(1.0f, true);

@@ -54,7 +54,7 @@ Stuff that are in progress and i need to finish
 	+ Window?
 - [x] Use `string_view` instead of `string` when possible (when string manipulation isnt necessary)
 - [x] Class members that dont need any treatment or additional code in a setter method, should be public (when this is the case a setter method for this member is not necessary)
-- [ ] Change methods description to use "\`\`" for parameters
+- [x] Change methods description to use "\`\`" for parameters
 - [x] Fix forward declarations
 
 - [ ] Better Material Component and texture handling

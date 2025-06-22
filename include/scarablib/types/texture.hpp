@@ -5,6 +5,7 @@
 #include "scarablib/types/image.hpp"
 #include <SDL2/SDL_surface.h>
 #include <GL/glew.h>
+#include <memory>
 
 // Size needs to be multiple of 2
 // 16x16, 32x32, 64x64, 128x128, 256x256 etc
@@ -41,8 +42,6 @@ class Texture {
 
 		~Texture() noexcept;
 
-		// Updates texture (this does not changes size and pixel format)
-		// void update_data(const void* data, const GLenum format);
 
 		// Returns the id of the texture
 		inline uint32 get_id() const noexcept {
@@ -81,9 +80,9 @@ class Texture {
 		void set_wrap(const Texture::Wrap wrap) const noexcept;
 
 		// Returns a default solid white texture
-		static Texture& default_texture() noexcept {
+		static std::shared_ptr<Texture> default_texture() noexcept {
 			// I don't like data being statically allocated this way
-			static Texture def_tex = Texture(Colors::WHITE);
+			static std::shared_ptr<Texture> def_tex = std::make_shared<Texture>(Colors::WHITE);
 			return def_tex;
 		}
 
@@ -92,7 +91,7 @@ class Texture {
 		static GLuint extract_format(const Image& image, const bool internal);
 
 	private:
-		GLuint id;
+		uint32 id;
 		uint32 width;
 		uint32 height;
 
