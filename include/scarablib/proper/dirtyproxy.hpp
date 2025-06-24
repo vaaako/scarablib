@@ -42,25 +42,29 @@ struct DirtyProxy {
 		}
 
 
-		constexpr DirtyProxy& operator+=(const T& rhs) noexcept {
+		template <typename U>
+		constexpr DirtyProxy& operator+=(const U& rhs) noexcept {
 			this->value += rhs;
 			this->isdirty = true;
 			return *this;
 		}
 
-		constexpr DirtyProxy& operator-=(const T& rhs) noexcept {
+		template <typename U>
+		constexpr DirtyProxy& operator-=(const U& rhs) noexcept {
 			this->value -= rhs;
 			this->isdirty = true;
 			return *this;
 		}
 
-		constexpr DirtyProxy& operator*=(const T& rhs) noexcept {
+		template <typename U>
+		constexpr DirtyProxy& operator*=(const U& rhs) noexcept {
 			this->value *= rhs;
 			this->isdirty = true;
 			return *this;
 		}
 
-		constexpr DirtyProxy& operator/=(const T& rhs) noexcept {
+		template <typename U>
+		constexpr DirtyProxy& operator/=(const U& rhs) noexcept {
 			this->value /= rhs;
 			this->isdirty = true;
 			return *this;
