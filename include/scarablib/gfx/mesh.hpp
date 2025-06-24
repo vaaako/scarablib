@@ -19,7 +19,7 @@ class Mesh {
 		// This is kinda wrong, because each instance of a Mesh will have copied bundle (but same VAO at least)
 
 		// Bounding box
-		BoundingBox bbox;
+		BoundingBox* bbox = nullptr;
 		// I wish this was in Model class, but i don't want to store vertices
 		// and i need it to build a bounding box
 
@@ -45,17 +45,24 @@ class Mesh {
 		template <typename T>
 		void set_geometry(const std::vector<Vertex>& vertices, const std::vector<T>& indices);
 
-		// Enables physics components for the mesh.
-		// Both values are optional.
-		// `Mass`: (1.0f) is in kilograms.
-		// `isstatic`: (false) is whether the mesh is affected by gravity or not
-		void enable_physics(const float mass = 1.0f, const bool isstatic = false) noexcept;
+		// Creates a physics components for the mesh
+		inline constexpr void enable_physics() noexcept {
+			this->physics = new PhysicsComponent();
+		}
+
+		// Creates a bounding box for the mesh
+		inline void make_bounding_box(const std::vector<Vertex>& vertices) noexcept {
+			this->bbox = new BoundingBox(vertices);
+		}
 
 		// Updates the bounding box based on the transformations of the Model.
-		// For dynamic transformations, use `set_dynamic_bbox_update(bool)`
+		// For dynamic transformations, use `set_dynamic_bbox_update(bool)`.
+		// You need to create the bounding box first with `make_bounding_box()`
 		void update_bbox() {
-			this->update_model_matrix(); // Needs updated matrix
-			this->bbox.update_world_bounds(this->model);
+			if(this->bbox == nullptr) {
+				this->update_model_matrix(); // Needs updated matrix
+				this->bbox->update_world_bounds(this->model);
+			}
 		}
 
 		// Sets whether the bounding box should be dynamically transformed
@@ -92,7 +99,6 @@ Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<T>& indices) n
 
 template <typename T>
 void Mesh::set_geometry(const std::vector<Vertex>& vertices, const std::vector<T>& indices) {
-	this->bbox = BoundingBox(vertices);
 	this->indices_length = static_cast<GLsizei>(indices.size()),
 	this->indices_type = (std::is_same_v<T, uint32>) ? GL_UNSIGNED_INT :
 		(std::is_same_v<T, uint16>) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_BYTE;

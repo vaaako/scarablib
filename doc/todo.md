@@ -55,9 +55,8 @@ Stuff that are in progress and i need to finish
 - [x] Better Material Component and texture handling
 - [ ] TextureHandle accept temporary texture object. For this to work change ref to shared_ptr
 - [ ] In Window::rotate i didnt have to clear the rotation before, why do i need it now? ([last commit]( https://github.com/vaaako/scarablib/commit/d2a5717958a1f73fde39dafbd6640e2c19dab076))
-- [ ] make transparency work without `if(tex.a == 0.0)`
+- [ ] make transparency work without `if(tex.a == 0.0)`?
 - [ ] Discord RPC support?
-- [ ] Remove `result` from Network class
 
 
 
@@ -73,6 +72,7 @@ Stuff that are in progress and i need to finish
 
 # TODO Network
 - [ ] Send message when client is disconnected
+- [ ] Remove `result` from Network class
 
 # TODO Bug
 - [x] Memory leak somewhere (i don't know if is in my code or in some library, but is not dangerous)

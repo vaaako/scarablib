@@ -48,6 +48,12 @@ class Model : public Mesh {
 		// - `axis`: (must be normalized) Which axis the angle will be applied
 		void set_orientation(const float angle, const vec3<float>& axis) noexcept;
 
+
+		// TODO: Will be useful later
+		// Loads a wavefront .obj file.
+		// `indices` is optional, pass nullptr if not needed
+		static std::vector<Vertex> load_obj(const char* path, std::vector<uint32>* indices);
+
 	protected:
 		// Axis where the orientation angle will be applied
 		float orient_angle      = 0.0f;
