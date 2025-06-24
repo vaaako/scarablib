@@ -1,6 +1,5 @@
 #include "scarablib/scenes/Iscene.hpp"
 #include "scarablib/components/materialcomponent.hpp"
-#include "scarablib/proper/log.hpp"
 
 IScene::IScene(Camera& camera) noexcept : camera(camera) {}
 
@@ -15,10 +14,10 @@ void IScene::remove_by_key(const std::string& key) {
 		throw ScarabError("Key '%s' was not found", key.data());
 	}
 
-	// Remove from the scene key map
-	this->scene.erase(key);
 	// Remove from the scene vao map
 	this->vao_groups.erase(this->scene.at(key)->bundle.vao->get_id());
+	// Remove from the scene key map
+	this->scene.erase(key);
 }
 
 void IScene::draw(Mesh& model) const noexcept {
