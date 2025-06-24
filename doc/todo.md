@@ -42,12 +42,6 @@ Stuff that are in progress and i need to finish
 
 - [x] Having problems with shaders, when compiling to executable
 	+ not happy with the solution, since it stores shaders forever in memory
-
-- [ ] In Window::rotate i didnt have to clear the rotation before, why do i need it now? ([last commit]( https://github.com/vaaako/scarablib/commit/d2a5717958a1f73fde39dafbd6640e2c19dab076))
-- [ ] make transparency work without `if(tex.a == 0.0)`
-- [ ] Discord RPC support?
-- [ ] Remove `result` from Network class
-
 - [x] Use bitwise flags when fits
 	+ Textures
 	+ Billboard
@@ -56,14 +50,16 @@ Stuff that are in progress and i need to finish
 - [x] Class members that dont need any treatment or additional code in a setter method, should be public (when this is the case a setter method for this member is not necessary)
 - [x] Change methods description to use "\`\`" for parameters
 - [x] Fix forward declarations
+- [x] REMOVE (almost) ALL INLINES
 
-- [ ] Better Material Component and texture handling
+- [x] Better Material Component and texture handling
+- [ ] TextureHandle accept temporary texture object. For this to work change ref to shared_ptr
+- [ ] In Window::rotate i didnt have to clear the rotation before, why do i need it now? ([last commit]( https://github.com/vaaako/scarablib/commit/d2a5717958a1f73fde39dafbd6640e2c19dab076))
+- [ ] make transparency work without `if(tex.a == 0.0)`
+- [ ] Discord RPC support?
+- [ ] Remove `result` from Network class
 
-- [ ] REMOVE (almost) ALL INLINES
-	+ i just came to the conclusion that inline let the header file unreadable
-	+ may increase compile time
-	+ the compiler should optimize it anyway
-	+ i will let only single line methods in header as inline, this way the cpp and the header file will be more readable
+
 
 # TODO Quick Fixes
 - [ ] Better texture constructor
@@ -108,22 +104,22 @@ Stuff that are in progress and i need to finish
 - [x] Custom shapes support (kinda, i think)
 - [x] Use one shader for 2D and 3D shapes
 - [ ] Color matrix support
-- [ ] Batch rendering for textures too
+- [x] Batch rendering for textures too
 	+ Would have to make another map, its worth it?
 - [x] Better Shader support for 2D and 3D shapes
 	+ for 3d, yeah
 - [x] Remove `ModelConf`
 	+ kinda?
-- [ ] CCW vertices
+- [x] CCW vertices
 
 - [ ] TextureArray
 	- [ ] Support for texture array and common texture to the same model
 	- [ ] make member of "current texture array index" and use it in the shader when drawing a model that uses a texture_array
-- [ ] Make a new static struct called `ModelFields` that returns `Vertex`'s fields to `ModelFactory` (and the user can use that for easy manipulation)
+- [x] Make a new static struct called `ModelFields` that returns `Vertex`'s fields to `ModelFactory` (and the user can use that for easy manipulation)
 	+ Like in vakraft, make a helper method for easy change faces values
 - [x] Be able to change `texid` and `shading` fields in `ModelFactory` for each face
 
-- [ ] Bounding box was not tested
+- [x] Bounding box was not tested
 	+ World calculation might not be working correctly (debug drawing not drawing when dynamic transform is enabled)
 	+ Not work fully as i want
 	+ Not tested
@@ -183,14 +179,16 @@ Stuff that are in progress and i need to finish
 	+ Doom checks for the billboard direction and changes based in it (kinda)
 - [x] Billboard: Method to invert rotation
 	+ isnt really necessary
-- [ ] Billboard: Texture array
 - [x] Currently bounding box is always created, make it optional
 	+ now needs to calll a method to create it, also the draw is now correct
 
 - [x] Better BoundingBox, not happy with the current state, dont know what to do
 - [x] Show bounding box
+- [ ] Billboard: Texture array
 - [ ] Different texture for each face (the other method that is not cubemap)
 - [ ] Ortographic camera
+- [ ] Model loading to Model class
+	- [ ] Multiple textures handling
 
 # Features for later
 - Sprite atlas

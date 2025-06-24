@@ -34,8 +34,6 @@ class Mesh {
 		// Build Mesh using only vertices.
 		// Mainly used for 2D Shapes. It will not make a collider
 		Mesh(const std::vector<Vertex>& vertices) noexcept;
-		// Build Mesh using a wavefront .obj file
-		Mesh(const char* path);
 
 		virtual ~Mesh() noexcept;
 

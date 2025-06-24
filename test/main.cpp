@@ -171,7 +171,36 @@ int main() {
 	}, Billboard::FRONTRIGHT | Billboard::RIGHT | Billboard::BACKRIGHT); // Flip textures
 
 	// scene3d.remove_by_key("cube");
-	// scene2d.remove_by_key("rect");
+	scene2d.remove_by_key("rect");
+
+
+	// Model* forest = scene3d.add<Model>("forest", "test/assets/objs/asianforest/asianforestbattleground.obj");
+	// forest->position = { 0.0f, -20.0f, 0.0f };
+	// forest->scale *= 0.2f;
+	// Texture forest_texture = Texture("test/assets/objs/asianforest/mizuumi.png");
+	// forest->material.texture = forest_texture;
+
+	// Model* doubleface = scene3d.add<Model>("doubleface", "test/assets/objs/doubleface/doubleface.obj");
+	// doubleface->position = { 20.0f, 0.0f, -20.0f };
+	// doubleface->scale *= 5.0f;
+	// Texture doubleface_texture = Texture("test/assets/objs/doubleface/TEXA.png");
+	// doubleface->material.texture = doubleface_texture;
+
+	// Model* kyoto = scene3d.add<Model>("kyoto", "test/assets/objs/kyoto/normaltex.obj");
+	// kyoto->position = { 0.0f, -20.0f, 0.0f };
+	// Texture kyoto_texture = Texture("test/assets/objs/kyoto/TEXA.png");
+	// kyoto->material.texture = kyoto_texture;
+
+	// Model* violencedistrict = scene3d.add<Model>("violencedistrict", "test/assets/objs/violencedistrict/normaltex.obj");
+	// violencedistrict->position = { 0.0f, -20.0f, 0.0f };
+	// Texture kyoto_texture = Texture("test/assets/objs/violencedistrict/TEXA.png");
+	// violencedistrict->material.texture = kyoto_texture;
+
+	// Model* cottage = scene3d.add<Model>("cottage", "test/assets/objs/cottage/normaltex.obj");
+	// cottage->position = { 0.0f, -10.0f, 0.0f };
+	// Texture kyoto_texture = Texture("test/assets/objs/cottage/TEXA.png");
+	// cottage->material.texture = kyoto_texture;
+
 
 	// MODELS //
 
@@ -221,6 +250,8 @@ int main() {
 		}
 
 		// Debug draw bounds
+		// cottage->bbox.draw_world_bounds(camera);
+
 		// cow->bbox.draw_local_bounds(camera, Colors::GREEN, true);
 		// cow->bbox.draw_world_bounds(camera, Colors::RED, false);
 		// MODELS UPDATE //

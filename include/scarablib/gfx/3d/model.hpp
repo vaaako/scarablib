@@ -24,7 +24,7 @@ class Model : public Mesh {
 		template <typename T>
 		Model(const std::vector<Vertex>& vertices, const std::vector<T>& indices) noexcept;
 		// Make a model using a wavefront .obj file
-		Model(const char* path) noexcept;
+		Model(const char* path);
 
 		// This method does not draw the model to the screen, as it does not bind the VAO and Shader (batch rendering)
 		virtual void draw_logic(const Camera& camera, const Shader& shader) noexcept override;
