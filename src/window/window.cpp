@@ -303,9 +303,6 @@ void Window::process_events() noexcept {
 				// Store all window events in this frame
 				this->frame_events.emplace(event.window.event);
 
-				// Also query for window events
-				this->dispatch_event(event.window.event);
-
 				switch (event.window.event) {
 					case SDL_WINDOWEVENT_RESIZED:
 						this->set_viewport(vec2<uint32>(event.window.data1, event.window.data2));
@@ -314,6 +311,11 @@ void Window::process_events() noexcept {
 					default:
 						break;
 				}
+
+				// Also query for window events
+				// But after window resized event, so when callback for resized is called
+				// its already updated
+				this->dispatch_event(event.window.event);
 				break;
 			}
 			default:
