@@ -95,9 +95,11 @@ void update_gravity(Model& model, const float dt, const float ground_y = 0.0f) {
 	}
 }
 
-// TODO: BoundingBox add SphereBox inside it
-// - Model that is not a model and has position only
+// TODO: Model that is not a model and has position only
 //    + For collision and light
+// - Be able to stand in loaded scenarios
+//    + Collision with walls
+//    + Ray and Grid method?
 
 // Library + SDL (blank window): ~15mb
 // OpenGL: ~140mb
@@ -106,7 +108,7 @@ int main() {
 		.width = 800,
 		.height = 600,
 		.title = "FPS: 0",
-		.vsync = false, // Lag when set to false ??
+		.vsync = true, // Lag when set to false ??
 		.resizable = true,
 		.debug_info = true
 	});
@@ -115,7 +117,8 @@ int main() {
 	// CAMERAS AND SCENES //
 
 	PerspectiveCamera camera = PerspectiveCamera(window);
-	camera.set_speed(200.0f);
+	camera.set_fov(90.0f);
+	camera.set_speed(250.0f);
 
 	Camera2D camera2d = Camera2D(window);
 
@@ -125,6 +128,7 @@ int main() {
 	// CAMERAS AND SCENES //
 
 	// ASSETS //
+
 	Texture kuromi = Texture("test/assets/images/kuromi.png");
 
 	Skybox skybox = Skybox(camera, {
@@ -144,7 +148,7 @@ int main() {
 	cow->material.color = Colors::CHIROYELLOW;
 	cow->position = { 0.0f, 0.0f, -20.0f };
 	cow->set_orientation(90.0f, { 0.0f, 0.0f, 1.0f });
-	// cow->update_bbox(); // Update local bounds
+	cow->make_bounding_box(Model::load_obj("test/assets/objs/cow.obj", nullptr));
 	cow->set_dynamic_bbox_update(true); // Update bounding box with the model matrix
 
 	Rectangle* rect = scene2d.add<Rectangle>("rect");
@@ -156,7 +160,7 @@ int main() {
 	cube->material.texture = kuromi;
 	cube->position = { 0.0f, 0.0f, -5.0f };
 	cube->scale = vec3<float>(2.0f);
-	cube->enable_physics(1.0f, true);
+	cube->enable_physics();
 	// PhysicsComponent is nullptr until enabled
 
 	Billboard* bill = scene3d.add<Billboard>("bill");
@@ -170,6 +174,8 @@ int main() {
 		"test/assets/images/directions/pinky/4.png"  // BACK
 	}, Billboard::FRONTRIGHT | Billboard::RIGHT | Billboard::BACKRIGHT); // Flip textures
 
+
+
 	// scene3d.remove_by_key("cube");
 	scene2d.remove_by_key("rect");
 
@@ -180,6 +186,9 @@ int main() {
 	// Texture forest_texture = Texture("test/assets/objs/asianforest/mizuumi.png");
 	// forest->material.texture = forest_texture;
 
+
+
+
 	// Model* doubleface = scene3d.add<Model>("doubleface", "test/assets/objs/doubleface/doubleface.obj");
 	// doubleface->position = { 20.0f, 0.0f, -20.0f };
 	// doubleface->scale *= 5.0f;
@@ -188,7 +197,7 @@ int main() {
 
 	// Model* kyoto = scene3d.add<Model>("kyoto", "test/assets/objs/kyoto/normaltex.obj");
 	// kyoto->position = { 0.0f, -20.0f, 0.0f };
-	// Texture kyoto_texture = Texture("test/assets/objs/kyoto/TEXA.png");
+	// Texture kyoto_texture = Texture("test/assets/objs/kyoto/TEXD.png");
 	// kyoto->material.texture = kyoto_texture;
 
 	// Model* violencedistrict = scene3d.add<Model>("violencedistrict", "test/assets/objs/violencedistrict/normaltex.obj");
@@ -196,10 +205,14 @@ int main() {
 	// Texture kyoto_texture = Texture("test/assets/objs/violencedistrict/TEXA.png");
 	// violencedistrict->material.texture = kyoto_texture;
 
-	// Model* cottage = scene3d.add<Model>("cottage", "test/assets/objs/cottage/normaltex.obj");
-	// cottage->position = { 0.0f, -10.0f, 0.0f };
-	// Texture kyoto_texture = Texture("test/assets/objs/cottage/TEXA.png");
-	// cottage->material.texture = kyoto_texture;
+	Model* cottage = scene3d.add<Model>("cottage", "test/assets/objs/cottage/normaltex.obj");
+	cottage->position = { 0.0f, -10.0f, 0.0f };
+	cottage->material.texture = new Texture("test/assets/objs/cottage/TEXA.png");
+
+
+	Model* golf = scene3d.add<Model>("golf", "test/assets/objs/car/Car3.obj");
+	golf->position = { 20.0f, 0.0f, -20.0f };
+	golf->material.texture = new Texture("test/assets/objs/car/car3_yellow.png");
 
 
 	// MODELS //
@@ -210,6 +223,7 @@ int main() {
 
 
 	window.on_event(Event::WINDOW_RESIZED, [&]() {
+		LOG_DEBUG("new size: (%d, %d)", window.get_width(), window.get_height());
 		camera.update_viewport(window);
 		camera2d.update_viewport(window);
 	});
@@ -249,11 +263,13 @@ int main() {
 			}
 		}
 
+		golf->position->z += 5.0f * dt;
+
 		// Debug draw bounds
 		// cottage->bbox.draw_world_bounds(camera);
 
-		// cow->bbox.draw_local_bounds(camera, Colors::GREEN, true);
-		// cow->bbox.draw_world_bounds(camera, Colors::RED, false);
+		// cow->bbox->draw_local_bounds(camera, Colors::GREEN, true);
+		// cow->bbox->draw_world_bounds(camera, Colors::RED, false);
 		// MODELS UPDATE //
 
 		// OTHER EVENTS //
@@ -271,6 +287,6 @@ int main() {
 		// OTHER EVENTS //
 
 		window.swap_buffers(); // Draw end
-		window.frame_capping(144.0f);
+		// window.frame_capping(144.0f);
 	}
 }

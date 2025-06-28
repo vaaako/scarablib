@@ -104,7 +104,7 @@ void Billboard::update_facing_texture(const vec3<float>& point_pos) noexcept {
 	// Only update the current sector if it has changed
 	if(sector != this->cur_sector) {
 		this->cur_sector = sector;
-		this->material.texture = *this->textures[sector];
+		this->material.texture = this->textures[sector];
 	}
 
 	#ifdef SCARAB_DEBUG_BILLBOARD_ANGLE

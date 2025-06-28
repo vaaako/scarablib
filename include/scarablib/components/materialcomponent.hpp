@@ -3,52 +3,81 @@
 #include "scarablib/types/color.hpp"
 #include "scarablib/types/texture.hpp"
 #include <cstddef>
+#include <memory>
 
 struct MaterialComponent {
 	struct TextureHandle {
 		private:
-			Texture* ref; // If it was a reference it wouldnt rebind
+			std::shared_ptr<Texture> ptr; // If it was a reference it wouldnt rebind
 
 		public:
-			inline TextureHandle() noexcept : ref(Texture::default_texture().get()) {}
-			inline constexpr TextureHandle(Texture& texture) noexcept : ref(&texture) {}
-			inline TextureHandle(std::nullptr_t) noexcept : ref(Texture::default_texture().get()) {}
+			// Default texture
+			TextureHandle() noexcept
+				: ptr(Texture::default_texture()) {}
+			// From rvalue texture
+			explicit TextureHandle(Texture* texture) noexcept
+				: ptr(texture ? std::shared_ptr<Texture>(texture) : Texture::default_texture()) {}
+			// From lvalue texture
+			explicit TextureHandle(const Texture& texture) noexcept
+				: ptr(std::make_shared<Texture>(texture)) {}
+			// From nullptr
+			TextureHandle(std::nullptr_t) noexcept
+				: ptr(Texture::default_texture()) {}
 
-			// Use as Texture reference
-			constexpr operator const Texture&() const noexcept {
-				return *this->ref;
-			}
-
-			constexpr operator Texture&() noexcept {
-				return *this->ref;
-			}
+			// Copy constructor
+			TextureHandle(const TextureHandle&) noexcept = default;
+			// Move constructor
+			TextureHandle(TextureHandle&&) noexcept = default;
 
 
 			// Pointer-like access
-			constexpr const Texture* operator->() const noexcept {
-				return this->ref;
+			[[nodiscard]] const Texture* operator->() const noexcept {
+				return this->ptr.get();
 			}
 
-			constexpr Texture* operator->() noexcept {
-				return this->ref;
+			[[nodiscard]] constexpr Texture* operator->() noexcept {
+				return this->ptr.get();
 			}
 
-			// If nullptr is passed, set to default texture
+
+			// Reference-like access
+			constexpr operator const Texture&() const noexcept {
+				return *this->ptr;
+			}
+
+			constexpr operator Texture&() noexcept {
+				return *this->ptr;
+			}
+
+			// Assign nullptr reset to default texture
 			TextureHandle& operator=(std::nullptr_t) noexcept {
-				this->ref = Texture::default_texture().get();
+				this->ptr = Texture::default_texture();
 				return *this;
 			}
 
-			TextureHandle& operator=(Texture& texture) noexcept {
-				this->ref = &texture;
+			// Assign shared_ptr
+			TextureHandle& operator=(const std::shared_ptr<Texture>& other) noexcept {
+				this->ptr = other;
+				return *this;
+			}
+
+			// Assign from lvalue texture
+			TextureHandle& operator=(const Texture& other) noexcept {
+				this->ptr = std::make_shared<Texture>(other);
+				return *this;
+			}
+
+			// Delete rvalue texture
+			TextureHandle& operator=(const Texture&& other) noexcept = delete;
+
+			TextureHandle& operator=(Texture* texture) noexcept {
+				this->ptr = texture ? std::shared_ptr<Texture>(texture) : Texture::default_texture();
 				return *this;
 			}
 
 			// Assignment from another handle
-			TextureHandle& operator=(const TextureHandle& other) noexcept {
-				this->ref = other.ref;
-				return *this;
-			}
+			TextureHandle& operator=(const TextureHandle& other) noexcept = default;
+			TextureHandle& operator=(TextureHandle&& other) noexcept = default;
 	};
 
 	// Current color

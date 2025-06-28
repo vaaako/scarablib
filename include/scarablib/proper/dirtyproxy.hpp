@@ -26,13 +26,13 @@ struct DirtyProxy {
 			return *this;
 		}
 
-		constexpr T* operator->() noexcept {
+		[[nodiscard]] constexpr T* operator->() noexcept {
 			this->isdirty = true; // Assume non-const acess is a modification
 			return &this->value;
 		}
 
 		// Allow access to members
-		constexpr const T* operator->() const noexcept {
+		[[nodiscard]] constexpr const T* operator->() const noexcept {
 			return &this->value;
 		}
 

@@ -1,20 +1,20 @@
 # Note
 I wrote most of the things here very tired, sorry for any english mistake
 
-# stuff i dont know if still working
-- Collision
+# Need to test until it works
 - Bounding box
-- VertexArray attributes
 
 # Currently working on
 Stuff that are in progress and i need to finish
 
 - Legacy Mode
 - Timer
+- Fonts
+- Texture Array
 - Bounding Box debug draw
 - Terrain Map
-- Texture Array
-- Timer
+- Physics
+- Network
 
 # TODO library
 - [x] Use my vectores instead of glm
@@ -53,15 +53,18 @@ Stuff that are in progress and i need to finish
 - [x] REMOVE (almost) ALL INLINES
 
 - [x] Better Material Component and texture handling
-- [ ] TextureHandle accept temporary texture object. For this to work change ref to shared_ptr
+- [x] TextureHandle accept temporary texture object. For this to work change ref to shared_ptr
 - [ ] In Window::rotate i didnt have to clear the rotation before, why do i need it now? ([last commit]( https://github.com/vaaako/scarablib/commit/d2a5717958a1f73fde39dafbd6640e2c19dab076))
 - [ ] make transparency work without `if(tex.a == 0.0)`?
 - [ ] Discord RPC support?
+- [ ] Be able to stand on loaded terrain
+	+ Also implement collision with walls
+	+ Ray + Grid method?
 
 
 
 # TODO Quick Fixes
-- [ ] Better texture constructor
+- [x] Better texture constructor
 	+ Use bitwise paramters
 	+ Paramter to choose between RGB and RGBA manually (check inside if image is really RGBA)
 	+ Organize constructors
@@ -143,7 +146,7 @@ Stuff that are in progress and i need to finish
 	+ Rigid body
 - [x] If possible, use mesh.hpp for 2D shapes
 - [x] Remove `SCARAB_2D_AND_3D`
-- [ ] Make it work with CULL_FACE
+- [x] Make it work with CULL_FACE
 - [ ] Finish font
 
 # TODO 3D
@@ -187,25 +190,6 @@ Stuff that are in progress and i need to finish
 - [ ] Billboard: Texture array
 - [ ] Different texture for each face (the other method that is not cubemap)
 - [ ] Ortographic camera
-- [ ] Model loading to Model class
-	- [ ] Multiple textures handling
-
-# Features for later
-- Sprite atlas
-- Tick
-- Entity manager
-- Support legacy opengl
-	+ Draw 2D and 3D shapes
-	+ Sprite support
-	+ 2D and 3D cutomizable camera
-
-## 3D features
-- Collision
-- Level of Detail (LOD)
-- Frustum Culling
-
-## 2D features
-- Collision
-- Camera
-- Load tile map support (Tiled)
+- [x] Model loading to Model class
+	+ [ ] Multiple textures handling
 

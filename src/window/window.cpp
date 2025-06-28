@@ -140,10 +140,9 @@ void Window::clear() const noexcept {
 
 
 void Window::grab_cursor(const bool grab) const noexcept {
-	// BUG:? I HADNT TO DO THIS BEFORE WHY DO I NEED IT NOW?????? WTF????
+	SDL_SetRelativeMouseMode(static_cast<SDL_bool>(grab));
 	// If this isnt't done, the camera will "jump"
 	int dummy_x, dummy_y;
-	SDL_SetRelativeMouseMode(static_cast<SDL_bool>(grab));
 	SDL_GetRelativeMouseState(&dummy_x, &dummy_y);
 }
 
