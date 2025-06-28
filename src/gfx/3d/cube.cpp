@@ -1,5 +1,5 @@
 #include "scarablib/gfx/3d/cube.hpp"
-#include "scarablib/gfx/geometry_factory.hpp"
+#include "scarablib/geometry/geometry_factory.hpp"
 
 Cube::Cube(const uint8 face_mask) noexcept
 	: Model() {

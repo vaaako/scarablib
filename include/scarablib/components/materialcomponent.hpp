@@ -1,7 +1,7 @@
 #pragma once
 
-#include "scarablib/types/color.hpp"
-#include "scarablib/types/texture.hpp"
+#include "scarablib/gfx/color.hpp"
+#include "scarablib/gfx/texture.hpp"
 #include <cstddef>
 #include <memory>
 

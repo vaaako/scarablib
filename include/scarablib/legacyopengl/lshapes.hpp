@@ -1,7 +1,7 @@
 #pragma once
 
 #include "scarablib/typedef.hpp"
-#include "scarablib/types/color.hpp"
+#include "scarablib/gfx/color.hpp"
 #include "scarablib/window/window.hpp"
 
 // Possible shapes in legacy opengl

@@ -1,5 +1,5 @@
 #include "scarablib/gfx/2d/circle.hpp"
-#include "scarablib/gfx/geometry_factory.hpp"
+#include "scarablib/geometry/geometry_factory.hpp"
 
 Circle::Circle() noexcept
 	: Sprite(GeometryFactory::make_rectangle_vertices()) {}

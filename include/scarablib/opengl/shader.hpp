@@ -5,7 +5,7 @@
 #include <glm/mat4x4.hpp>
 #include <vector>
 #include "scarablib/typedef.hpp"
-#include "scarablib/types/color.hpp"
+#include "scarablib/gfx/color.hpp"
 
 // OpenGL shader object
 struct Shader {

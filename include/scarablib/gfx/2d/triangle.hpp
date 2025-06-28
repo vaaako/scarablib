@@ -1,6 +1,6 @@
 #pragma once
 
-#include "scarablib/gfx/2d/sprite.hpp"
+#include "scarablib/geometry/sprite.hpp"
 
 // Represents a rectangle object
 struct Triangle : public Sprite {

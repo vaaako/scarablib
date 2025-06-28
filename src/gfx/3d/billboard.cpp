@@ -1,6 +1,6 @@
 #include "scarablib/gfx/3d/billboard.hpp"
-#include "scarablib/gfx/geometry_factory.hpp"
-#include "scarablib/gfx/3d/model.hpp"
+#include "scarablib/geometry/geometry_factory.hpp"
+#include "scarablib/geometry/model.hpp"
 #include <cstddef>
 #include <cstdlib>
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "scarablib/types/vertex.hpp"
+#include "scarablib/geometry/vertex.hpp"
 #include <GL/glew.h>
 #include <unordered_map>
 

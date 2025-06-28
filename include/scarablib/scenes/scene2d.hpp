@@ -1,7 +1,7 @@
 #pragma once
 
 #include "scarablib/scenes/Iscene.hpp"
-#include "scarablib/scenes/camera2d.hpp"
+#include "scarablib/camera/camera2d.hpp"
 
 // Scene object used for managing 2D objects
 class Scene2D : public IScene {

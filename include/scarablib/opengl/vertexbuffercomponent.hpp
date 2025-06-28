@@ -5,7 +5,6 @@
 #include "scarablib/opengl/vbo.hpp"
 #include "scarablib/opengl/ebo.hpp"
 #include "scarablib/proper/error.hpp"
-#include "scarablib/proper/log.hpp"
 #include "scarablib/typedef.hpp"
 
 // TODO: In future texuv will not be always presented

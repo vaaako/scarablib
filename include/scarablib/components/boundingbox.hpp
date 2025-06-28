@@ -1,8 +1,8 @@
 #pragma once
 
-#include "scarablib/scenes/camera.hpp"
+#include "scarablib/camera/camera.hpp"
 #include "scarablib/typedef.hpp"
-#include "scarablib/types/vertex.hpp"
+#include "scarablib/geometry/vertex.hpp"
 
 // This class is a AABB of a 3D model.
 // It can be used for hitbox and collision detection

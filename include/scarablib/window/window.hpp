@@ -2,7 +2,7 @@
 
 #include "scarablib/proper/error.hpp"
 #include "scarablib/typedef.hpp"
-#include "scarablib/types/color.hpp"
+#include "scarablib/gfx/color.hpp"
 #include "scarablib/window/buttoncode.hpp"
 #include "scarablib/window/events.hpp"
 #include "scarablib/window/keycode.hpp"

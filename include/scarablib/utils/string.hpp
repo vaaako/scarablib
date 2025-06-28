@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cctype>
 #include <string>
 
 // Helper namespace with methods related to string manipulation

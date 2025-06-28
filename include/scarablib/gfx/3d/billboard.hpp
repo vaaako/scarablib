@@ -1,6 +1,6 @@
 #pragma once
 
-#include "scarablib/gfx/3d/model.hpp"
+#include "scarablib/geometry/model.hpp"
 #include "scarablib/opengl/shader_manager.hpp"
 #include "scarablib/opengl/shaders.hpp"
 

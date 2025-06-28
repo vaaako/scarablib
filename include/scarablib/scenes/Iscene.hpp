@@ -1,12 +1,12 @@
 #pragma once
 
-#include "scarablib/gfx/3d/model.hpp"
+#include "scarablib/camera/camera.hpp"
+#include "scarablib/geometry/mesh.hpp"
 #include "scarablib/opengl/shader_manager.hpp"
 #include "scarablib/opengl/shaders.hpp"
 #include "scarablib/window/window.hpp"
 #include <algorithm> // lower_bound
 #include <memory>
-#include <string_view>
 
 // Virtual class used to make Scene2D and Scene3D
 class IScene {
