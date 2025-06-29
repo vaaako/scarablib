@@ -78,6 +78,10 @@ void Billboard::set_directional_textures(const std::vector<const char*> paths, c
 }
 
 void Billboard::update_facing_texture(const vec3<float>& point_pos) noexcept {
+	if(this->textures.empty()) {
+		return;
+	}
+
 	const float dx = point_pos.x - this->position->x;
 	const float dz = point_pos.z - this->position->z;
 
@@ -92,7 +96,7 @@ void Billboard::update_facing_texture(const vec3<float>& point_pos) noexcept {
 	const float angle_to_target = std::atan2(dx, dz);
 
 	// Get the billboard's forward-facing angle in radians
-	const float forward_angle = this->directions[this->base_dir];
+	const float forward_angle = this->directions[this->direction];
 	// Calculate the angle of the camera relative to the billboard's front
 	// The result is the CCW angle from the billboard's front to the camera vector
 	const float relative_angle = std::fmod(angle_to_target - forward_angle + M_PI2, M_PI2);

@@ -32,6 +32,9 @@ struct Billboard : public Model {
 		NORTHWEST
 	};
 
+	// Billboard relative front direction
+	Billboard::Direction direction = Billboard::Direction::EAST;
+
 	Billboard() noexcept;
 	// This is overrided because if not, it wouldn't be possible to clean the textures
 	~Billboard() noexcept override;
@@ -60,16 +63,6 @@ struct Billboard : public Model {
 	// Updates the billboard's texture direction based on a point position (usually the camera)
 	void update_facing_texture(const vec3<float>& point_pos) noexcept;
 
-	// Returns the current direction the billboard is facing
-	inline Billboard::Direction get_direction() const noexcept {
-		return this->base_dir;
-	}
-
-	// Set a new direction to the billboard to face
-	inline void set_direction(const Billboard::Direction dir) {
-		this->base_dir = dir;
-	}
-
 	// Returns the shader used by the billboard
 	inline Shader* get_shader() const noexcept override {
 		return this->shader;
@@ -94,8 +87,6 @@ struct Billboard : public Model {
 		std::vector<std::shared_ptr<Texture>> textures;
 		// Precalculated number of textures (either 4 or 8)
 		size_t num_sectors = 0;
-		// Billboard relative front direction
-		Billboard::Direction base_dir = Billboard::Direction::EAST;
 		// Used to check if texture must change
 		uint32 cur_sector = 9; // Unbounded value to change the first time
 		// Pre calculated angle steps between directions
