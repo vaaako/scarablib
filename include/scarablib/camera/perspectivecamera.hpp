@@ -20,10 +20,10 @@ class PerspectiveCamera : public Camera {
 
 		// MOVEMENT
 
-		// Moves the camera using a unit vector.
+		// Moves the camera using a direction vector.
 		// Where X is front/back, Y is up/down and Z is left/right.
 		// Example: [1, 0, -1] means the camera moved to Front-Left
-		void move(const vec3<float>& dir, const float dt) noexcept;
+		void move(vec3<float> dir, const float speed) noexcept;
 
 		// Use mouse moved direction to rotate the camera
 		// void rotate(const MouseHandler& mouse) noexcept;
@@ -39,6 +39,11 @@ class PerspectiveCamera : public Camera {
 		// Retuns camera unit direction vector
 		inline vec3<float> get_forward() const noexcept {
 			return this->forward;
+		}
+
+		// Returns camera unit right vector
+		inline vec3<float> get_right() const noexcept {
+			return this->right;
 		}
 
 		// Returns camera unit up vector
@@ -84,17 +89,15 @@ class PerspectiveCamera : public Camera {
 		// Yaw is horizontal rotation, Pitch is vertical
 		void set_rotation(const float yaw, const float pitch) noexcept;
 
-		// Sets camera movement speed
-		inline void set_speed(const float speed) noexcept {
-			this->speed = speed / 10.0f;
+		// Sets camera height in cm
+		inline void set_height(float height_cm) noexcept {
+			this->position.y = std::max(height_cm * 0.01f, 0.0f); // Convert to meters 
 		}
 
 		// Returns a string with the cardinal direction the camera is facing based on its yaw
 		static std::string_view get_cardinal_direction(const float yaw);
 
 	private:
-		float speed = 0.1f;
-
 		float fov;
 		float max_fov = 100.0f;
 		float min_fov = 1.0f;

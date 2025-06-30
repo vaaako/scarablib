@@ -1,5 +1,6 @@
 #include "scarablib/camera/perspectivecamera.hpp"
 #include "scarablib/proper/error.hpp"
+#include "scarablib/proper/log.hpp"
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/geometric.hpp>
 
@@ -97,19 +98,23 @@ void PerspectiveCamera::update_camera_vectors() noexcept {
 }
 
 
-void PerspectiveCamera::move(const vec3<float>& dir, const float dt) noexcept {
-	// Combine movement direction
-	vec3<float> move = this->forward * dir.z +
-					   this->up      * dir.y +
-					   this->right   * dir.x;
+void PerspectiveCamera::move(vec3<float> dir, const float speed) noexcept {
+	if(glm::length(dir) > 0.0f) {
+		dir = glm::normalize(dir);
+	}
+
+	vec3<float> horizontal = this->forward * dir.z + this->right * dir.x;
 
 	// Normalize only horizontal (XZ) to prevent faster diagonal movement
 	if(dir.x != 0.0f || dir.z != 0.0f) {
-		move = glm::normalize(move);
+		horizontal = glm::normalize(horizontal);
 	}
 
-	// Update position
-	this->position += move * this->speed * dt;
+	// Final movement vector
+	// horizontal + vertical
+	vec3<float> move = horizontal + this->up * dir.y;
+
+	this->position += move * speed;
 }
 
 

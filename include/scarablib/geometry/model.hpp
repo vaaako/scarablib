@@ -2,6 +2,7 @@
 
 #include <GL/glew.h>
 #include "scarablib/geometry/mesh.hpp"
+#include "scarablib/geometry/triangle.hpp"
 #include "scarablib/opengl/shader.hpp"
 #include "scarablib/proper/dirtyproxy.hpp"
 #include "scarablib/camera/camera.hpp"
@@ -49,10 +50,13 @@ class Model : public Mesh {
 		void set_orientation(const float angle, const vec3<float>& axis) noexcept;
 
 
-		// TODO: Will be useful later
 		// Loads a wavefront .obj file.
-		// `indices` is optional, pass nullptr if not needed
+		// - `indices` is optional, pass nullptr if not needed
 		static std::vector<Vertex> load_obj(const char* path, std::vector<uint32>* indices);
+
+		// Returns a vector of triangles from the model
+		// - `transform`: (Optional) Transform applied to the model
+		static std::vector<MeshTriangle> get_obj_triangles(const char* path, const glm::mat4& transform = glm::mat4(1.0f));
 
 	protected:
 		// Axis where the orientation angle will be applied

@@ -55,6 +55,10 @@ class Mesh {
 			this->bbox = new BoundingBox(vertices);
 		}
 
+		inline glm::mat4 get_model_matrix() const noexcept {
+			return this->model;
+		}
+
 		// Updates the bounding box based on the transformations of the Model.
 		// For dynamic transformations, use `set_dynamic_bbox_update(bool)`.
 		// You need to create the bounding box first with `make_bounding_box()`
