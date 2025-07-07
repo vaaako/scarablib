@@ -83,7 +83,6 @@ Raycast::Rayhit UniformGrid::raycast(const Raycast::Ray& ray) const noexcept {
 	// This algorithm efficiently finds every cell a ray passes through
 
 	vec3<uint32> currentcell = get_cell_index(ray.origin);
-	LOG_DEBUG("Current cell: (%i, %i, %i)", currentcell.x, currentcell.y, currentcell.z);
 
 	// Handle case where ray starts outside the grid
 	if (currentcell.x < 0 || currentcell.x >= this->griddims.x ||

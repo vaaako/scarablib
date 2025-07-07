@@ -20,10 +20,15 @@ class PerspectiveCamera : public Camera {
 
 		// MOVEMENT
 
+
+		// Convert local direction to world-space direction
+		vec3<float> to_wordspace(const vec3<float>& dir, const float speed) const noexcept;
+
 		// Moves the camera using a direction vector.
+		// This will convert the direction vector to world-space before moving.
 		// Where X is front/back, Y is up/down and Z is left/right.
 		// Example: [1, 0, -1] means the camera moved to Front-Left
-		void move(vec3<float> dir, const float speed) noexcept;
+		void move(const vec3<float>& dir, const float speed) noexcept;
 
 		// Use mouse moved direction to rotate the camera
 		// void rotate(const MouseHandler& mouse) noexcept;

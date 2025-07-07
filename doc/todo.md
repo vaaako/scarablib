@@ -57,10 +57,12 @@ Stuff that are in progress and i need to finish
 - [ ] In Window::rotate i didnt have to clear the rotation before, why do i need it now? ([last commit]( https://github.com/vaaako/scarablib/commit/d2a5717958a1f73fde39dafbd6640e2c19dab076))
 - [ ] make transparency work without `if(tex.a == 0.0)`?
 - [ ] Discord RPC support?
-- [ ] Be able to stand on loaded terrain
-	+ Also implement collision with walls
-	+ Ray + Grid method?
 
+- [ ] Putt built in not related engine classes in a `builtin` folder
+	+ UniformGrid
+	+ Raycast
+	+ TerrainMap
+	+ etc
 
 
 # TODO Quick Fixes
@@ -193,3 +195,10 @@ Stuff that are in progress and i need to finish
 - [x] Model loading to Model class
 	+ [ ] Multiple textures handling
 
+- [x] Be able to stand on loaded terrain
+	+ Also implement collision with walls
+	+ Ray + Grid method?
+- [ ] UniformGrid is not fully implemented
+	+ Planes are not being detected
+	+ Corners are not being detected
+	+ Ceilings are not being detected

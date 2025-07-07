@@ -98,23 +98,19 @@ void PerspectiveCamera::update_camera_vectors() noexcept {
 }
 
 
-void PerspectiveCamera::move(vec3<float> dir, const float speed) noexcept {
-	if(glm::length(dir) > 0.0f) {
-		dir = glm::normalize(dir);
-	}
-
-	vec3<float> horizontal = this->forward * dir.z + this->right * dir.x;
-
+vec3<float> PerspectiveCamera::to_wordspace(const vec3<float>& dir, const float speed) const noexcept {
+	vec3<float> direction = this->forward * dir.z + this->right * dir.x;
 	// Normalize only horizontal (XZ) to prevent faster diagonal movement
-	if(dir.x != 0.0f || dir.z != 0.0f) {
-		horizontal = glm::normalize(horizontal);
+	if(glm::length(direction) > 0.0f) {
+		direction = glm::normalize(direction);
 	}
-
 	// Final movement vector
 	// horizontal + vertical
-	vec3<float> move = horizontal + this->up * dir.y;
+	return direction + this->up * dir.y;
+}
 
-	this->position += move * speed;
+void PerspectiveCamera::move(const vec3<float>& dir, const float speed) noexcept {
+	this->position += this->to_wordspace(dir, speed) * speed;
 }
 
 
