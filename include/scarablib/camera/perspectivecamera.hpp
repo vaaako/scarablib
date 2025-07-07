@@ -22,7 +22,7 @@ class PerspectiveCamera : public Camera {
 
 
 		// Convert local direction to world-space direction
-		vec3<float> to_wordspace(const vec3<float>& dir, const float speed) const noexcept;
+		vec3<float> to_wordspace(const vec3<float>& dir) const noexcept;
 
 		// Moves the camera using a direction vector.
 		// This will convert the direction vector to world-space before moving.
