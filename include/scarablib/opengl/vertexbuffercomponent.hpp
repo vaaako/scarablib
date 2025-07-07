@@ -11,6 +11,7 @@
 // For invisible objects
 
 // A class that bundles the VAO, VBO and EBO buffers.
+// Also stores information necessary for rendering like indices size and indices type.
 // With utilitary methods for creating the Vertex Buffer
 class VertexBufferComponent {
 	public:
@@ -24,8 +25,23 @@ class VertexBufferComponent {
 		VertexBufferComponent() noexcept = default;
 		~VertexBufferComponent() noexcept;
 
-		inline size_t get_hash() const noexcept {
+		// Returns unique hash used in VAOManager to get this VAO
+		inline constexpr size_t get_hash() const noexcept {
 			return this->hash;
+		}
+
+		// Returns the length of this VAO.
+		// This is used for rendering
+		// For 3D shapes this is the length of indices.
+		// For 2D shapes this is the length of vertices.
+		inline constexpr int get_length() const noexcept {
+			return this->length;
+		}
+
+		// Returns the type of indices.
+		// This is used for 3D rendering
+		inline constexpr GLenum get_indices_type() const noexcept {
+			return this->indices_type;
 		}
 
 		// Configurates additional attributes for data.
@@ -48,11 +64,17 @@ class VertexBufferComponent {
 			const bool normalized;
 			const size_t offset;
 		};
-		std::vector<VertexAttribute> attributes;
 
+		std::vector<VertexAttribute> attributes;
 		// Current offset of attributes
 		size_t stride = sizeof(Vertex); // position and texuv are always presented
 		size_t hash;
+		// For rendering
+		// in 2D this is vertices size
+		int length = 0;
+		// For rendering
+		// not used for 2D shapes
+		GLenum indices_type = GL_UNSIGNED_INT;
 
 		inline void cleanup_attributes() noexcept {
 			// Clear attributes
@@ -89,6 +111,14 @@ void VertexBufferComponent::make_vao(const std::vector<T>& vertices, const std::
 
 	if(vertices.empty()) {
 		throw ScarabError("Vertices vector is empty");
+	}
+
+	if(!indices.empty()) {
+		this->length = indices.size();
+		this->indices_type = (std::is_same_v<U, uint32>) ? GL_UNSIGNED_INT :
+			(std::is_same_v<U, uint16>) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_BYTE;
+	} else {
+		this->length = vertices.size();
 	}
 
 	// Returns a hash unique hash

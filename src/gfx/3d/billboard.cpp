@@ -30,7 +30,8 @@ void Billboard::draw_logic(const Camera& camera, const Shader& shader) noexcept 
 	shader.set_vector3f("billboardPos", this->position);
 	shader.set_float("billboardSize", this->scale->x);
 
-	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(this->indices_length), GL_UNSIGNED_BYTE, (void*)0);
+	// hard coded indices size
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, (void*)0);
 }
 
 

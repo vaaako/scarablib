@@ -9,12 +9,12 @@
 
 
 // Used to convert vectors after loading model
-template <typename OUT, typename INP>
-std::vector<OUT> convert_to(const std::vector<INP>& indices) {
-	std::vector<OUT> output;
+template <typename T, typename U>
+std::vector<T> convert_to(const std::vector<U>& indices) {
+	std::vector<T> output;
 	output.reserve(indices.size());
-	for (INP val : indices) {
-		output.push_back(static_cast<OUT>(val));
+	for(U val : indices) {
+		output.push_back(static_cast<T>(val));
 	}
 	return output;
 }
@@ -28,22 +28,17 @@ Model::Model(const char* path) : Mesh() {
 		throw ScarabError("Failed to load/parse (%s) file. Indices are empty", path);
 	}
 
-	this->indices_length = static_cast<GLsizei>(indices.size());
-
 	// Check which indice type fits
 	// Then convert vector to that type and upload to VAO
 	const uint32 max_val = *std::max_element(indices.begin(), indices.end());
 	if(max_val <= UINT8_MAX) {
-		this->indices_type = GL_UNSIGNED_BYTE;
 		this->bundle.make_vao(vertices, convert_to<uint8>(indices));
 
 	} else if(max_val <= UINT16_MAX) {
-		this->indices_type = GL_UNSIGNED_SHORT;
 		this->bundle.make_vao(vertices, convert_to<uint16>(indices));
 
 	// Is uint32 or uint64, use existing indices
 	} else {
-		this->indices_type = GL_UNSIGNED_INT;
 		this->bundle.make_vao(vertices, indices);
 	}
 
@@ -108,7 +103,7 @@ void Model::draw_logic(const Camera& camera, const Shader& shader) noexcept {
 	shader.set_color("shapeColor", this->material.color);
 	shader.set_matrix4f("mvp", (camera.get_proj_matrix() * camera.get_view_matrix()) * this->model);
 
-	glDrawElements(GL_TRIANGLES, this->indices_length, this->indices_type, (void*)0);
+	glDrawElements(GL_TRIANGLES, this->bundle.get_length(), this->bundle.get_indices_type(), (void*)0);
 }
 
 

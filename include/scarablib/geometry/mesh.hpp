@@ -6,7 +6,6 @@
 #include "scarablib/components/physicscomponent.hpp"
 #include "scarablib/opengl/shader.hpp"
 #include "scarablib/opengl/vertexbuffercomponent.hpp"
-#include "scarablib/typedef.hpp"
 
 // Basic data for 3D and 2D shapes
 class Mesh {
@@ -83,10 +82,6 @@ class Mesh {
 		}
 
 	protected:
-		// OpenGL
-		GLsizei indices_length = 0; // For drawing (in 2D this is vertices size instead, but i dont know how to call it)
-		GLenum indices_type    = 0; // For drawing (not used for 2D shapes)
-
 		// Matrix
 		bool isdirty; // Calculate matrix if anything changed
 		glm::mat4 model = glm::mat4(1.0f);
@@ -103,9 +98,5 @@ Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<T>& indices) n
 
 template <typename T>
 void Mesh::set_geometry(const std::vector<Vertex>& vertices, const std::vector<T>& indices) {
-	this->indices_length = static_cast<GLsizei>(indices.size()),
-	this->indices_type = (std::is_same_v<T, uint32>) ? GL_UNSIGNED_INT :
-		(std::is_same_v<T, uint16>) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_BYTE;
-
 	this->bundle.make_vao(vertices, indices);
 }
