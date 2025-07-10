@@ -7,7 +7,11 @@ Mesh::Mesh(const std::vector<Vertex>& vertices) noexcept {
 }
 
 Mesh::~Mesh() noexcept {
-	delete this->physics;
-	delete this->bbox;
+	if(this->physics) {
+		delete this->physics;
+	}
+	if(this->bbox) {
+		delete this->bbox;
+	}
 }
 

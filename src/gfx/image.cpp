@@ -23,7 +23,7 @@ Image::Image(const char* path, const bool flip_horizontally, const bool flip_ver
 		// Flip horizontally
 		int rowSize = this->width * this->nr_channels;
 		for(int y = 0; y < this->height; y++) {
-			unsigned char* row = this->data + (y * rowSize);
+			uint8* row = this->data + (y * rowSize);
 			for(int x = 0; x < this->width / 2; x++) {
 				for(int c = 0; c < this->nr_channels; c++) {
 					std::swap(row[x * this->nr_channels + c], row[(this->width - 1 - x) * this->nr_channels + c]);

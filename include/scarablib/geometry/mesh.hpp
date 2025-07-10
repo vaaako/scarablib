@@ -44,32 +44,26 @@ class Mesh {
 		template <typename T>
 		void set_geometry(const std::vector<Vertex>& vertices, const std::vector<T>& indices);
 
-		// Creates a physics components for the mesh
-		inline constexpr void enable_physics() noexcept {
-			this->physics = new PhysicsComponent();
-		}
-
-		// Creates a bounding box for the mesh
-		inline void make_bounding_box(const std::vector<Vertex>& vertices) noexcept {
-			this->bbox = new BoundingBox(vertices);
-		}
-
 		inline glm::mat4 get_model_matrix() const noexcept {
 			return this->model;
 		}
 
+		// BoundingBox must be created before calling this function.
 		// Updates the bounding box based on the transformations of the Model.
-		// For dynamic transformations, use `set_dynamic_bbox_update(bool)`.
-		// You need to create the bounding box first with `make_bounding_box()`
+		// For dynamic transformations, use `set_dynamic_bbox_update(bool)`
 		void update_bbox() {
 			if(this->bbox == nullptr) {
-				this->update_model_matrix(); // Needs updated matrix
-				this->bbox->update_world_bounds(this->model);
+				return;
 			}
+			this->update_model_matrix(); // Needs updated matrix
+			this->bbox->update_world_bounds(this->model);
 		}
 
 		// Sets whether the bounding box should be dynamically transformed
 		void set_dynamic_bbox_update(const bool value) noexcept {
+			if(this->bbox == nullptr) {
+				return;
+			}
 			this->dynamic_bounding = value;
 		}
 
