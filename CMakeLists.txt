@@ -10,27 +10,31 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fdiagnostics-color=always")
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -MM -MD -fdiagnostics-color=always")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra -Wall -Wuninitialized -Winit-self -Wfloat-equal")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wundef -Wpointer-arith -Wcast-align -Wstrict-overflow=5")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wwrite-strings -Wcast-qual -Wswitch-default")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wconversion -Wunreachable-code")
-
 option(USE_STATIC_LIBS "Link against static libraries instead of shared ones" OFF)
 
 file(GLOB_RECURSE SOURCES src/*.cpp src/*/*.cpp src/**/*.cpp)
 add_executable(${PROJECT_NAME} ${SOURCES} test/main.cpp)
 
-if(USE_STATIC_LIBS)
-	# Include directories
-	include_directories(
-		include
-		include/external
-		include/external/SDL2 # SDL_mixer includes SDL_stdinc
-		include/external/SDL_mixer
-	)
 
+# Mark as private to avoid warnings
+target_include_directories(scarablib_dev
+	PRIVATE
+		include
+	SYSTEM PRIVATE
+		include/external
+		include/external/GL
+		include/external/SDL2
+		include/external/enet
+		include/external/glm
+		include/external/stb
+		include/external/tinyobjloader
+
+)
+
+# O0 for debug and fast compiling
+target_compile_options(${PROJECT_NAME} PRIVATE -O0 -g -fdiagnostics-color=always -Wextra -Wall -Wuninitialized -Wunreachable-code -Wfloat-equal)
+
+if(USE_STATIC_LIBS)
 	link_directories(
 		lib/GLEW
 		lib/SDL2
@@ -45,7 +49,7 @@ if(USE_STATIC_LIBS)
 	set(LIB_ENET "${CMAKE_SOURCE_DIR}/lib/enet/libenet.a")
 
 	# Link static libraries
-	target_link_libraries(scarablib_dev 
+	target_link_libraries(${PROJECT_NAME}
 		GL # Link OpenGL dynamically
 		${LIB_GLEW}
 		${LIB_SDL2}
@@ -57,28 +61,22 @@ else()
 	# Set to modern OpenGL
 	set(OpenGL_GL_PREFERENCE "GLVND")
 
-	# Include directories
-	include_directories(
-		include
-		include/external
-		include/external/SDL2 # SDL_mixer includes SDL_stdinc
-		include/external/SDL_mixer
-	)
-
 	# Find shared libraries
 	find_package(OpenGL REQUIRED)
 
-	find_library(SDL2_LIBRARY SDL2 PATHS ${CMAKE_SOURCE_DIR}/lib/SDL2)
-	find_library(SDL2_MIXER_LIBRARY SDL2_mixer PATHS ${CMAKE_SOURCE_DIR}/lib/SDL2_mixer)
-	find_library(GLEW_LIBRARY GLEW PATHS ${CMAKE_SOURCE_DIR}/lib/GLEW)
+	find_package(SDL2 REQUIRED)
+	find_package(SDL2_mixer REQUIRED)
+	find_package(GLEW REQUIRED)
+	# find_package(enet REQUIRED)
 	find_library(ENET_LIBRARY enet PATHS ${CMAKE_SOURCE_DIR}/lib/enet)
 
 	# Link shared libraries
-	target_link_libraries(scarablib_dev 
-		${OPENGL_LIBRARIES}
-		${GLEW_LIBRARY}
-		${SDL2_LIBRARY}
-		${SDL2_MIXER_LIBRARY}
+	target_link_libraries(${PROJECT_NAME}
+		PRIVATE
+		OpenGL::GL
+		GLEW::GLEW
+		SDL2::SDL2
+		SDL2_mixer::SDL2_mixer
 		${ENET_LIBRARY}
 	)
 endif()
