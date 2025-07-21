@@ -49,8 +49,7 @@ class VertexBufferComponent {
 		// - `count`: The number of components per attribute (e.g., 3 for a vec3, 2 for a vec2).
 		// - `type`: (Default: GL_FLOAT) Type of data (e.g., GL_FLOAT).
 		// - `normalized`: (Default: false) Whether to normalize the data (e.g., true for [-1, 1] to [0, 1])
-		template<typename T>
-		void add_attribute(const uint32 count, const GLenum type = GL_FLOAT, const bool normalized = true);
+		void add_attribute(const uint32 count, const GLenum type = GL_FLOAT, const bool normalized = false);
 
 		// Automatically computes Vertex Buffer and stores in VAOManager
 		template <typename T, typename U>
@@ -58,10 +57,19 @@ class VertexBufferComponent {
 
 	private:
 		struct VertexAttribute {
+			// This is the location in the shader.
+			// 0 for position, 1 for texuv.
+			// This is incremented automatically in add_attribute
 			const uint32 location;
+			// How many components per attribute.
+			// Example: 2 for a vec2
 			const uint32 component_count;
+			// Type of data
+			// Example: GL_FLOAT
 			const GLenum type;
+			// Whether to normalize the data
 			const bool normalized;
+			// Offset of the attribute
 			const size_t offset;
 		};
 
@@ -83,16 +91,6 @@ class VertexBufferComponent {
 			this->stride = sizeof(Vertex);
 		}
 };
-
-
-template<typename T>
-void VertexBufferComponent::add_attribute(const uint32 count, const GLenum type, const bool normalized) {
-
-	// Plus 2 because position and texuv are always at location 0 and 1
-	const uint32 location = 2 + (uint32)this->attributes.size();
-	this->attributes.push_back({ location, count, type, normalized, this->stride });
-	this->stride += count * sizeof(float);
-}
 
 template <typename T, typename U>
 void VertexBufferComponent::make_vao(const std::vector<T>& vertices, const std::vector<U>& indices) {
@@ -162,7 +160,10 @@ void VertexBufferComponent::make_vao(const std::vector<T>& vertices, const std::
 
 	// If T is a Vertex (3D shape), add the other attributes
 	if constexpr (std::is_base_of_v<Vertex, T>) {
-		this->vbo->link_attrib(1, 2, sizeof(T), offsetof(T, texuv));
+		// Use offset: sizeof(vec3<float>) and not offset method
+		// because T may be child of Vertex
+		// this->vbo->link_attrib(1, 2, sizeof(T), offsetof(T, texuv));
+		this->vbo->link_attrib(1, 2, sizeof(T), sizeof(vec3<float>));
 
 		for(const auto& attrib : this->attributes) {
 			this->vbo->link_attrib(attrib.location, attrib.component_count,

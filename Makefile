@@ -1,10 +1,7 @@
 CXX = clang++
 CXXFLAGS = -std=c++20 -O3 \
 		   -I./include \
-		   -I./include/external \
-		   -I./include/external/SDL2 \
-		   -I./include/external/SDL_mixer \
-# -I./include/external/SDL2 -> SDL_mixer
+		   -I./include/external
 
 # Default to 'static' if not specified
 LIBRARY_TYPE ?= static

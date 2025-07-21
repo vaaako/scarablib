@@ -1,8 +1,6 @@
 # Scarablib
 Scarablib 🪲 is a C++ library designed to simplify graphical development, offering tools for both 2D and 3D rendering. While still in its early stages, Scarablib is being developed as a hobby project. You can track its progress in the [`todo.md`](doc/todo.md) file.
 
-<!-- See [examples/](examples/) to check some features (**note:** not all features have examples yet) -->
-
 ![showcase](medias/showcase.gif)
 
 # Features
@@ -12,7 +10,8 @@ Scarablib 🪲 is a C++ library designed to simplify graphical development, offe
 - **Abstraction:** Simplifies complex graphical operations
 - **2D and 3D development:** Easy-to-use tools for both 2D and 3D rendering
 - **Beginner-Friendly API:** Designed with simplicity in mind, it is easy to learn for new developers while remaining powerful enough for advanced users
-- **Extensible Architecture:** Built to support future enhancements, ensuring scalability for any project type
+- **Uniform Grid:** Built-in spatial partitioning system for collision detection
+- **Simplified VAO creation:** Dynamic methods for creating Vertex Array Objects with minimal boilerplate
 
 # Libraries used
 - [`SDL2`](https://www.libsdl.org/) for window management
@@ -26,6 +25,7 @@ Scarablib 🪲 is a C++ library designed to simplify graphical development, offe
 >You can find the licenses for these libraries in the [`licenses/`](licenses/) directory
 
 # Roadmap
+- **Physics and collisions:** In progress
 - **Light:** Implementation of light sources
 - **Networking:** Adding network support for multiplayer or distributed applications
 
@@ -53,6 +53,7 @@ int main() {
 	Cube* cube = scene3d.add<Cube>("cube");
 	cube->set_position({ 0.0f, 0.0f, -5.0f });
 	cube->set_color(Colors::MAGENTA);
+	cube->material.texture = new Texture("textures/cube.png");
 
 	// Used to rotate the cube
 	float angle = 0.0f;
@@ -71,8 +72,8 @@ int main() {
 		// Change cube's angle
 		//                angle    axis (x, y, z)
 		cube->set_rotation(angle, { true, true, false });
-		// Draw single model
-		scene.draw(*cube);
+		// Draw all models added to the scene with batch drawing
+		scene.draw_all();
 
 		// Change cube's angle
 		angle += 1.0f;

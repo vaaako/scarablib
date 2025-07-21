@@ -17,10 +17,10 @@ add_executable(${PROJECT_NAME} ${SOURCES} test/main.cpp)
 
 
 # Mark as private to avoid warnings
-target_include_directories(scarablib_dev
+target_include_directories(${PROJECT_NAME}
 	PRIVATE
 		include
-	SYSTEM PRIVATE
+	SYSTEM PUBLIC
 		include/external
 		include/external/GL
 		include/external/SDL2
@@ -28,7 +28,6 @@ target_include_directories(scarablib_dev
 		include/external/glm
 		include/external/stb
 		include/external/tinyobjloader
-
 )
 
 # O0 for debug and fast compiling

@@ -54,7 +54,7 @@ Skybox::Skybox(const Camera& camera, const std::array<const char*, 6>& faces)
 		}
 
 		// Order: Right > Left > Top > Bottom > Back > Front
-		const GLenum format = Texture::extract_format(*image, false);
+		const GLenum format = Texture::extract_format((uint32)image->nr_channels, false);
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
 				0, static_cast<GLint>(format), image->width, image->height, 0, format, GL_UNSIGNED_BYTE, image->data);
 

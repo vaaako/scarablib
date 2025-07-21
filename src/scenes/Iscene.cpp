@@ -69,8 +69,16 @@ void IScene::draw_all() const noexcept {
 				cur_shader = model_shader;
 			}
 
+			// TODO: What to do if i have texture and texture array
+
+
+			// Use texture array if it exists
+			if(model->material.texture_array != nullptr) {
+				model->material.texture_array->bind();
+			}
+
 			// Change texture if it's different from the currently bound one
-			if(model->material.texture->get_id() != cur_texture->get_id()) {
+			else if(model->material.texture->get_id() != cur_texture->get_id()) {
 				cur_texture->unbind();
 				cur_texture = model->material.texture;
 				cur_texture->bind();

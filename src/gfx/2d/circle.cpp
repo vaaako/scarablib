@@ -8,7 +8,9 @@ void Circle::draw_logic(const Camera& camera, const Shader& shader) noexcept {
 	this->update_model_matrix();
 
 	shader.set_matrix4f("mvp", (camera.get_proj_matrix() * camera.get_view_matrix()) * this->model);
+
 	shader.set_color("shapeColor", this->material.color);
+	shader.set_int("texid", (int)this->material.texture_index);
 
 	shader.set_float("blur", this->blur);
 

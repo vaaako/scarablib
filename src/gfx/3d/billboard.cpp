@@ -24,7 +24,9 @@ void Billboard::draw_logic(const Camera& camera, const Shader& shader) noexcept 
 
 	shader.set_matrix4f("proj", camera.get_proj_matrix());
 	shader.set_matrix4f("view", camera.get_view_matrix());
+
 	shader.set_color("shapeColor", this->material.color);
+	shader.set_int("texid", (int)this->material.texture_index);
 
 	// Billboard stuff
 	shader.set_vector3f("billboardPos", this->position);

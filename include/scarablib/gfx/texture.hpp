@@ -1,96 +1,29 @@
 #pragma once
 
-#include "scarablib/typedef.hpp"
-#include "scarablib/gfx/image.hpp"
-#include <SDL2/SDL_surface.h>
-#include <GL/glew.h>
+#include "scarablib/gfx/texturebase.hpp"
 #include <memory>
 
-// Size needs to be multiple of 2
-// 16x16, 32x32, 64x64, 128x128, 256x256 etc
-
-
-// Texture object used for shapes (2D and 3D).
-// It will allocate ~1mb of RAM for each loaded texture
-class Texture {
+// Texture object used for shapes (2D and 3D)
+class Texture : public TextureBase {
 	public:
-		// Texture filtering type
-		enum class Filter : uint32 {
-			NEAREST =  GL_NEAREST,
-			LINEAR = GL_LINEAR
-		};
-
-		// Texture wrapping type
-		enum class Wrap : uint32 {
-			REPEAT = GL_REPEAT,
-			MIRRORED = GL_MIRRORED_REPEAT,
-			CLAMP_TO_EDGE = GL_CLAMP_TO_EDGE,
-		};
-
-		// This will make an empty solid white texture.
+		// Create a solid white texture
 		Texture() noexcept;
 
-		// Constructor to create a texture from a file path with NEAREST filtering and REPEAT wrapping.
-		// `wrap`: Wrap type. Optional. Default: Texture::Wrap::REPEAT.
+		// Create a texture from an image file.
 		// You can also flip the texture vertically or horizontally
 		Texture(const char* path, const bool flip_vertically = false, const bool flip_horizontally = false);
 
-		// Uses pre-defined data to make a texture.
-		Texture(const void* data, const uint32 width, const uint32 height, const GLint internal_format, const GLenum format);
+		// Uses pre-defined data to make a texture
+		Texture(const uint8* data, const uint32 width, const uint32 height, const uint32 channels);
 
-		~Texture() noexcept;
-
-
-		// Returns the id of the texture
-		inline uint32 get_id() const noexcept {
-			return this->id;
-		}
-		
-		// Returns the internal format of the texture
-		// inline GLenum get_type() const noexcept {
-		// 	return GL_TEXTURE_2D;
-		// }
-
-		// Returns the width of the texture
-		inline uint32 get_width() const noexcept {
-			return this->width;
-		}
-
-		// Returns the height of the texture
-		inline uint32 get_height() const noexcept {
-			return this->height;
-		}
-
-		// Bind the texture for use in rendering
-		inline void bind() const noexcept {
-			glBindTexture(GL_TEXTURE_2D, this->id);
-		}
-
-		// Unbind the texture to stop using it in rendering
-		inline void unbind() const noexcept {
-			glBindTexture(GL_TEXTURE_2D, 0);
-		}
-
-		// Change the filtering mode
-		void set_filter(const Texture::Filter filter) const noexcept;
-
-		// Change the wrapping mode
-		void set_wrap(const Texture::Wrap wrap) const noexcept;
+		~Texture() noexcept = default;
 
 		// Returns a default solid white texture
 		static std::shared_ptr<Texture> default_texture() noexcept {
 			// I don't like data being statically allocated this way
+			// Cant put inside IScene because MaterialComponent also uses this and
+			// not always batch drawing is used
 			static std::shared_ptr<Texture> def_tex = std::make_shared<Texture>();
 			return def_tex;
 		}
-
-		// Extracts which color format a image has.
-		// If `internal` is true, returns enum for internal format
-		static GLuint extract_format(const Image& image, const bool internal);
-
-	private:
-		uint32 id;
-		uint32 width;
-		uint32 height;
-
 };

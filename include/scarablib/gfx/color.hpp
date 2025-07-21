@@ -79,10 +79,10 @@ struct Color {
 	// Normalize color values
 	inline const vec4<float> normalize() const noexcept {
 		return {
-			this->red   / 255,
-			this->green / 255,
-			this->blue  / 255,
-			this->alpha / 255
+			this->red   / 255.0f,
+			this->green / 255.0f,
+			this->blue  / 255.0f,
+			this->alpha / 255.0f
 		};
 	}
 

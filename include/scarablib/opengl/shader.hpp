@@ -37,38 +37,38 @@ struct Shader {
 
 		// UNIFORMS //
 
-		// Sets value of a mat4f uniform and sends it to the shader
+		// Sends a mat4f oto the shader
 		inline void set_matrix4f(const char* unif, const glm::mat4& mat, const uint32 index = 1) const noexcept {
 			glUniformMatrix4fv(glGetUniformLocation(this->id, unif), static_cast<GLsizei>(index), GL_FALSE, glm::value_ptr(mat));
 		}
 
-		// Sets value of a ivec uniform and sends it to the shader
+		// Sends a vector of ints to the shader
 		inline void set_ivec(const char* unif, const std::vector<int>& vec, const uint32 index = 1) const noexcept {
 			glUniform1iv(glGetUniformLocation(this->id, unif), static_cast<GLsizei>(index), &vec[0]);
 		}
 
-		// Converts the color struct to a vec4f and sends it to the shader
+		// Sends color type as vec4f to the shader
 		inline void set_color(const char* unif, const Color& color) const noexcept {
 			glUniform4f(glGetUniformLocation(this->id, unif), color.red, color.green, color.blue, color.alpha);
 		}
 
-		// Sets value of a vec2f uniform and sends it to the shader
+		// Sends a vec2f uniform to the shader
 		inline void set_vector2f(const char* unif, const vec2<float>& vec) const noexcept {
 			glUniform2f(glGetUniformLocation(this->id, unif), vec.x, vec.y);
 		}
 
-		// Sets value of a vec3f uniform and sends it to the shader
+		// Sends a vec3f uniform to the shader
 		inline void set_vector3f(const char* unif, const vec3<float>& vec) const noexcept {
 			glUniform3f(glGetUniformLocation(this->id, unif), vec.x, vec.y, vec.z);
 		}
 
-		// Sets value of a vec4f uniform and sends it to the shader
+		// Sends a vec4f uniform to the shader
 		inline void set_vector4f(const char* unif, const vec4<float>& vec) const noexcept {
 			glUniform4f(glGetUniformLocation(this->id, unif), vec.x, vec.y, vec.z, vec.w);
 		}
 
-		// Sets value of a int value uniform and sends it to the shader
-		inline void set_int(const char* unif, const GLint val) const noexcept {
+		// Sends a int uniform to the shader
+		inline void set_int(const char* unif, const int val) const noexcept {
 			glUniform1i(glGetUniformLocation(this->id, unif), val);
 		}
 
