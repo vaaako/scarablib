@@ -11,6 +11,10 @@
 // A texture array is a texture that contains multiple images inside
 class TextureArray : public TextureBase {
 	public:
+		// Current texture index being used
+		uint16 texture_index = 0;
+
+		// Config struct used to create multiple textures
 		struct Config {
 			const char* path;
 			bool flip_vertically = false;

@@ -12,7 +12,12 @@ Billboard::Billboard() noexcept
 Billboard::~Billboard() noexcept {
 	// Release physics
 	// Mesh does this, but this is a overrided destructor
-	delete this->physics;
+	if(this->physics) {
+		delete this->physics;
+	}
+	if(this->bbox) {
+		delete this->bbox;
+	}
 
 	// Clear directional textures if any
 	this->clear_textures();
@@ -24,9 +29,6 @@ void Billboard::draw_logic(const Camera& camera, const Shader& shader) noexcept 
 
 	shader.set_matrix4f("proj", camera.get_proj_matrix());
 	shader.set_matrix4f("view", camera.get_view_matrix());
-
-	shader.set_color("shapeColor", this->material.color);
-	shader.set_int("texid", (int)this->material.texture_index);
 
 	// Billboard stuff
 	shader.set_vector3f("billboardPos", this->position);
@@ -111,7 +113,7 @@ void Billboard::update_facing_texture(const vec3<float>& point_pos) noexcept {
 	// Only update the current sector if it has changed
 	if(sector != this->cur_sector) {
 		this->cur_sector = sector;
-		this->material.texture = this->textures[sector];
+		this->material->texture = this->textures[sector];
 	}
 
 	#ifdef SCARAB_DEBUG_BILLBOARD_ANGLE

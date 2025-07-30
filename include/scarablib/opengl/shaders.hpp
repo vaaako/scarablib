@@ -25,7 +25,7 @@ namespace Shaders {
 
 		void main() {
 			gl_Position = mvp * vec4(aPos, 1.0);
-			texuv    = vec2(aTex.xy);
+			texuv       = vec2(aTex.xy);
 		}
 	)glsl";
 
@@ -48,25 +48,22 @@ namespace Shaders {
 		}
 	)glsl";
 
-	// TODO: Add mix with two sampler2DArray sampler
-
 	const char* const DEFAULT_FRAGMENT = R"glsl(
 		#version 330 core
 
 		in vec2  texuv;
 		out vec4 FragColor;
 
-		uniform sampler2DArray texSampler;
-
 		uniform vec4 shapeColor;
-		uniform int texid;
+
+		uniform sampler2D      texSampler;      // Bound to texture unit 0
+		uniform sampler2DArray texSamplerArray; // Bound to texture unit 1
+		uniform int   texlayer;                 // If using texSamplerArray
+		uniform float mixAmount;                // Blend amount (0.0 = only tex2D, 1.0 = only array)
 
 		void main() {
-			vec4 tex = texture(texSampler, vec3(texuv, texid));
-			if(tex.a == 0.0) {
-				discard;
-			}
-			FragColor = tex * (shapeColor.rgba / 255);
+			// mix(texSampler, texSamplerArray, mixAmount) * shapeColor
+			FragColor = mix(texture(texSampler, texuv), texture(texSamplerArray, vec3(texuv, texlayer)), mixAmount) * shapeColor;
 		}
 	)glsl";
 
@@ -83,7 +80,7 @@ namespace Shaders {
 		void main() {
 			texuv = aPos;
 			vec4 pos = proj * view * vec4(aPos, 1.0);
-			// Draw above
+			// Fixed position
 			gl_Position = pos.xyww;
 		}
 	)glsl";
@@ -134,16 +131,20 @@ namespace Shaders {
 		out vec4 FragColor;
 		in vec2 texuv;
 
-		uniform sampler2D texSampler;
 		uniform vec4 shapeColor;
 
 		uniform float blur;
 
-		vec3 circle_area(vec2 uv, vec2 center, float radius, float blur) {
+		uniform sampler2D      texSampler;      // Bound to texture unit 0
+		uniform sampler2DArray texSamplerArray; // Bound to texture unit 1
+		uniform int   texlayer;                 // If using texSamplerArray
+		uniform float mixAmount;                // Blend amount (0.0 = only tex2D, 1.0 = only array)
+
+		vec3 circle_area(vec2 texuv, vec2 center, float radius, float blur) {
 			// Clamp blur to avoid branching
 			blur = clamp(blur, 0.001, 1.0); // value, min, max
 			// Distance to the center of the circle
-			float distance = length(uv - center);
+			float distance = length(texuv - center);
 			// Use smoothstep for smooth edges, radius and blur are now parameters
 			float circle = smoothstep(radius, radius - blur, distance);
 			// Return
@@ -151,13 +152,11 @@ namespace Shaders {
 		}
 
 		void main() {
-			vec4 tex = texture(texSampler, texuv);
-			if(tex.a == 0.0) {
-				discard;
-			}
+			// mix(texSampler, texSamplerArray, mixAmount)
+			vec4 mix = mix(texture(texSampler, texuv), texture(texSamplerArray, vec3(texuv, texlayer)), mixAmount);
 			// Apply circle as a texture
 			// Cut alpha from rectangle to make it circular
-			FragColor = vec4(tex.rgb * (shapeColor.rgb / 255), tex.a * circle_area(texuv, vec2(0.5, 0.5), 0.5, blur).r);
+			FragColor = vec4(mix.rgb * shapeColor.rgb, mix.a * circle_area(texuv, vec2(0.5, 0.5), 0.5, blur).r);
 		}
 	)glsl";
 

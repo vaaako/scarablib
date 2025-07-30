@@ -21,7 +21,7 @@ class TextureBase {
 		};
 
 		// ID may be defined later or pass an existing one
-		TextureBase(const uint16 width, const uint16 height, const uint32 id = 0) noexcept;
+		TextureBase(const GLint texturetype, const uint16 width, const uint16 height, const uint32 id = 0) noexcept;
 		~TextureBase() noexcept;
 
 		// Returns the id of the texture
@@ -42,12 +42,12 @@ class TextureBase {
 		// Bind the texture for use in rendering
 		inline void bind(const uint8 unit = 0) const noexcept {
 			glActiveTexture(GL_TEXTURE0 + std::clamp((int)unit, 0, 31));
-			glBindTexture(GL_TEXTURE_2D_ARRAY, this->id);
+			glBindTexture(this->texturetype, this->id);
 		}
 
 		// Unbind the texture to stop using it in rendering
 		inline void unbind() const noexcept {
-			glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+			glBindTexture(this->texturetype, 0);
 		}
 
 		// Changes the filtering mode
@@ -60,8 +60,18 @@ class TextureBase {
 		// If `internal` is true, returns enum for internal format
 		// Returns 0 if invalid format.
 		static uint32 extract_format(const uint8 num_channels, const bool internal);
+
+		inline constexpr bool operator==(const TextureBase& other) const noexcept {
+			return this->id == other.id;
+		}
+
+		inline constexpr bool operator!=(const TextureBase& other) const noexcept {
+			return this->id == other.id;
+		}
 	protected:
 		uint32 id;
 		uint16 width;
 		uint16 height;
+	private:
+		GLint texturetype;
 };

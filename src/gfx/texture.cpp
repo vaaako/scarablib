@@ -5,21 +5,20 @@
 #include "scarablib/typedef.hpp"
 #include <SDL2/SDL_render.h>
 
-Texture::Texture() noexcept : TextureBase(1, 1) {
+Texture::Texture() noexcept : TextureBase(GL_TEXTURE_2D, 1, 1) {
 	glGenTextures(1, &this->id);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, this->id);
+	glBindTexture(GL_TEXTURE_2D, this->id);
 	// For a default white texture, swizzling can ensure it returns a solid color without uploading actual data
 	GLint swizzle_mask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ONE };
-	glTexParameteriv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_RGBA, swizzle_mask);
+	glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzle_mask);
 	const uint8 data[4] = { 255, 255, 255, 255 };
-	glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, 1, 1, 1);
-	glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, 1, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, data);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 Texture::Texture(const char* path, const bool flip_horizontally, const bool flip_vertically)
 	// Placeholder for width and height
-	: TextureBase(1, 1) {
+	: TextureBase(GL_TEXTURE_2D, 1, 1) {
 
 	Image* image = new Image(path, flip_horizontally, flip_vertically);
 	if(image->data == nullptr) {
@@ -32,25 +31,14 @@ Texture::Texture(const char* path, const bool flip_horizontally, const bool flip
 
 	// Generate and bind texture
 	glGenTextures(1, &this->id);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, this->id);
+	glBindTexture(GL_TEXTURE_2D, this->id);
 
 	// Allocate data
-	glTexStorage3D(
-		GL_TEXTURE_2D_ARRAY,
-		1, // Mipmap level
-		Texture::extract_format(image->nr_channels, true),
-		image->width, image->height,
-		1  // num textures
-	);
-
-	// Upload texture
-	glTexSubImage3D(
-		GL_TEXTURE_2D_ARRAY,
-		0,       // Mipmap level
-		0, 0, 0, // x, y, layer (z)
-		image->width, image->height,
-		1,       // Depth
-		Texture::extract_format(image->nr_channels, false),
+	glTexImage2D(
+		GL_TEXTURE_2D, 0,
+		TextureBase::extract_format(image->nr_channels, true),
+		image->width, image->height, 0,
+		TextureBase::extract_format(image->nr_channels, false),
 		GL_UNSIGNED_BYTE,
 		image->data
 	);
@@ -68,7 +56,7 @@ Texture::Texture(const char* path, const bool flip_horizontally, const bool flip
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 	// Generate mipmap and unbind
-	glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
+	glGenerateMipmap(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	#ifdef SCARAB_DEBUG_TEXTURE
@@ -76,8 +64,8 @@ Texture::Texture(const char* path, const bool flip_horizontally, const bool flip
 	#endif
 }
 
-Texture::Texture(const uint8* data, const uint32 width, const uint32 height, const uint32 channels)
-	: TextureBase(width, height) {
+Texture::Texture(const uint8* data, const uint32 width, const uint32 height, const uint32 channels, const uint32 internal_channels)
+	: TextureBase(GL_TEXTURE_2D, width, height) {
 
 	if(data == nullptr) {
 		throw ScarabError("Data for texture is null");
@@ -85,25 +73,14 @@ Texture::Texture(const uint8* data, const uint32 width, const uint32 height, con
 
 	// Generate and bind texture
 	glGenTextures(1, &this->id);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, this->id);
+	glBindTexture(GL_TEXTURE_2D, this->id);
 
 	// Allocate data
-	glTexStorage3D(
-		GL_TEXTURE_2D_ARRAY,
-		1, // Mipmap level
-		TextureBase::extract_format(channels, true),
-		width, height,
-		1  // num textures
-	);
-
-	// Upload texture
-	glTexSubImage3D(
-		GL_TEXTURE_2D_ARRAY,
-		0,       // Mipmap level
-		0, 0, 0, // x, y, layer (z)
-		width, height,
-		1,       // Depth
-		TextureBase::extract_format(channels, false),
+	glTexImage2D(
+		GL_TEXTURE_2D, 0,
+		internal_channels,
+		width, height, 0,
+		channels,
 		GL_UNSIGNED_BYTE,
 		data
 	);
@@ -119,7 +96,7 @@ Texture::Texture(const uint8* data, const uint32 width, const uint32 height, con
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 	// Generate mipmap and unbind
-	glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
+	glGenerateMipmap(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	#ifdef SCARAB_DEBUG_TEXTURE

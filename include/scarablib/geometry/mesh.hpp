@@ -1,6 +1,7 @@
 #pragma once
 
 #include <GL/glew.h>
+#include <memory>
 #include "scarablib/components/boundingbox.hpp"
 #include "scarablib/components/materialcomponent.hpp"
 #include "scarablib/components/physicscomponent.hpp"
@@ -10,8 +11,9 @@
 // Basic data for 3D and 2D shapes
 class Mesh {
 	public:
-		// Color and texture of the mesh
-		MaterialComponent material;
+		// Material of this mesh
+		std::shared_ptr<MaterialComponent> material = std::make_shared<MaterialComponent>();
+		// Since material can be shared i need to be a pointer so a double delete is not done
 
 		// Bundle for VAO, VBO and EBO
 		VertexBufferComponent bundle;

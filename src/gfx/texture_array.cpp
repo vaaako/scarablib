@@ -4,7 +4,7 @@
 #include <algorithm>
 
 TextureArray::TextureArray(const uint16 width, const uint16 height, const uint16 max_textures, const uint8 channels)
-	: TextureBase(width, height), max_textures(max_textures), channels(channels) {
+	: TextureBase(GL_TEXTURE_2D_ARRAY, width, height), max_textures(max_textures), channels(channels) {
 
 	// Set number of textures
 	GLint max_layers;

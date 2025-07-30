@@ -4,6 +4,7 @@
 #include <glm/ext.hpp>
 #include <glm/mat4x4.hpp>
 #include <vector>
+#include "scarablib/proper/log.hpp"
 #include "scarablib/typedef.hpp"
 #include "scarablib/gfx/color.hpp"
 
@@ -49,8 +50,10 @@ struct Shader {
 
 		// Sends color type as vec4f to the shader
 		inline void set_color(const char* unif, const Color& color) const noexcept {
-			glUniform4f(glGetUniformLocation(this->id, unif), color.red, color.green, color.blue, color.alpha);
+			glUniform4f(glGetUniformLocation(this->id, unif), color.red / 255.0f, color.green / 255.0f, color.blue / 255.0f, color.alpha / 255.0f);
 		}
+		// Divide by 255 in CPU is better
+		// If divide here it would be a division per vertex
 
 		// Sends a vec2f uniform to the shader
 		inline void set_vector2f(const char* unif, const vec2<float>& vec) const noexcept {
@@ -73,7 +76,7 @@ struct Shader {
 		}
 
 		// Sets value of a float value uniform and sends it to the shader
-		inline void set_float(const char* unif, const GLfloat val) const noexcept {
+		inline void set_float(const char* unif, const float val) const noexcept {
 			glUniform1f(glGetUniformLocation(this->id, unif), val);
 		}
 	private:

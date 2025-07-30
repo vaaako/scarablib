@@ -32,8 +32,6 @@ void Sprite::update_model_matrix() noexcept {
 void Sprite::draw_logic(const Camera& camera, const Shader& shader) noexcept {
 	this->update_model_matrix();
 
-	// NOTE: is_dirty for color wouldn't work because would set this color to the next meshes
-	shader.set_color("shapeColor", this->material.color);
 	shader.set_matrix4f("mvp", (camera.get_proj_matrix() * camera.get_view_matrix()) * this->model);
 
 	// Not indices btw

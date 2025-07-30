@@ -39,7 +39,18 @@ class IScene {
 		// If the model was added to the scene, it will be drawn twice
 		void draw(Mesh& model) const noexcept;
 
-		// Draw all objects added to the scene
+		// Draw all objects added to the scene.
+		// This effectively calls Model::draw() for each object.
+		// Beware that this method, for efficienty reasons, pass value to the following uniforms:
+		// shapeColor, texSampler, texSamplerArray, texLayer, mixAmount.
+		// - shapeColor: Only changed when a model has a different color
+		// - texSampler: Bound to texture unit 0
+		// - texSamplerArray: Bound to texture unit 1
+		// - texLayer: The layer to use of the texture array. Only if Model::MaterialComponent::TextureArray is not null
+		// - mixAmount: Blend amount of texture and texture array. Only if Model::MaterialComponent::TextureArray is not null
+		//
+		// You can personalize all of this inside your model's draw method. Since Model::draw() is called after uniform changes.
+		// Just overwrite what you want
 		void draw_all() const noexcept;
 
 		// Update viewport using window object
@@ -129,7 +140,7 @@ T* IScene::add(const std::string& key, Args&&... args) {
 			// Secondary sort key: texture pointer
 			// Only checked if the shaders are the same
 			// Texture will never be nullptr in this case becaue is a TextureHandle
-			return a->material.texture->get_id() < b->material.texture->get_id();
+			return a->material->texture->get_id() < b->material->texture->get_id();
 	});
 
 	// Insert the model in the correct place

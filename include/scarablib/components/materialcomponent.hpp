@@ -3,23 +3,24 @@
 #include "scarablib/gfx/color.hpp"
 #include "scarablib/gfx/texture.hpp"
 #include "scarablib/gfx/texture_array.hpp"
-#include "scarablib/typedef.hpp"
 #include <cstddef>
 #include <memory>
 
+
 struct MaterialComponent {
+	// Handles when user tries to set material.texture to nullptr.
+	// Setting it to the default solid white texture instead.
+	// Since 99% of the time the shader will use a texture anyway.
+	// so having this system and not a "uniform check" (check for u_hasTexture) makes sense
+	//
+	// Has so for texture array where the use is not gauranteed, makes sense.
+	// not to have the same system for texture arrays
 	struct TextureHandle {
 		std::shared_ptr<Texture> ptr; // In this case is better to use a shared_ptr
 
 		public:
 			// Default texture
 			TextureHandle() noexcept;
-			// From rvalue texture
-			// explicit TextureHandle(Texture* texture) noexcept
-			// 	: ptr(texture ? std::shared_ptr<Texture>(texture) : Texture::default_texture()) {}
-			// // From lvalue texture
-			// explicit TextureHandle(const Texture& texture) noexcept
-			// 	: ptr(std::make_shared<Texture>(texture)) {}
 
 			explicit TextureHandle(Texture* texture) noexcept;
 			// From lvalue texture
@@ -57,6 +58,24 @@ struct MaterialComponent {
 				return *this->ptr;
 			}
 
+			// -- OPERATOR == //
+			inline bool operator==(TextureHandle& other) noexcept {
+				return this->ptr->get_id() == other->get_id();
+			}
+
+			inline bool operator!=(TextureHandle& other) noexcept {
+				return this->ptr->get_id() == other->get_id();
+			}
+
+			inline bool operator==(std::nullptr_t) noexcept {
+				return this->ptr->get_id() == Texture::default_texture()->get_id();
+			}
+
+			inline bool operator!=(std::nullptr_t) noexcept {
+				return this->ptr->get_id() != Texture::default_texture()->get_id();
+			}
+			// OPERATOR == -- //
+
 			// Assign nullptr reset to default texture
 			inline TextureHandle& operator=(std::nullptr_t) noexcept {
 				this->ptr = Texture::default_texture();
@@ -82,18 +101,18 @@ struct MaterialComponent {
 			}
 	};
 
-	// Current texture index being used>
-	// This only takes effect if have a texture array
-	uint16 texture_index = 0;
-	// This member is here and not in TextureArray because then i would have
-	// to check if TextureArray is not null in Model, Billboard and Circle
-	// and i dont want to do this
+	// How much of the texture to mix with texture array.
+	// Where 0 is only texture and 1 is only texture array.
+	// Does not take any effect if texture is nullptr
+	float mix_amount = 0.0f;
 
-	// Current color
+	// Material's color
 	Color color = Colors::WHITE;
-	// Current texture being used.
-	TextureHandle texture = nullptr; // Default texture
+	// Material's texture
+	TextureHandle texture = nullptr; // nullptr: Default texture
+	// Material's texture array
 	TextureArray* texture_array = nullptr;
 
+	MaterialComponent() noexcept = default;
 	~MaterialComponent() noexcept;
 };
