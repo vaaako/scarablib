@@ -31,7 +31,7 @@ target_include_directories(${PROJECT_NAME}
 )
 
 # O0 for debug and fast compiling
-target_compile_options(${PROJECT_NAME} PRIVATE -O0 -g -fdiagnostics-color=always -Wextra -Wall -Wuninitialized -Wunreachable-code -Wfloat-equal)
+target_compile_options(${PROJECT_NAME} PRIVATE -O0 -g -fdiagnostics-color=always -Wextra -Wall -Wuninitialized -Wunreachable-code)
 
 if(USE_STATIC_LIBS)
 	link_directories(
