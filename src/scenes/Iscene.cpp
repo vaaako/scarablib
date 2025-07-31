@@ -120,7 +120,6 @@ void IScene::draw_all() const noexcept {
 				// If model->material.texture is nullptr a operator overload will change to the default texture
 				// So i dont have to check if is cur_texture is nullptr or not
 				if(model->material->texture->get_id() != cur_texture->get_id()) {
-					cur_texture->unbind();
 					cur_texture = model->material->texture;
 					cur_texture->bind(0); // Unit 0
 				}
@@ -130,11 +129,10 @@ void IScene::draw_all() const noexcept {
 			if(hastexarray) {
 				// Bind first time or change texture array
 				if(cur_texarray == nullptr || model->material->texture_array->get_id() != cur_texarray->get_id()) {
-					// cur_texarray->unbind();
 					cur_texarray = model->material->texture_array;
 					cur_texarray->bind(1); // Unit 1
 				}
-				// LOG_DEBUG("Texture index: %d", model->material->texture_array->texture_index);
+				// This correctly changes billboard texture
 				cur_shader->set_int("texlayer", model->material->texture_array->texture_index);
 			}
 

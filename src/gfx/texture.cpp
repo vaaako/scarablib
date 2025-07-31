@@ -11,8 +11,7 @@ Texture::Texture() noexcept : TextureBase(GL_TEXTURE_2D, 1, 1) {
 	// For a default white texture, swizzling can ensure it returns a solid color without uploading actual data
 	GLint swizzle_mask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ONE };
 	glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzle_mask);
-	const uint8 data[4] = { 255, 255, 255, 255 };
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, 1, 1); // Allocate without data
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 

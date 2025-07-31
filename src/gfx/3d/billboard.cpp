@@ -23,8 +23,6 @@ void Billboard::draw_logic(const Camera& camera, const Shader& shader) noexcept 
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, (void*)0);
 }
 
-#define SCARAB_DEBUG_BILLBOARD_TEXTURE
-
 void Billboard::set_directional_textures(const std::vector<const char*> paths, const uint32 flip) {
 	if(paths.size() < 4 || paths.size() > 8) {
 		throw ScarabError("Minimum of 4 and maximum of 8 images are supported");
@@ -58,17 +56,7 @@ void Billboard::set_directional_textures(const std::vector<const char*> paths, c
 		}
 	}
 
-	// Check if its all correct
-	// for(size_t i = 0; i < this->textures.size(); i++) {
-	// 	if(this->textures[i] == nullptr) {
-	// 		throw ScarabError(
-	// 			"Texture configuration error: Missing texture at index %zu. "
-	// 			"The final texture count must be %u. Check flip configuration.",
-	// 			i, final_size
-	// 		);
-	// 	}
-	// }
-
+	// Check if matches
 	if(this->material->texture_array->get_num_textures() != final_size) {
 		throw ScarabError(
 			"Texture configuration error: The final texture count must be %u. Check flip configuration.",

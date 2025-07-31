@@ -64,8 +64,9 @@ namespace Shaders {
 		void main() {
 			// mix(texSampler, texSamplerArray, mixAmount) * shapeColor
 			vec4 mix = mix(texture(texSampler, texuv), texture(texSamplerArray, vec3(texuv, texlayer)), mixAmount) * shapeColor;
-			// FragColor = mix(texture(texSampler, texuv), texture(texSamplerArray, vec3(texuv, texlayer)), mixAmount) * shapeColor;
-			// FragColor = vec4(vec3(mix.a), 1.0);
+			if(mix.a == 0.0) {
+				discard;
+			}
 			FragColor = mix;
 		}
 	)glsl";
