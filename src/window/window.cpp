@@ -76,8 +76,8 @@ Window::Window(const Window::Config& config)
 	// Configure OpenGL
 	glViewport(0, 0, (GLsizei)config.width, (GLsizei)config.height);
 	// Blending
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	// Depth
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL); // 2D and Skybox support with depth test

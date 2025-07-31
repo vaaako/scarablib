@@ -3,7 +3,7 @@
 #include <SDL2/SDL_pixels.h>
 #include "scarablib/typedef.hpp"
 
-enum class Colors : uint {
+enum class Colors : uint32 {
 	WHITE    = 0xffffff,
 	BLACK    = 0x000000,
 	ALMOSTBLACK = 0x222222,

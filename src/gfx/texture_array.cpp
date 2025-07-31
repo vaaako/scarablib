@@ -31,10 +31,14 @@ TextureArray::TextureArray(const uint16 width, const uint16 height, const uint16
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
 }
 
-uint16 TextureArray::add_texture(const char* path, const bool flip_vertically, const bool flip_horizontally) {
+uint16 TextureArray::add_texture(const char* path, const bool flip_vertically, const bool flip_horizontally, const int layer) {
 	// Check if limit has been reached
 	if(this->num_textures >= this->max_textures) {
-		throw ScarabError("Texture array limit (%i) has been reached!", this->num_textures);
+		throw ScarabError("Texture array limit (%i) has been reached!", this->max_textures);
+	}
+
+	if(layer >= (int)this->max_textures) {
+		throw ScarabError("Desired layer (%i) is higher than the limit (%i)", layer, this->max_textures);
 	}
 
 	if(path == nullptr) {
@@ -62,7 +66,7 @@ uint16 TextureArray::add_texture(const char* path, const bool flip_vertically, c
 	glTexSubImage3D(
 		GL_TEXTURE_2D_ARRAY,
 		0, // Mipmap level
-		0, 0, this->num_textures, // x, y, layer (z)
+		0, 0, (layer < 0) ? this->next_texture : layer, // x, y, layer (z)
 		this->width, this->height,
 		1, // Depth
 		TextureBase::extract_format(image->nr_channels, false),
@@ -71,6 +75,11 @@ uint16 TextureArray::add_texture(const char* path, const bool flip_vertically, c
 	);
 	delete image;
 	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+
+	// Only increment next texture if adding to the end
+	if(layer < 0) {
+		this->next_texture++;
+	}
 
 	uint16 index = this->num_textures++; // Increment index
 	return index;

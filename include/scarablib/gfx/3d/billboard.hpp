@@ -36,10 +36,10 @@ struct Billboard : public Model {
 	Billboard::Direction direction = Billboard::Direction::EAST;
 
 	Billboard() noexcept;
-	// This is overrided because if not, it wouldn't be possible to clean the textures
-	~Billboard() noexcept override;
 
 	// Sets up directional billboard textures that automatically change based on the camera's angle.
+	// This uses a texture array, so all textures must have the same size.
+	// Size and number of channels will be based on the first texture provided.
 	// Parameters:
 	// - `paths`: A list of 4 or 8 texture file paths. These represent the visual appearance from different viewing angles.
 	// - `flip`: A bitmask indicating which textures should be mirrored horizontally.
@@ -84,11 +84,11 @@ struct Billboard : public Model {
 		static constexpr float M_PI2 = M_PIf * 2.0f;
 
 		// Directional textures
-		std::vector<std::shared_ptr<Texture>> textures;
+		// TextureArray* textures = nullptr;
 		// Precalculated number of textures (either 4 or 8)
-		size_t num_sectors = 0;
+		// size_t num_sectors = 0;
 		// Used to check if texture must change
-		uint32 cur_sector = 9; // Unbounded value to change the first time
+		// uint32 cur_sector = 9; // Unbounded value to change the first time
 		// Pre calculated angle steps between directions
 		float angle_step = 0; // Using radians in this case is more accurate
 
@@ -100,5 +100,4 @@ struct Billboard : public Model {
 		);
 
 		void draw_logic(const Camera& camera, const Shader& shader) noexcept override;
-		void clear_textures() noexcept;
 };

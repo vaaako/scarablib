@@ -1,27 +1,12 @@
 #include "scarablib/gfx/3d/billboard.hpp"
 #include "scarablib/geometry/geometry_factory.hpp"
 #include "scarablib/geometry/model.hpp"
+#include "scarablib/gfx/image.hpp"
 #include <cstddef>
 #include <cstdlib>
 
 Billboard::Billboard() noexcept
 	: Model(GeometryFactory::make_plane_vertices(), std::vector<uint8> { 0, 1, 2, 0, 2, 3 }) {}
-
-// Overrided from Mesh, so is needed to release the vao_mesh
-// This is overrided because if not, it wouldn't be possible to clean the textures
-Billboard::~Billboard() noexcept {
-	// Release physics
-	// Mesh does this, but this is a overrided destructor
-	if(this->physics) {
-		delete this->physics;
-	}
-	if(this->bbox) {
-		delete this->bbox;
-	}
-
-	// Clear directional textures if any
-	this->clear_textures();
-}
 
 
 void Billboard::draw_logic(const Camera& camera, const Shader& shader) noexcept {
@@ -38,6 +23,7 @@ void Billboard::draw_logic(const Camera& camera, const Shader& shader) noexcept 
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, (void*)0);
 }
 
+#define SCARAB_DEBUG_BILLBOARD_TEXTURE
 
 void Billboard::set_directional_textures(const std::vector<const char*> paths, const uint32 flip) {
 	if(paths.size() < 4 || paths.size() > 8) {
@@ -46,44 +32,58 @@ void Billboard::set_directional_textures(const std::vector<const char*> paths, c
 
 	const uint8 final_size = (paths.size() <= 4) ? 4 : 8;
 
-	this->clear_textures(); // This method can be called multiple times
-
-	// Resize and init values with nullptr so i can check if a index has a texture already
-	this->textures.resize(final_size, nullptr);
+	// Load image to get dimensions and channels
+	Image* image = new Image(paths[0], false);
+	this->material->texture_array = new TextureArray(image->width, image->height, final_size, image->nr_channels);
+	delete image;
 
 	for(size_t i = 0; i < paths.size(); i++) {
 		// Add base texture
-		this->textures[i] = std::make_shared<Texture>(paths[i], false);
+		this->material->texture_array->add_texture(paths[i], false);
+
+		#ifdef SCARAB_DEBUG_BILLBOARD_TEXTURE
+		LOG_DEBUG("Setting texture %zu to %s", i, paths[i]);
+		#endif
 
 		// Check if should be flipped
 		if(flip & (1 << i)) {
-			const size_t opposite_index = final_size - i;
+			const size_t opposite_index = (final_size - i) % final_size;
 
 			#ifdef SCARAB_DEBUG_BILLBOARD_TEXTURE
 			LOG_DEBUG("Flipping %zu and placing at %zu", i, opposite_index);
 			#endif
 
-			this->textures[opposite_index] = std::make_shared<Texture>(paths[i], true);
+			// this->textures[opposite_index] = std::make_shared<Texture>(paths[i], true);
+			this->material->texture_array->add_texture(paths[i], true, false, opposite_index);
 		}
 	}
 
 	// Check if its all correct
-	for(size_t i = 0; i < this->textures.size(); i++) {
-		if(this->textures[i] == nullptr) {
-			throw ScarabError(
-				"Texture configuration error: Missing texture at index %zu. "
-				"The final texture count must be %u. Check flip configuration.",
-				i, final_size
-			);
-		}
+	// for(size_t i = 0; i < this->textures.size(); i++) {
+	// 	if(this->textures[i] == nullptr) {
+	// 		throw ScarabError(
+	// 			"Texture configuration error: Missing texture at index %zu. "
+	// 			"The final texture count must be %u. Check flip configuration.",
+	// 			i, final_size
+	// 		);
+	// 	}
+	// }
+
+	if(this->material->texture_array->get_num_textures() != final_size) {
+		throw ScarabError(
+			"Texture configuration error: The final texture count must be %u. Check flip configuration.",
+			final_size
+		);
 	}
 
-	this->num_sectors = this->textures.size();
-	this->angle_step = M_PI2 / (float)this->num_sectors;
+	this->material->texture_array->generate_mipmap();
+
+	// this->num_sectors = this->textures.size();
+	this->angle_step = M_PI2 / (float)this->material->texture_array->get_num_textures();
 }
 
 void Billboard::update_facing_texture(const vec3<float>& point_pos) noexcept {
-	if(this->textures.empty()) {
+	if(this->material->texture_array == nullptr) {
 		return;
 	}
 
@@ -111,9 +111,9 @@ void Billboard::update_facing_texture(const vec3<float>& point_pos) noexcept {
 	const uint32 sector = static_cast<uint32>(centered_angle / this->angle_step);
 
 	// Only update the current sector if it has changed
-	if(sector != this->cur_sector) {
-		this->cur_sector = sector;
-		this->material->texture = this->textures[sector];
+	if(sector != this->material->texture_array->texture_index) {
+		// this->cur_sector = sector;
+		this->material->texture_array->texture_index = sector;
 	}
 
 	#ifdef SCARAB_DEBUG_BILLBOARD_ANGLE
@@ -121,9 +121,3 @@ void Billboard::update_facing_texture(const vec3<float>& point_pos) noexcept {
 	#endif
 }
 
-
-
-void Billboard::clear_textures() noexcept {
-	this->textures.clear();
-	this->textures.shrink_to_fit(); // Actually releases the allocated memory
-}

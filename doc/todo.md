@@ -59,14 +59,10 @@ Stuff that are in progress and i need to finish
 - [ ] make transparency work without `if(tex.a == 0.0)`?
 - [ ] Discord RPC support?
 
-- [ ] Putt built in not related engine classes in a `builtin` folder?
-	+ UniformGrid
-	+ Raycast
-	+ TerrainMap
-	+ etc
-
 - [ ] Revise ShaderManager
 	+ I dont know if its fully optimized and working properly
+
+- [ ] Prioritize Material when organizing models to batch draw
 
 # TODO Quick Fixes
 - [x] Better texture constructor
@@ -86,6 +82,7 @@ Stuff that are in progress and i need to finish
 - [x] Memory leak somewhere (i don't know if is in my code or in some library, but is not dangerous)
 	+ It appears to be related to SDL2 and its dependencies (X11, PulseAudio, etc.) 
 - [X] Fix FPS drop when movement is enabled
+- [x] TextureArray when setting a layer it increments even if texture in that layer exist already
 - [ ] Circle alpha may not be working
 
 # TODO Window

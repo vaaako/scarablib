@@ -34,7 +34,7 @@ class TextureArray : public TextureBase {
 
 		// Add a new texture to the texture array and returns its index.
 		// The texture must have the same width and height as the others
-		uint16 add_texture(const char* path, const bool flip_vertically = false, const bool flip_horizontally = false);
+		uint16 add_texture(const char* path, const bool flip_vertically = false, const bool flip_horizontally = false, const int layer = -1);
 
 		// Add new textures to the texture array and returns index of added texture.
 		// All the textures must have the same width and height
@@ -60,6 +60,7 @@ class TextureArray : public TextureBase {
 
 	private:
 		uint16 num_textures = 0; // Current number of textures
+		uint16 next_texture = 0; // Next texture to add
 		uint16 max_textures;     // Limit of textures
 		uint8 channels;          // Desired number of channels
 };
