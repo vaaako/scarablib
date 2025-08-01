@@ -94,5 +94,8 @@ Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<T>& indices) n
 
 template <typename T>
 void Mesh::set_geometry(const std::vector<Vertex>& vertices, const std::vector<T>& indices) {
+	// add texuv attribute
+	this->bundle.add_attribute(2, GL_FLOAT, false);
+	// make vao
 	this->bundle.make_vao(vertices, indices);
 }

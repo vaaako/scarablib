@@ -20,12 +20,19 @@ void VBO::alloc_data(const std::vector<float>& data, const GLenum usage) const n
 	glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(data.size() * sizeof(float)), data.data(), usage);
 }
 
-
 void VBO::link_attrib(const uint32 index, const uint32 count, const uint32 total_byte_size,
 		const uint32 offset, const GLenum type, const bool normalized) const noexcept {
-
 	glVertexAttribPointer(index, static_cast<GLint>(count), type, normalized,
-			static_cast<GLsizei>(total_byte_size), (void*)offset);
+			static_cast<GLsizei>(total_byte_size), reinterpret_cast<void*>(offset));
 	glEnableVertexAttribArray(index);
 }
+
+/*
+
+BIND
+ALLOC DATA <- (first being used)
+LINK ATTR  <- (all that needs)
+UNBIND
+
+*/
 

@@ -125,7 +125,7 @@ namespace Shaders {
 			vec3 billboardedPos = billboardPos + (aPos.x * right * billboardSize + aPos.y * up * billboardSize);
 
 			gl_Position = proj * view * vec4(billboardedPos, 1.0);
-			texuv    = aTex;
+			texuv       = vec2(aTex.xy);
 		}
 	)glsl";
 

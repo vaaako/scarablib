@@ -64,6 +64,10 @@ Stuff that are in progress and i need to finish
 
 - [ ] Prioritize Material when organizing models to batch draw
 
+- [ ] When making a new vao, make indices vector not required
+	+ it isnt technically because it checks if indices are empty
+	+ but an empty vector is created to use this method
+
 # TODO Quick Fixes
 - [x] Better texture constructor
 	+ Use bitwise paramters

@@ -67,8 +67,8 @@ std::pair<std::vector<Vertex>, std::vector<uint8>> GeometryFactory::make_cube_fa
 		const uint32 start_index = v * 4; // Vertices per face
 
 		final_vertices.insert(
-			final_vertices.end(), // Insert at the end
-			vertices.begin() + start_index, // Start copying from here
+			final_vertices.end(),              // Insert at the end
+			vertices.begin() + start_index,    // Start copying from here
 			vertices.begin() + start_index + 4 // Stop copying here
 		);
 

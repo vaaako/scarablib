@@ -7,9 +7,6 @@
 #include "scarablib/proper/error.hpp"
 #include "scarablib/typedef.hpp"
 
-// TODO: In future texuv will not be always presented
-// For invisible objects
-
 // A class that bundles the VAO, VBO and EBO buffers.
 // Also stores information necessary for rendering like indices size and indices type.
 // With utilitary methods for creating the Vertex Buffer
@@ -45,7 +42,7 @@ class VertexBufferComponent {
 		}
 
 		// Configurates additional attributes for data.
-		// This will only be used if data is a vector of Vertex.
+		// This will only be used if data is a vector of Vertex (or child of).
 		// - `count`: The number of components per attribute (e.g., 3 for a vec3, 2 for a vec2).
 		// - `type`: (Default: GL_FLOAT) Type of data (e.g., GL_FLOAT).
 		// - `normalized`: (Default: false) Whether to normalize the data (e.g., true for [-1, 1] to [0, 1])
@@ -57,10 +54,6 @@ class VertexBufferComponent {
 
 	private:
 		struct VertexAttribute {
-			// This is the location in the shader.
-			// 0 for position, 1 for texuv.
-			// This is incremented automatically in add_attribute
-			const uint32 location;
 			// How many components per attribute.
 			// Example: 2 for a vec2
 			const uint32 component_count;
@@ -75,7 +68,7 @@ class VertexBufferComponent {
 
 		std::vector<VertexAttribute> attributes;
 		// Current offset of attributes
-		size_t stride = sizeof(Vertex); // position and texuv are always presented
+		size_t stride = sizeof(vec3<float>); // position is always presented
 		size_t hash;
 		// For rendering
 		// in 2D this is vertices size
@@ -88,7 +81,7 @@ class VertexBufferComponent {
 			// Clear attributes
 			this->attributes.clear();
 			this->attributes.shrink_to_fit(); // Actually releases the allocated memory
-			this->stride = sizeof(Vertex);
+			this->stride = sizeof(vec3<float>);
 		}
 };
 
@@ -158,15 +151,12 @@ void VertexBufferComponent::make_vao(const std::vector<T>& vertices, const std::
 	// Position
 	this->vbo->link_attrib(0, 3, sizeof(T), 0);
 
-	// If T is a Vertex (3D shape), add the other attributes
+	// If T is a Vertex, add the other attributes
 	if constexpr (std::is_base_of_v<Vertex, T>) {
-		// Use offset: sizeof(vec3<float>) and not offset method
-		// because T may be child of Vertex
-		// this->vbo->link_attrib(1, 2, sizeof(T), offsetof(T, texuv));
-		this->vbo->link_attrib(1, 2, sizeof(T), sizeof(vec3<float>));
-
-		for(const auto& attrib : this->attributes) {
-			this->vbo->link_attrib(attrib.location, attrib.component_count,
+		for(size_t i = 0; i < this->attributes.size(); i++) {
+			const VertexAttribute attrib = this->attributes[i];
+			// +1 to jump position which is always added and already added
+			this->vbo->link_attrib(i + 1, attrib.component_count,
 					sizeof(T), attrib.offset, attrib.type, attrib.normalized);
 		}
 	}
