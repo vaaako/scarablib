@@ -72,10 +72,9 @@ void IScene::draw_all() const noexcept {
 	// Track currently bound objects to avoid redundant bindings
 	GLuint cur_vao = 0;
 	Shader* cur_shader = this->shader;
-	MaterialComponent::TextureHandle cur_texture;
+	MaterialComponent::TextureHandle cur_texture = nullptr; // Default texture
 	TextureArray* cur_texarray = nullptr;
 	Color cur_color = Colors::WHITE;
-	// GLenum texture_type = GL_TEXTURE_2D;
 
 	// Bind defaults
 	cur_shader->use();   // Bind default shader
@@ -114,18 +113,16 @@ void IScene::draw_all() const noexcept {
 
 
 			// -- TEXTURE //
-			const bool hastex = model->material->texture != nullptr;
-			const bool hastexarray = model->material->texture_array != nullptr;
-			if(hastex) {
-				// If model->material.texture is nullptr a operator overload will change to the default texture
-				// So i dont have to check if is cur_texture is nullptr or not
-				if(model->material->texture->get_id() != cur_texture->get_id()) {
-					cur_texture = model->material->texture;
-					cur_texture->bind(0); // Unit 0
-				}
+
+			// Texture is never nullptr, it can be the default texture sometimes
+			// no need to check if has texture
+			if(model->material->texture->get_id() != cur_texture->get_id()) {
+				cur_texture = model->material->texture;
+				cur_texture->bind(0); // Unit 0
 			}
 
 			// Use texture array if it exists
+			const bool hastexarray = model->material->texture_array != nullptr;
 			if(hastexarray) {
 				// Bind first time or change texture array
 				if(cur_texarray == nullptr || model->material->texture_array->get_id() != cur_texarray->get_id()) {
@@ -137,7 +134,7 @@ void IScene::draw_all() const noexcept {
 			}
 
 			// Not need for cur_mixamount because this is irrelevant
-			const float mix_amount = (hastex && hastexarray) ? model->material->mix_amount : (hastexarray ? 1.0f : 0.0f);
+			const float mix_amount = (model->material->texture != nullptr && hastexarray) ? model->material->mix_amount : (hastexarray ? 1.0f : 0.0f);
 			cur_shader->set_float("mixAmount", mix_amount);
 			// TEXTURE -- //
 

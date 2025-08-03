@@ -27,7 +27,7 @@ class Mesh {
 		// Physics component
 		PhysicsComponent* physics = nullptr;
 
-		// Mesh is not build, you should provide vertices and indices with `set_geometry` method
+		// Mesh is not build, you should provide vertices and indices with `Mesh::set_geometry(...)` method
 		Mesh() noexcept = default;
 		// Build Mesh using vertices and indices
 		template <typename T>

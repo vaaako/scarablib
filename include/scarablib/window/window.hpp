@@ -134,13 +134,6 @@ class Window {
 			glDepthFunc(GL_LEQUAL + (state * 4)); // true => 1 * 4 => 515 + 4 => 519 (GL_ALWAYS)
 		}
 
-		// Disabled cull face and sets depth test to always pass.
-		// This makes 2D rendering more optimized accurate but 3D rendering will not work properly
-		inline void set_2dmode(const bool state) const noexcept {
-			this->set_cullface(state);
-			this->set_depthtest_always(state);
-		}
-
 		// Set the window's size using the provided width and height values.
 		// This also adjusts the OpenGL viewport to match the new window size.
 		void set_size(const vec2<uint32>& size) noexcept;
