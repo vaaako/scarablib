@@ -9,6 +9,8 @@ Scarablib 🪲 is a C++ library designed to simplify graphical development, offe
 
 - **Abstraction:** Simplifies complex graphical operations
 - **2D and 3D development:** Easy-to-use tools for both 2D and 3D rendering
+	+ Multiple built-in 2D and 3D shapes
+	+ Easy texture loading and management
 - **Beginner-Friendly API:** Designed with simplicity in mind, it is easy to learn for new developers while remaining powerful enough for advanced users
 - **Uniform Grid:** Built-in spatial partitioning system for collision detection
 - **Simplified VAO creation:** Dynamic methods for creating Vertex Array Objects with minimal boilerplate
@@ -50,7 +52,7 @@ int main() {
 	Scene3D scene3d = Scene3D(camera);
 
 	// Model setup
-	Cube* cube = scene3d.add<Cube>("cube");
+	Cube* cube = scene3d.add<Cube>("cube"); // Add to scene for batch drawing
 	cube->set_position({ 0.0f, 0.0f, -5.0f });
 	cube->set_color(Colors::MAGENTA);
 	cube->material.texture = new Texture("textures/cube.png");

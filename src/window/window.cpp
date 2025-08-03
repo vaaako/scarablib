@@ -62,7 +62,7 @@ Window::Window(const Window::Config& config)
 	}
 
 	// Initialize GLEW
-	glewExperimental = GL_FALSE;
+	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
 	if(err != GLEW_OK) {
 		SDL_GL_DeleteContext(this->glContext);
