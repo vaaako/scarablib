@@ -6,7 +6,6 @@
 #include "scarablib/camera/camera2d.hpp"
 #include "scarablib/typedef.hpp"
 #include <string>
-#include <GL/glew.h>
 
 // Font object used to draw text on the screen
 // WARNING: NOT FINISHED YET. STILL DONT WORKING PROPERLY

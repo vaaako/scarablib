@@ -3,6 +3,7 @@
 #include "scarablib/opengl/vaomanager.hpp"
 #include "scarablib/proper/error.hpp"
 #include "scarablib/proper/log.hpp"
+#include "scarablib/typedef.hpp"
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_timer.h>
@@ -61,16 +62,14 @@ Window::Window(const Window::Config& config)
 		throw ScarabError("Failed to create OpenGL context: %s", SDL_GetError());
 	}
 
-	// Initialize GLEW
-	glewExperimental = GL_TRUE;
-	GLenum err = glewInit();
-	if(err != GLEW_OK) {
+	// Initialize GLAD
+	if(!gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress)) {
 		SDL_GL_DeleteContext(this->glContext);
 		SDL_DestroyWindow(this->window);
 		Mix_CloseAudio();
 		SDL_CloseAudio();
 		SDL_Quit();
-		throw ScarabError("Failed to init GLEW: %s", glewGetErrorString(err));
+		throw ScarabError("Failed to initialize GLAD");
 	}
 
 	// Configure OpenGL

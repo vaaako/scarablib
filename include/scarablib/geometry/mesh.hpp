@@ -1,6 +1,5 @@
 #pragma once
 
-#include <GL/glew.h>
 #include <memory>
 #include "scarablib/components/boundingbox.hpp"
 #include "scarablib/components/materialcomponent.hpp"

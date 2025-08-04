@@ -2,7 +2,6 @@
 
 #include "scarablib/gfx/texturebase.hpp"
 #include "scarablib/typedef.hpp"
-#include <GL/glew.h>
 #include <vector>
 
 // WARNING: NOT FINISHED. STILL WORKING ON IT

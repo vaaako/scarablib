@@ -1,10 +1,8 @@
 #pragma once
 
-#include <GL/glew.h>
 #include <glm/ext.hpp>
 #include <glm/mat4x4.hpp>
 #include <vector>
-#include "scarablib/proper/log.hpp"
 #include "scarablib/typedef.hpp"
 #include "scarablib/gfx/color.hpp"
 

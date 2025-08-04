@@ -7,7 +7,6 @@
 #include "scarablib/window/events.hpp"
 #include "scarablib/window/keycode.hpp"
 
-#include <GL/glew.h>
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_video.h>

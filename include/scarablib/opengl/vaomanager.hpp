@@ -1,7 +1,6 @@
 #pragma once
 
 #include "scarablib/geometry/vertex.hpp"
-#include <GL/glew.h>
 #include <unordered_map>
 
 // This is a class that handles the creation and management of unique Vertex Array Objects (VAO).

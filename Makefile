@@ -8,17 +8,17 @@ LIBRARY_TYPE ?= static
 
 # Conditional LDFLAGS based on LIBRARY_TYPE
 ifeq ($(LIBRARY_TYPE), static)
-	LDFLAGS = ./lib/GLEW/libGLEW.a \
+	LDFLAGS = ./lib/glad/libglad.a \
 			  ./lib/SDL2/libSDL2.a \
 			  ./lib/SDL2_mixer/libSDL2_mixer.a \
 			  ./lib/enet/libenet.a \
 			  -lGL -ldl -lpthread -lm
 else ifeq ($(LIBRARY_TYPE), shared)
-	LDFLAGS = -L./lib/GLEW \
+	LDFLAGS = -L./lib/glad \
 			  -L./lib/SDL2 \
 			  -L./lib/SDL2_mixer \
 			  -L./enet/enet \
-			  -lGL -lGLEW -lSDL2 -lSDL2main -lSDL2_mixer -lenet
+			  -lGL -lglad -lSDL2 -lSDL2main -lSDL2_mixer -lenet
 endif
 
 # Dirs

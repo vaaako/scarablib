@@ -1,8 +1,7 @@
 #pragma once
 
-#include <GL/glew.h>
-#include <vector>
 #include "scarablib/typedef.hpp"
+#include <vector>
 
 // OpenGL Element Array Buffer object
 class EBO {

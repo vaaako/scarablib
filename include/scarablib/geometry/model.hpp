@@ -1,6 +1,5 @@
 #pragma once
 
-#include <GL/glew.h>
 #include "scarablib/geometry/mesh.hpp"
 #include "scarablib/geometry/triangle.hpp"
 #include "scarablib/opengl/shader.hpp"

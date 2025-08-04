@@ -1,7 +1,6 @@
 #pragma once
 
 #include "scarablib/typedef.hpp"
-#include <GL/glew.h>
 
 // OpenGL Vertex Array Object object
 class VAO {

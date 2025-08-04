@@ -20,7 +20,7 @@ Scarablib 🪲 is a C++ library designed to simplify graphical development, offe
 	+ [`SDL2_mixer`](https://www.libsdl.org/projects/mixer/) for sound handling
 - [`stb_image`](https://github.com/nothings/stb) for image loading
 - [`stb_truetype`](https://github.com/nothings/stb) for TTF loading
-- [`GLEW`](https://glew.sourceforge.net/) for OpenGL support
+- [`glad`](https://github.com/Dav1dde/glad) for OpenGL support
 - [`glm`](https://github.com/g-truc/glm) for vector and matrix math
 - [`tinyobjloader`](https://github.com/tinyobjloader/tinyobjloader) for wavefront obj loader
 
