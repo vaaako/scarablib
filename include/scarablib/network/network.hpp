@@ -14,6 +14,10 @@
 #include <arpa/inet.h>
 #endif
 
+// To avoid exporting ENet header with the library
+struct _ENetHost;
+struct _ENetPeer;
+
 class Network {
 	public:
 		// Flags to tell how sending packets should be handled.
@@ -138,8 +142,8 @@ class Network {
 		uint32 connected_clients = 0;
 
 		// ENet objects
-		void* host; // ENetHost*
-		void* peer = nullptr; // ENetPeer* (used to disconnect from server)
+		_ENetHost* host;           // ENetHost*
+		_ENetPeer* peer = nullptr; // ENetPeer* (used to disconnect from server)
 
 		// Resolve a ENet IPv6 address to a string
 		std::string resolve_enet_address(void* host); // (ENetAddress) Using void* to avoid including enet in header

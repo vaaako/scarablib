@@ -3,6 +3,8 @@
 #include "scarablib/proper/log.hpp"
 
 #include <cstring>
+
+#define ENET_IMPLEMENTATION
 #include <enet/enet.h>
 
 // Inspired by https://github.com/Hopson97/open-builder/blob/e4ca7d0652a4b1e3e55278b79f28f01c8c087a68/src/common/common/network/enet.cpp

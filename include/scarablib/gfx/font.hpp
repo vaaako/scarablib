@@ -7,6 +7,9 @@
 #include "scarablib/typedef.hpp"
 #include <string>
 
+// To avoid exporting stb_truetype header with the library
+// struct _stbtt_bakedchar;
+
 // Font object used to draw text on the screen
 // WARNING: NOT FINISHED YET. STILL DONT WORKING PROPERLY
 class Font {
@@ -34,9 +37,6 @@ class Font {
 		};
 
 		// Font
-		// If i declare cdata as stbtt_bakedchar in header file
-		// i will have to include stb_truetype.h and when sharing the library i would have to also share stb_truetype.h
-		// which i dont want
 		void* cdata; // stbtt_bakedchar
 		Glyph* buffer_data;
 		size_t buffer_capacity;
