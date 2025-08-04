@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(scarablib_dev VERSION 0.1.0)
+project(scarablib VERSION 0.1.0)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
@@ -7,19 +7,29 @@ set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 # -- Project settings
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-option(USE_STATIC_LIBS "Link against static libraries instead of shared ones" FALSE)
+# -- Headers
+option(STATIC "Buil as a static library" ON)
+option(SHARED "Build as a shared library" OFF)
+option(DEBUG "Build with debug flags" OFF)
 
 # -- Source files
 file(GLOB_RECURSE SOURCES
+	# This is better than compiling to a static library
 	lib/glad/glad2.c
 	src/*.cpp src/*/*.cpp src/**/*.cpp)
-add_executable(${PROJECT_NAME} ${SOURCES} test/main.cpp)
 
+# -- Compile to static and/or shared libraries
+if(STATIC)
+	add_library(${PROJECT_NAME} STATIC ${SOURCES})
+endif()
 
-# Mark as private to avoid warnings
+if(SHARED)
+	add_library(${PROJECT_NAME} SHARED ${SOURCES})
+endif()
+
+# -- Mark external headers as PUBLIC to avoid warnings
 target_include_directories(${PROJECT_NAME}
 	PRIVATE
 		include
@@ -33,55 +43,50 @@ target_include_directories(${PROJECT_NAME}
 		include/external/tinyobjloader
 )
 
-# O0 for debug and fast compiling
+# -- Target test executable
+set(TEST_NAME "scarablib_test")
+add_executable(${TEST_NAME} test/main.cpp)
+target_link_libraries(${TEST_NAME} PRIVATE ${PROJECT_NAME}) # Link the compiled library
+target_include_directories(${TEST_NAME} PRIVATE include)
+
+
+# -- Compile flags
+# -O0 for debug and fast compiling
 target_compile_options(${PROJECT_NAME} PRIVATE
-	-O0 -g -fdiagnostics-color=always -Wextra -Wall -Wuninitialized -Wunreachable-code
+	$<$<CONFIG:Debug>:
+		-O0 -g -fdiagnostics-color=always
+		-Wextra -Wall -Wuninitialized -Wunreachable-code
+	>
+	$<$<CONFIG:Release>:
+		# -march=native -> Optimize for current CPU (may not work on all CPUs)
+		# -DNDEBUG -> Remove debug symbols
+		-O3 -march=native -ffast-math -DNDEBUG
+	>
 )
 
-# Set to modern OpenGL
-set(OpenGL_GL_PREFERENCE "GLVND")
+# -- Linking static libraries
+set(OpenGL_GL_PREFERENCE "GLVND") # Set to modern OpenGL
 
-# Find shared libraries
-find_package(OpenGL REQUIRED)
+# Windows compilation was not tested
+if(WIN32)
+	# Locate SDL2 and its components
+	find_package(SDL2 REQUIRED CONFIG)
+	find_package(SDL2_mixer REQUIRED CONFIG)
 
-find_package(SDL2 REQUIRED)
-find_package(SDL2_mixer REQUIRED)
-
-# find_library(GLAD_LIBRARY glad PATHS ${CMAKE_SOURCE_DIR}/lib/glad)
-find_library(ENET_LIBRARY enet PATHS ${CMAKE_SOURCE_DIR}/lib/enet)
-
-# Link shared libraries
-target_link_libraries(${PROJECT_NAME}
-	PRIVATE
-	OpenGL::GL
-	SDL2::SDL2
-	SDL2_mixer::SDL2_mixer
-	# ${GLAD_LIBRARY}
-	${ENET_LIBRARY}
-)
-
-# if(USE_STATIC_LIBS)
-# 	link_directories(
-# 		lib/glad
-# 		lib/SDL2
-# 		lib/SDL2_mixer
-# 		lib/enet
-# 	)
-#
-# 	# Define the paths to static libraries
-# 	set(LIB_GLAD "${CMAKE_SOURCE_DIR}/lib/glad/libglad.a")
-# 	set(LIB_SDL2 "${CMAKE_SOURCE_DIR}/lib/SDL2/libSDL2.a")
-# 	set(LIB_SDL2_MIXER "${CMAKE_SOURCE_DIR}/lib/SDL2_mixer/libSDL2_mixer.a")
-# 	set(LIB_ENET "${CMAKE_SOURCE_DIR}/lib/enet/libenet.a")
-#
-# 	# Link static libraries
-# 	target_link_libraries(${PROJECT_NAME}
-# 		GL # Link OpenGL dynamically
-# 		${LIB_GLAD}
-# 		${LIB_SDL2}
-# 		${LIB_SDL2_MIXER}
-# 		${LIB_ENET}
-# 	)
-#
-# else()
-
+	target_link_libraries(${PROJECT_NAME}
+		SDL2::SDL2-static
+		SDL2::SDL2main
+		SDL2_mixer::SDL2_mixer-static
+		# System libraries required by SDL2 on windows
+		opengl32
+		winmm
+		imm32
+		version
+	)
+elseif(UNIX)
+	target_link_libraries(${PROJECT_NAME}
+		GL # Link OpenGL dynamically
+		"${CMAKE_SOURCE_DIR}/lib/SDL2/libSDL2.a"
+		"${CMAKE_SOURCE_DIR}/lib/SDL2_mixer/libSDL2_mixer.a"
+	)
+endif()

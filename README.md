@@ -94,43 +94,23 @@ int main() {
 Scarablib can be built using either `CMake` or `Makefile`. Both methods are supported, but they serve slightly different purposes:
 
 ## CMake
-CMake in this project is used to compile and run the [test/main.cpp](test/main.cpp) file, which is the file used for testing the library
+## Static Library (Recommended)
+Build the static library:
 ```sh
-cmake -S . -B build    # Configure
-cmake --build build    # Compile
-./build/scarablib_dev  # Run
+cmake -B build -DSHARED=1 -DCMAKE_BUILD_TYPE=Release
+cmake --build build
 ```
 
-## Makefile
-With `Make` you can compile the library to a shared or static library to use it on your own projects.
-The default target will generate a static library in the `build/` directory.
-
-The static target will use the static dependencies libraries located in the `lib/` directory
-```
-make
-```
-
-Installing this library is done by running
+## Static Library
+Build the static library:
 ```sh
-sudo make install
+cmake -B build -DSTATIC=1 -DCMAKE_BUILD_TYPE=Release
+cmake --build build
 ```
-
-You can then compile your own project linking the library and OpenGL. Example:
-```sh
-clang++ main.cpp -lGL -lscarablib -o mygame
-```
-
-You can change the target to generate a shared library instead.
-Note that for generating the shared library, you don't need to install the dependencies, but for using it, you will need to install the dependencies.
-
-The shared target will use the shared dependencies libraries located in the `lib/` directory.
-```
-make LIBRARY_TYPE=shared
-```
-
 
 # Windows Support
-Currently, Scarablib does not officially support Windows. However, you can attempt to compile it yourself
+CMake is configurated to build on windows, but I didn't test it yet and don't know if it works or not
+
 
 ## Scripts
 - `debug.sh`: Debug using valgrind
