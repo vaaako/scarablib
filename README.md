@@ -91,9 +91,6 @@ int main() {
 
 
 # Building and run
-Scarablib can be built using either `CMake` or `Makefile`. Both methods are supported, but they serve slightly different purposes:
-
-## CMake
 ## Static Library (Recommended)
 Build the static library:
 ```sh
@@ -108,15 +105,15 @@ cmake -B build -DSTATIC=1 -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ```
 
+## Debug
+If debug build type is set to **Debug**, CMake will look for the `test/main.cpp` file and build the executable `build/scarablib_test`
+```sh
+cmake -B build -DSTATIC=1 -DCMAKE_BUILD_TYPE=Debug
+cmake --build build
+```
+
 # Windows Support
 CMake is configurated to build on windows, but I didn't test it yet and don't know if it works or not
-
-
-## Scripts
-- `debug.sh`: Debug using valgrind
-- `build_compile_commands.sh`: Uses [bear](https://github.com/rizsotto/Bear) to generate `compile_commands.json` file for LSP integration
-- `install-flamegraph.sh` and `run-flamegraph.sh`: Easy install and run [flamegraph](https://github.com/brendangregg/FlameGraph)
-
 
 # Contributing
 Scarablib is a hobby project, and contributions are welcome! If you’d like to contribute, please open an issue or submit a pull request
