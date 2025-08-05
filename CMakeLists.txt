@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.10)
 project(scarablib VERSION 0.1.0)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
@@ -15,7 +15,7 @@ option(SHARED "Build as a shared library" OFF)
 option(DEBUG "Build with debug flags" OFF)
 
 # -- Source files
-file(GLOB_RECURSE SOURCES
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
 	# This is better than compiling to a static library
 	lib/glad/glad2.c
 	src/*.cpp src/*/*.cpp src/**/*.cpp)
@@ -44,10 +44,12 @@ target_include_directories(${PROJECT_NAME}
 )
 
 # -- Target test executable
-set(TEST_NAME "scarablib_test")
-add_executable(${TEST_NAME} test/main.cpp)
-target_link_libraries(${TEST_NAME} PRIVATE ${PROJECT_NAME}) # Link the compiled library
-target_include_directories(${TEST_NAME} PRIVATE include)
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+	set(TEST_NAME "scarablib_test")
+	add_executable(${TEST_NAME} test/main.cpp)
+	target_link_libraries(${TEST_NAME} PRIVATE ${PROJECT_NAME}) # Link the compiled library
+	target_include_directories(${TEST_NAME} PRIVATE include)
+endif()
 
 
 # -- Compile flags
