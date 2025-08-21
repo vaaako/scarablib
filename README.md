@@ -26,6 +26,9 @@ Scarablib 🪲 is a C++ library designed to simplify graphical development, offe
 
 >You can find the licenses for these libraries in the [`licenses/`](licenses/) directory
 
+## Dependencies
+- [glad header](include/external/glad/gl.h)
+
 # Roadmap
 - **Physics and collisions:** In progress
 - **Light:** Implementation of light sources
@@ -94,26 +97,28 @@ int main() {
 ## Static Library (Recommended)
 Build the static library:
 ```sh
-cmake -B build -DSHARED=1 -DCMAKE_BUILD_TYPE=Release
-cmake --build build
-```
-
-## Static Library
-Build the static library:
-```sh
 cmake -B build -DSTATIC=1 -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ```
 
+## Shared Library
+Build the shared library:
+```sh
+cmake -B build -DSHARED=1 -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+```
+
+This will not merge `SDL2` and `SDL2_mixer`, you will need to put the shared files in your project and link them
+
 ## Debug
-If debug build type is set to **Debug**, CMake will look for the `test/main.cpp` file and build the executable `build/scarablib_test`
+If build type is set to **Debug**, CMake will look for the `test/main.cpp` file and build the executable `build/scarablib_test`
 ```sh
 cmake -B build -DSTATIC=1 -DCMAKE_BUILD_TYPE=Debug
 cmake --build build
 ```
 
-# Windows Support
-CMake is configurated to build on windows, but I didn't test it yet and don't know if it works or not
+## Windows Support
+Windows support is implemented but not tested. Currently only `SDL2` static library is used, you will have to ship `SDL2_mixer.dll`
 
 # Contributing
 Scarablib is a hobby project, and contributions are welcome! If you’d like to contribute, please open an issue or submit a pull request
