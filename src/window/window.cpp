@@ -106,7 +106,7 @@ Window::Window(const Window::Config& config)
 }
 
 Window::~Window() noexcept {
-	if (this->show_debug_info) {
+	if(this->show_debug_info) {
 		LOG_INFO("Window %d destroyed", SDL_GetWindowID(this->window));
 	}
 

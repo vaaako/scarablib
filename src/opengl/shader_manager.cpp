@@ -27,7 +27,10 @@ Shader* ShaderManager::get_shader(const std::string_view& name) const noexcept {
 
 void ShaderManager::cleanup() noexcept {
 	for(auto& [_, entry] : this->shader_map) {
-		delete entry;
+		// Just in case
+		if(entry != nullptr) {
+			delete entry;
+		}
 	}
 	this->shader_map.clear();
 }

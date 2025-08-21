@@ -68,6 +68,16 @@ Stuff that are in progress and i need to finish
 	+ it isnt technically because it checks if indices are empty
 	+ but an empty vector is created to use this method
 
+- [ ] New OpenGL 4.3+ VAO method
+	+ VAO stores the Vertex struct data, not the whole mesh
+	+ This makes more sense
+	+ Lower CPU overhead, faster state switching, simpler driver optimization, reduced GPU memory churn
+	+ https://patrick-is.cool/posts/2025/on-vaos/
+	+ this is agame changing
+	+ Vertex Pulling may be even more efficent, look at this
+	+ both?
+- [ ] [Modern OpenGL](https://juandiegomontoya.github.io/modern_opengl.html) and [Modern functions](https://github.com/fendevel/Guide-to-Modern-OpenGL-Functions)
+
 # TODO Quick Fixes
 - [x] Better texture constructor
 	+ Use bitwise paramters
@@ -207,3 +217,8 @@ Stuff that are in progress and i need to finish
 	+ Planes are not being detected
 	+ Corners are not being detected
 	+ Ceilings are not being detected
+
+- [ ] Convert a small image to a scenario
+	+ Like terrain map
+	+ Each pixel is converted to a block
+	+ Each color corresponds to a texture
