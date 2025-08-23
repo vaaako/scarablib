@@ -1,6 +1,14 @@
 #include "scarablib/opengl/vertexbuffercomponent.hpp"
+#include "scarablib/proper/log.hpp"
+#include "scarablib/window/window.hpp"
 
 VertexBufferComponent::~VertexBufferComponent() noexcept {
+	// Unable to relase objects correctly
+	if(SDL_GL_GetCurrentContext() == NULL) {
+		LOG_WARNING_FN("Called without a valid OpenGL context. Leaking GPU resources");
+		return;
+	}
+
 	if(this->vao != nullptr) {
 		VAOManager::get_instance().release_vao(this->hash);
 		delete this->vao;

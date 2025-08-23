@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TARGET=./build/scarablib_dev
+TARGET=./build/scarablib_test
 
 FILE=memcheck.log
 SUPPRESSIONS=./valgrind.supp
@@ -12,6 +12,11 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m'
 
+if [ ! -f "$TARGET" ]; then
+	echo -e "${RED}Error: Target executable not found at '$TARGET'.${NC}"
+	echo "Please ensure you have built the project and are running this script from the project's root directory."
+	exit 1
+fi
 
 # Determine options based on arguments
 SUPPRESS=""

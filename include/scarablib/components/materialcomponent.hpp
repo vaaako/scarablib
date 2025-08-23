@@ -83,7 +83,7 @@ struct MaterialComponent {
 			}
 
 			// Assign shared_ptr
-			inline constexpr TextureHandle& operator=(const std::shared_ptr<Texture>& other) noexcept {
+			inline TextureHandle& operator=(const std::shared_ptr<Texture>& other) noexcept {
 				this->ptr = other;
 				return *this;
 			}

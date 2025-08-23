@@ -23,6 +23,7 @@ Window::Window(const Window::Config& config)
 	// NOTE: Reserves couple KBs depending on chunksize
 	if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) != 0) {
 		Mix_CloseAudio();
+		Mix_Quit();
 		SDL_CloseAudio();
 		SDL_Quit();
 		throw ScarabError("Failed to init SDL_mixer: %s", SDL_GetError());
@@ -38,6 +39,7 @@ Window::Window(const Window::Config& config)
 
 	if(!this->window) {
 		Mix_CloseAudio();
+		Mix_Quit();
 		SDL_CloseAudio();
 		SDL_Quit();
 		throw ScarabError("Failed to create a SDL window: %s", SDL_GetError());
@@ -57,6 +59,7 @@ Window::Window(const Window::Config& config)
 	if(this->glContext == NULL) {
 		SDL_DestroyWindow(this->window);
 		Mix_CloseAudio();
+		Mix_Quit();
 		SDL_CloseAudio();
 		SDL_Quit();
 		throw ScarabError("Failed to create OpenGL context: %s", SDL_GetError());
@@ -67,6 +70,7 @@ Window::Window(const Window::Config& config)
 		SDL_GL_DeleteContext(this->glContext);
 		SDL_DestroyWindow(this->window);
 		Mix_CloseAudio();
+		Mix_Quit();
 		SDL_CloseAudio();
 		SDL_Quit();
 		throw ScarabError("Failed to initialize GLAD");
@@ -110,18 +114,21 @@ Window::~Window() noexcept {
 		LOG_INFO("Window %d destroyed", SDL_GetWindowID(this->window));
 	}
 
-	// Clean up OpenGL context
-	SDL_GL_DeleteContext(this->glContext);
-	// Destroy SDL window
-	SDL_DestroyWindow(this->window);
-	// Close SDL_mixer
-	Mix_CloseAudio();
-	// Quit SDL
-	SDL_Quit();
 	// Clean up VAO Manager
 	VAOManager::get_instance().cleanup();
 	// Clean up Shader Manager
 	ShaderManager::get_instance().cleanup();
+	// Clean up OpenGL context
+	SDL_GL_DeleteContext(this->glContext);
+	this->glContext = nullptr;
+
+	// Destroy SDL window
+	SDL_DestroyWindow(this->window);
+	// Close SDL_mixer
+	Mix_CloseAudio();
+	Mix_Quit();
+	// Quit SDL
+	SDL_Quit();
 }
 
 
