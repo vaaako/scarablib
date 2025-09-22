@@ -56,3 +56,8 @@ The window object must be relased after all other OpenGL objects, otherwhise it 
 
 # OpenGL objects
 I recommend under all cases always use `VertexBufferComponent` object over `VAO`, `VBO`, `EBO` and `VAOManager` objects, since `VertexBufferComponent` wrap all these in simple and reliable methods with checks and automation 
+
+You don't need to bind VAO if you intent to use VBO modern methods to set up VAO
+
+Only the modern VAO methods and making is supported (in `VertexBufferComponent` and `Scene3D`)
+(i need to change this setence later)

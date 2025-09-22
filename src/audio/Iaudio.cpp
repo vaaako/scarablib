@@ -1,9 +1,10 @@
 #include "scarablib/audio/Iaudio.hpp"
 #include "scarablib/utils/string.hpp"
 #include "scarablib/proper/error.hpp"
+#include <array>
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
-#include <array>
 
 IAudio::IAudio(const char* path) {
 	// Supported extensions lookup table

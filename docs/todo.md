@@ -59,8 +59,6 @@ Stuff that are in progress and i need to finish
 - [ ] make transparency work without `if(tex.a == 0.0)`?
 - [ ] Discord RPC support?
 
-- [ ] Revise ShaderManager
-	+ I dont know if its fully optimized and working properly
 
 - [ ] Prioritize Material when organizing models to batch draw
 
@@ -77,6 +75,25 @@ Stuff that are in progress and i need to finish
 	+ Vertex Pulling may be even more efficent, look at this
 	+ both?
 - [ ] [Modern OpenGL](https://juandiegomontoya.github.io/modern_opengl.html) and [Modern functions](https://github.com/fendevel/Guide-to-Modern-OpenGL-Functions)
+
+- [ ] make sure single draw call is working
+
+
+# TODO Shaders
+- [ ] Revise ShaderManager
+	+ I dont know if its fully optimized and working properly
+- [x] Rename `Shader` to `ShaderProgram`
+- [ ] Separate Shader Objects (`GL_ARB_separate_shader_objects`)
+	+ `ShaderProgram->bind_vertex()` and `ShaderProgram->bind_fragment()`?
+- [ ] More dynamic Shader class
+	+ `make_shader` and `compile_shader` methods
+- [ ] Put shader inside `MaterialComponent`
+- [ ] Fix circle shader
+- [ ] Shader "blocks"
+	+ Library provides a base shader then a custom shader. THe custom shader is concatenated at runtime before compiling
+- [ ] Shader back to external file
+	+ convert to headers
+
 
 # TODO Quick Fixes
 - [x] Better texture constructor
@@ -145,6 +162,7 @@ Stuff that are in progress and i need to finish
 	+ Not tested
 	+ Should also work for 2D shapes and be built in Mesh constructor that uses vertices only
 	+ Skipping this because i have more important stuff to do
+
 
 # TODO 2D
 - [x] Unify shader and `shader_texture` somehow

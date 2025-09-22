@@ -1,5 +1,5 @@
 # Scarablib
-Scarablib 🪲 is a C++ library designed to simplify graphical development, offering tools for both 2D and 3D rendering. While still in its early stages, Scarablib is being developed as a hobby project. You can track its progress in the [`todo.md`](doc/todo.md) file.
+Scarablib 🪲 is a C++ library designed to simplify graphical development, offering tools for both 2D and 3D rendering. While still in its early stages, Scarablib is being developed as a hobby project. You can track its progress in the [`todo.md`](docs/todo.md) file.
 
 ![showcase](medias/showcase.gif)
 
@@ -116,6 +116,9 @@ If build type is set to **Debug**, CMake will look for the `test/main.cpp` file 
 cmake -B build -DSTATIC=1 -DCMAKE_BUILD_TYPE=Debug
 cmake --build build
 ```
+
+## Using
+Now you just need to move the headers and the generated library. In order to use the [template Makefile](docs/Makefile) you need to move your `cpp` files to a folder named `src/`, the generated library to a folder named `lib/scarablib/`, `include/scarablib/` and `include/external/glad/` to a folder named `included/`. If done correctly you should be able to use the command `make` and it will compile it with no errors
 
 ## Windows Support
 Windows support is implemented but not tested. Currently only `SDL2` static library is used, you will have to ship `SDL2_mixer.dll`
