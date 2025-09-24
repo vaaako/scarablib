@@ -1,6 +1,6 @@
 #pragma once
 
-#include "scarablib/opengl/shader.hpp"
+#include "scarablib/opengl/shader_program.hpp"
 #include "scarablib/opengl/shader_manager.hpp"
 #include "scarablib/opengl/shaders.hpp"
 #include "scarablib/camera/camera2d.hpp"
@@ -22,7 +22,7 @@ class Font {
 		// Add text to batch rendering
 		void draw_text(const std::string& text, const vec2<float>& pos, const float scale = 1.0f, const Color& color = Colors::WHITE) noexcept;
 
-		inline Shader& get_shader() const noexcept {
+		inline ShaderProgram& get_shader() const noexcept {
 			return *this->shader;
 		}
 
@@ -46,7 +46,7 @@ class Font {
 		GLuint vao;
 		GLuint vbo;
 
-		Shader* shader = ShaderManager::get_instance().get_or_load_shader(
+		std::shared_ptr<ShaderProgram> shader = ShaderManager::get_instance().load_shader(
 			"font",
 			Shaders::DEFAULT_VERTEX,
 			Shaders::FONT_FRAGMENT

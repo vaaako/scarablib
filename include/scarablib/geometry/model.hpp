@@ -2,7 +2,6 @@
 
 #include "scarablib/geometry/mesh.hpp"
 #include "scarablib/geometry/triangle.hpp"
-#include "scarablib/opengl/shader.hpp"
 #include "scarablib/proper/dirtyproxy.hpp"
 #include "scarablib/camera/camera.hpp"
 #include "scarablib/typedef.hpp"
@@ -26,8 +25,9 @@ class Model : public Mesh {
 		// Make a model using a wavefront .obj file
 		Model(const char* path);
 
+		// TODO: Remove shader from paramters and get from material
 		// This method does not draw the model to the screen, as it does not bind the VAO and Shader (batch rendering)
-		virtual void draw_logic(const Camera& camera, const Shader& shader) noexcept override;
+		virtual void draw_logic(const Camera& camera) noexcept override;
 
 		// Returns current angle
 		inline float get_angle() const noexcept {

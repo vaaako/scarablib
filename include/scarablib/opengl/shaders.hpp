@@ -25,7 +25,7 @@ namespace Shaders {
 
 		void main() {
 			gl_Position = mvp * vec4(aPos, 1.0);
-			texuv       = vec2(aTex.xy);
+			texuv       = aTex;
 		}
 	)glsl";
 
@@ -34,7 +34,7 @@ namespace Shaders {
 		#version 330 core
 
 		in vec2 texuv;
-		out vec4 FragColor;
+		out vec4 fragcolor;
 
 		uniform sampler2D texSampler;
 		uniform vec4 shapeColor;
@@ -44,7 +44,7 @@ namespace Shaders {
 			if(tex.a == 0.0) {
 				discard;
 			}
-			FragColor =  tex * (shapeColor.rgba / 255);
+			fragcolor =  tex * (shapeColor.rgba / 255);
 		}
 	)glsl";
 
@@ -52,24 +52,31 @@ namespace Shaders {
 		#version 330 core
 
 		in vec2  texuv;
-		out vec4 FragColor;
+		out vec4 fragcolor;
 
 		uniform vec4 shapeColor;
 
 		uniform sampler2D      texSampler;      // Bound to texture unit 0
 		uniform sampler2DArray texSamplerArray; // Bound to texture unit 1
 		uniform int   texlayer;                 // If using texSamplerArray
-		uniform float mixAmount;                // Blend amount (0.0 = only tex2D, 1.0 = only array)
+		uniform float mixamount;                // Blend amount (0.0 = only tex2D, 1.0 = only array)
 
 		void main() {
-			// mix(texSampler, texSamplerArray, mixAmount) * shapeColor
-			vec4 mix = mix(texture(texSampler, texuv), texture(texSamplerArray, vec3(texuv, texlayer)), mixAmount) * shapeColor;
-			if(mix.a == 0.0) {
+			// mix(texSampler, texSamplerArray, mixamount)
+			vec4 mixtex = mix(texture(texSampler, texuv),
+							texture(texSamplerArray, vec3(texuv, texlayer)),
+							mixamount);
+			if(mixtex.a < 0.001) {
 				discard;
 			}
-			FragColor = mix;
+			fragcolor = mixtex * shapeColor;
 		}
 	)glsl";
+
+	// void user_main(in vec2 uv, out vec4 color); <- declared and injected before main()
+	// user_main(texuv, fragcolor);                <- called inside main()
+	// in: like const
+	// out: write-only
 
 	const char* const SKYBOX_VERTEX = R"glsl(
 		#version 330 core
@@ -93,13 +100,13 @@ namespace Shaders {
 	const char* const SKYBOX_FRAGMENT = R"glsl(
 		#version 330
 
-		out vec4 FragColor;
+		out vec4 fragcolor;
 		in vec3 texuv;
 
 		uniform samplerCube samplerSkybox;
 
 		void main() {
-			FragColor = texture(samplerSkybox, texuv);
+			fragcolor = texture(samplerSkybox, texuv);
 		}
 	)glsl";
 
@@ -113,18 +120,17 @@ namespace Shaders {
 
 		uniform mat4 view;
 		uniform mat4 proj;
-		uniform vec3 billboardPos;
-		uniform float billboardSize;
+		uniform vec3 billpos;   // Billboard Position
+		uniform float billsize; // Billboard Size
 
 		void main() {
 			// Extract the right and up vectors from the view matrix
 			vec3 right = normalize(vec3(view[0].x, view[1].x, view[2].x));
-			vec3 up = normalize(vec3(view[0].y, view[1].y, view[2].y));
-
+			vec3 up    = normalize(vec3(view[0].y, view[1].y, view[2].y));
 			// Reconstruct the billboarded position
-			vec3 billboardedPos = billboardPos + (aPos.x * right * billboardSize + aPos.y * up * billboardSize);
+			vec3 rbillpos = billpos + (aPos.x * right * billsize + aPos.y * up * billsize);
 
-			gl_Position = proj * view * vec4(billboardedPos, 1.0);
+			gl_Position = proj * view * vec4(rbillpos, 1.0);
 			texuv       = vec2(aTex.xy);
 		}
 	)glsl";
@@ -132,38 +138,53 @@ namespace Shaders {
 	const char* const CIRCLE_FRAGMENT = R"glsl(
 		#version 330 core
 
-		out vec4 FragColor;
 		in vec2 texuv;
+		out vec4 fragcolor;
 
 		uniform vec4 shapeColor;
-
-		uniform float blur;
 
 		uniform sampler2D      texSampler;      // Bound to texture unit 0
 		uniform sampler2DArray texSamplerArray; // Bound to texture unit 1
 		uniform int   texlayer;                 // If using texSamplerArray
-		uniform float mixAmount;                // Blend amount (0.0 = only tex2D, 1.0 = only array)
+		uniform float mixamount;                // Blend amount (0.0 = only tex2D, 1.0 = only array)
 
-		vec3 circle_area(vec2 texuv, vec2 center, float radius, float blur) {
-			// Clamp blur to avoid branching
-			blur = clamp(blur, 0.001, 1.0); // value, min, max
-			// Distance to the center of the circle
-			float distance = length(texuv - center);
-			// Use smoothstep for smooth edges, radius and blur are now parameters
-			float circle = smoothstep(radius, radius - blur, distance);
-			// Return
-			return vec3(circle);
-		}
+		float mask(float radius);
 
 		void main() {
-			// mix(texSampler, texSamplerArray, mixAmount)
-			vec4 mix = mix(texture(texSampler, texuv), texture(texSamplerArray, vec3(texuv, texlayer)), mixAmount);
-			// Apply circle as a texture
-			// Cut alpha from rectangle to make it circular
-			FragColor = vec4(mix.rgb * shapeColor.rgb, mix.a * circle_area(texuv, vec2(0.5, 0.5), 0.5, blur).r);
+			// mix(texSampler, texSamplerArray, mixamount)
+
+			vec4 mixtex = mix(texture(texSampler, texuv),
+							texture(texSamplerArray, vec3(texuv, texlayer)),
+							mixamount);
+
+			// NOTE: Alpha is not really needed, the if-case could be "dist < radius"
+			// but i want to keep the blur as an option
+
+			const float radius = 0.5;
+			// Distance from the center to the borders
+			float dist = length(texuv - 0.5);
+			// Smooth interpolation of distance. Keep between radius and raius-blur
+			// Clamp blur from 0.001 to 1.0
+			// float alpha = smoothstep(radius, radius - clamp(blur, 0.001, 1.0), dist);
+			float alpha = mask(radius);
+
+			if(alpha <= blur) {
+				discard;
+			}
+
+			fragcolor = vec4(mixtex.rgb * shapeColor.rgb, shapeColor.a * alpha);
+		}
+		
+		uniform float blur;
+		float mask(float radius) {
+			// Distance from the center to the borders
+			float dist = length(texuv - 0.5);
+			// Smooth interpolation of distance. Keep between radius and raius-blur
+			// Clamp blur from 0.001 to 1.0
+			float alpha = smoothstep(radius, radius - clamp(blur, 0.001, 1.0), dist);
+			return alpha;
 		}
 	)glsl";
-
 
 	const char* const FONT_FRAGMENT = R"glsl(
 		#version 330 core

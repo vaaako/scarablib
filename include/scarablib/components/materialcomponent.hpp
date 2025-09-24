@@ -3,6 +3,8 @@
 #include "scarablib/gfx/color.hpp"
 #include "scarablib/gfx/texture.hpp"
 #include "scarablib/gfx/texture_array.hpp"
+#include "scarablib/opengl/shader_manager.hpp"
+#include "scarablib/opengl/shaders.hpp"
 #include <cstddef>
 #include <memory>
 
@@ -12,9 +14,6 @@ struct MaterialComponent {
 	// Setting it to the default solid white texture instead.
 	// Since 99% of the time the shader will use a texture anyway.
 	// so having this system and not a "uniform check" (check for u_hasTexture) makes sense
-	//
-	// Has so for texture array where the use is not gauranteed, makes sense.
-	// not to have the same system for texture arrays
 	struct TextureHandle {
 		std::shared_ptr<Texture> ptr; // In this case is better to use a shared_ptr
 
@@ -39,22 +38,22 @@ struct MaterialComponent {
 			TextureHandle& operator=(const Texture&& other) noexcept = delete;
 
 			// Pointer-like const access
-			[[nodiscard]] inline constexpr const Texture* operator->() const noexcept {
+			[[nodiscard]] inline const Texture* operator->() const noexcept {
 				return this->ptr.get();
 			}
 
 			// Pointer-like non-const access
-			[[nodiscard]] inline constexpr Texture* operator->() noexcept {
+			[[nodiscard]] inline Texture* operator->() noexcept {
 				return this->ptr.get();
 			}
 
 			// Reference-like const access
-			inline constexpr operator const Texture&() const noexcept {
+			inline operator const Texture&() const noexcept {
 				return *this->ptr;
 			}
 
 			// Reference-like non-const access
-			inline constexpr operator Texture&() noexcept {
+			inline operator Texture&() noexcept {
 				return *this->ptr;
 			}
 
@@ -112,6 +111,19 @@ struct MaterialComponent {
 	TextureHandle texture = nullptr; // nullptr: Default texture
 	// Material's texture array
 	TextureArray* texture_array = nullptr;
+
+	// Material's default shader
+	std::shared_ptr<ShaderProgram> shader = ShaderManager::get_instance().load_shader(
+		"default",                   // Shader name.
+		Shaders::DEFAULT_VERTEX,     // Default vertex shader source.
+		Shaders::DEFAULT_FRAGMENT    // Default fragment shader source.
+	); // Pointer to the default shader used by the scene.
+
+	// 1. First Mesh: A Mesh is created and its MaterialComponent asks the ShaderManager for the default shader
+	// 2. ShaderManager (Cache miss): The manager compiles the first shader and allocated memory for one ShaderProgram object and compiles the code. It creates a shared_ptr to manage this new object and stores it in its map. It returns a copy of this `shared_ptr`
+	// 3. ShaderManager (Cache hit): The manager looks up the name "default" in its map and finds the existing shared_ptr. It returns a copy of the shared_ptr
+	//
+	// Each shared_ptr consumes around 16 bytes (8 bytes raw pointer)
 
 	MaterialComponent() noexcept = default;
 	~MaterialComponent() noexcept;

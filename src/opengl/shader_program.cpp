@@ -1,8 +1,8 @@
-#include "scarablib/opengl/shader.hpp"
+#include "scarablib/opengl/shader_program.hpp"
 #include "scarablib/proper/error.hpp"
 #include <cstddef>
 
-Shader::Shader(const char* vertex_source, const char* fragment_source) {
+ShaderProgram::ShaderProgram(const char* vertex_source, const char* fragment_source) {
 	// Compile vertex shader
 	GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
 	if(vertex_shader == 0) {
@@ -59,7 +59,7 @@ Shader::Shader(const char* vertex_source, const char* fragment_source) {
 	glDeleteShader(fragment_shader);
 }
 
-Shader::~Shader() noexcept {
+ShaderProgram::~ShaderProgram() noexcept {
 	glDeleteProgram(this->id);
 }
 

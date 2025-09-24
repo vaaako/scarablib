@@ -4,7 +4,6 @@
 #include "scarablib/components/boundingbox.hpp"
 #include "scarablib/components/materialcomponent.hpp"
 #include "scarablib/components/physicscomponent.hpp"
-#include "scarablib/opengl/shader.hpp"
 #include "scarablib/opengl/vertexbuffercomponent.hpp"
 
 // Basic data for 3D and 2D shapes
@@ -39,7 +38,7 @@ class Mesh {
 
 		// This method does not draw the Mesh to the screen.
 		// As it does not bind the VAO, Shader and Texture (batch rendering)
-		virtual void draw_logic(const Camera& camera, const Shader& shader) noexcept = 0;
+		virtual void draw_logic(const Camera& camera) noexcept = 0;
 
 		// Build Mesh using vertices and indices
 		template <typename T>
@@ -70,12 +69,6 @@ class Mesh {
 
 		virtual void update_model_matrix() noexcept = 0;
 
-		// Returns nullptr, as the default shader from Scene2D is used.
-		// Overridden by models using custom shaders
-		virtual inline Shader* get_shader() const noexcept {
-			return nullptr;
-		}
-
 	protected:
 		// Matrix
 		bool isdirty; // Calculate matrix if anything changed
@@ -94,7 +87,7 @@ Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<T>& indices) n
 template <typename T>
 void Mesh::set_geometry(const std::vector<Vertex>& vertices, const std::vector<T>& indices) {
 	// add texuv attribute
-	this->bundle.add_attribute(2, GL_FLOAT, false);
+	this->bundle.add_attribute<float>(2, true);
 	// make vao
 	this->bundle.make_vao(vertices, indices);
 }

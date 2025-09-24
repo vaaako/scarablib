@@ -1,8 +1,6 @@
 #pragma once
 
 #include "scarablib/geometry/model.hpp"
-#include "scarablib/opengl/shader_manager.hpp"
-#include "scarablib/opengl/shaders.hpp"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/vector_angle.hpp>
@@ -63,11 +61,6 @@ struct Billboard : public Model {
 	// Updates the billboard's texture direction based on a point position (usually the camera)
 	void update_facing_texture(const vec3<float>& point_pos) noexcept;
 
-	// Returns the shader used by the billboard
-	inline Shader* get_shader() const noexcept override {
-		return this->shader;
-	};
-
 	private:
 		// Precalculated directions
 		const float directions[8] = {
@@ -83,21 +76,8 @@ struct Billboard : public Model {
 		// Scoped macro
 		static constexpr float M_PI2 = M_PIf * 2.0f;
 
-		// Directional textures
-		// TextureArray* textures = nullptr;
-		// Precalculated number of textures (either 4 or 8)
-		// size_t num_sectors = 0;
-		// Used to check if texture must change
-		// uint32 cur_sector = 9; // Unbounded value to change the first time
 		// Pre calculated angle steps between directions
 		float angle_step = 0; // Using radians in this case is more accurate
 
-		// Store one time only (deleted inside window destructor)
-		Shader* shader = ShaderManager::get_instance().get_or_load_shader(
-			"billboard",
-			Shaders::BILLBOARD_VERTEX,
-			Shaders::DEFAULT_FRAGMENT
-		);
-
-		void draw_logic(const Camera& camera, const Shader& shader) noexcept override;
+		void draw_logic(const Camera& camera) noexcept override;
 };

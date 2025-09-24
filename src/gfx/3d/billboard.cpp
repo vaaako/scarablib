@@ -6,18 +6,27 @@
 #include <cstdlib>
 
 Billboard::Billboard() noexcept
-	: Model(GeometryFactory::make_plane_vertices(), std::vector<uint8> { 0, 1, 2, 0, 2, 3 }) {}
+	: Model(GeometryFactory::make_plane_vertices(), std::vector<uint8> { 0, 1, 2, 0, 2, 3 }) {
+
+	// Store one time only (deleted inside window destructor)
+	this->material->shader = ShaderManager::get_instance().load_shader(
+		"billboard",
+		Shaders::BILLBOARD_VERTEX,
+		Shaders::DEFAULT_FRAGMENT
+	);
+}
 
 
-void Billboard::draw_logic(const Camera& camera, const Shader& shader) noexcept {
+void Billboard::draw_logic(const Camera& camera) noexcept {
 	this->update_model_matrix();
 
-	shader.set_matrix4f("proj", camera.get_proj_matrix());
-	shader.set_matrix4f("view", camera.get_view_matrix());
+	std::shared_ptr<ShaderProgram> shader = this->material->shader; // cache
+	shader->set_matrix4f("proj", camera.get_proj_matrix());
+	shader->set_matrix4f("view", camera.get_view_matrix());
 
 	// Billboard stuff
-	shader.set_vector3f("billboardPos", this->position);
-	shader.set_float("billboardSize", this->scale->x);
+	shader->set_vector3f("billpos", this->position);
+	shader->set_float("billsize", this->scale->x);
 
 	// hard coded indices size
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, (void*)0);

@@ -2,8 +2,6 @@
 
 #include "scarablib/camera/camera.hpp"
 #include "scarablib/geometry/mesh.hpp"
-#include "scarablib/opengl/shader_manager.hpp"
-#include "scarablib/opengl/shaders.hpp"
 #include "scarablib/window/window.hpp"
 #include <algorithm> // lower_bound
 #include <memory>
@@ -63,11 +61,6 @@ class IScene {
 			this->camera.update_viewport(width, height);
 		}
 
-		// Returns a reference to the scene's default shader.
-		inline Shader& get_shader() {
-			return *this->shader;
-		}
-
 		// Sets the polygon drawing mode
 		inline void set_drawmode(const DrawMode drawmode) noexcept {
 			glPolygonMode(GL_FRONT_AND_BACK, drawmode);
@@ -85,12 +78,6 @@ class IScene {
 		std::unordered_map<std::string, std::shared_ptr<Mesh>> scene;
 		// Use VAO as ID to track and batch draw meshes with the same VAO.
 		std::unordered_map<uint32, std::vector<std::shared_ptr<Mesh>>> vao_groups;
-
-		Shader* shader = ShaderManager::get_instance().get_or_load_shader(
-			"scene",                     // Shader name.
-			Shaders::DEFAULT_VERTEX,     // Default vertex shader source.
-			Shaders::DEFAULT_FRAGMENT    // Default fragment shader source.
-		); // Pointer to the default shader used by the scene.
 };
 
 
@@ -121,20 +108,20 @@ T* IScene::add(const std::string& key, Args&&... args) {
 	std::shared_ptr<Mesh> mesh_ptr = std::make_shared<T>(std::forward<Args>(args)...); // Create new mesh
 	this->scene.emplace(key, mesh_ptr); // Used be get_by_key()
 
-	auto& vao_groups = this->vao_groups[mesh_ptr->bundle.vao->get_id()];
+	auto& vao_groups = this->vao_groups[mesh_ptr->bundle.vertexarray->get_vaoid()];
 
 	// Sort shaders and texture to minimize bind changes.
 	// Find the correct position for insertion
 	auto it = std::lower_bound(vao_groups.begin(), vao_groups.end(), mesh_ptr,
 		[](const std::shared_ptr<Mesh>& a, const std::shared_ptr<Mesh>& b) {
-			const Shader* sa = a->get_shader();
-			const Shader* sb = b->get_shader();
+			const uint32 sa = a->material->shader->get_id();
+			const uint32 sb = b->material->shader->get_id();
 
 			// Primary sort key: shader pointer
 			// This handles null cases too
 			if(sa != sb) {
 				// Compare even if one is nullptr
-				return std::less<const Shader*>()(sa, sb);
+				return std::less<const uint32>()(sa, sb);
 			}
 
 			// Secondary sort key: texture pointer

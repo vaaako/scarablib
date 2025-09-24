@@ -2,7 +2,6 @@
 
 #include "scarablib/typedef.hpp"
 #include <functional>
-#include <optional>
 
 // Mesh data uploaded to the GPU
 struct Vertex {

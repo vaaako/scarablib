@@ -7,15 +7,16 @@
 Skybox::Skybox(const Camera& camera, const std::array<const char*, 6>& faces)
 	: camera(camera) {
 
-	static const std::vector<vec3<float>> vertices = {
-		{ -1.0f,  1.0f, -1.0f }, // 0 - Top-Left-Back
-		{  1.0f,  1.0f, -1.0f }, // 1 - Top-Right-Back
-		{  1.0f, -1.0f, -1.0f }, // 2 - Bottom-Right-Back
-		{ -1.0f, -1.0f, -1.0f }, // 3 - Bottom-Left-Back
-		{ -1.0f,  1.0f,  1.0f }, // 4 - Top-Left-Front
-		{  1.0f,  1.0f,  1.0f }, // 5 - Top-Right-Front
-		{  1.0f, -1.0f,  1.0f }, // 6 - Bottom-Right-Front
-		{ -1.0f, -1.0f,  1.0f }  // 7 - Bottom-Left-Front
+	// TODO: Back to vec3<float> later
+	static const std::vector<Vertex> vertices = {
+		Vertex { glm::vec3(-1.0f,  1.0f, -1.0f) }, // 0 - Top-Left-Back
+		Vertex { glm::vec3(1.0f,  1.0f, -1.0f) }, // 1 - Top-Right-Back
+		Vertex { glm::vec3(1.0f, -1.0f, -1.0f) }, // 2 - Bottom-Right-Back
+		Vertex { glm::vec3(-1.0f, -1.0f, -1.0f) }, // 3 - Bottom-Left-Back
+		Vertex { glm::vec3(-1.0f,  1.0f,  1.0f) }, // 4 - Top-Left-Front
+		Vertex { glm::vec3( 1.0f,  1.0f,  1.0f) }, // 5 - Top-Right-Front
+		Vertex { glm::vec3( 1.0f, -1.0f,  1.0f) }, // 6 - Bottom-Right-Front
+		Vertex { glm::vec3(-1.0f, -1.0f,  1.0f )}  // 7 - Bottom-Left-Front
 	};
 
 	static const std::vector<uint32> indices = {
@@ -76,19 +77,21 @@ Skybox::Skybox(const Camera& camera, const std::array<const char*, 6>& faces)
 
 void Skybox::draw() noexcept {
 	// glDepthFunc(GL_LEQUAL);
+	std::shared_ptr<ShaderProgram> shader = this->shader; // cache
+	std::shared_ptr<VertexArray> vertexarray = this->bundle.vertexarray;
 
-	this->shader->use();
-	this->shader->set_matrix4f("view", glm::mat3(camera.get_view_matrix())); // Conversion: Remove translation
-	this->shader->set_matrix4f("proj", camera.get_proj_matrix());
+	shader->use();
+	shader->set_matrix4f("view", glm::mat3(camera.get_view_matrix())); // Conversion: Remove translation
+	shader->set_matrix4f("proj", camera.get_proj_matrix());
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, this->texid);
 
-	this->bundle.vao->bind();
+	vertexarray->bind_vao();
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-	this->bundle.vao->unbind();
+	vertexarray->unbind_vao();
 
-	this->shader->unbind();
+	shader->unbind();
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
 	// glDepthFunc(GL_LESS);

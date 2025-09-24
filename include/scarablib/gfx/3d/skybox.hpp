@@ -21,7 +21,7 @@ struct Skybox {
 		VertexBufferComponent bundle;
 		uint32 texid;
 
-		Shader* shader = ShaderManager::get_instance().get_or_load_shader(
+		std::shared_ptr<ShaderProgram> shader = ShaderManager::get_instance().load_shader(
 			"skybox",
 			Shaders::SKYBOX_VERTEX,
 			Shaders::SKYBOX_FRAGMENT

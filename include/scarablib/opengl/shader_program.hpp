@@ -7,19 +7,19 @@
 #include "scarablib/gfx/color.hpp"
 
 // OpenGL shader object
-struct Shader {
+struct ShaderProgram {
 		// Construct a shader using vertex and fragment shaders code
-		Shader(const char* vertex_source, const char* fragment_source);
-		~Shader() noexcept;
+		ShaderProgram(const char* vertex_source, const char* fragment_source);
+		~ShaderProgram() noexcept;
 
 		// Disable copy and moving
-		Shader(const Shader&) noexcept = delete;
-		Shader& operator=(const Shader&) noexcept = delete;
-		Shader(Shader&&) noexcept = delete;
-		Shader& operator=(Shader&&) noexcept = delete;
+		ShaderProgram(const ShaderProgram&) noexcept = delete;
+		ShaderProgram& operator=(const ShaderProgram&) noexcept = delete;
+		ShaderProgram(ShaderProgram&&) noexcept = delete;
+		ShaderProgram& operator=(ShaderProgram&&) noexcept = delete;
 
 		// Returns shader ID
-		inline GLuint get_id() const noexcept {
+		inline uint32 get_id() const noexcept {
 			return this->id;
 		}
 
@@ -78,5 +78,5 @@ struct Shader {
 			glUniform1f(glGetUniformLocation(this->id, unif), val);
 		}
 	private:
-		GLuint id;
+		uint32 id;
 };

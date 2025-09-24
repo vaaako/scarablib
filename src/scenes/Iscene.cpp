@@ -2,6 +2,7 @@
 #include "scarablib/components/materialcomponent.hpp"
 #include "scarablib/gfx/color.hpp"
 #include "scarablib/gfx/texture_array.hpp"
+#include "scarablib/proper/log.hpp"
 
 IScene::IScene(Camera& camera) noexcept : camera(camera) {}
 
@@ -17,20 +18,20 @@ void IScene::remove_by_key(const std::string& key) {
 	}
 
 	// Remove from the scene vao map
-	this->vao_groups.erase(this->scene.at(key)->bundle.vao->get_id());
+	this->vao_groups.erase(this->scene.at(key)->bundle.vertexarray->get_vaoid());
 	// Remove from the scene key map
 	this->scene.erase(key);
 }
 
 // TODO: Not finished i need to check if its working and change a little bit
 void IScene::draw(Mesh& model) const noexcept {
-	this->shader->use();
-	// Shader* shader = (model.get_shader() != nullptr) ? model.get_shader() : shader;
+	std::shared_ptr<ShaderProgram> shader = model.material->shader;
+	shader->use();
 
 	shader->set_int("texSampler", 0);      // Bind texture to unit 0
 	shader->set_int("texSamplerArray", 1); // Bind to unit 1
 
-	model.bundle.vao->bind();
+	model.bundle.vertexarray->bind_vao();
 
 	const MaterialComponent::TextureHandle& texture = model.material->texture;
 	const TextureArray* texture_array = model.material->texture_array;
@@ -50,13 +51,11 @@ void IScene::draw(Mesh& model) const noexcept {
 
 	// Not need for cur_mixamount because this is irrelevant
 	const float mix_amount = (hastex && hastexarray) ? model.material->mix_amount : (hastexarray ? 1.0f : 0.0f);
-	shader->set_float("mixAmount", mix_amount);
+	shader->set_float("mixamount", mix_amount);
 
 	shader->set_color("shapeColor", model.material->color);
 
-	model.draw_logic(this->camera,
-		(model.get_shader() != nullptr) ? *model.get_shader() : *this->shader
-	);
+	model.draw_logic(this->camera);
 }
 
 // glUseProgram      - Most expensive change
@@ -66,28 +65,24 @@ void IScene::draw(Mesh& model) const noexcept {
 
 void IScene::draw_all() const noexcept {
 	// Cache shader and camera
-	Shader* shader = this->shader;
 	Camera& camera = this->camera;
 
 	// Track currently bound objects to avoid redundant bindings
-	GLuint cur_vao = 0;
-	Shader* cur_shader = this->shader;
-	MaterialComponent::TextureHandle cur_texture = nullptr; // Default texture
-	TextureArray* cur_texarray = nullptr;
-	Color cur_color = Colors::WHITE;
+	GLuint cur_vao                               = 0;
+	std::shared_ptr<ShaderProgram> cur_shader    = nullptr;
+	MaterialComponent::TextureHandle cur_texture = nullptr; // This is not nullptr, this is converted to a texture inside TextureHandle
+	TextureArray* cur_texarray                   = nullptr;
+	Color cur_color                              = Colors::WHITE;
 
 	// Bind defaults
-	cur_shader->use();   // Bind default shader
 	cur_texture->bind(); // Bind default texture
-
-	// Uniforms
-	cur_shader->set_int("texSampler", 0);      // Bind texture to unit 0
-	cur_shader->set_int("texSamplerArray", 1); // Bind to unit 1
-	cur_shader->set_color("shapeColor", cur_color);
 
 	for(const auto& [vao, models] : this->vao_groups) {
 		// Bind VAO if its a different from the currently bound
 		if(vao != cur_vao) {
+			#ifdef SCARAB_DEBUG_DRAW_ALL
+			LOG_DEBUG("Changing VAO from %d to: %d", cur_vao, vao);
+			#endif
 			glBindVertexArray(vao);
 			cur_vao = vao;
 		}
@@ -96,12 +91,13 @@ void IScene::draw_all() const noexcept {
 		for(const std::shared_ptr<Mesh>& model : models) {
 			// -- SHADER //
 			// Determine which shader to use
-			Shader* model_shader = (model->get_shader() != nullptr) ? model->get_shader() : shader;
-			// Change between default shader and different shader
+			std::shared_ptr<ShaderProgram> model_shader = model->material->shader;
 			if(model_shader != cur_shader) {
-				cur_shader->unbind();
-				model_shader->use();
 				cur_shader = model_shader;
+				cur_shader->use();
+				#ifdef SCARAB_DEBUG_DRAW_ALL
+				LOG_DEBUG("changin shader %d", cur_shader->get_id());
+				#endif
 
 				// Bind Again
 				cur_shader->set_int("texSampler", 0);      // Bind texture to unit 0
@@ -135,17 +131,21 @@ void IScene::draw_all() const noexcept {
 
 			// Not need for cur_mixamount because this is irrelevant
 			const float mix_amount = (model->material->texture != nullptr && hastexarray) ? model->material->mix_amount : (hastexarray ? 1.0f : 0.0f);
-			cur_shader->set_float("mixAmount", mix_amount);
+			cur_shader->set_float("mixamount", mix_amount);
 			// TEXTURE -- //
 
 			// -- COLOR //
 			if(model->material->color != cur_color) {
-				cur_shader->set_color("shapeColor", model->material->color);
+				#ifdef SCARAB_DEBUG_DRAW_ALL
+				LOG_DEBUG("changin color (%d, %d, %d, %d)", cur_color.red, cur_color.green, cur_color.blue, cur_color.alpha);
+				#endif
+				cur_color = model->material->color;
+				cur_shader->set_color("shapeColor", cur_color);
 			}
 			// COLOR -- //
 
 			// Draw model
-			model->draw_logic(camera, *cur_shader);
+			model->draw_logic(camera);
 		}
 	}
 

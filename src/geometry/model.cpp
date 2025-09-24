@@ -93,15 +93,16 @@ void Model::update_model_matrix() noexcept {
 	}
 }
 
+#include "scarablib/utils/opengl.hpp"
+
 // I just need to provide the mvp just if any of the matrix changes, because the value is stored
 // but i dont know how to do it currently (and i am lazy)
-void Model::draw_logic(const Camera& camera, const Shader& shader) noexcept {
+void Model::draw_logic(const Camera& camera) noexcept {
 	// Shader is binded outside for batch rendering
 	this->update_model_matrix();
 
 	// NOTE: is_dirty for color wouldn't work because would set this color to the next meshes
-	shader.set_matrix4f("mvp", (camera.get_proj_matrix() * camera.get_view_matrix()) * this->model);
-
+	this->material->shader->set_matrix4f("mvp", (camera.get_proj_matrix() * camera.get_view_matrix()) * this->model);
 	glDrawElements(GL_TRIANGLES, this->bundle.get_length(), this->bundle.get_indices_type(), (void*)0);
 }
 

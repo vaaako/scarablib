@@ -1,5 +1,5 @@
 #include "scarablib/gfx/font.hpp"
-#include "scarablib/opengl/shader.hpp"
+#include "scarablib/opengl/shader_program.hpp"
 #include "scarablib/proper/error.hpp"
 #include "scarablib/proper/log.hpp"
 #include "scarablib/camera/camera2d.hpp"
@@ -114,7 +114,7 @@ void Font::draw_text(const std::string& text, const vec2<float>& pos, const floa
 	model = glm::scale(model, glm::vec3(scale, scale, 1.0f));
 
 	// Bind Shader
-	Shader& shader = this->get_shader();
+	ShaderProgram& shader = this->get_shader();
 	shader.use();
 	shader.set_color("shapeColor", color);
 	shader.set_matrix4f("mvp", (this->camera.get_proj_matrix() * this->camera.get_view_matrix()) * model);
