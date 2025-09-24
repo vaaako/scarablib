@@ -80,18 +80,21 @@ Stuff that are in progress and i need to finish
 
 
 # TODO Shaders
-- [ ] Revise ShaderManager
+- [x] Revise ShaderManager
 	+ I dont know if its fully optimized and working properly
 - [x] Rename `Shader` to `ShaderProgram`
-- [ ] Separate Shader Objects (`GL_ARB_separate_shader_objects`)
-	+ `ShaderProgram->bind_vertex()` and `ShaderProgram->bind_fragment()`?
+- [x] Put shader inside `MaterialComponent`
+- [x] Fix circle shader
 - [ ] More dynamic Shader class
 	+ `make_shader` and `compile_shader` methods
-- [ ] Put shader inside `MaterialComponent`
-- [ ] Fix circle shader
-- [ ] Shader "blocks"
-	+ Library provides a base shader then a custom shader. THe custom shader is concatenated at runtime before compiling
-- [ ] Shader back to external file
+- [ ] Separate Shader Objects (`GL_ARB_separate_shader_objects`)
+	+ `ShaderProgram->bind_vertex()` and `ShaderProgram->bind_fragment()`?
+- [ ] Custom shaders
+	+ Shader "blocks": Library provides a base shader then a custom shader. The custom shader is concatenated at runtime before compiling
+- [ ] UBO?
+	+ idk if its really necessary, currently the common uniforms are centered in `Iscene.cpp`
+	+ maybe this could be necessary when implementing custom shaders
+- [ ] Shader back to external file?
 	+ convert to headers
 
 
