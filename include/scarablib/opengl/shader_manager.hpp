@@ -20,11 +20,20 @@ class ShaderManager {
 		// - `vertex_shader`: The source code for the vertex shader.
 		// - `fragment_shader`: The source code for the fragment shader.
 		// Returns: A pointer to the existing shader, or a pointer to a newly created shader if it didn't exist.
-		// NOTE:  Use this when overriding `Mesh::get_shader()`
 		std::shared_ptr<ShaderProgram> load_shader(const std::string_view& name, const char* vertex_shader, const char* fragment_shader) noexcept;
+
+		// Uploads a user defined shader. This uses the default vertex shader (Shaders::DEFAULT_VERTEX_SHADER).
+		// - `name`: The name of the shader. Used for tracking shader existence.
+		// - `vertexid`: The ID of the vertex shader to use as a base.
+		// - `user_shader`: The source code for the fragment shader.
+		// Returns: A pointer to the existing shader, or a pointer to a newly created shader if it didn't exist.
+		std::shared_ptr<ShaderProgram> load_custom_shader(const std::string_view& name, uint32 vertexid, const char* user_shader) noexcept;
 
 		// Retrieves an existing shader by its name.
 		std::shared_ptr<ShaderProgram> get_shader(const std::string_view& name) const noexcept;
+
+		// Releases a Shader from the manager, using its name
+		void release_vao(const std::string_view& name) noexcept;
 
 		// Cleans up all shaders.
 		// WARNING: This is called when a window is destroyed. DO NOT call it manually.

@@ -8,6 +8,11 @@
 // A class that bundles the VAO, VBO and EBO buffers.
 // Also stores information necessary for rendering like indices size and indices type.
 // With utilitary methods for creating the Vertex Buffer
+//
+// The library has a "Builder" and a "Object class" for every object that needs a manager.
+// It would totally be possible to put the Builder's methods inside the Object class.
+// But the Builder only contains methods and member that are useful when making this object
+// then putting this methods all together is kinda pointless and memory loss
 class VertexBufferComponent {
 	public:
 		// Must be initialized with some constructor

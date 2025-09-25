@@ -114,8 +114,8 @@ T* IScene::add(const std::string& key, Args&&... args) {
 	// Find the correct position for insertion
 	auto it = std::lower_bound(vao_groups.begin(), vao_groups.end(), mesh_ptr,
 		[](const std::shared_ptr<Mesh>& a, const std::shared_ptr<Mesh>& b) {
-			const uint32 sa = a->material->shader->get_id();
-			const uint32 sb = b->material->shader->get_id();
+			const uint32 sa = a->material->shader->get_programid();
+			const uint32 sb = b->material->shader->get_programid();
 
 			// Primary sort key: shader pointer
 			// This handles null cases too

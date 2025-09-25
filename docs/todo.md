@@ -78,6 +78,10 @@ Stuff that are in progress and i need to finish
 
 - [ ] make sure single draw call is working
 
+- [ ] Unify `VAOManager` and `ShaderManager` to `ResourceManager`
+- [ ] Vertex store `VertexArray` only
+	+ put `indices_length`, `hash` etc in it
+	+ builder methods are only useful when making a new vao, not need to it
 
 # TODO Shaders
 - [x] Revise ShaderManager
@@ -85,12 +89,16 @@ Stuff that are in progress and i need to finish
 - [x] Rename `Shader` to `ShaderProgram`
 - [x] Put shader inside `MaterialComponent`
 - [x] Fix circle shader
-- [ ] More dynamic Shader class
+- [x] More dynamic Shader class
 	+ `make_shader` and `compile_shader` methods
+- [ ] Custom shaders
+	+ Shader injection
+	+ Copy `VertexBufferComponent` to `ShaderComponent`
+	+ `ShaderComponent` (uses `ShaderManager`) -> Returns `ShaderProgram`
+	+ `ShaderManager` stores `ShaderProgram`
+	+ Like `VertexArray`, `ShaderProgram` should only take the IDs as input. `ShaderComponent` should build all
 - [ ] Separate Shader Objects (`GL_ARB_separate_shader_objects`)
 	+ `ShaderProgram->bind_vertex()` and `ShaderProgram->bind_fragment()`?
-- [ ] Custom shaders
-	+ Shader "blocks": Library provides a base shader then a custom shader. The custom shader is concatenated at runtime before compiling
 - [ ] UBO?
 	+ idk if its really necessary, currently the common uniforms are centered in `Iscene.cpp`
 	+ maybe this could be necessary when implementing custom shaders

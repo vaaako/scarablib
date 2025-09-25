@@ -46,6 +46,29 @@ The window object must be relased after all other OpenGL objects, otherwhise it 
 
 # Texture
 
+# Custom Shaders
+
+Default uniforms are:
+- `shapeColor`: Mesh's color
+- `texSampler`: Texture 2D (one pixel solid white if none is set)
+- `texSamplerArray`: Texture Array
+- `texLayer`: Texture Array's index
+- `mixAmount`: mix amount of **texSampler** and **texSamplerArray**
+
+`texSamplerArray`, `texLayer` and `mixAmount` will only have value if a Texture Array is used
+
+If you want to mix `texSampler` and `texSamplerArray` you can use the following snippet
+```glsl
+vec4 mixedtex = mix(
+	// Texture Sampler
+	texture(texSampler, texuv),
+	// Texture Array Sampler
+	texture(texSamplerArray, vec3(texuv, texlayer)),
+	// Mix amount
+	mixamount
+);
+```
+
 # Skybox
 
 # TerrainMap

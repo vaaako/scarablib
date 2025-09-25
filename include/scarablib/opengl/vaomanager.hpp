@@ -44,12 +44,12 @@ class VAOManager {
 			const std::vector<Vertex>& vertices, const std::vector<T>& indices,
 			const std::vector<VertexAttribute>& attributes);
 
-		// Releases a VAO from the manager, using its hash
-		void release_vao(const size_t hash) noexcept;
-
 		// Returns an entry of a VAO using its hash
 		// Error if the hash is not found
 		std::shared_ptr<VertexArray> get_vao_entry(const size_t hash) const;
+
+		// Releases a VAO from the manager, using its hash
+		void release_vao(const size_t hash) noexcept;
 
 		// Cleans up all VAOs.
 		// WARNING: This is called inside Window destructor.
