@@ -12,7 +12,7 @@ IScene::~IScene() noexcept {
 }
 
 
-void IScene::remove_by_key(const std::string& key) {
+void IScene::remove_by_key(const std::string_view& key) {
 	if(!this->scene.contains(key)) {
 		throw ScarabError("Key '%s' was not found", key.data());
 	}

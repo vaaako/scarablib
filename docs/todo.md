@@ -1,8 +1,8 @@
 # Note
 I wrote most of the things here very tired, sorry for any english mistake
 
-# Need to test until it works
-- Bounding box
+# Stuff to remember
+- I dont call `VertexManager` inside `VertexArray` because i want to give user the option to not use the manager
 
 # Currently working on
 Stuff that are in progress and i need to finish
@@ -83,6 +83,17 @@ Stuff that are in progress and i need to finish
 	+ put `indices_length`, `hash` etc in it
 	+ builder methods are only useful when making a new vao, not need to it
 
+- [ ] Rename `VAOManager` to `VertexManager`
+- [ ] Rethink Managers
+	+ Manager: Makes "Objects" and keep one object pointer on map
+	+ `VertexArray` can be built without the attributes
+	+ i can move attributes to `VertexArray`, the method that adds can on the VBO right way, only need to store the stride and increment it inside the method
+	+ `ShaderProgram` will have a member that stores id of vertex and fragment shader
+	+ `Shader Manager` checks if any of the shaders already exist, if so, then use it to make the new program
+	+ i cant think in any way to check if the combination of these already exist, to not re-compile the same Shader Program
+	+ even checking for the shaders is not perfect, because the hash will be different event if a single character is mismatch
+	+ i could user Shader Pipeline
+
 # TODO Shaders
 - [x] Revise ShaderManager
 	+ I dont know if its fully optimized and working properly
@@ -91,6 +102,7 @@ Stuff that are in progress and i need to finish
 - [x] Fix circle shader
 - [x] More dynamic Shader class
 	+ `make_shader` and `compile_shader` methods
+- [ ] `ShaderManager` also manages Shader objects and `ShaderProgrram`
 - [ ] Custom shaders
 	+ Shader injection
 	+ Copy `VertexBufferComponent` to `ShaderComponent`

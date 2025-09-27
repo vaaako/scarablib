@@ -2,12 +2,11 @@
 
 #include "scarablib/opengl/shader_program.hpp"
 #include <memory>
-#include <string_view>
 #include <unordered_map>
 
-// Manages all loaded shaders.
-// This exists for the same reason as the VAO manager.
-// To different instances with same shader don't re-load the shader every new instance
+// Manages memory of all Shaders and Shader Programs created.
+// This exists so if a Mesh wants to use the same Shader or Shader Program and this
+// already exists, the manager gives the existing memory
 class ShaderManager {
 	public:
 		static ShaderManager& get_instance() {
@@ -16,30 +15,40 @@ class ShaderManager {
 		}
 
 		// Uploads vertex and fragment shader code to the manager.
-		// - `name`: The name of the shader. Used for tracking shader existence.
-		// - `vertex_shader`: The source code for the vertex shader.
-		// - `fragment_shader`: The source code for the fragment shader.
+		// - `vertex_souce`: The source code for the vertex shader.
+		// - `fragment_source`: The source code for the fragment shader.
 		// Returns: A pointer to the existing shader, or a pointer to a newly created shader if it didn't exist.
-		std::shared_ptr<ShaderProgram> load_shader(const std::string_view& name, const char* vertex_shader, const char* fragment_shader) noexcept;
+		std::shared_ptr<ShaderProgram> load_shader_program(const std::vector<ShaderProgram::ShaderInfo>& infos);
 
-		// Uploads a user defined shader. This uses the default vertex shader (Shaders::DEFAULT_VERTEX_SHADER).
-		// - `name`: The name of the shader. Used for tracking shader existence.
-		// - `vertexid`: The ID of the vertex shader to use as a base.
-		// - `user_shader`: The source code for the fragment shader.
-		// Returns: A pointer to the existing shader, or a pointer to a newly created shader if it didn't exist.
-		std::shared_ptr<ShaderProgram> load_custom_shader(const std::string_view& name, uint32 vertexid, const char* user_shader) noexcept;
+		// Returns an existing or new compiled shader
+		std::shared_ptr<uint32> get_or_compile_shader(const char* source, ShaderProgram::Type type);
 
-		// Retrieves an existing shader by its name.
-		std::shared_ptr<ShaderProgram> get_shader(const std::string_view& name) const noexcept;
+		// std::shared_ptr<ShaderProgram> load_custom_shader(const ShaderManager::Type shader_type, const char* user_shader) noexcept;
+
+		// Retrieves an existing Shader using its hash.
+		// Returns nullptr if not found
+		std::shared_ptr<uint32> get_shader(const size_t hash) noexcept;
+
+		// Retrieves an existing Shader Program using its hash.
+		// Returns nullptr if not found
+		std::shared_ptr<ShaderProgram> get_program(const size_t hash) noexcept;
 
 		// Releases a Shader from the manager, using its name
-		void release_vao(const std::string_view& name) noexcept;
+		// void release_shader(const size_t hash) noexcept;
 
 		// Cleans up all shaders.
 		// WARNING: This is called when a window is destroyed. DO NOT call it manually.
 		void cleanup() noexcept;
 
 	private:
-		// If I use char* here, it will look up the memory address of the string instead of the string itself
-		std::unordered_map<std::string_view, std::shared_ptr<ShaderProgram>> shader_map;
+		std::unordered_map<size_t, std::weak_ptr<uint32>> shader_cache;
+		std::unordered_map<size_t, std::weak_ptr<ShaderProgram>> program_cache;
 };
+
+// I had to make a whole new system for managing shaders and not only Shader Programs
+// as i was doing before
+//
+// But i think its worth it. I used weak_ptr so if no other object is using the Shader/Shader Program
+// it will get expired and therefore freeing some unused memory
+//
+// I know the expired weak_ptr still consumes memory, but is less than ShaderProgram and uint32

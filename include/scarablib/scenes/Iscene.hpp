@@ -23,15 +23,15 @@ class IScene {
 
 		// Add a shape to the scene
 		template <typename T, typename... Args>
-		T* add(const std::string& key, Args&&... args);
+		T* add(const std::string_view& key, Args&&... args);
 
 		// Returns an object by key and dynamically convert it.
 		// Returns nullptr if the key does not exist
 		template <typename T>
-		std::shared_ptr<T> get_by_key(const std::string& key) noexcept;
+		std::shared_ptr<T> get_by_key(const std::string_view& key) noexcept;
 
 		// Remove object by key
-		void remove_by_key(const std::string& key);
+		void remove_by_key(const std::string_view& key);
 
 		// Draw a single model.
 		// If the model was added to the scene, it will be drawn twice
@@ -75,14 +75,14 @@ class IScene {
 		Camera& camera;
 
 		// Objects added to the scene, stored as shared pointers for automatic memory management.
-		std::unordered_map<std::string, std::shared_ptr<Mesh>> scene;
+		std::unordered_map<std::string_view, std::shared_ptr<Mesh>> scene;
 		// Use VAO as ID to track and batch draw meshes with the same VAO.
 		std::unordered_map<uint32, std::vector<std::shared_ptr<Mesh>>> vao_groups;
 };
 
 
 template <typename T>
-std::shared_ptr<T> IScene::get_by_key(const std::string& key) noexcept {
+std::shared_ptr<T> IScene::get_by_key(const std::string_view& key) noexcept {
 	if(!this->scene.contains(key)) {
 		return nullptr;
 	}
@@ -97,7 +97,7 @@ std::shared_ptr<T> IScene::get_by_key(const std::string& key) noexcept {
 }
 
 template <typename T, typename... Args>
-T* IScene::add(const std::string& key, Args&&... args) {
+T* IScene::add(const std::string_view& key, Args&&... args) {
 	static_assert(std::is_base_of_v<Mesh, T>,
 			"You can only add Mesh types to the scene");
 

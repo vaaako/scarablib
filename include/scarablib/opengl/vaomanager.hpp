@@ -44,11 +44,12 @@ class VAOManager {
 			const std::vector<Vertex>& vertices, const std::vector<T>& indices,
 			const std::vector<VertexAttribute>& attributes);
 
-		// Returns an entry of a VAO using its hash
-		// Error if the hash is not found
+		// Returns an entry of a VAO using its hash.
+		// Returns nullptr if not found
 		std::shared_ptr<VertexArray> get_vao_entry(const size_t hash) const;
 
-		// Releases a VAO from the manager, using its hash
+		// Releases a VAO from the manager, using its hash.
+		// Does nothing if not found
 		void release_vao(const size_t hash) noexcept;
 
 		// Cleans up all VAOs.
@@ -73,19 +74,19 @@ std::pair<size_t, std::shared_ptr<VertexArray>> VAOManager::acquire_vao(
 		throw ScarabError("Vertices vector is empty for VAO creation");
 	}
 
-	// 1. Compute the hash (internal detail)
+	// -- COMPUTE HASH
 	const size_t hash = this->compute_hash(vertices, indices);
 
-	// 2. Check if it already exists. If so, increment ref_count and return.
-	auto it = this->vao_map.find(hash);
-	if (it != this->vao_map.end()) {
+	// -- CHECK IF CACHED
+	std::shared_ptr<VertexArray> vertexarray = this->get_vao_entry(hash);
+	if(vertexarray != nullptr) {
 		#ifdef SCARAB_DEBUG_VAO_MANAGER
 		LOG_DEBUG("Hash %zu found! Reusing VAO.", hash);
 		#endif
 		// Return the existing entry
 		return {
 			hash,
-			it->second
+			vertexarray
 		};
 	}
 
@@ -94,7 +95,6 @@ std::pair<size_t, std::shared_ptr<VertexArray>> VAOManager::acquire_vao(
 	#endif
 
 	// Make buffers
-	std::shared_ptr<VertexArray> vertexarray;
 	if(!indices.empty()) {
 		vertexarray = std::make_shared<VertexArray>(indices);
 	} else {
@@ -129,6 +129,8 @@ std::pair<size_t, std::shared_ptr<VertexArray>> VAOManager::acquire_vao(
 }
 
 // Specialized hash function for better distribution
+
+// TODO: Use ScarabMath::hash_combine
 template <typename T>
 size_t VAOManager::compute_hash(const std::vector<Vertex>& vertices, const std::vector<T>& indices) const noexcept {
 	static_assert(std::is_unsigned_v<T>, "Only unsigned types for indices are accepted");

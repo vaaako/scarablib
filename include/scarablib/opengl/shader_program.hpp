@@ -2,17 +2,42 @@
 
 #include <glm/ext.hpp>
 #include <glm/mat4x4.hpp>
+#include <memory>
 #include <vector>
 #include "scarablib/typedef.hpp"
 #include "scarablib/gfx/color.hpp"
 
 // OpenGL shader object
 class ShaderProgram {
+	friend class ShaderManager;
+
 	public:
-		// Construct a shader using vertex and fragment shaders source code
-		ShaderProgram(const char* vertex_source, const char* fragment_source);
-		// This constructor is used when making a program out of an existing shader
-		ShaderProgram(const bool isvertex, const uint32 shaderid, const char* source);
+		// Supported shader versions
+		enum class Type {
+			Vertex   = GL_VERTEX_SHADER,
+			Fragment = GL_FRAGMENT_SHADER
+		};
+
+		// Struct used for Shader object
+		// struct Shader {
+		// 	uint32 id   = 0;
+		// 	uint32 hash = 0;
+		// 	ShaderProgram::Type type;
+		// };
+
+		// Shader information to pass to program.
+		// Use `existing_id` if you want to use an existing ID
+		struct ShaderInfo {
+			// Shader's source
+			const char* source = nullptr;
+			// Type of the shader
+			ShaderProgram::Type type;
+			// Use an existing shader instead of a new source code
+			std::shared_ptr<uint32> existing_id = nullptr;
+		};
+
+		// Contruct shader giving a vector of all desired shaders to use
+		ShaderProgram(const std::vector<ShaderInfo>& infos);
 		~ShaderProgram() noexcept;
 
 		// Disable copy and moving
@@ -26,16 +51,6 @@ class ShaderProgram {
 			return this->programid;
 		}
 
-		// Returns id of fragment shader
-		inline uint32 get_vertexid() const noexcept {
-			return this->vertexid;
-		}
-
-		// // Returns id of vertex shader
-		// inline uint32 get_fragmentid() const noexcept {
-		// 	return this->fragmentid;
-		// }
-
 		// Enable shader program
 		inline void use() const noexcept {
 			glUseProgram(this->programid);
@@ -46,13 +61,15 @@ class ShaderProgram {
 			glUseProgram(0);
 		}
 
+		inline std::vector<>
 
-		// Compiles a shader and returns its ID to use it when creating the shader.
-		// If an ID for this shader already exists, it will be replaced
-		void compile_shader(const char* source, const bool isvertex = true);
 
-		// Uses vertex and fragment shader IDs (created with ShaderProgram::compile_shader) to make Shader Program.
-		void link_program();
+		// Utility function for users who might want to compile a single shader
+		// without creating a full program.
+		// It returns a `shared_ptr<uint32>` because this method is usually used inside `ShaderManager`.
+		// This `shared_ptr` contains a custom destructor
+		static std::shared_ptr<uint32> compile_shader(const char* source, const ShaderProgram::Type type);
+
 
 
 		// -- UNIFORMS
@@ -98,8 +115,9 @@ class ShaderProgram {
 		inline void set_float(const char* unif, const float val) const noexcept {
 			glUniform1f(glGetUniformLocation(this->programid, unif), val);
 		}
+
 	private:
 		uint32 programid;
-		uint32 vertexid   = 0;
-		uint32 fragmentid = 0;
+		uint32 hash;
+		std::vector<std::shared_ptr<uint32>> attached_shaders;
 };

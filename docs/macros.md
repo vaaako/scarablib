@@ -16,9 +16,11 @@ Prints any keyboard key pressed and its state
 # SCARAB_DEBUG_VAO_MANAGER
 Shows all VAO's hashes created and deleted
 
-
 # SCARAB_DEBUG_BILLBOARD_TEXTURE
 Shows all VAO's hashes created and deleted
 
 # SCARAB_DEBUG_DRAW_ALL
 Shows when the current VAO and Shader changes
+
+# SCARAB_DEBUG_SHADER_MANAGER
+Shows all Shader Program's hashes created and deleted

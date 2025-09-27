@@ -8,12 +8,11 @@
 Billboard::Billboard() noexcept
 	: Model(GeometryFactory::make_plane_vertices(), std::vector<uint8> { 0, 1, 2, 0, 2, 3 }) {
 
-	// Store one time only (deleted inside window destructor)
-	this->material->shader = ShaderManager::get_instance().load_shader(
-		"billboard",
-		Shaders::BILLBOARD_VERTEX,
-		Shaders::DEFAULT_FRAGMENT
-	);
+	this->material->shader = ShaderManager::get_instance().load_shader_program({
+		// Default vertex and fragment shader source
+		{ .source = Shaders::BILLBOARD_VERTEX, .type = ShaderProgram::Type::Vertex },
+		{ .source = Shaders::DEFAULT_FRAGMENT, .type = ShaderProgram::Type::Fragment },
+	});
 }
 
 

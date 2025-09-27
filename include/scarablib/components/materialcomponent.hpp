@@ -113,11 +113,11 @@ struct MaterialComponent {
 	TextureArray* texture_array = nullptr;
 
 	// Material's default shader
-	std::shared_ptr<ShaderProgram> shader = ShaderManager::get_instance().load_shader(
-		"default",                   // Shader name.
-		Shaders::DEFAULT_VERTEX,     // Default vertex shader source.
-		Shaders::DEFAULT_FRAGMENT    // Default fragment shader source.
-	); // Pointer to the default shader used by the scene.
+	std::shared_ptr<ShaderProgram> shader = ShaderManager::get_instance().load_shader_program({
+		// Default vertex and fragment shader source
+		{ .source = Shaders::DEFAULT_VERTEX,   .type = ShaderProgram::Type::Vertex },
+		{ .source = Shaders::DEFAULT_FRAGMENT, .type = ShaderProgram::Type::Fragment },
+	});
 
 	// 1. First Mesh: A Mesh is created and its MaterialComponent asks the ShaderManager for the default shader
 	// 2. ShaderManager (Cache miss): The manager compiles the first shader and allocated memory for one ShaderProgram object and compiles the code. It creates a shared_ptr to manage this new object and stores it in its map. It returns a copy of this `shared_ptr`
