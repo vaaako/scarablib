@@ -10,8 +10,8 @@ Billboard::Billboard() noexcept
 
 	this->material->shader = ShaderManager::get_instance().load_shader_program({
 		// Default vertex and fragment shader source
-		{ .source = Shaders::BILLBOARD_VERTEX, .type = ShaderProgram::Type::Vertex },
-		{ .source = Shaders::DEFAULT_FRAGMENT, .type = ShaderProgram::Type::Fragment },
+		{ .source = Shaders::BILLBOARD_VERTEX, .type = Shader::Type::Vertex },
+		{ .source = Shaders::DEFAULT_FRAGMENT, .type = Shader::Type::Fragment },
 	});
 }
 

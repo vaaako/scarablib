@@ -1,19 +1,16 @@
 #include "scarablib/opengl/shader_program.hpp"
 #include "scarablib/proper/error.hpp"
+#include <algorithm>
 #include <cstddef>
 
-ShaderProgram::ShaderProgram(const std::vector<ShaderInfo>& infos) {
-	if(infos.empty()) {
-		throw ScarabError("No shader info provided to create a program");
+ShaderProgram::ShaderProgram(const std::vector<std::shared_ptr<Shader>>& shaders) {
+	if(shaders.empty()) {
+		throw ScarabError("No shaders provided to create a program");
 	}
 
-	for(const auto& info : infos) {
-		if(info.existing_id != nullptr) {
-			this->attached_shaders.push_back(info.existing_id);
-		} else if(info.source != nullptr) {
-			this->attached_shaders.push_back(this->compile_shader(info.source, info.type));
-		} else {
-			throw ScarabError("ShaderInfo must have either source or existing_id");
+	for(const auto& shader : shaders) {
+		if(shader == nullptr || shader->id == 0) {
+			throw ScarabError("\"shader\" object is nullptr or contains an invalid id");
 		}
 	}
 
@@ -22,17 +19,18 @@ ShaderProgram::ShaderProgram(const std::vector<ShaderInfo>& infos) {
 		throw ScarabError("Failed to create shader program");
 	}
 
-	for(const auto& shader_id : this->attached_shaders) {
-		glAttachShader(programid, *shader_id);
+	for(const auto& shader : shaders) {
+		glAttachShader(programid, shader->id);
 	}
 	glLinkProgram(programid);
 
-	for(const auto& shader_id : this->attached_shaders) {
-		glDetachShader(programid, *shader_id);
+	// Detach shaders (not needed anymore)
+	for(const auto& shader : shaders) {
+		glDetachShader(programid, shader->id);
 		// glDeleteShader(shaderid);
 	}
 
-	// Check for compilation error
+	// Check for linking error
 	GLint success;
 	glGetProgramiv(programid, GL_LINK_STATUS, &success);
 	if(!success) {
@@ -43,6 +41,7 @@ ShaderProgram::ShaderProgram(const std::vector<ShaderInfo>& infos) {
 	}
 
 	this->programid = programid;
+	this->attached_shaders = shaders; // transfer ownership of weak_ptr of "shaders"
 }
 
 ShaderProgram::~ShaderProgram() noexcept {
@@ -51,32 +50,42 @@ ShaderProgram::~ShaderProgram() noexcept {
 	this->attached_shaders.clear();
 }
 
-std::shared_ptr<uint32> ShaderProgram::compile_shader(const char* source, const ShaderProgram::Type type) {
-	// Compile vertex shader
-	GLuint shaderid = glCreateShader((int)type);
-	if(shaderid == 0) {
-		throw ScarabError("Failed to compile shader.");
-	}
-	glShaderSource(shaderid, 1, &source, nullptr);
-	glCompileShader(shaderid);
+std::shared_ptr<Shader> ShaderProgram::get_shader(const uint32 id) {
+	// Find and remove existing shader
+	auto it = std::find_if(this->attached_shaders.begin(), this->attached_shaders.end(), [&](const std::shared_ptr<Shader>& s){
+		return s->id == id;
+	});
+	return (it != attached_shaders.end()) ? *it : nullptr;
+}
 
-	// Check for compilation error
-	GLint success;
-	glGetShaderiv(shaderid, GL_COMPILE_STATUS, &success);
-	if(!success) {
-		GLchar info_log[512];
-		glGetShaderInfoLog(shaderid, 512, NULL, info_log);
-		glDeleteShader(shaderid); // Clean up the failed shader
-		throw ScarabError("Error Compiling  %s: \n%s",
-			((int)type == GL_VERTEX_SHADER) ? "VERTEX" : "FRAGMENT",
-			info_log
+std::shared_ptr<Shader> ShaderProgram::get_shader(const Shader::Type type) {
+	// Find and remove existing shader
+	auto it = std::find_if(this->attached_shaders.begin(), this->attached_shaders.end(), [&](const std::shared_ptr<Shader>& s){
+		return s->type == type;
+	});
+	return (it != attached_shaders.end()) ? *it : nullptr;
+}
+
+void ShaderProgram::swap_shader(const uint32 id, const Shader::Type type) {
+	// Remove existing
+	if(std::shared_ptr<Shader> existing = this->get_shader(type)) {
+		this->attached_shaders.erase(
+			std::remove(this->attached_shaders.begin(), this->attached_shaders.end(), existing), this->attached_shaders.end()
 		);
 	}
 
-	return std::shared_ptr<uint32>(new uint32(shaderid), [](uint32* id_to_delete) {
-		if(id_to_delete != nullptr) {
-			glDeleteShader(*id_to_delete);
-			delete id_to_delete;
-		}
-	});
+	// Link shader
+	glAttachShader(programid, id);
+	glLinkProgram(programid);
+	glDetachShader(programid, id);
+
+	// Check for linking error
+	GLint success;
+	glGetProgramiv(programid, GL_LINK_STATUS, &success);
+	if(!success) {
+		GLchar info_log[512];
+		glGetProgramInfoLog(programid, 512, NULL, info_log);
+		glDeleteShader(programid); // Clean up the failed program
+		throw ScarabError("Error Linking shaders: \n%s", info_log);
+	}
 }

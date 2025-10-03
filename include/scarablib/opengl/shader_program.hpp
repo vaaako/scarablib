@@ -4,6 +4,7 @@
 #include <glm/mat4x4.hpp>
 #include <memory>
 #include <vector>
+#include "scarablib/opengl/shader.hpp"
 #include "scarablib/typedef.hpp"
 #include "scarablib/gfx/color.hpp"
 
@@ -12,32 +13,9 @@ class ShaderProgram {
 	friend class ShaderManager;
 
 	public:
-		// Supported shader versions
-		enum class Type {
-			Vertex   = GL_VERTEX_SHADER,
-			Fragment = GL_FRAGMENT_SHADER
-		};
-
-		// Struct used for Shader object
-		// struct Shader {
-		// 	uint32 id   = 0;
-		// 	uint32 hash = 0;
-		// 	ShaderProgram::Type type;
-		// };
-
-		// Shader information to pass to program.
-		// Use `existing_id` if you want to use an existing ID
-		struct ShaderInfo {
-			// Shader's source
-			const char* source = nullptr;
-			// Type of the shader
-			ShaderProgram::Type type;
-			// Use an existing shader instead of a new source code
-			std::shared_ptr<uint32> existing_id = nullptr;
-		};
-
-		// Contruct shader giving a vector of all desired shaders to use
-		ShaderProgram(const std::vector<ShaderInfo>& infos);
+		// Contruct shader giving a vector of all desired shaders to attach to the program
+		ShaderProgram(const std::vector<std::shared_ptr<Shader>>& shaders);
+		// Must be shared_ptr because this will own the weak_ptr of ShaderManager
 		~ShaderProgram() noexcept;
 
 		// Disable copy and moving
@@ -46,31 +24,38 @@ class ShaderProgram {
 		ShaderProgram(ShaderProgram&&) noexcept = delete;
 		ShaderProgram& operator=(ShaderProgram&&) noexcept = delete;
 
-		// Returns id of shader program
+		// Returns the id of shader program
 		inline uint32 get_programid() const noexcept {
 			return this->programid;
 		}
 
-		// Enable shader program
+		// Returns the hash of shader program.
+		// Will return 0 if this Shader Program was not created using the ShaderManager
+		inline size_t get_hash() const noexcept {
+			return this->hash;
+		}
+
+		// Enables the shader program
 		inline void use() const noexcept {
 			glUseProgram(this->programid);
 		}
 
-		// Disable shader program
+		// Disables the shader program
 		inline void unbind() const noexcept {
 			glUseProgram(0);
 		}
 
-		inline std::vector<>
+		// Returns an attached shader by id.
+		// Returns nullptr if not found
+		std::shared_ptr<Shader> get_shader(const uint32 id);
+		// Returns an attached shader by type.
+		// Returns nullptr if not found
+		std::shared_ptr<Shader> get_shader(const Shader::Type type);
 
-
-		// Utility function for users who might want to compile a single shader
-		// without creating a full program.
-		// It returns a `shared_ptr<uint32>` because this method is usually used inside `ShaderManager`.
-		// This `shared_ptr` contains a custom destructor
-		static std::shared_ptr<uint32> compile_shader(const char* source, const ShaderProgram::Type type);
-
-
+		// Swaps a attached shader to another.
+		// This method will look for this type of shader and swap it by the new id
+		void swap_shader(const uint32 id, const Shader::Type type);
+		
 
 		// -- UNIFORMS
 
@@ -118,6 +103,7 @@ class ShaderProgram {
 
 	private:
 		uint32 programid;
-		uint32 hash;
-		std::vector<std::shared_ptr<uint32>> attached_shaders;
+		size_t hash = 0;
+		// Must be shared_ptr because this will own the weak_ptr of ShaderManager
+		std::vector<std::shared_ptr<Shader>> attached_shaders;
 };

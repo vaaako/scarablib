@@ -1,76 +1,92 @@
 #include "scarablib/opengl/shader_manager.hpp"
 
+#include "scarablib/opengl/shaders.hpp"
 #include "scarablib/proper/error.hpp"
 #include "scarablib/proper/log.hpp"
 #include "scarablib/utils/hash.hpp"
 #include "scarablib/window/window.hpp" // SDL_GL_GetCurrentContext
 // Please keep this so in the future if i want to change SDL version i will just need to rename in one file
 
-#include <memory>
-
 #define SCARAB_DEBUG_SHADER_MANAGER
 
-std::shared_ptr<ShaderProgram> ShaderManager::load_shader_program(const std::vector<ShaderProgram::ShaderInfo>& infos) {
+std::shared_ptr<ShaderProgram> ShaderManager::load_shader_program(const std::vector<ShaderManager::ShaderInfo>& infos) {
 	if(infos.empty()) {
 		throw ScarabError("No shader info provided to create a program");
 	}
 
-	// Hash all shaders to check if any program is cached
-	size_t combined_hash = 0;
-	std::vector<size_t> individual_hashes;
-	for(const ShaderProgram::ShaderInfo& info : infos) {
-		size_t hash = ScarabHash::hash_make(std::string(info.source));
-		individual_hashes.push_back(hash);
-		ScarabHash::hash_combine(combined_hash, hash);
-	}
-
-	// -- CHECK COMBINED HASHES
-	
-	// Check if the program is already cached
-	if(this->program_cache.count(combined_hash)) {
-		#ifdef SCARAB_DEBUG_SHADER_MANAGER
-		LOG_DEBUG("Found shader program hash: %zu", combined_hash);
-		#endif
-		if(std::shared_ptr<ShaderProgram> cache = this->get_program(combined_hash)) {
-			return cache;
-		}
-	}
-
-	#ifdef SCARAB_DEBUG_SHADER_MANAGER
-	LOG_DEBUG("Not Found shader program hash: %zu", combined_hash);
-	#endif
-
-
-	// -- GET OR COMPILE SHADERS
-	
 	// Creates a temporary vector of ShaderInfo to pass to the constructor.
 	// This vector is now holding the owner of all shader's IDs
 	// but inside the ShaderProgram's constructor this ownership is moved (not explicitly)
-	std::vector<ShaderProgram::ShaderInfo> shaders_build_info;
-	for(const auto& info : infos) {
-		shaders_build_info.emplace_back(ShaderProgram::ShaderInfo {
-			.source      = nullptr,
-			.type        = info.type,
-			.existing_id = this->get_or_compile_shader(info.source, info.type)
-		});
+	std::vector<std::shared_ptr<Shader>> shaders;
+
+	// -- VALIDATE SHADERS
+	for(const ShaderManager::ShaderInfo& info : infos) {
+		if(info.source == nullptr) {
+			throw ScarabError("ShaderInfo \"source\" was not provided");
+		}
+
+		if(info.type == Shader::Type::None) {
+			throw ScarabError("ShaderInfo \"type\" was not provided");
+		}
+
+		// TODO: Support Vertex shader too
+		// Inject custom shader
+		std::string source = info.source; // std::string to void memory erros inside if-check
+		if(info.iscustom) {
+			source = std::string(Shaders::DEFAULT_FRAGMENT);
+			std::string placeholder = "// {{USER_CODE}}";
+			source.replace(
+				// Find substring
+				source.find(placeholder),
+				// Size
+				placeholder.length(),
+				// Replace with
+				// "#define HAS_USER_SHADER\n#ifdef HAS_USER_SHADER\n" + std::string(info.source) + "\n#endif"
+				"#define HAS_USER_SHADER" + std::string(info.source)
+			);
+		}
+		LOG_DEBUG("final shader: %s", source.c_str());
+		std::shared_ptr<Shader> shader = this->get_or_compile_shader(source.c_str(), info.type);
+		shaders.emplace_back(shader);
 	}
 
-	// -- CREATE PROGRAM
+	// -- CHECK COMBINED HASHES
+	// Check if the program is already cached
+	size_t combined_hash = this->combine_shader_hashes(shaders);
+	if(std::shared_ptr<ShaderProgram> cache = this->get_program(combined_hash)) {
+		#ifdef SCARAB_DEBUG_SHADER_MANAGER
+		LOG_DEBUG("Found shader program hash: %zu", combined_hash);
+		#endif
+		return cache;
+	}
 
+	#ifdef SCARAB_DEBUG_SHADER_MANAGER
+	LOG_DEBUG("Not Found/Expired shader program hash: %zu", combined_hash);
+	#endif
+
+	// -- CREATE PROGRAM
 	// Create the ShaderProgram and cache it
-	std::shared_ptr<ShaderProgram> program = std::make_shared<ShaderProgram>(shaders_build_info);
+	std::shared_ptr<ShaderProgram> program = std::make_shared<ShaderProgram>(shaders);
 	program->hash = combined_hash;
 	this->program_cache[combined_hash] = program;
 	return program;
 }
 
-std::shared_ptr<uint32> ShaderManager::get_or_compile_shader(const char* source, ShaderProgram::Type type) {
+size_t ShaderManager::combine_shader_hashes(const std::vector<std::shared_ptr<Shader>>& shaders) const noexcept {
+	size_t combined_hash = 0;
+	for(const auto& shader : shaders) {
+		ScarabHash::hash_combine(combined_hash, shader->hash);
+	}
+	return combined_hash;
+}
+
+std::shared_ptr<Shader> ShaderManager::get_or_compile_shader(const char* source, Shader::Type type) {
 	size_t hash = ScarabHash::hash_make(std::string(source));
 
 	// Chek if the shader is already compiled and cached
-	if(this->shader_cache.count(hash)) {
+	if(source != nullptr && this->shader_cache.count(hash)) {
 		LOG_DEBUG("Found %s shader hash: %zu", ((int)type == GL_VERTEX_SHADER) ? "VERTEX" : "FRAGMENT", hash);
-		if(std::shared_ptr<uint32> cache = this->get_shader(hash)) {
+		if(std::shared_ptr<Shader> cache = this->get_shader(hash)) {
 			return cache;
 		}
 	}
@@ -79,15 +95,15 @@ std::shared_ptr<uint32> ShaderManager::get_or_compile_shader(const char* source,
 	LOG_DEBUG("NOT found/expired %s hash (%zu) not found, compiling new", ((int)type == GL_VERTEX_SHADER) ? "VERTEX" : "FRAGMENT", hash);
 	#endif
 
-	std::shared_ptr<uint32> id = ShaderProgram::compile_shader(source, type);
-	this->shader_cache[hash] = id;
-	return id;
+	std::shared_ptr<Shader> shader = std::make_shared<Shader>(source, type);
+	this->shader_cache[shader->hash] = shader;
+	return shader;
 }
 
-std::shared_ptr<uint32> ShaderManager::get_shader(const size_t hash) noexcept {
+std::shared_ptr<Shader> ShaderManager::get_shader(const size_t hash) noexcept {
 	auto it = this->shader_cache.find(hash);
 	if(it != this->shader_cache.end()) {
-		if(std::shared_ptr<uint32> ptr = it->second.lock()) {
+		if(std::shared_ptr<Shader> ptr = it->second.lock()) {
 			return ptr;
 		}
 		this->shader_cache.erase(it); // expired, remove entry

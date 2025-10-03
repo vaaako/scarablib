@@ -115,8 +115,8 @@ struct MaterialComponent {
 	// Material's default shader
 	std::shared_ptr<ShaderProgram> shader = ShaderManager::get_instance().load_shader_program({
 		// Default vertex and fragment shader source
-		{ .source = Shaders::DEFAULT_VERTEX,   .type = ShaderProgram::Type::Vertex },
-		{ .source = Shaders::DEFAULT_FRAGMENT, .type = ShaderProgram::Type::Fragment },
+		{ .source = Shaders::DEFAULT_VERTEX,   .type = Shader::Type::Vertex },
+		{ .source = Shaders::DEFAULT_FRAGMENT, .type = Shader::Type::Fragment },
 	});
 
 	// 1. First Mesh: A Mesh is created and its MaterialComponent asks the ShaderManager for the default shader

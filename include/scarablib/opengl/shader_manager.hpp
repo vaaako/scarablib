@@ -9,25 +9,34 @@
 // already exists, the manager gives the existing memory
 class ShaderManager {
 	public:
+		// Shader information to pass to program.
+		// If you want to re-use an existing shader you can either use its source
+		// or set `ShaderInfo::shader` to it
+		struct ShaderInfo {
+			// Shader's source
+			const char* source = nullptr;
+			// Type of this shader
+			Shader::Type type = Shader::Type::None;
+			// Set to true if the source provided is a custom shader
+			// This DOES NOT mean that the shader was created by you
+			bool iscustom = false;
+		};
+
 		static ShaderManager& get_instance() {
 			static ShaderManager instance;
 			return instance;
 		}
 
 		// Uploads vertex and fragment shader code to the manager.
-		// - `vertex_souce`: The source code for the vertex shader.
-		// - `fragment_source`: The source code for the fragment shader.
 		// Returns: A pointer to the existing shader, or a pointer to a newly created shader if it didn't exist.
-		std::shared_ptr<ShaderProgram> load_shader_program(const std::vector<ShaderProgram::ShaderInfo>& infos);
+		std::shared_ptr<ShaderProgram> load_shader_program(const std::vector<ShaderManager::ShaderInfo>& infos);
 
 		// Returns an existing or new compiled shader
-		std::shared_ptr<uint32> get_or_compile_shader(const char* source, ShaderProgram::Type type);
-
-		// std::shared_ptr<ShaderProgram> load_custom_shader(const ShaderManager::Type shader_type, const char* user_shader) noexcept;
+		std::shared_ptr<Shader> get_or_compile_shader(const char* source, Shader::Type type);
 
 		// Retrieves an existing Shader using its hash.
 		// Returns nullptr if not found
-		std::shared_ptr<uint32> get_shader(const size_t hash) noexcept;
+		std::shared_ptr<Shader> get_shader(const size_t hash) noexcept;
 
 		// Retrieves an existing Shader Program using its hash.
 		// Returns nullptr if not found
@@ -41,8 +50,11 @@ class ShaderManager {
 		void cleanup() noexcept;
 
 	private:
-		std::unordered_map<size_t, std::weak_ptr<uint32>> shader_cache;
+		std::unordered_map<size_t, std::weak_ptr<Shader>> shader_cache;
 		std::unordered_map<size_t, std::weak_ptr<ShaderProgram>> program_cache;
+
+		// Helper method for making a single hash out of mulitple shader hashes
+		size_t combine_shader_hashes(const std::vector<std::shared_ptr<Shader>>& shaders) const noexcept;
 };
 
 // I had to make a whole new system for managing shaders and not only Shader Programs

@@ -10,7 +10,6 @@
 //
 // - BILLBOARD_VERTEX: Vertex shader for billboards
 //
-// - CIRCLE_FRAGMENT: Fragment shader for circles
 // - FONT_FRAGMENT: (unfinished) Fragment shader for fonts
 namespace Shaders {
 	const char* const DEFAULT_VERTEX = R"glsl(
@@ -29,25 +28,6 @@ namespace Shaders {
 		}
 	)glsl";
 
-
-	const char* const DEFAULT_FRAGMENT_BAK = R"glsl(
-		#version 330 core
-
-		in vec2 texuv;
-		out vec4 fragcolor;
-
-		uniform sampler2D texSampler;
-		uniform vec4 shapeColor;
-
-		void main() {
-			vec4 tex = texture(texSampler, texuv);
-			if(tex.a == 0.0) {
-				discard;
-			}
-			fragcolor =  tex * (shapeColor.rgba / 255);
-		}
-	)glsl";
-
 	const char* const DEFAULT_FRAGMENT = R"glsl(
 		#version 330 core
 
@@ -61,8 +41,8 @@ namespace Shaders {
 		uniform int   texlayer;                 // If using texSamplerArray
 		uniform float mixamount;                // Blend amount (0.0 = only tex2D, 1.0 = only array)
 
-		// User custom shader will be injected here
-		// will also be injected a "#define HAS_USER_SHADER" macro
+		// User shader will be injected here
+		// it will also be injected a "HAS_USER_SHADER" macro
 		// {{USER_CODE}}
 
 		#ifndef HAS_USER_SHADER
