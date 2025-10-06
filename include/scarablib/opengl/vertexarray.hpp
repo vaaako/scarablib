@@ -8,7 +8,7 @@
 
 // Methods for making VAO, VBO and EBO (optional)
 class VertexArray {
-	friend class VAOManager;
+	friend class ResourcesManager;
 	public:
 		enum Buffers {
 			VAO,

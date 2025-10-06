@@ -1,6 +1,5 @@
 #include "scarablib/window/window.hpp"
-#include "scarablib/opengl/shader_manager.hpp"
-#include "scarablib/opengl/vaomanager.hpp"
+#include "scarablib/opengl/resourcesmanager.hpp"
 #include "scarablib/proper/error.hpp"
 #include "scarablib/proper/log.hpp"
 #include "scarablib/typedef.hpp"
@@ -114,10 +113,8 @@ Window::~Window() noexcept {
 		LOG_INFO("Window %d destroyed", SDL_GetWindowID(this->window));
 	}
 
-	// Clean up VAO Manager
-	VAOManager::get_instance().cleanup();
-	// Clean up Shader Manager
-	ShaderManager::get_instance().cleanup();
+	// Clean up Vertex Arrays and Shaders
+	ResourcesManager::get_instance().cleanup();
 	// Clean up OpenGL context
 	SDL_GL_DeleteContext(this->glContext);
 	this->glContext = nullptr;

@@ -1,13 +1,10 @@
-#include "scarablib/opengl/shader_manager.hpp"
-
+#include "scarablib/opengl/resourcesmanager.hpp"
 #include "scarablib/opengl/shaders.hpp"
-#include "scarablib/proper/error.hpp"
 #include "scarablib/proper/log.hpp"
-#include "scarablib/utils/hash.hpp"
 #include "scarablib/window/window.hpp" // SDL_GL_GetCurrentContext
 // Please keep this so in the future if i want to change SDL version i will just need to rename in one file
 
-std::shared_ptr<ShaderProgram> ShaderManager::load_shader_program(const std::vector<ShaderManager::ShaderInfo>& infos) {
+std::shared_ptr<ShaderProgram> ResourcesManager::load_shader_program(const std::vector<ResourcesManager::ShaderInfo>& infos) {
 	if(infos.empty()) {
 		throw ScarabError("No shader info provided to create a program");
 	}
@@ -18,7 +15,7 @@ std::shared_ptr<ShaderProgram> ShaderManager::load_shader_program(const std::vec
 	std::vector<std::shared_ptr<Shader>> shaders;
 
 	// -- VALIDATE SHADERS
-	for(const ShaderManager::ShaderInfo& info : infos) {
+	for(const ResourcesManager::ShaderInfo& info : infos) {
 		if(info.source == nullptr) {
 			throw ScarabError("ShaderInfo \"source\" was not provided");
 		}
@@ -68,7 +65,7 @@ std::shared_ptr<ShaderProgram> ShaderManager::load_shader_program(const std::vec
 	return program;
 }
 
-size_t ShaderManager::combine_shader_hashes(const std::vector<std::shared_ptr<Shader>>& shaders) const noexcept {
+size_t ResourcesManager::combine_shader_hashes(const std::vector<std::shared_ptr<Shader>>& shaders) const noexcept {
 	size_t combined_hash = 0;
 	for(const auto& shader : shaders) {
 		ScarabHash::hash_combine(combined_hash, shader->hash);
@@ -76,7 +73,7 @@ size_t ShaderManager::combine_shader_hashes(const std::vector<std::shared_ptr<Sh
 	return combined_hash;
 }
 
-std::shared_ptr<Shader> ShaderManager::get_or_compile_shader(const char* source, Shader::Type type) {
+std::shared_ptr<Shader> ResourcesManager::get_or_compile_shader(const char* source, Shader::Type type) {
 	size_t hash = ScarabHash::hash_make(std::string(source));
 
 	// Chek if the shader is already compiled and cached
@@ -98,7 +95,19 @@ std::shared_ptr<Shader> ShaderManager::get_or_compile_shader(const char* source,
 	return shader;
 }
 
-std::shared_ptr<Shader> ShaderManager::get_shader(const size_t hash) noexcept {
+std::shared_ptr<VertexArray> ResourcesManager::get_vertexarray(const size_t hash) noexcept {
+	auto it = this->vertexarray_cache.find(hash);
+	if(it != this->vertexarray_cache.end()) {
+		if(std::shared_ptr<VertexArray> ptr = it->second.lock()) {
+			return ptr;
+		}
+		this->vertexarray_cache.erase(it); // expired, remove entry
+	}
+	return nullptr; // not found or expired
+}
+
+
+std::shared_ptr<Shader> ResourcesManager::get_shader(const size_t hash) noexcept {
 	auto it = this->shader_cache.find(hash);
 	if(it != this->shader_cache.end()) {
 		if(std::shared_ptr<Shader> ptr = it->second.lock()) {
@@ -109,7 +118,7 @@ std::shared_ptr<Shader> ShaderManager::get_shader(const size_t hash) noexcept {
 	return nullptr; // not found or expired
 }
 
-std::shared_ptr<ShaderProgram> ShaderManager::get_program(const size_t hash) noexcept {
+std::shared_ptr<ShaderProgram> ResourcesManager::get_program(const size_t hash) noexcept {
 	auto it = this->program_cache.find(hash);
 	if(it != this->program_cache.end()) {
 		if(std::shared_ptr<ShaderProgram> ptr = it->second.lock()) {
@@ -121,13 +130,13 @@ std::shared_ptr<ShaderProgram> ShaderManager::get_program(const size_t hash) noe
 }
 
 
-void ShaderManager::cleanup() noexcept {
+void ResourcesManager::cleanup() noexcept {
 	// Unable to relase VAOs correctly
 	if(SDL_GL_GetCurrentContext() == NULL) {
 		LOG_WARNING_FN("Called without a valid OpenGL context. Leaking GPU resources");
 	}
-
-	// Has no effect since its called when window gets destroyed, but i like to have them here
+	// Has no effect since its called implicitly, but i like to have them here
+	this->vertexarray_cache.clear();
 	this->shader_cache.clear();
 	this->program_cache.clear();
 }

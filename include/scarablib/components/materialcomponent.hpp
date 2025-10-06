@@ -3,7 +3,7 @@
 #include "scarablib/gfx/color.hpp"
 #include "scarablib/gfx/texture.hpp"
 #include "scarablib/gfx/texture_array.hpp"
-#include "scarablib/opengl/shader_manager.hpp"
+#include "scarablib/opengl/resourcesmanager.hpp"
 #include "scarablib/opengl/shaders.hpp"
 #include <cstddef>
 #include <memory>
@@ -113,15 +113,16 @@ struct MaterialComponent {
 	TextureArray* texture_array = nullptr;
 
 	// Material's default shader
-	std::shared_ptr<ShaderProgram> shader = ShaderManager::get_instance().load_shader_program({
+	std::shared_ptr<ShaderProgram> shader = ResourcesManager::get_instance().load_shader_program({
 		// Default vertex and fragment shader source
 		{ .source = Shaders::DEFAULT_VERTEX,   .type = Shader::Type::Vertex },
 		{ .source = Shaders::DEFAULT_FRAGMENT, .type = Shader::Type::Fragment },
 	});
 
-	// 1. First Mesh: A Mesh is created and its MaterialComponent asks the ShaderManager for the default shader
-	// 2. ShaderManager (Cache miss): The manager compiles the first shader and allocated memory for one ShaderProgram object and compiles the code. It creates a shared_ptr to manage this new object and stores it in its map. It returns a copy of this `shared_ptr`
-	// 3. ShaderManager (Cache hit): The manager looks up the name "default" in its map and finds the existing shared_ptr. It returns a copy of the shared_ptr
+	// 1. First Mesh: A Mesh is created and its MaterialComponent asks the ResourcesManager for the default shader
+	// 2. ResourcesManager (Cache miss): The manager compiles the first shader and allocated memory for one ShaderProgram object and compiles the code.
+	//    It creates a shared_ptr to manage this new object and stores it in its map. It returns a copy of this `shared_ptr`
+	// 3. ResourcesManager (Cache hit): The manager looks up the name "default" in its map and finds the existing shared_ptr. It returns a copy of the shared_ptr
 	//
 	// Each shared_ptr consumes around 16 bytes (8 bytes raw pointer)
 

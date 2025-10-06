@@ -1,6 +1,6 @@
 #include "scarablib/gfx/2d/circle.hpp"
 #include "scarablib/geometry/geometry_factory.hpp"
-#include "scarablib/opengl/shader_manager.hpp"
+#include "scarablib/opengl/resourcesmanager.hpp"
 #include "scarablib/opengl/shaders.hpp"
 
 Circle::Circle() noexcept
@@ -34,12 +34,12 @@ Circle::Circle() noexcept
 		}
 	)glsl";
 
-	this->material->shader = ShaderManager::get_instance().load_shader_program({
-		ShaderManager::ShaderInfo {
+	this->material->shader = ResourcesManager::get_instance().load_shader_program({
+		ResourcesManager::ShaderInfo {
 			.source = Shaders::DEFAULT_VERTEX,
 			.type   = Shader::Type::Vertex
 		},
-		ShaderManager::ShaderInfo {
+		ResourcesManager::ShaderInfo {
 			.source   = source,
 			.type     = Shader::Type::Fragment,
 			.iscustom = true

@@ -15,7 +15,7 @@ Model::Model(const char* path) : Mesh() {
 	}
 
 	// Create Vertex Array Buffer
-	this->vertexarray = VAOManager::get_instance()
+	this->vertexarray = ResourcesManager::get_instance()
 		.acquire_vertexarray(vertices, std::vector<uint8>{});
 	this->vertexarray->add_attribute<float>(2, true);
 

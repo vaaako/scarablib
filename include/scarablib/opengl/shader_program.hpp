@@ -10,12 +10,12 @@
 
 // OpenGL shader object
 class ShaderProgram {
-	friend class ShaderManager;
+	friend class ResourcesManager;
 
 	public:
 		// Contruct shader giving a vector of all desired shaders to attach to the program
 		ShaderProgram(const std::vector<std::shared_ptr<Shader>>& shaders);
-		// Must be shared_ptr because this will own the weak_ptr of ShaderManager
+		// Must be shared_ptr because this will own the weak_ptr of ResourcesManager
 		~ShaderProgram() noexcept;
 
 		// Disable copy and moving
@@ -30,7 +30,7 @@ class ShaderProgram {
 		}
 
 		// Returns the hash of shader program.
-		// Will return 0 if this Shader Program was not created using the ShaderManager
+		// Will return 0 if this Shader Program was not created using the ResourcesManager
 		inline size_t get_hash() const noexcept {
 			return this->hash;
 		}
@@ -103,7 +103,8 @@ class ShaderProgram {
 
 	private:
 		uint32 programid;
-		size_t hash = 0; // Only ShaderManager changes this value
-		// Must be shared_ptr because this will own the weak_ptr of ShaderManager
+		size_t hash = 0; // Only ResourcesManager changes this value
 		std::vector<std::shared_ptr<Shader>> attached_shaders;
+		// I need to store as a Shader struct and not only the IDs so the weak_ptr doesnt get expired
+		// I also need as struct because ResourcesManager uses this when making a custom shader
 };

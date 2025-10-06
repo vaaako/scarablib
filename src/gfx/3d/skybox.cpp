@@ -1,7 +1,6 @@
 #include "scarablib/gfx/3d/skybox.hpp"
 #include "scarablib/geometry/vertex.hpp"
 #include "scarablib/gfx/texture.hpp"
-#include "scarablib/opengl/vaomanager.hpp"
 #include "scarablib/proper/error.hpp"
 #include "scarablib/typedef.hpp"
 #include "scarablib/gfx/image.hpp"
@@ -42,7 +41,7 @@ Skybox::Skybox(const Camera& camera, const std::array<const char*, 6>& faces)
 		6, 2, 3
 	};
 
-	this->vertexarray = VAOManager::get_instance()
+	this->vertexarray = ResourcesManager::get_instance()
 		.acquire_vertexarray(vertices, indices);
 
 	// Gen texture cube map

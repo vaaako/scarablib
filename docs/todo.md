@@ -78,8 +78,8 @@ Stuff that are in progress and i need to finish
 
 - [ ] make sure single draw call is working
 
-- [ ] Unify `VAOManager` and `ShaderManager` to `ResourceManager`
-- [ ] Vertex store `VertexArray` only
+- [x] Unify `VAOManager` and `ShaderManager` to `ResourceManager`
+- [x] Vertex store `VertexArray` only
 	+ put `indices_length`, `hash` etc in it
 	+ builder methods are only useful when making a new vao, not need to it
 
@@ -151,7 +151,7 @@ Stuff that are in progress and i need to finish
 
 # TODO Features
 - [ ] More texture options
-	+ [ ] Texture overlay
+	+ [x] Texture overlay
 	+ [ ] Texture atlas support
 		* For reference: [anim8](https://github.com/kikito/anim8)
 	+ [ ] Opacity
@@ -173,14 +173,12 @@ Stuff that are in progress and i need to finish
 - [x] Remove `ModelConf`
 	+ kinda?
 - [x] CCW vertices
-
-- [ ] TextureArray
-	- [ ] Support for texture array and common texture to the same model
-	- [ ] make member of "current texture array index" and use it in the shader when drawing a model that uses a texture_array
+- [x] TextureArray
+	+ Support for texture array and common texture to the same model
+	+ make member of "current texture array index" and use it in the shader when drawing a model that uses a texture_array
 - [x] Make a new static struct called `ModelFields` that returns `Vertex`'s fields to `ModelFactory` (and the user can use that for easy manipulation)
 	+ Like in vakraft, make a helper method for easy change faces values
 - [x] Be able to change `texid` and `shading` fields in `ModelFactory` for each face
-
 - [x] Bounding box was not tested
 	+ World calculation might not be working correctly (debug drawing not drawing when dynamic transform is enabled)
 	+ Not work fully as i want
@@ -218,6 +216,7 @@ Stuff that are in progress and i need to finish
 	+ [X] Shapes custom scale
 	+ [x] Review [camera movement](https://github.com/swr06/Minecraft/blob/master/Source/Core/Camera.cpp)
 	+ [ ] Third person, Front view and top down
+	+ [ ] Ortographic camera
 	+ Camera movement is stolen from minecraft
 - [ ] Chunk mesh native support
 - [x] Merge `set_angle` and `set_axis` somehow
@@ -247,9 +246,8 @@ Stuff that are in progress and i need to finish
 
 - [x] Better BoundingBox, not happy with the current state, dont know what to do
 - [x] Show bounding box
-- [ ] Billboard: Texture array
+- [x] Billboard: Texture array
 - [ ] Different texture for each face (the other method that is not cubemap)
-- [ ] Ortographic camera
 - [x] Model loading to Model class
 	+ [ ] Multiple textures handling
 
@@ -260,8 +258,5 @@ Stuff that are in progress and i need to finish
 	+ Planes are not being detected
 	+ Corners are not being detected
 	+ Ceilings are not being detected
-
 - [ ] Convert a small image to a scenario
-	+ Like terrain map
-	+ Each pixel is converted to a block
-	+ Each color corresponds to a texture
+	+ like raylib does

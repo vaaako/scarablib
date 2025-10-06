@@ -3,7 +3,7 @@
 // Indices attributes are not needed to set here
 // I will not make Bounding Box here because this is probably a 2D model
 Mesh::Mesh(const std::vector<Vertex>& vertices) noexcept {
-	this->vertexarray = VAOManager::get_instance()
+	this->vertexarray = ResourcesManager::get_instance()
 		.acquire_vertexarray(vertices, std::vector<uint8>{});
 	this->vertexarray->add_attribute<float>(2, true);
 }

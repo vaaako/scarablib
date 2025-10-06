@@ -4,7 +4,7 @@
 #include "scarablib/components/boundingbox.hpp"
 #include "scarablib/components/materialcomponent.hpp"
 #include "scarablib/components/physicscomponent.hpp"
-#include "scarablib/opengl/vaomanager.hpp"
+#include "scarablib/opengl/resourcesmanager.hpp"
 #include "scarablib/opengl/vertexarray.hpp"
 
 // Basic data for 3D and 2D shapes
@@ -87,7 +87,7 @@ Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<T>& indices) n
 
 template <typename T>
 void Mesh::set_geometry(const std::vector<Vertex>& vertices, const std::vector<T>& indices) {
-	this->vertexarray = VAOManager::get_instance()
+	this->vertexarray = ResourcesManager::get_instance()
 		.acquire_vertexarray(vertices, indices);
 	this->vertexarray->add_attribute<float>(2, true);
 }
