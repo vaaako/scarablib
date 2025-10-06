@@ -7,13 +7,15 @@ Scarablib 🪲 is a C++ library designed to simplify graphical development, offe
 > [!NOTE]
 > Scarablib is in pre-alpha
 
-- **Abstraction:** Simplifies complex graphical operations
-- **2D and 3D development:** Easy-to-use tools for both 2D and 3D rendering
-	+ Multiple built-in 2D and 3D shapes
-	+ Easy texture loading and management
-- **Beginner-Friendly API:** Designed with simplicity in mind, it is easy to learn for new developers while remaining powerful enough for advanced users
-- **Uniform Grid:** Built-in spatial partitioning system for collision detection
-- **Simplified VAO creation:** Dynamic methods for creating Vertex Array Objects with minimal boilerplate
+- **Beginner-Friendly API**: Designed with simplicity in mind, it is easy to learn for new developers while remaining powerful enough for advanced users
+- **2D and 3D development**: Easy-to-use tools for both 2D and 3D rendering
+	+ 2D and 3D basic shapes, Billboard and multiple type of planes
+	+ Material Component with Color, Shader and Texture
+- **Memory Management**: The memory is exclusively managed by the library
+	+ The library also contains a built-in resource manager and batch drawing
+- **Simplified VAO creation**: Dynamic methods for creating Vertex Array Objects with minimal boilerplate
+- **Built-in systems**: Raycasting, Terrain Map (collision for 2D images), Uniform Grid (collision for custom 3D models)
+- **Custom Shader Support**: Support for creation of customizable shaders
 
 # Libraries used
 - [`SDL2`](https://www.libsdl.org/) for window management
