@@ -35,6 +35,6 @@ void Sprite::draw_logic(const Camera& camera) noexcept {
 	this->material->shader->set_matrix4f("mvp", (camera.get_proj_matrix() * camera.get_view_matrix()) * this->model);
 
 	// Not indices btw
-	glDrawArrays(GL_TRIANGLE_FAN, 0, this->bundle.get_length());
+	glDrawArrays(GL_TRIANGLE_FAN, 0, this->vertexarray->get_length());
 }
 

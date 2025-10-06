@@ -108,7 +108,7 @@ T* IScene::add(const std::string_view& key, Args&&... args) {
 	std::shared_ptr<Mesh> mesh_ptr = std::make_shared<T>(std::forward<Args>(args)...); // Create new mesh
 	this->scene.emplace(key, mesh_ptr); // Used be get_by_key()
 
-	auto& vao_groups = this->vao_groups[mesh_ptr->bundle.vertexarray->get_vaoid()];
+	auto& vao_groups = this->vao_groups[mesh_ptr->vertexarray->get_vaoid()];
 
 	// Sort shaders and texture to minimize bind changes.
 	// Find the correct position for insertion

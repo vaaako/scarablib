@@ -6,10 +6,11 @@ namespace ScarabHash {
 	// From boost library.
 	// To multiple values, keep passing the same variable as `seed` until you done.
 	// Is VERY recommended to initialize `seed` before using it.
-	// Do NOT use raw pointers like `char*` or `const char*`, it will nor work
+	// Do NOT use raw pointers like `char*` or `const char*`, it will not work.
 	// Converting to `std::string` is fine though
 	template <typename T>
 	inline void hash_combine(std::size_t& seed, const T& value) noexcept {
+		// Use golden ration to mix the hash
 		std::hash<T> h;
 		seed ^= h(value) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
 	}

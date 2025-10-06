@@ -1,23 +1,9 @@
 #include "scarablib/geometry/model.hpp"
 #include "scarablib/proper/log.hpp"
 #include "scarablib/utils/string.hpp"
-#include <algorithm>
-
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tinyobjloader/tiny_obj_loader.h>
-
-
-// Used to convert vectors after loading model
-template <typename T, typename U>
-std::vector<T> convert_to(const std::vector<U>& indices) {
-	std::vector<T> output;
-	output.reserve(indices.size());
-	for(U val : indices) {
-		output.push_back(static_cast<T>(val));
-	}
-	return output;
-}
 
 Model::Model(const char* path) : Mesh() {
 	std::vector<uint32> indices;
@@ -28,19 +14,10 @@ Model::Model(const char* path) : Mesh() {
 		throw ScarabError("Failed to load/parse (%s) file. Indices are empty", path);
 	}
 
-	// Check which indice type fits
-	// Then convert vector to that type and upload to VAO
-	const uint32 max_val = *std::max_element(indices.begin(), indices.end());
-	if(max_val <= UINT8_MAX) {
-		this->bundle.make_vao(vertices, convert_to<uint8>(indices));
-
-	} else if(max_val <= UINT16_MAX) {
-		this->bundle.make_vao(vertices, convert_to<uint16>(indices));
-
-	// Is uint32 or uint64, use existing indices
-	} else {
-		this->bundle.make_vao(vertices, indices);
-	}
+	// Create Vertex Array Buffer
+	this->vertexarray = VAOManager::get_instance()
+		.acquire_vertexarray(vertices, std::vector<uint8>{});
+	this->vertexarray->add_attribute<float>(2, true);
 
 	// Free memory
 	vertices.clear();
@@ -52,7 +29,6 @@ void Model::set_rotation(const float angle, const vec3<float>& axis) noexcept {
 	if(axis == vec3<float>(0.0f)) {
 		return; // Dont update
 	}
-
 	this->angle = angle;
 	this->axis = axis;
 	this->isdirty = true;
@@ -63,7 +39,6 @@ void Model::set_orientation(const float angle, const vec3<float>& axis) noexcept
 	if(axis == vec3<float>(0.0f)) {
 		return;
 	}
-
 	this->orient_angle = angle;
 	this->orient_axis = axis;
 	this->isdirty = true;
@@ -93,8 +68,6 @@ void Model::update_model_matrix() noexcept {
 	}
 }
 
-#include "scarablib/utils/opengl.hpp"
-
 // I just need to provide the mvp just if any of the matrix changes, because the value is stored
 // but i dont know how to do it currently (and i am lazy)
 void Model::draw_logic(const Camera& camera) noexcept {
@@ -103,7 +76,7 @@ void Model::draw_logic(const Camera& camera) noexcept {
 
 	// NOTE: is_dirty for color wouldn't work because would set this color to the next meshes
 	this->material->shader->set_matrix4f("mvp", (camera.get_proj_matrix() * camera.get_view_matrix()) * this->model);
-	glDrawElements(GL_TRIANGLES, this->bundle.get_length(), this->bundle.get_indices_type(), (void*)0);
+	glDrawElements(GL_TRIANGLES, this->vertexarray->get_length(), this->vertexarray->get_indices_type(), (void*)0);
 }
 
 
@@ -150,7 +123,6 @@ std::vector<Vertex> Model::load_obj(const char* path, std::vector<uint32>* indic
 			}
 
 			// WARNING: Dont push normals yet
-
 			// vec3<float> normal;
 			// if(index.normal_index > 0) {
 			// 	normal = {

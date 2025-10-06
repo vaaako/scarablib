@@ -18,7 +18,7 @@ void IScene::remove_by_key(const std::string_view& key) {
 	}
 
 	// Remove from the scene vao map
-	this->vao_groups.erase(this->scene.at(key)->bundle.vertexarray->get_vaoid());
+	this->vao_groups.erase(this->scene.at(key)->vertexarray->get_vaoid());
 	// Remove from the scene key map
 	this->scene.erase(key);
 }
@@ -31,7 +31,7 @@ void IScene::draw(Mesh& model) const noexcept {
 	shader->set_int("texSampler", 0);      // Bind texture to unit 0
 	shader->set_int("texSamplerArray", 1); // Bind to unit 1
 
-	model.bundle.vertexarray->bind_vao();
+	model.vertexarray->bind_vao();
 
 	const MaterialComponent::TextureHandle& texture = model.material->texture;
 	const TextureArray* texture_array = model.material->texture_array;

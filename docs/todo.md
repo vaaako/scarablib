@@ -102,15 +102,17 @@ Stuff that are in progress and i need to finish
 - [x] Fix circle shader
 - [x] More dynamic Shader class
 	+ `make_shader` and `compile_shader` methods
-- [ ] `ShaderManager` also manages Shader objects and `ShaderProgrram`
-- [ ] Custom shaders
+- [x] `ShaderManager` also manages Shader objects and `ShaderProgrram`
+- [x] Custom shaders
 	+ Shader injection
 	+ Copy `VertexBufferComponent` to `ShaderComponent`
 	+ `ShaderComponent` (uses `ShaderManager`) -> Returns `ShaderProgram`
 	+ `ShaderManager` stores `ShaderProgram`
 	+ Like `VertexArray`, `ShaderProgram` should only take the IDs as input. `ShaderComponent` should build all
-- [ ] Separate Shader Objects (`GL_ARB_separate_shader_objects`)
+- [x] Separate Shader Objects (`GL_ARB_separate_shader_objects`)
 	+ `ShaderProgram->bind_vertex()` and `ShaderProgram->bind_fragment()`?
+	+ Not necessary right now
+- [ ] Custom shader for vertex shader also
 - [ ] UBO?
 	+ idk if its really necessary, currently the common uniforms are centered in `Iscene.cpp`
 	+ maybe this could be necessary when implementing custom shaders

@@ -2,9 +2,10 @@
 
 #include "scarablib/opengl/shader_manager.hpp"
 #include "scarablib/opengl/shaders.hpp"
-#include "scarablib/opengl/vertexbuffercomponent.hpp"
+#include "scarablib/opengl/vertexarray.hpp"
 #include "scarablib/camera/camera.hpp"
 #include "scarablib/typedef.hpp"
+#include <memory>
 
 struct Skybox {
 	// Uses a vector of 6 image paths as faces.
@@ -17,8 +18,7 @@ struct Skybox {
 
 	private:
 		const Camera& camera;
-
-		VertexBufferComponent bundle;
+		std::shared_ptr<VertexArray> vertexarray;
 		uint32 texid;
 
 	std::shared_ptr<ShaderProgram> shader = ShaderManager::get_instance().load_shader_program({

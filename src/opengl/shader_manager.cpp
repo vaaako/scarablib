@@ -7,8 +7,6 @@
 #include "scarablib/window/window.hpp" // SDL_GL_GetCurrentContext
 // Please keep this so in the future if i want to change SDL version i will just need to rename in one file
 
-#define SCARAB_DEBUG_SHADER_MANAGER
-
 std::shared_ptr<ShaderProgram> ShaderManager::load_shader_program(const std::vector<ShaderManager::ShaderInfo>& infos) {
 	if(infos.empty()) {
 		throw ScarabError("No shader info provided to create a program");
@@ -45,9 +43,7 @@ std::shared_ptr<ShaderProgram> ShaderManager::load_shader_program(const std::vec
 				"#define HAS_USER_SHADER" + std::string(info.source)
 			);
 		}
-		LOG_DEBUG("final shader: %s", source.c_str());
-		std::shared_ptr<Shader> shader = this->get_or_compile_shader(source.c_str(), info.type);
-		shaders.emplace_back(shader);
+		shaders.emplace_back(this->get_or_compile_shader(source.c_str(), info.type));
 	}
 
 	// -- CHECK COMBINED HASHES
@@ -85,7 +81,9 @@ std::shared_ptr<Shader> ShaderManager::get_or_compile_shader(const char* source,
 
 	// Chek if the shader is already compiled and cached
 	if(source != nullptr && this->shader_cache.count(hash)) {
+		#ifdef SCARAB_DEBUG_SHADER_MANAGER
 		LOG_DEBUG("Found %s shader hash: %zu", ((int)type == GL_VERTEX_SHADER) ? "VERTEX" : "FRAGMENT", hash);
+		#endif
 		if(std::shared_ptr<Shader> cache = this->get_shader(hash)) {
 			return cache;
 		}

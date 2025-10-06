@@ -4,7 +4,8 @@
 #include "scarablib/components/boundingbox.hpp"
 #include "scarablib/components/materialcomponent.hpp"
 #include "scarablib/components/physicscomponent.hpp"
-#include "scarablib/opengl/vertexbuffercomponent.hpp"
+#include "scarablib/opengl/vaomanager.hpp"
+#include "scarablib/opengl/vertexarray.hpp"
 
 // Basic data for 3D and 2D shapes
 class Mesh {
@@ -14,7 +15,7 @@ class Mesh {
 		// Since material can be shared i need to be a pointer so a double delete is not done
 
 		// Bundle for VAO, VBO and EBO
-		VertexBufferComponent bundle;
+		std::shared_ptr<VertexArray> vertexarray;
 		// This is kinda wrong, because each instance of a Mesh will have copied bundle (but same VAO at least)
 
 		// Bounding box
@@ -86,8 +87,7 @@ Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<T>& indices) n
 
 template <typename T>
 void Mesh::set_geometry(const std::vector<Vertex>& vertices, const std::vector<T>& indices) {
-	// add texuv attribute
-	this->bundle.add_attribute<float>(2, true);
-	// make vao
-	this->bundle.make_vao(vertices, indices);
+	this->vertexarray = VAOManager::get_instance()
+		.acquire_vertexarray(vertices, indices);
+	this->vertexarray->add_attribute<float>(2, true);
 }

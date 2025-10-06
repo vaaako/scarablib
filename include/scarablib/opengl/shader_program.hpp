@@ -103,7 +103,7 @@ class ShaderProgram {
 
 	private:
 		uint32 programid;
-		size_t hash = 0;
+		size_t hash = 0; // Only ShaderManager changes this value
 		// Must be shared_ptr because this will own the weak_ptr of ShaderManager
 		std::vector<std::shared_ptr<Shader>> attached_shaders;
 };

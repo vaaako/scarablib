@@ -4,6 +4,7 @@
 #include "scarablib/opengl/vertexarray.hpp"
 #include "scarablib/proper/error.hpp"
 #include "scarablib/proper/log.hpp"
+#include <algorithm>
 #include <memory>
 #include <unordered_map>
 
@@ -15,19 +16,6 @@
 // But now that i implemented VertexArray, with shared_ptr this is not necessary anymore
 class VAOManager {
 	public:
-		struct VertexAttribute {
-			// How many components per attribute.
-			// Example: 2 for a vec2
-			const uint32 component_count;
-			// Type of data
-			// Example: GL_FLOAT
-			const GLenum type;
-			// Whether to normalize the data
-			const bool normalized;
-			// Offset of the attribute
-			const size_t offset;
-		};
-
 		// Get the singleton instance of the VAOManager reference
 		static VAOManager& get_instance() {
 			static VAOManager instance;
@@ -39,18 +27,16 @@ class VAOManager {
 		// - `vertices`: The vertex data.
 		// - `indices`: (Optional) The index data.
 		// Returns: The entry for this VAO
-		template <typename T>
-		std::pair<size_t, std::shared_ptr<VertexArray>> acquire_vao(
-			const std::vector<Vertex>& vertices, const std::vector<T>& indices,
-			const std::vector<VertexAttribute>& attributes);
+		template <typename T, typename U>
+		std::shared_ptr<VertexArray> acquire_vertexarray(const std::vector<T>& vertices, const std::vector<U>& indices);
 
 		// Returns an entry of a VAO using its hash.
 		// Returns nullptr if not found
-		std::shared_ptr<VertexArray> get_vao_entry(const size_t hash) const;
+		std::shared_ptr<VertexArray> get_vertexarray(const size_t hash) noexcept;
 
 		// Releases a VAO from the manager, using its hash.
 		// Does nothing if not found
-		void release_vao(const size_t hash) noexcept;
+		// void release_vao(const size_t hash) noexcept;
 
 		// Cleans up all VAOs.
 		// WARNING: This is called inside Window destructor.
@@ -58,109 +44,71 @@ class VAOManager {
 		void cleanup() noexcept;
 
 	private:
-		std::unordered_map<size_t, std::shared_ptr<VertexArray>> vao_map;
+		std::unordered_map<size_t, std::weak_ptr<VertexArray>> vertex_cache;
 
-		template<typename T>
-		size_t compute_hash(const std::vector<Vertex>& vertices, const std::vector<T>& indices = {}) const noexcept;
+		// Specialized hash function for better distribution
+		template <typename T, typename U>
+		size_t compute_hash(const std::vector<T>& vertices, const std::vector<U>& indices = {}) const noexcept;
 };
 
-template <typename T>
-std::pair<size_t, std::shared_ptr<VertexArray>> VAOManager::acquire_vao(
-	const std::vector<Vertex>& vertices, const std::vector<T>& indices,
-	const std::vector<VertexAttribute>& attributes) {
+#define SCARAB_DEBUG_VAO_MANAGER
 
-	static_assert(std::is_unsigned_v<T>, "Only unsigned types for indices are accepted");
+template <typename T, typename U>
+std::shared_ptr<VertexArray> VAOManager::acquire_vertexarray(const std::vector<T>& vertices, const std::vector<U>& indices) {
 	if(vertices.empty()) {
 		throw ScarabError("Vertices vector is empty for VAO creation");
 	}
 
-	// -- COMPUTE HASH
-	const size_t hash = this->compute_hash(vertices, indices);
-
 	// -- CHECK IF CACHED
-	std::shared_ptr<VertexArray> vertexarray = this->get_vao_entry(hash);
+	const size_t hash = this->compute_hash(vertices, indices);
+	std::shared_ptr<VertexArray> vertexarray = this->get_vertexarray(hash);
 	if(vertexarray != nullptr) {
 		#ifdef SCARAB_DEBUG_VAO_MANAGER
 		LOG_DEBUG("Hash %zu found! Reusing VAO.", hash);
 		#endif
-		// Return the existing entry
-		return {
-			hash,
-			vertexarray
-		};
+		return vertexarray; // Return the existing entry
 	}
 
 	#ifdef SCARAB_DEBUG_VAO_MANAGER
 	LOG_DEBUG("Hash %zu not found. Creating new VAO.", hash);
 	#endif
 
-	// Make buffers
+	// -- CREATE BUFFERS
 	if(!indices.empty()) {
-		vertexarray = std::make_shared<VertexArray>(indices);
+		// -- CREATE VAO WITH THE SMALLEST POSSIBLE TYPE FOR INDICES
+		const uint32 max_val = *std::max_element(indices.begin(), indices.end());
+		if(max_val <= UINT8_MAX) {
+			vertexarray = std::make_shared<VertexArray>(vertices, ScarabOpenGL::convert_to<uint8>(indices));
+		} else if(max_val <= UINT16_MAX) {
+			vertexarray = std::make_shared<VertexArray>(vertices, ScarabOpenGL::convert_to<uint16>(indices));
+		// Is uint32 or uint64, use existing indices
+		} else {
+			vertexarray = std::make_shared<VertexArray>(vertices, indices);
+		}
 	} else {
-		vertexarray = std::make_shared<VertexArray>(std::vector<T>{});
+		vertexarray = std::make_shared<VertexArray>(vertices, std::vector<uint8>{});
 	}
 
 	#ifdef SCARAB_DEBUG_VAO_MANAGER
 	LOG_DEBUG("VAO ID made: %zu", vertexarray->get_vaoid());
 	#endif
 
-	// Alloc data
-	vertexarray->alloc_data(vertices.size() * sizeof(Vertex), vertices.data());
-	// Put position attribute
-	vertexarray->link_attrib<float>(0, 3, sizeof(Vertex), 0);
-
-	// Add all other attributes
-	for(size_t i = 0; i < attributes.size(); i++) {
-		const VertexAttribute attrib = attributes[i];
-		// +1 to jump position which is always added and already added
-		vertexarray->link_attrib(i + 1, attrib.component_count,
-				attrib.type, sizeof(Vertex), attrib.offset, attrib.normalized);
-
-		LOG_DEBUG("adding attribute");
-	}
 	GL_CHECK();
 
-	this->vao_map[hash] = vertexarray;
-	return {
-		hash,
-		vertexarray
-	};
+	vertexarray->hash = hash;
+	this->vertex_cache[hash] = vertexarray;
+	return vertexarray;
 }
 
-// Specialized hash function for better distribution
-
-// TODO: Use ScarabMath::hash_combine
-template <typename T>
-size_t VAOManager::compute_hash(const std::vector<Vertex>& vertices, const std::vector<T>& indices) const noexcept {
-	static_assert(std::is_unsigned_v<T>, "Only unsigned types for indices are accepted");
-
-	// Use FNV-1a hash for better distribution
-	constexpr size_t FNV_PRIME = 1099511628211ULL;
-	constexpr size_t FNV_OFFSET = 14695981039346656037ULL;
-
-	size_t hash = FNV_OFFSET;
-
-	// Hash vertex data
-	const char* data = reinterpret_cast<const char*>(vertices.data());
-	const size_t vertex_bytes = vertices.size() * sizeof(Vertex);
-
-	for(size_t i = 0; i < vertex_bytes; i++) {
-		hash ^= static_cast<size_t>(data[i]);
-		hash *= FNV_PRIME;
+template <typename T, typename U>
+std::size_t VAOManager::compute_hash(const std::vector<T>& vertices, const std::vector<U>& indices) const noexcept {
+	size_t hash = 0;
+	for(const T& vertex : vertices) {
+		ScarabHash::hash_combine(hash, vertex);
 	}
-
-	// Hash index data (only if indices are provided)
-	if(!indices.empty()) {
-		const char* index_data = reinterpret_cast<const char*>(indices.data());
-		const size_t index_bytes = indices.size() * sizeof(T);
-
-		for(size_t i = 0; i < index_bytes; i++) {
-			hash ^= static_cast<size_t>(index_data[i]);
-			hash *= FNV_PRIME;
-		}
+	for(const U& index : indices) {
+		ScarabHash::hash_combine(hash, index);
 	}
-
 	return hash;
 }
 

@@ -1,9 +1,25 @@
 #pragma once
 
 #include "scarablib/typedef.hpp"
+#include <vector>
 
 namespace ScarabOpenGL {
-	template<typename T> static constexpr GLenum gl_type();
+	// Get a GLenum from a type
+	template<typename T>
+	static constexpr GLenum gl_type();
+
+	// Converts a vector type to another
+	template <typename T, typename U>
+	std::vector<T> convert_to(const std::vector<U>& indices) {
+		std::vector<T> output;
+		output.reserve(indices.size());
+		for(U val : indices) {
+			output.push_back(static_cast<T>(val));
+		}
+		return output;
+	}
+
+	// Used on GL_CHECK macro
 	void check_gl_error(const char* file, int line);
 };
 

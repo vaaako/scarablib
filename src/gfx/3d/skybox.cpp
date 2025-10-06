@@ -1,5 +1,7 @@
 #include "scarablib/gfx/3d/skybox.hpp"
+#include "scarablib/geometry/vertex.hpp"
 #include "scarablib/gfx/texture.hpp"
+#include "scarablib/opengl/vaomanager.hpp"
 #include "scarablib/proper/error.hpp"
 #include "scarablib/typedef.hpp"
 #include "scarablib/gfx/image.hpp"
@@ -10,8 +12,8 @@ Skybox::Skybox(const Camera& camera, const std::array<const char*, 6>& faces)
 	// TODO: Back to vec3<float> later
 	static const std::vector<Vertex> vertices = {
 		Vertex { glm::vec3(-1.0f,  1.0f, -1.0f) }, // 0 - Top-Left-Back
-		Vertex { glm::vec3(1.0f,  1.0f, -1.0f) }, // 1 - Top-Right-Back
-		Vertex { glm::vec3(1.0f, -1.0f, -1.0f) }, // 2 - Bottom-Right-Back
+		Vertex { glm::vec3(1.0f,  1.0f, -1.0f)  }, // 1 - Top-Right-Back
+		Vertex { glm::vec3(1.0f, -1.0f, -1.0f)  }, // 2 - Bottom-Right-Back
 		Vertex { glm::vec3(-1.0f, -1.0f, -1.0f) }, // 3 - Bottom-Left-Back
 		Vertex { glm::vec3(-1.0f,  1.0f,  1.0f) }, // 4 - Top-Left-Front
 		Vertex { glm::vec3( 1.0f,  1.0f,  1.0f) }, // 5 - Top-Right-Front
@@ -40,7 +42,8 @@ Skybox::Skybox(const Camera& camera, const std::array<const char*, 6>& faces)
 		6, 2, 3
 	};
 
-	this->bundle.make_vao(vertices, indices);
+	this->vertexarray = VAOManager::get_instance()
+		.acquire_vertexarray(vertices, indices);
 
 	// Gen texture cube map
 	glGenTextures(1, &this->texid);
@@ -78,7 +81,7 @@ Skybox::Skybox(const Camera& camera, const std::array<const char*, 6>& faces)
 void Skybox::draw() noexcept {
 	// glDepthFunc(GL_LEQUAL);
 	std::shared_ptr<ShaderProgram> shader = this->shader; // cache
-	std::shared_ptr<VertexArray> vertexarray = this->bundle.vertexarray;
+	std::shared_ptr<VertexArray> vertexarray = this->vertexarray;
 
 	shader->use();
 	shader->set_matrix4f("view", glm::mat3(camera.get_view_matrix())); // Conversion: Remove translation
