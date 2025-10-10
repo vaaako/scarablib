@@ -7,14 +7,13 @@ I wrote most of the things here very tired, sorry for any english mistake
 # Currently working on
 Stuff that are in progress and i need to finish
 
-- Legacy Mode
 - Timer
-- Fonts
 - Texture Array
 - Bounding Box debug draw
 - Collision
 - Physics
 - Terrain Map
+- Fonts
 - Network
 
 # TODO library
@@ -55,36 +54,12 @@ Stuff that are in progress and i need to finish
 
 - [x] Better Material Component and texture handling
 - [x] TextureHandle accept temporary texture object. For this to work change ref to shared_ptr
-- [ ] In Window::rotate i didnt have to clear the rotation before, why do i need it now? ([last commit]( https://github.com/vaaako/scarablib/commit/d2a5717958a1f73fde39dafbd6640e2c19dab076))
-- [ ] make transparency work without `if(tex.a == 0.0)`?
-- [ ] Discord RPC support?
-
-
-- [ ] Prioritize Material when organizing models to batch draw
-
-- [ ] When making a new vao, make indices vector not required
-	+ it isnt technically because it checks if indices are empty
-	+ but an empty vector is created to use this method
-
-- [ ] New OpenGL 4.3+ VAO method
-	+ VAO stores the Vertex struct data, not the whole mesh
-	+ This makes more sense
-	+ Lower CPU overhead, faster state switching, simpler driver optimization, reduced GPU memory churn
-	+ https://patrick-is.cool/posts/2025/on-vaos/
-	+ this is agame changing
-	+ Vertex Pulling may be even more efficent, look at this
-	+ both?
-- [ ] [Modern OpenGL](https://juandiegomontoya.github.io/modern_opengl.html) and [Modern functions](https://github.com/fendevel/Guide-to-Modern-OpenGL-Functions)
-
-- [ ] make sure single draw call is working
 
 - [x] Unify `VAOManager` and `ShaderManager` to `ResourceManager`
 - [x] Vertex store `VertexArray` only
 	+ put `indices_length`, `hash` etc in it
 	+ builder methods are only useful when making a new vao, not need to it
-
-- [ ] Rename `VAOManager` to `VertexManager`
-- [ ] Rethink Managers
+- [x] Rethink Managers
 	+ Manager: Makes "Objects" and keep one object pointer on map
 	+ `VertexArray` can be built without the attributes
 	+ i can move attributes to `VertexArray`, the method that adds can on the VBO right way, only need to store the stride and increment it inside the method
@@ -93,6 +68,23 @@ Stuff that are in progress and i need to finish
 	+ i cant think in any way to check if the combination of these already exist, to not re-compile the same Shader Program
 	+ even checking for the shaders is not perfect, because the hash will be different event if a single character is mismatch
 	+ i could user Shader Pipeline
+- [x] New OpenGL 4.3+ VAO method
+	+ VAO stores the Vertex struct data, not the whole mesh
+	+ This makes more sense
+	+ Lower CPU overhead, faster state switching, simpler driver optimization, reduced GPU memory churn
+	+ https://patrick-is.cool/posts/2025/on-vaos/
+	+ this is agame changing
+	+ Vertex Pulling may be even more efficent, look at this
+	+ both?
+- [x] [Modern OpenGL](https://juandiegomontoya.github.io/modern_opengl.html) and [Modern functions](https://github.com/fendevel/Guide-to-Modern-OpenGL-Functions)
+
+- [ ] In Window::rotate i didnt have to clear the rotation before, why do i need it now? ([last commit]( https://github.com/vaaako/scarablib/commit/d2a5717958a1f73fde39dafbd6640e2c19dab076))
+- [ ] make transparency work without `if(tex.a == 0.0)`?
+- [ ] Discord RPC support?
+- [ ] Prioritize Material when organizing models to batch draw
+
+
+
 
 # TODO Shaders
 - [x] Revise ShaderManager
@@ -112,6 +104,8 @@ Stuff that are in progress and i need to finish
 - [x] Separate Shader Objects (`GL_ARB_separate_shader_objects`)
 	+ `ShaderProgram->bind_vertex()` and `ShaderProgram->bind_fragment()`?
 	+ Not necessary right now
+- [ ] Shader Pipeline
+	+ Do not replace program, make it optional
 - [ ] Custom shader for vertex shader also
 - [ ] UBO?
 	+ idk if its really necessary, currently the common uniforms are centered in `Iscene.cpp`
@@ -185,7 +179,7 @@ Stuff that are in progress and i need to finish
 	+ Not tested
 	+ Should also work for 2D shapes and be built in Mesh constructor that uses vertices only
 	+ Skipping this because i have more important stuff to do
-
+- [ ] make sure single draw call is working
 
 # TODO 2D
 - [x] Unify shader and `shader_texture` somehow

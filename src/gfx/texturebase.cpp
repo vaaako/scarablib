@@ -1,4 +1,5 @@
 #include "scarablib/gfx/texturebase.hpp"
+#include "scarablib/proper/error.hpp"
 
 TextureBase::TextureBase(const GLint texturetype, const uint16 width, const uint16 height, const uint32 id) noexcept
 	: id(id), width(width), height(height), texturetype(texturetype) {}
@@ -8,20 +9,30 @@ TextureBase::~TextureBase() noexcept {
 }
 
 void TextureBase::set_filter(const TextureBase::Filter filter) const noexcept {
+#if !defined(BUILD_OPGL30)
+	glTextureParameteri(this->id, GL_TEXTURE_MIN_FILTER, (GLint)filter);
+	glTextureParameteri(this->id, GL_TEXTURE_MAG_FILTER, (GLint)filter);
+#else
 	this->bind();
 	// Nearest: Pixelate
 	// Linear: Blur
 	glTexParameteri(this->texturetype, GL_TEXTURE_MIN_FILTER, (GLint)filter);
 	glTexParameteri(this->texturetype, GL_TEXTURE_MAG_FILTER, (GLint)filter);
 	this->unbind();
+#endif
 }
 
 void TextureBase::set_wrap(const TextureBase::Wrap wrap) const noexcept {
+#if !defined(BUILD_OPGL30)
+	glTextureParameteri(this->id, GL_TEXTURE_WRAP_S, (GLint)wrap);
+	glTextureParameteri(this->id, GL_TEXTURE_WRAP_T, (GLint)wrap);
+#else
 	this->bind();
 	// Repeat, Mirrored Repeat, Clamp to Edge, Clamp to Border (then use array of RGBA to color the border)
 	glTexParameteri(this->texturetype, GL_TEXTURE_WRAP_S, (GLint)wrap);
 	glTexParameteri(this->texturetype, GL_TEXTURE_WRAP_T, (GLint)wrap);
 	this->unbind();
+#endif
 }
 
 uint32 TextureBase::extract_format(const uint8 num_channels, const bool internal) {

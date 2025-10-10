@@ -75,17 +75,17 @@ void ShaderProgram::swap_shader(const uint32 id, const Shader::Type type) {
 	}
 
 	// Link shader
-	glAttachShader(programid, id);
-	glLinkProgram(programid);
-	glDetachShader(programid, id);
+	glAttachShader(this->programid, id);
+	glLinkProgram(this->programid);
+	glDetachShader(this->programid, id);
 
 	// Check for linking error
 	GLint success;
-	glGetProgramiv(programid, GL_LINK_STATUS, &success);
+	glGetProgramiv(this->programid, GL_LINK_STATUS, &success);
 	if(!success) {
 		GLchar info_log[512];
-		glGetProgramInfoLog(programid, 512, NULL, info_log);
-		glDeleteShader(programid); // Clean up the failed program
+		glGetProgramInfoLog(this->programid, 512, NULL, info_log);
+		glDeleteProgram(this->programid); // Clean up the failed program
 		throw ScarabError("Error Linking shaders: \n%s", info_log);
 	}
 }

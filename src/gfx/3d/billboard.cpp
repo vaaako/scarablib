@@ -65,7 +65,7 @@ void Billboard::set_directional_textures(const std::vector<const char*> paths, c
 	}
 
 	// Check if matches
-	if(this->material->texture_array->get_num_textures() != final_size) {
+	if(this->material->texture_array->get_num_layers() != final_size) {
 		throw ScarabError(
 			"Texture configuration error: The final texture count must be %u. Check flip configuration.",
 			final_size
@@ -75,7 +75,7 @@ void Billboard::set_directional_textures(const std::vector<const char*> paths, c
 	this->material->texture_array->generate_mipmap();
 
 	// this->num_sectors = this->textures.size();
-	this->angle_step = M_PI2 / (float)this->material->texture_array->get_num_textures();
+	this->angle_step = M_PI2 / (float)this->material->texture_array->get_num_layers();
 }
 
 void Billboard::update_facing_texture(const vec3<float>& point_pos) noexcept {

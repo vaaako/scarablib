@@ -13,53 +13,57 @@ class TextureArray : public TextureBase {
 		// Current texture index being used
 		uint16 texture_index = 0;
 
-		// Config struct used to create multiple textures
-		struct Config {
+		// Config struct used to create multiple layers
+		struct Layer {
 			const char* path;
 			bool flip_vertically = false;
 			bool flip_horizontally = false;
 		};
 
-		// Creates a texture array. All textures added to the array must have the same dimensions.
-		// - `width`: Width of all textures
-		// - `height`: Height of all textures
-		// - `max_textures`: Desired limit of textures. Automatically clamped to 0-2048
+		// Creates a texture array. All layers added to the array must have the same dimensions.
+		// - `width`: Width of all layers
+		// - `height`: Height of all layers
+		// - `max_layers`: Desired limit of layers. Automatically clamped to 0-2048
 		// - `channels`: (Default: 4) Number of channels
 		//    + 1: Grayscale
 		//    + 3: RGB (e.g. JPEG or PNG without alpha)
 		//    + 4: RGBA (e.g. PNG with alpha)
-		TextureArray(const uint16 width, const uint16 height, const uint16 max_textures, const uint8 channels = 4);
-		~TextureArray() noexcept = default;
+		TextureArray(const uint16 width, const uint16 height, const uint16 max_layers, const uint8 channels = 4);		~TextureArray() noexcept = default;
 
-		// Add a new texture to the texture array and returns its index.
-		// The texture must have the same width and height as the others
+		// Adds or replaces a layer of the texture array and returns its index.
+		// All layers must have the same width and height
 		uint16 add_texture(const char* path, const bool flip_vertically = false, const bool flip_horizontally = false, const int layer = -1);
 
-		// Add new textures to the texture array and returns index of added texture.
-		// All the textures must have the same width and height
-		uint16 add_textures(const std::vector<TextureArray::Config>& paths);
+		// Adds or replaces a layer of the texture array and returns its index.
+		// All layers must have the same width and height
+		uint16 add_textures(const std::vector<TextureArray::Layer>& paths);
 
-		// Returns the current number of textures in the array
-		inline uint32 get_num_textures() const noexcept {
-			return this->num_textures;
+		// Returns the current number of layers in the array
+		inline uint32 get_num_layers() const noexcept {
+			return this->num_layers;
 		}
 
-		// Returns the limit of textures that can be added
-		inline uint32 get_max_textures() const noexcept {
-			return this->max_textures;
+		// Returns the limit of layers that can be added
+		inline uint32 get_max_layers() const noexcept {
+			return this->max_layers;
 		}
 
 		// Generates mipmaps for all textures.
 		// You must call this after adding all desired textures
 		inline void generate_mipmap() const noexcept {
+		#if !defined(BUILD_OPGL30)
+			glGenerateTextureMipmap(this->id);
+		#else
 			this->bind();
 			glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
 			this->unbind();
+		#endif
 		}
+		// NOTE: here and not in TextureBase because only TextureArray needs this
 
 	private:
-		uint16 num_textures = 0; // Current number of textures
-		uint16 next_texture = 0; // Next texture to add
-		uint16 max_textures;     // Limit of textures
-		uint8 channels;          // Desired number of channels
+		uint16 num_layers = 0; // Current number of layers
+		uint16 next_layer = 0; // Next layer number to add
+		uint16 max_layers;     // Limit of layers
+		uint8 channels;        // Desired number of channels
 };

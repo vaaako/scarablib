@@ -13,7 +13,7 @@ class Texture : public TextureBase {
 		// You can also flip the texture vertically or horizontally
 		Texture(const char* path, const bool flip_vertically = false, const bool flip_horizontally = false);
 
-		// Uses pre-defined data to make a texture
+		// Loads texture from raw memory data
 		Texture(const uint8* data, const uint32 width, const uint32 height, const uint32 channels, const uint32 internal_channels);
 
 		~Texture() noexcept = default;

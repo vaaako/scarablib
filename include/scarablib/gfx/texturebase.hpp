@@ -1,8 +1,6 @@
 #pragma once
 
 #include "scarablib/typedef.hpp"
-#include "scarablib/window/window.hpp"
-#include <algorithm>
 
 // WARNING: Do not use this class directly
 class TextureBase {
@@ -41,8 +39,12 @@ class TextureBase {
 
 		// Bind the texture for use in rendering
 		inline void bind(const uint8 unit = 0) const noexcept {
+		#if !defined(BUILD_OPGL30)
+			glBindTextureUnit(unit, this->id);
+		#else
 			glActiveTexture(GL_TEXTURE0 + std::clamp((int)unit, 0, 31));
 			glBindTexture(this->texturetype, this->id);
+		#endif
 		}
 
 		// Unbind the texture to stop using it in rendering
