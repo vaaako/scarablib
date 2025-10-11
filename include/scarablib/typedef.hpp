@@ -26,5 +26,3 @@ using vec3 = glm::vec<3, T>;
 template <typename T>
 using vec4 = glm::vec<4, T>;
 
-// OpenGL
-// typedef uint32_t vaoid;

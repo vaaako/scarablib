@@ -5,12 +5,6 @@
 #include <random>
 
 namespace ScarabRandom {
-	namespace {
-		// Helper to access a single static generator
-		std::random_device rd;
-		std::mt19937 gen(rd());
-	}
-
 	// Randomly choose an element from the given vector
 	template <typename T>
 	[[nodiscard]] T choose_from(const std::vector<T>& choices) noexcept ;
@@ -27,12 +21,16 @@ namespace ScarabRandom {
 
 	// Choose a random integer in a given range
 	[[nodiscard]] inline int inrange(const int min, const int max) noexcept {
+		std::random_device rd;
+		std::mt19937 gen(rd());
 		std::uniform_int_distribution<> dis(min, max);
 		return dis(gen);
 	};
 
 	// Choose a random float in a given range
 	[[nodiscard]] inline float inrangef(const float min, const float max) noexcept {
+		std::random_device rd;
+		std::mt19937 gen(rd());
 		std::uniform_real_distribution<> dis(min, max);
 		return (float)dis(gen);
 	};
@@ -40,6 +38,9 @@ namespace ScarabRandom {
 
 template <typename T>
 T ScarabRandom::choose_from(const std::vector<T>& choices) noexcept {
+	std::random_device rd;
+	std::mt19937 gen(rd());
+
 	// Initialize distribution
 	std::uniform_int_distribution<> dis(0, (int)(choices.size() - 1));
 	// Select a random index and return the corresponding choice
@@ -52,6 +53,9 @@ T ScarabRandom::choose_weighted(const std::vector<T>& choices, const std::vector
 	if(choices.size() != weights.size() || choices.empty()) {
 		return 0;
 	}
+
+	std::random_device rd;
+	std::mt19937 gen(rd());
 
 	// Initialize distribution
 	std::discrete_distribution<> dis(weights.begin(), weights.end());

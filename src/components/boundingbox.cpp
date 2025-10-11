@@ -34,6 +34,24 @@ void BoundingBox::update_world_bounds(const glm::mat4& model_matrix) noexcept {
 	}
 }
 
+/*
+void AABB::update_world_bounds_fast(const glm::mat4& M) noexcept {
+	const glm::vec3 center = (local_max + local_min) * 0.5f;
+	const glm::vec3 extents = (local_max - local_min) * 0.5f;
+
+	glm::vec3 world_center = glm::vec3(M * glm::vec4(center, 1.0f));
+
+	glm::mat3 absM = glm::mat3(
+		glm::abs(M[0]), glm::abs(M[1]), glm::abs(M[2])
+	);
+
+	glm::vec3 world_extents = absM * extents;
+
+	min = world_center - world_extents;
+	max = world_center + world_extents;
+}
+*/
+
 
 bool BoundingBox::collides_with_sphere(const vec3<float>& center, const float radius) const noexcept {
 	// Find closest point on AABB to sphere center

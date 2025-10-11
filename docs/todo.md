@@ -180,6 +180,9 @@ Stuff that are in progress and i need to finish
 	+ Should also work for 2D shapes and be built in Mesh constructor that uses vertices only
 	+ Skipping this because i have more important stuff to do
 - [ ] make sure single draw call is working
+- [ ] BoundingVolume > AABB
+	+ BoundingVolume > OOBB
+	+ 
 
 # TODO 2D
 - [x] Unify shader and `shader_texture` somehow
