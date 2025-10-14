@@ -325,6 +325,9 @@ class Window {
 		vec2<int16> moved_dir;  // Normaalized moved_dir
 		// xrel yrel
 
+		// Helper for cleaning resources inside the constructor
+		void cleanup() noexcept;
+	
 		// Called at the beggining of the frame.
 		void calc_dt() noexcept;
 

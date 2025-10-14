@@ -13,22 +13,22 @@ Window::Window(const Window::Config& config)
 	: width(config.width), height(config.height), show_debug_info(config.debug_info) {
 
 	// Initialize SDL (video and audio)
-	// NOTE: Memory leak happening here
+	// NOTE: Memory leak here
 	if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
+		this->cleanup();
 		throw ScarabError("Failed to init SDL: %s", SDL_GetError());
 	}
 
 	// Initialize SDL_mixer
+	// NOTE: Memory leak here
 	// NOTE: Reserves couple KBs depending on chunksize
 	if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) != 0) {
-		Mix_CloseAudio();
-		Mix_Quit();
-		SDL_CloseAudio();
-		SDL_Quit();
+		this->cleanup();
 		throw ScarabError("Failed to init SDL_mixer: %s", SDL_GetError());
 	}
 
 	// Create SDL window
+	// NOTE: Memory leak here
 	this->window = SDL_CreateWindow(
 		config.title.c_str(),
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
@@ -37,10 +37,7 @@ Window::Window(const Window::Config& config)
 	);
 
 	if(!this->window) {
-		Mix_CloseAudio();
-		Mix_Quit();
-		SDL_CloseAudio();
-		SDL_Quit();
+		this->cleanup();
 		throw ScarabError("Failed to create a SDL window: %s", SDL_GetError());
 	}
 
@@ -56,22 +53,13 @@ Window::Window(const Window::Config& config)
 
 	this->glContext = SDL_GL_CreateContext(window);
 	if(this->glContext == NULL) {
-		SDL_DestroyWindow(this->window);
-		Mix_CloseAudio();
-		Mix_Quit();
-		SDL_CloseAudio();
-		SDL_Quit();
+		this->cleanup();
 		throw ScarabError("Failed to create OpenGL context: %s", SDL_GetError());
 	}
 
 	// Initialize GLAD
 	if(!gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress)) {
-		SDL_GL_DeleteContext(this->glContext);
-		SDL_DestroyWindow(this->window);
-		Mix_CloseAudio();
-		Mix_Quit();
-		SDL_CloseAudio();
-		SDL_Quit();
+		this->cleanup();
 		throw ScarabError("Failed to initialize GLAD");
 	}
 
@@ -90,6 +78,7 @@ Window::Window(const Window::Config& config)
 	// SDL Configurations
 	SDL_SetWindowResizable(this->window, (SDL_bool)config.resizable);
 	if(SDL_GL_SetSwapInterval(config.vsync) < 0) {
+		this->cleanup();
 		throw ScarabError("Failed to enable vsync: %s", SDL_GetError());
 	}
 
@@ -113,18 +102,27 @@ Window::~Window() noexcept {
 		LOG_INFO("Window %d destroyed", SDL_GetWindowID(this->window));
 	}
 
-	// Clean up Vertex Arrays and Shaders
+	// Clean up VertexArrays, Shaders and ShaderPrograms
 	ResourcesManager::get_instance().cleanup();
-	// Clean up OpenGL context
-	SDL_GL_DeleteContext(this->glContext);
-	this->glContext = nullptr;
+	this->cleanup();
+}
 
-	// Destroy SDL window
-	SDL_DestroyWindow(this->window);
-	// Close SDL_mixer
-	Mix_CloseAudio();
+void Window::cleanup() noexcept {
+	if(this->glContext) {
+		SDL_GL_DeleteContext(this->glContext);
+		this->glContext = nullptr;
+	}
+
+	if(this->window) {
+		SDL_DestroyWindow(this->window);
+		this->window = nullptr;
+	}
+
+	// Shutdown SDL_mixer
+	Mix_CloseAudio(); // Should be called for each time Mix_OpenAudio is called. One here
 	Mix_Quit();
-	// Quit SDL
+
+	// Shutdown SDL
 	SDL_Quit();
 }
 
