@@ -13,8 +13,6 @@
 Skybox::Skybox(const Camera& camera, const std::array<const char*, 6>& faces)
 	: camera(camera) {
 
-	LOG_DEBUG("Skybox shader hash: %zu", this->shader->get_hash());
-
 	// TODO: Back to vec3<float> later
 	static const std::vector<Vertex> vertices = {
 		Vertex { glm::vec3(-1.0f,  1.0f, -1.0f) }, // 0 - Top-Left-Back
