@@ -28,6 +28,7 @@ void Billboard::draw_logic(const Camera& camera) noexcept {
 	shader->set_float("billsize", this->scale->x);
 
 	// hard coded indices size
+	// Indices are static, so it will be always GL_UNSIGNED_BYTE
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, (void*)0);
 }
 

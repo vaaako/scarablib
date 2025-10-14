@@ -28,7 +28,9 @@ class TextureArray : public TextureBase {
 		//    + 1: Grayscale
 		//    + 3: RGB (e.g. JPEG or PNG without alpha)
 		//    + 4: RGBA (e.g. PNG with alpha)
-		TextureArray(const uint16 width, const uint16 height, const uint16 max_layers, const uint8 channels = 4);		~TextureArray() noexcept = default;
+		TextureArray(const uint16 width, const uint16 height, const uint16 max_layers, const uint8 channels = 4);
+
+		~TextureArray() noexcept = default;
 
 		// Adds or replaces a layer of the texture array and returns its index.
 		// All layers must have the same width and height

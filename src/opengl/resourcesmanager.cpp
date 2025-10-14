@@ -47,15 +47,15 @@ std::shared_ptr<ShaderProgram> ResourcesManager::load_shader_program(const std::
 	// Check if the program is already cached
 	size_t combined_hash = this->combine_shader_hashes(shaders);
 	if(std::shared_ptr<ShaderProgram> cache = this->get_program(combined_hash)) {
-		#ifdef SCARAB_DEBUG_SHADER_MANAGER
+	#if defined(SCARAB_DEBUG_SHADER_MANAGER)
 		LOG_DEBUG("Found shader program hash: %zu", combined_hash);
-		#endif
+	#endif
 		return cache;
 	}
 
-	#ifdef SCARAB_DEBUG_SHADER_MANAGER
+#if defined(SCARAB_DEBUG_SHADER_MANAGER)
 	LOG_DEBUG("Not Found/Expired shader program hash: %zu", combined_hash);
-	#endif
+#endif
 
 	// -- CREATE PROGRAM
 	// Create the ShaderProgram and cache it
@@ -78,17 +78,17 @@ std::shared_ptr<Shader> ResourcesManager::get_or_compile_shader(const char* sour
 
 	// Chek if the shader is already compiled and cached
 	if(source != nullptr && this->shader_cache.count(hash)) {
-		#ifdef SCARAB_DEBUG_SHADER_MANAGER
+	#if defined(SCARAB_DEBUG_SHADER_MANAGER)
 		LOG_DEBUG("Found %s shader hash: %zu", ((int)type == GL_VERTEX_SHADER) ? "VERTEX" : "FRAGMENT", hash);
-		#endif
+	#endif
 		if(std::shared_ptr<Shader> cache = this->get_shader(hash)) {
 			return cache;
 		}
 	}
 
-	#ifdef SCARAB_DEBUG_SHADER_MANAGER
+#if defined(SCARAB_DEBUG_SHADER_MANAGER)
 	LOG_DEBUG("NOT found/expired %s hash (%zu) not found, compiling new", ((int)type == GL_VERTEX_SHADER) ? "VERTEX" : "FRAGMENT", hash);
-	#endif
+#endif
 
 	std::shared_ptr<Shader> shader = std::make_shared<Shader>(source, type);
 	this->shader_cache[shader->hash] = shader;

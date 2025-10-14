@@ -4,6 +4,7 @@
 #include "scarablib/opengl/shader_program.hpp"
 #include "scarablib/opengl/vertexarray.hpp"
 #include "scarablib/proper/error.hpp"
+#include "scarablib/proper/log.hpp"
 #include <algorithm>
 #include <memory>
 #include <unordered_map>
@@ -79,6 +80,9 @@ class ResourcesManager {
 
 template <typename T, typename U>
 std::shared_ptr<VertexArray> ResourcesManager::acquire_vertexarray(const std::vector<T>& vertices, const std::vector<U>& indices) {
+	static_assert(std::is_base_of_v<Vertex, T>, "T must derive from Vertex");
+	static_assert(std::is_unsigned_v<U>, "U must be an unsigned integer type");
+
 	if(vertices.empty()) {
 		throw ScarabError("Vertices vector is empty for VAO creation");
 	}
@@ -87,34 +91,51 @@ std::shared_ptr<VertexArray> ResourcesManager::acquire_vertexarray(const std::ve
 	const size_t hash = this->compute_hash(vertices, indices);
 	std::shared_ptr<VertexArray> vertexarray = this->get_vertexarray(hash);
 	if(vertexarray != nullptr) {
-		#ifdef SCARAB_DEBUG_VAO_MANAGER
+	#if defined(SCARAB_DEBUG_VAO_MANAGER)
 		LOG_DEBUG("Hash %zu found! Reusing VAO.", hash);
-		#endif
+	#endif
 		return vertexarray; // Return the existing entry
 	}
 
-	#ifdef SCARAB_DEBUG_VAO_MANAGER
+#if defined(SCARAB_DEBUG_VAO_MANAGER)
 	LOG_DEBUG("Hash %zu not found. Creating new VAO.", hash);
-	#endif
+#endif
 
 	if(!indices.empty()) {
 		// -- CREATE VAO WITH THE SMALLEST POSSIBLE TYPE FOR INDICES
-		const uint32 max_val = *std::max_element(indices.begin(), indices.end());
+		
+		// Use uint64 to be safe
+		const uint64 max_val = *std::max_element(indices.begin(), indices.end());
 		if(max_val <= UINT8_MAX) {
 			vertexarray = std::make_shared<VertexArray>(vertices, ScarabOpenGL::convert_to<uint8>(indices));
+		#if defined(SCARAB_DEBUG_VAO_MANAGER)
+			LOG_DEBUG("Converted indices to uint8");
+		#endif
 		} else if(max_val <= UINT16_MAX) {
 			vertexarray = std::make_shared<VertexArray>(vertices, ScarabOpenGL::convert_to<uint16>(indices));
-		// Is uint32 or uint64, use existing indices
+		#if defined(SCARAB_DEBUG_VAO_MANAGER)
+			LOG_DEBUG("Converted indices to uint16");
+		#endif
+		// Is uint32, use existing indices
+		} else if(max_val <= UINT32_MAX){
+			vertexarray = std::make_shared<VertexArray>(vertices, ScarabOpenGL::convert_to<uint32>(indices));
+		#if defined(SCARAB_DEBUG_VAO_MANAGER)
+			LOG_DEBUG("Converted indices to uint32");
+		#endif
+		// Is uint64, use existing indices
 		} else {
+		#if defined(SCARAB_DEBUG_VAO_MANAGER)
+			LOG_DEBUG("Creating indices as uint64");
+		#endif
 			vertexarray = std::make_shared<VertexArray>(vertices, indices);
 		}
 	} else {
 		vertexarray = std::make_shared<VertexArray>(vertices, std::vector<uint8>{});
 	}
 
-	#ifdef SCARAB_DEBUG_VAO_MANAGER
+#if defined(SCARAB_DEBUG_VAO_MANAGER)
 	LOG_DEBUG("VAO ID made: %zu", vertexarray->get_vaoid());
-	#endif
+#endif
 
 	GL_CHECK();
 

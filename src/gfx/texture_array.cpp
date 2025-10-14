@@ -95,8 +95,7 @@ uint16 TextureArray::add_texture(const char* path, const bool flip_vertically, c
 		GL_TEXTURE_2D_ARRAY,
 		0, // Mipmap level
 		0, 0, (layer < 0) ? this->next_texture : layer, // x, y, layer (z)
-		this->width, this->height,
-		1, // Depth
+		this->width, this->height, 1, // Width, Height, Depth
 		TextureBase::extract_format(image->nr_channels, false),
 		GL_UNSIGNED_BYTE,
 		image->data

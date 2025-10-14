@@ -80,9 +80,9 @@ void IScene::draw_all() const noexcept {
 	for(const auto& [vao, models] : this->vao_groups) {
 		// Bind VAO if its a different from the currently bound
 		if(vao != cur_vao) {
-			#ifdef SCARAB_DEBUG_DRAW_ALL
+		#if defined(SCARAB_DEBUG_DRAW_ALL)
 			LOG_DEBUG("Changing VAO from %d to: %d", cur_vao, vao);
-			#endif
+		#endif
 			glBindVertexArray(vao);
 			cur_vao = vao;
 		}
@@ -95,9 +95,9 @@ void IScene::draw_all() const noexcept {
 			if(model_shader != cur_shader) {
 				cur_shader = model_shader;
 				cur_shader->use();
-				#ifdef SCARAB_DEBUG_DRAW_ALL
+			#if defined(SCARAB_DEBUG_DRAW_ALL)
 				LOG_DEBUG("changin shader %d", cur_shader->get_id());
-				#endif
+			#endif
 
 				// Bind Again
 				cur_shader->set_int("texSampler", 0);      // Bind texture to unit 0
@@ -136,9 +136,9 @@ void IScene::draw_all() const noexcept {
 
 			// -- COLOR //
 			if(model->material->color != cur_color) {
-				#ifdef SCARAB_DEBUG_DRAW_ALL
+			#if defined(SCARAB_DEBUG_DRAW_ALL)
 				LOG_DEBUG("changin color (%d, %d, %d, %d)", cur_color.red, cur_color.green, cur_color.blue, cur_color.alpha);
-				#endif
+			#endif
 				cur_color = model->material->color;
 				cur_shader->set_color("shapeColor", cur_color);
 			}
