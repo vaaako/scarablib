@@ -106,7 +106,6 @@ Stuff that are in progress and i need to finish
 	+ Not necessary right now
 - [ ] Shader Pipeline
 	+ Do not replace program, make it optional
-- [ ] Custom shader for vertex shader also
 - [ ] UBO?
 	+ idk if its really necessary, currently the common uniforms are centered in `Iscene.cpp`
 	+ maybe this could be necessary when implementing custom shaders
@@ -152,8 +151,6 @@ Stuff that are in progress and i need to finish
 	+ [x] Texture Array (not really used by anything currently)
 - [x] Batch rendering
 - [x] Use the same font object for different texts
-- [ ] Shader support
-	+ Define shader object, methods like `load_from_file` and be able to use this custom shader
 
 # TODO Shapes
 - [x] Make a Model Factory instead of static `get vao` and a struct for each model
@@ -182,7 +179,6 @@ Stuff that are in progress and i need to finish
 - [ ] make sure single draw call is working
 - [ ] BoundingVolume > AABB
 	+ BoundingVolume > OOBB
-	+ 
 
 # TODO 2D
 - [x] Unify shader and `shader_texture` somehow

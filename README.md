@@ -37,7 +37,7 @@ Scarablib 🪲 is a C++ library designed to simplify graphical development, offe
 - **Networking:** Adding network support for multiplayer or distributed applications
 
 # Documentation
-Currently there is no documentation. But each method is documented in the source code as a comment above it. If you are using a LSP you can easily view it
+Currently there is no documentation. But each method is documented in the source code as a comment above it. If you are using a LSP you can easily 
 
 # Example
 This example creates a 3D scene with a rotating cube
@@ -96,6 +96,17 @@ int main() {
 
 
 # Building and run
+# Macros
+These are all the macros you can enable when compiling the library
+
+## Funcionality
+- `BUILD_OPGL30`: Use `OpenGL 3.0` compatible methods instead of `OpenGL 4.5` DSA methods (default)
+
+## Debug
+- `SCARAB_DEBUG_VAO_MANAGER`: Shows information of `VertexArray` creation
+- `SCARAB_DEBUG_SHADER_MANAGER`: Shows information of `Shader` and `ShaderProgram` creation 
+- `SCARAB_DEBUG_DRAW_ALL`: Shows information of `VertexArray` creation
+
 ## Static Library (Recommended)
 Build the static library:
 ```sh
