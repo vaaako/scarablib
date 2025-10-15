@@ -76,12 +76,12 @@ Stuff that are in progress and i need to finish
 	+ Vertex Pulling may be even more efficent, look at this
 	+ both?
 - [x] [Modern OpenGL](https://juandiegomontoya.github.io/modern_opengl.html) and [Modern functions](https://github.com/fendevel/Guide-to-Modern-OpenGL-Functions)
+- [x] Make a repository for the networking library
 
 - [ ] In Window::rotate i didnt have to clear the rotation before, why do i need it now? ([last commit]( https://github.com/vaaako/scarablib/commit/d2a5717958a1f73fde39dafbd6640e2c19dab076))
 - [ ] make transparency work without `if(tex.a == 0.0)`?
 - [ ] Discord RPC support?
 - [ ] Prioritize Material when organizing models to batch draw
-- [ ] Make a repository for the networking library
 
 
 
