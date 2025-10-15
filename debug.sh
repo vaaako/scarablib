@@ -29,9 +29,13 @@ case "$1" in
 	-g|--gen-suppress)
 		echo -e "${GREEN}Generating suppression templates...${NC}"
 
+		OUTPUT="${LOG_FILE}_suppressions.txt"
 		valgrind --leak-check=full --show-leak-kinds=all \
 			--gen-suppressions=all --log-file=/dev/stdout \
-			"$TARGET" | tee "${LOG_FILE}_suppressions.txt"
+			"$TARGET" | tee "$OUTPUT"
+
+		# Get only the suppression blocks
+		awk '/^{$/ , /^}$/' "$OUTPUT" > "$LOG_FILE.supp"
 
 		exit 0
 		;;

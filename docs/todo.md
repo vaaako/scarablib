@@ -8,7 +8,6 @@ I wrote most of the things here very tired, sorry for any english mistake
 Stuff that are in progress and i need to finish
 
 - Timer
-- Texture Array
 - Bounding Box debug draw
 - Collision
 - Physics
@@ -82,7 +81,7 @@ Stuff that are in progress and i need to finish
 - [ ] make transparency work without `if(tex.a == 0.0)`?
 - [ ] Discord RPC support?
 - [ ] Prioritize Material when organizing models to batch draw
-
+- [ ] Make a repository for the networking library
 
 
 

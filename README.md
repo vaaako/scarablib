@@ -1,12 +1,11 @@
 # Scarablib
-Scarablib 🪲 is a C++ library designed to simplify graphical development, offering tools for both 2D and 3D rendering. While still in its early stages, Scarablib is being developed as a hobby project. You can track its progress in the [`todo.md`](docs/todo.md) file.
+Scarablib 🪲 is a C++ library designed to simplify graphical development, offering tools for both 2D and 3D rendering. While still in its early stages, Scarablib is being developed as a hobby project. You can track its progress in the [`todo.md`](docs/todo.md) file
+
+Contact me on discord: **vakothebat**
 
 ![showcase](medias/showcase.gif)
 
 # Features
-> [!NOTE]
-> Scarablib is in pre-alpha
-
 - **Beginner-Friendly API**: Designed with simplicity in mind, it is easy to learn for new developers while remaining powerful enough for advanced users
 - **2D and 3D development**: Easy-to-use tools for both 2D and 3D rendering
 	+ 2D and 3D basic shapes, Billboard and multiple type of planes
@@ -129,6 +128,11 @@ If build type is set to **Debug**, CMake will look for the `test/main.cpp` file 
 cmake -B build -DSTATIC=1 -DCMAKE_BUILD_TYPE=Debug
 cmake --build build
 ```
+
+<!--
+# Memory leaks
+The library does not contains any memory leak, but if you run `valgrind` you may notice that some memory still reachable at the end of the execution. This is from SDL library. If you are using `wayland` around 800 bytes of definitly lost memory will should up
+-->
 
 ## Using
 Now you just need to move the headers and the generated library. In order to use the [template Makefile](docs/Makefile) you need to move your `cpp` files to a folder named `src/`, the generated library to a folder named `lib/scarablib/`, `include/scarablib/` and `include/external/glad/` to a folder named `included/`. If done correctly you should be able to use the command `make` and it will compile it with no errors
