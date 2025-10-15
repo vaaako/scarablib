@@ -1,7 +1,7 @@
 CXX=clang++
 CXXFLAGS=-std=c++20 -O3 \
 		 -I./include/
-LDFLAGS=-Llib/scarablib -lscarablib
+LDFLAGS=-L./lib/scarablib -lscarablib
 
 BUILD_DIR  = build
 OBJS_DIR   = $(BUILD_DIR)/objs

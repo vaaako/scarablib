@@ -1,45 +1,77 @@
-# Scarablib
-Scarablib 🪲 is a C++ library designed to simplify graphical development, offering tools for both 2D and 3D rendering. While still in its early stages, Scarablib is being developed as a hobby project. You can track its progress in the [`todo.md`](docs/todo.md) file
+# Scarablib 🪲 v1.0
+**Scarablib** is a C++ graphics library designed to simplify 2D and 3D development. It provides an easy-to-use, beginner-friendly API while still offering powerful features like resource management, custom shaders, raycasting, and more
+
+> ⚠️ Scarablib is a **hobby project** and still under active development. You can track progress in the [`docs/todo.md`](docs/todo.md) file
 
 Contact me on discord: **vakothebat**
 
-![showcase](medias/showcase.gif)
+Orbiting cubes, Wavefront model, Plane and the Skybox
+![showcase gif](medias/showcase.gif)
+
+Billboard, Cube, Two Crossed Planes and the Skybox
+![showcase image](medias/showcase.png)
+
+# Documentation
+Currently, there is **no external documentation**. However, all methods are documented with comments in the source code. A [markdown file](docs/documentation.md) is planned to be added
+
+---
 
 # Features
 - **Beginner-Friendly API**: Designed with simplicity in mind, it is easy to learn for new developers while remaining powerful enough for advanced users
-- **2D and 3D development**: Easy-to-use tools for both 2D and 3D rendering
-	+ 2D and 3D basic shapes, Billboard and multiple type of planes
-	+ Material Component with Color, Shader and Texture
-- **Memory Management**: The memory is exclusively managed by the library
-	+ The library also contains a built-in resource manager and batch drawing
-- **Simplified VAO creation**: Dynamic methods for creating Vertex Array Objects with minimal boilerplate
-- **Built-in systems**: Raycasting, Terrain Map (collision for 2D images), Uniform Grid (collision for custom 3D models)
-- **Custom Shader Support**: Support for creation of customizable shaders
+- **2D and 3D development**: Easy-to-use tools for 2D and 3D rendering
+	Includes:
+	+ Basic 2D/3D shapes
+	+ Billboards and multiple plane types
+	+ Material components (Color, Shader, Texture and Texture Array)
+- **Memory Management**: Automatic memory handling with a built-in resource manager and batch renderer
+- **Simplified VAO creation**: Dynamic tools to create VAOs (just if needed) with minimal boilerplate
+- **Built-in systems**
+	+ Sounds
+	+ Wavefront OBJ loading
+	+ AABB
+	+ 2D Terrain Map Collision
+	+ 3D Uniform Grid Collison
+- **Custom Shader Support**: Easily load and apply custom GLSL shaders
+
+## Unfinished features
+These features are in-progress or partially working (expect bugs/performance issues):
+
+- **Timer**: Untested
+- **Bounding Box**: Working but unoptimized
+- **Collision System**: Untested
+- **Physics**: Partially implemented
+- **Terrain Map Collision**: Working but unoptimized
+- **Uniform Grid Collision**: Working but unoptimized
+- **Fonts**: Not yet implemented (kinda lazy to add it right now)
+- **Raycasting**: Untested
+
+## Roadmap
+- Physics and collision
+	+ AABB, OBB, Physics Engine, Terrain Map and Uniform Grid
+- Lighting support
+- Networking support
+
+---
 
 # Libraries used
 - [`SDL2`](https://www.libsdl.org/) for window management
 	+ [`SDL2_mixer`](https://www.libsdl.org/projects/mixer/) for sound handling
 - [`stb_image`](https://github.com/nothings/stb) for image loading
-- [`stb_truetype`](https://github.com/nothings/stb) for TTF loading
-- [`glad`](https://github.com/Dav1dde/glad) for OpenGL support
+- [`stb_truetype`](https://github.com/nothings/stb) for TTF font loading
+- [`glad`](https://github.com/Dav1dde/glad) for OpenGL loader
 - [`glm`](https://github.com/g-truc/glm) for vector and matrix math
-- [`tinyobjloader`](https://github.com/tinyobjloader/tinyobjloader) for wavefront obj loader
+- [`tinyobjloader`](https://github.com/tinyobjloader/tinyobjloader) for wavefront OBJ loader
 
->You can find the licenses for these libraries in the [`licenses/`](licenses/) directory
+> Licenses for these libraries are in the [`licenses/`](licenses/) directory
 
 ## Dependencies
-- [glad header](include/external/glad/gl.h)
+- [GLAD header](include/external/glad/gl.h)
 
-# Roadmap
-- **Physics and collisions:** In progress
-- **Light:** Implementation of light sources
-- **Networking:** Adding network support for multiplayer or distributed applications
+---
 
-# Documentation
-Currently there is no documentation. But each method is documented in the source code as a comment above it. If you are using a LSP you can easily 
 
-# Example
-This example creates a 3D scene with a rotating cube
+# Example: Rotating Cube
+This example creates a single 3D scene with a rotating cube
 ```cpp
 #include <scarablib/window/window.hpp>
 #include <scarablib/input/keycode.hpp>
@@ -94,36 +126,33 @@ int main() {
 ```
 
 
-# Building and run
-# Macros
-These are all the macros you can enable when compiling the library
+# Buildind the Library
+## Macros
+### Functionality
+- `BUILD_OPGL30`: Use `OpenGL 3.0` compatible methods (default is OpenGL 4.5 DSA)
 
-## Funcionality
-- `BUILD_OPGL30`: Use `OpenGL 3.0` compatible methods instead of `OpenGL 4.5` DSA methods (default)
-
-## Debug
-- `SCARAB_DEBUG_VAO_MANAGER`: Shows information of `VertexArray` creation
-- `SCARAB_DEBUG_SHADER_MANAGER`: Shows information of `Shader` and `ShaderProgram` creation 
-- `SCARAB_DEBUG_DRAW_ALL`: Shows information of `VertexArray` creation
+### Debug
+- `SCARAB_DEBUG_VAO_MANAGER`: Logs VAO creation
+- `SCARAB_DEBUG_SHADER_MANAGER`: Logs shader/program creation
+- `SCARAB_DEBUG_DRAW_ALL`: Logs batch draw calls
 
 ## Static Library (Recommended)
-Build the static library:
 ```sh
 cmake -B build -DSTATIC=1 -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ```
 
 ## Shared Library
-Build the shared library:
 ```sh
 cmake -B build -DSHARED=1 -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ```
 
-This will not merge `SDL2` and `SDL2_mixer`, you will need to put the shared files in your project and link them
+> ![NOTE]
+> `SDL2` and `SDL2_mixer` are not bundled. You will need to include and link them manually
 
-## Debug
-If build type is set to **Debug**, CMake will look for the `test/main.cpp` file and build the executable `build/scarablib_test`
+## Debug Build
+Compiles the test executable `build/scarablib_test` using `test/main.cpp`
 ```sh
 cmake -B build -DSTATIC=1 -DCMAKE_BUILD_TYPE=Debug
 cmake --build build
@@ -134,15 +163,32 @@ cmake --build build
 The library does not contains any memory leak, but if you run `valgrind` you may notice that some memory still reachable at the end of the execution. This is from SDL library. If you are using `wayland` around 800 bytes of definitly lost memory will should up
 -->
 
-## Using
-Now you just need to move the headers and the generated library. In order to use the [template Makefile](docs/Makefile) you need to move your `cpp` files to a folder named `src/`, the generated library to a folder named `lib/scarablib/`, `include/scarablib/` and `include/external/glad/` to a folder named `included/`. If done correctly you should be able to use the command `make` and it will compile it with no errors
+## Using the Library
+To use the provided [Makefile](docs/Makefile), follow this structure:
+```
+your_project/
+├── src/               # Your .cpp files
+├── lib/
+│   └── scarablib/     # Built static/shared library
+├── include/
+│   ├── scarablib/     # Scarablib headers
+│   └── external/glad/ # GLAD headers
+```
+
+Then run:
+```sh
+make
+```
 
 ## Windows Support
-Windows support is implemented but not tested. Currently only `SDL2` static library is used, you will have to ship `SDL2_mixer.dll`
+Window support exists but is **untested**. You will need to ship `SDL_mixer.dll` alongside your application. Currently, only the `SDL2` **static** library is used
+
+
+---
 
 # Contributing
-Scarablib is a hobby project, and contributions are welcome! If you’d like to contribute, please open an issue or submit a pull request
+Scarablib is a personal project, but contributions are very welcome! Feel free to open an issue or submit a pull request if you would like to help improve it
 
 # LICENSE
-This project is licensed under a modified version of the zlib License. See the [LICENSE](LICENSE) file for details
+This project is licensed under a **modified zlib License**. See the [LICENSE](LICENSE) file for detailsDafor full terms
 
