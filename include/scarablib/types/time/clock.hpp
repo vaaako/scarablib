@@ -1,16 +1,15 @@
 #pragma once
 
 #include <chrono>
-#include <functional>
 
 // A flexible clock that provides delta time and manages callback-based alarms
 class Clock {
 	public:
 		using HighResClock = std::chrono::high_resolution_clock;
-		using Callback = std::function<void()>; // 
 
 		Clock() noexcept;
 
+		// Returns elapsed time in seconds since last clock update
 		inline float get_delta() const noexcept {
 			return this->delta;
 		}
@@ -27,5 +26,4 @@ class Clock {
 	private:
 		float delta;
 		HighResClock::time_point last_time;
-
 };
