@@ -1,7 +1,8 @@
 #include "scarablib/gfx/3d/plane.hpp"
 #include "scarablib/geometry/geometry_factory.hpp"
+#include "scarablib/typedef.hpp"
 
-Plane::Plane(const Plane::Type type) noexcept : Model() {
+Plane::Plane(const Plane::Type type) noexcept : Model(), type(type) {
 	switch (type) {
 		case Plane::Type::SINGLE_PLANE:
 			this->set_geometry(
@@ -37,3 +38,26 @@ Plane::Plane(const Plane::Type type) noexcept : Model() {
 	}
 }
 
+
+
+void Plane::draw_logic(const Camera& camera) noexcept {
+	// Enable cullface if fourcrossed else disable it
+	bool enabled     = glIsEnabled(GL_CULL_FACE);
+	bool fourcrossed = this->type == Plane::Type::FOUR_CROSSED_PLANE;
+	if(fourcrossed) {
+		glEnable(GL_CULL_FACE);
+	} else {
+		glDisable(GL_CULL_FACE);
+	}
+
+	this->update_model_matrix();
+	this->material->shader->set_matrix4f("mvp", (camera.get_proj_matrix() * camera.get_view_matrix()) * this->model);
+	glDrawElements(GL_TRIANGLES, this->vertexarray->get_length(), this->vertexarray->get_indices_type(), (void*)0);
+
+	// Cullface back to original state
+	if(fourcrossed && !enabled) {
+		glDisable(GL_CULL_FACE);
+	} else if(enabled) {
+		glEnable(GL_CULL_FACE);
+	}
+}

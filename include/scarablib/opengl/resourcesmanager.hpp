@@ -64,6 +64,7 @@ class ResourcesManager {
 		// Cleans up all maps;
 		// WARNING: This is called inside Window destructor, DO NOT call it manually
 		void cleanup() noexcept;
+
 	private:
 		std::unordered_map<size_t, std::weak_ptr<VertexArray>> vertexarray_cache;
 		std::unordered_map<size_t, std::weak_ptr<Shader>> shader_cache;

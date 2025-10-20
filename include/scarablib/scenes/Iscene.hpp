@@ -28,7 +28,7 @@ class IScene {
 		// Returns an object by key and dynamically convert it.
 		// Returns nullptr if the key does not exist
 		template <typename T>
-		std::shared_ptr<T> get_by_key(const std::string_view& key) noexcept;
+		std::shared_ptr<T> get_by_key(const std::string_view& key);
 
 		// Remove object by key
 		void remove_by_key(const std::string_view& key);
@@ -82,14 +82,14 @@ class IScene {
 
 
 template <typename T>
-std::shared_ptr<T> IScene::get_by_key(const std::string_view& key) noexcept {
+std::shared_ptr<T> IScene::get_by_key(const std::string_view& key) {
 	if(!this->scene.contains(key)) {
 		return nullptr;
 	}
 
 	// Try to cast the object to the requested type
 	auto casted_ptr = std::dynamic_pointer_cast<T>(this->scene.at(key));
-	if (!casted_ptr) {
+	if(!casted_ptr) {
 		throw ScarabError("Failed to cast object with key '%s' to type", key.data());
 	}
 

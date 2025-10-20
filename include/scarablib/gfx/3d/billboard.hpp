@@ -61,6 +61,9 @@ struct Billboard : public Model {
 	// Updates the billboard's texture direction based on a point position (usually the camera)
 	void update_facing_texture(const vec3<float>& point_pos) noexcept;
 
+	// Overrides to correctly update the vertex shader
+	void draw_logic(const Camera& camera) noexcept override;
+
 	private:
 		// Precalculated directions
 		const float directions[8] = {
@@ -78,6 +81,4 @@ struct Billboard : public Model {
 
 		// Pre calculated angle steps between directions
 		float angle_step = 0; // Using radians in this case is more accurate
-
-		void draw_logic(const Camera& camera) noexcept override;
 };
