@@ -13,7 +13,6 @@ Stuff that are in progress and i need to finish
 - Physics
 - Terrain Map
 - Fonts
-- Network
 
 # TODO library
 - [x] Use my vectores instead of glm

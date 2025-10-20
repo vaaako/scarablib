@@ -147,17 +147,6 @@ void Window::grab_cursor(const bool grab) const noexcept {
 }
 
 
-float Window::fps() noexcept {
-	if(this->delta_time <= 0.0f) {
-		return 0.0f;
-	}
-	return 1.0f / this->delta_time;
-
-	// const float alpha = 0.1f; // Smoothing factor
-	// this->smooth_fps = this->smooth_fps * (1.0f - alpha) + (1.0f / this->delta_time) * alpha;
-	// return this->smooth_fps;
-}
-
 void Window::set_size(const vec2<uint32>& size) noexcept {
 	this->width = size.x;
 	this->height = size.y;
@@ -194,36 +183,23 @@ vec2<int> Window::relative_move() const noexcept {
 	return mov;
 }
 
+
 void Window::frame_capping(const float fps) const noexcept {
 	if(fps <= 0.0f) {
 		return;
 	}
 
+	const float dt = this->dt();
 	const float duration = 1.0f / fps;
-	const uint64 now     = SDL_GetPerformanceCounter();
-	const float elapsed = static_cast<float>(now - this->last_update) / (float)SDL_GetPerformanceFrequency();
 
 	// If not synchronized
-	if(elapsed < duration) {
+	// Not very precise, but it works
+	if(dt < duration) {
 		// Convert to milliseconds, clamp minimum delay to avoid 0ms inaccuracies
-		const uint32 delay_ms = static_cast<uint32>((duration - elapsed) * 1000.0f);
+		const uint32 delay_ms = (duration - dt) * 1000.0f;
 		if(delay_ms > 0) {
 			SDL_Delay(delay_ms);
 		}
-	}
-}
-
-// private
-void Window::calc_dt() noexcept {
-	const uint64 now = SDL_GetPerformanceCounter();
-	const uint64 elapsed = now - this->last_update;
-	this->last_update = now;
-	this->delta_time = static_cast<float>(elapsed) / static_cast<float>(SDL_GetPerformanceFrequency());
-	// note: elapsed may be multiplied by 1000.0f to get milliseconds
-
-	// Ignore bad frame times (first frame, context switch, GPU stall, etc)
-	if(this->delta_time <= 0.0f || this->delta_time >= 0.2f) {
-		this->delta_time = 0.0f;
 	}
 }
 
@@ -246,7 +222,8 @@ void Window::dispatch_event(const uint32 event) const noexcept {
 
 void Window::process_events() noexcept {
 	// Frame beggining calculations
-	this->calc_dt();
+	this->clock.mark(); // Calculate delta time
+	// this->update_fps_counter(); // Calculates average fps
 
 	SDL_Event event;
 	while(SDL_PollEvent(&event)) {

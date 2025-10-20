@@ -3,6 +3,7 @@
 #include "scarablib/proper/error.hpp"
 #include "scarablib/typedef.hpp"
 #include "scarablib/gfx/color.hpp"
+#include "scarablib/types/time/clock.hpp"
 #include "scarablib/window/buttoncode.hpp"
 #include "scarablib/window/events.hpp"
 #include "scarablib/window/keycode.hpp"
@@ -35,7 +36,7 @@ class Window {
 		~Window() noexcept;
 
 		// Handle any events occurring in the window.
-		// Also calculates FPS and Delta time
+		// Also calculates delta time
 		void process_events() noexcept;
 
 
@@ -48,20 +49,20 @@ class Window {
 
 		// Swap the front and back buffers at the end of each frame.
 		// Also clears events buffer.
-		// This should be called at the end of each frame
+		// This should be called at the end of each frame.
 		// to display the newly rendered frame to the screen
 		void swap_buffers() noexcept;
 
 		// Clear the screen by setting the background color and clearing the buffer.
 		// This should be called at the beginning of each frame to reset the drawing surface.
-		// It clears both the color and depth buffers.
+		// It clears both the color and depth buffers
 		void clear() const noexcept;
 
 
 		// GETTERS //
 
 		// Return a pointer to the SDL_Window object.
-		// This can be used to directly manipulate or access SDL window properties.
+		// This can be used to directly manipulate or access SDL window properties
 		inline SDL_Window* get_reference() const noexcept {
 			return this->window;
 		}
@@ -71,12 +72,12 @@ class Window {
 			return this->glContext;
 		}
 
-		// Return the width of the window in pixels.
+		// Return the width of the window in pixels
 		inline uint32 get_width() const noexcept {
 			return this->width;
 		}
 
-		// Return the height of the window in pixels.
+		// Return the height of the window in pixels
 		inline uint32 get_height() const noexcept {
 			return this->height;
 		}
@@ -182,21 +183,25 @@ class Window {
 
 		// TIMER //
 
-		// Window FPS per second
-		float fps() noexcept;
-
-		// Get the time elapsed between the current and last frame, in seconds.
+		// Returns the elapsed time between the current and last frame, in seconds
 		inline float dt() const noexcept {
-			return this->delta_time;
+			return this->clock.get_delta();
+		}
+
+		// Returns Window's FPS.
+		// This method calculates the instantaneous FPS.
+		// This value can fluctuate from one frame to the next
+		inline float fps() const noexcept {
+			const float dt = this->dt();
+			return (dt <= 0.0f) ? 0.0f : 1.0f / dt;
 		}
 
 		// Stabilize the FPS and tries to limit the frame rate.
 		// Frame capping will not work if VSync is enabled
 		void frame_capping(const float fps) const noexcept;
 
-		// Optional `time` parameter adjusts the time scale (default: 1000.0 for seconds).
-		// Get the number of milliseconds that have passed since the SDL library was initialized.
-		// Note: The value wraps after approximately 49 days of continuous program execution.
+		// Returns the number of milliseconds that have passed since the SDL library was initialized.
+		// Note: The value wraps after approximately 49 days of continuous program execution
 		inline uint32 timenow() const noexcept {
 			return SDL_GetTicks();
 		}
@@ -303,9 +308,7 @@ class Window {
 		SDL_GLContext glContext;
 
 		// FPS and DT
-		uint32 last_time   = SDL_GetTicks();
-		float delta_time   = 1.0f;
-		uint64 last_update = 0; // Updated on swap_buffers (frame end)
+		Clock clock = Clock();
 
 		// INPUT HANDLERS
 		// Keyboard events in this frame
@@ -328,9 +331,6 @@ class Window {
 		// Helper for cleaning resources inside the constructor
 		void cleanup() noexcept;
 	
-		// Called at the beggining of the frame.
-		void calc_dt() noexcept;
-
 		// Set the viewport to the provided size.
 		// This won't change the window's size
 		void set_viewport(const vec2<uint32>& size) noexcept;

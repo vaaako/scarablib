@@ -46,6 +46,39 @@ The window object must be relased after all other OpenGL objects, otherwhise it 
 
 # Texture
 
+# Timer
+## Clock
+## Interval
+```cpp
+int main() {
+	Clock clock;
+	IntervalTimer anim_timer;
+	IntervalTimer onesec_timer;
+
+	const float animation_fps = 24.0f;
+	const float anim_interval = 1.0f / animation_fps;
+
+	// Game loop simulation
+	while(window.is_open()) {
+		// Get delta time from clock
+		const float delta = clock.mark();
+
+		// Update animation
+		if(anim_timer.update(delta, anim_interval)) {
+			LOG_DEBUG("Updating animation frame!");
+		}
+
+		// Trigger when a second has passed
+		if (onesec_timer.update(delta, 1.0f)) {
+			LOG_DEBUG("A second has passed!");
+		}
+
+		// Simulate game work
+		std::this_thread::sleep_for(std::chrono::milliseconds(5));
+	}
+}
+```
+
 # Custom Shaders
 
 Default uniforms are:
