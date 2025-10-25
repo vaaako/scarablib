@@ -4,7 +4,7 @@
 
 // Represents an ellipse
 struct Circle : public Sprite {
-	// Amount of blur on circle's border. Clamped to 0.001-1.0
+	// Amount of blur on circle's border. Clamped: 0.001 to 1.0
 	float blur = 0.01f;
 
 	Circle() noexcept;
