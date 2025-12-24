@@ -7,7 +7,6 @@ I wrote most of the things here very tired, sorry for any english mistake
 # Currently working on
 Stuff that are in progress and i need to finish
 
-- Timer
 - Bounding Box debug draw
 - Collision
 - Physics
@@ -120,10 +119,6 @@ Stuff that are in progress and i need to finish
 
 - [x] Simplify Keyboard and Mouse input and put all that in Window class
 - [x] Unify bundle and VAOManger somehow idk get rid of bundle
-
-# TODO Network
-- [ ] Send message when client is disconnected
-- [ ] Remove `result` from Network class
 
 # TODO Bug
 - [x] Memory leak somewhere (i don't know if is in my code or in some library, but is not dangerous)

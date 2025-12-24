@@ -1,4 +1,4 @@
-#include "scarablib/geometry/uniformgrid.hpp"
+#include "scarablib/types/map/uniformgrid.hpp"
 #include "scarablib/geometry/model.hpp"
 #include "scarablib/proper/log.hpp"
 

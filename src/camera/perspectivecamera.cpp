@@ -93,7 +93,7 @@ void PerspectiveCamera::update_camera_vectors() noexcept {
 
 	// Use fixed up position
 	this->right = glm::normalize(glm::cross(this->forward, { 0.0f, 1.0f, 0.0f }));
-	this->up   = glm::normalize(glm::cross(this->right, this->forward));
+	this->up    = glm::normalize(glm::cross(this->right, this->forward));
 }
 
 
@@ -128,6 +128,6 @@ std::string_view PerspectiveCamera::get_cardinal_direction(const float yaw) {
 void PerspectiveCamera::update_proj_matrix() noexcept {
 	this->proj = glm::mat4(1.0f);
 	this->proj = glm::perspective(glm::radians(this->fov),
-		(static_cast<float>(this->width) / static_cast<float>(this->height)),
+		(float)this->aspectratio,
 		this->near_plane, this->far_plane);
 }

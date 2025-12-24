@@ -75,7 +75,8 @@ void Model::draw_logic(const Camera& camera) noexcept {
 	this->update_model_matrix();
 
 	// NOTE: is_dirty for color wouldn't work because would set this color to the next meshes
-	this->material->shader->set_matrix4f("mvp", (camera.get_proj_matrix() * camera.get_view_matrix()) * this->model);
+	this->material->shader->set_matrix4f("mvp",
+		(camera.get_proj_matrix() * camera.get_view_matrix()) * this->model);
 	glDrawElements(GL_TRIANGLES, this->vertexarray->get_length(), this->vertexarray->get_indices_type(), (void*)0);
 }
 

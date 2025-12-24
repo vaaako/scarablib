@@ -20,7 +20,6 @@ class PerspectiveCamera : public Camera {
 
 		// MOVEMENT
 
-
 		// Convert local direction to world-space direction
 		vec3<float> to_wordspace(const vec3<float>& dir) const noexcept;
 

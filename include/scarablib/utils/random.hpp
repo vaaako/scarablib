@@ -21,16 +21,16 @@ namespace ScarabRandom {
 
 	// Choose a random integer in a given range
 	[[nodiscard]] inline int inrange(const int min, const int max) noexcept {
-		std::random_device rd;
-		std::mt19937 gen(rd());
+		static thread_local std::random_device rd;
+		static thread_local std::mt19937 gen(rd());
 		std::uniform_int_distribution<> dis(min, max);
 		return dis(gen);
 	};
 
 	// Choose a random float in a given range
 	[[nodiscard]] inline float inrangef(const float min, const float max) noexcept {
-		std::random_device rd;
-		std::mt19937 gen(rd());
+		static thread_local std::random_device rd;
+		static thread_local std::mt19937 gen(rd());
 		std::uniform_real_distribution<> dis(min, max);
 		return (float)dis(gen);
 	};
@@ -38,8 +38,8 @@ namespace ScarabRandom {
 
 template <typename T>
 T ScarabRandom::choose_from(const std::vector<T>& choices) noexcept {
-	std::random_device rd;
-	std::mt19937 gen(rd());
+	static thread_local std::random_device rd;
+	static thread_local std::mt19937 gen(rd());
 
 	// Initialize distribution
 	std::uniform_int_distribution<> dis(0, (int)(choices.size() - 1));
@@ -54,8 +54,8 @@ T ScarabRandom::choose_weighted(const std::vector<T>& choices, const std::vector
 		return 0;
 	}
 
-	std::random_device rd;
-	std::mt19937 gen(rd());
+	static thread_local std::random_device rd;
+	static thread_local std::mt19937 gen(rd());
 
 	// Initialize distribution
 	std::discrete_distribution<> dis(weights.begin(), weights.end());

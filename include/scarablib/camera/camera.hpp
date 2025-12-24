@@ -30,6 +30,7 @@ class Camera {
 	protected:
 		uint32 width;
 		uint32 height;
+		float aspectratio;
 		float zoom = 1.0f;
 
 		// Matrices

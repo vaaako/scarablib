@@ -1,10 +1,13 @@
 #include "scarablib/camera/camera.hpp"
 
-Camera::Camera(const Window& window) noexcept : width(window.get_width()), height(window.get_height()) {};
+Camera::Camera(const Window& window) noexcept
+	: width(window.get_width()), height(window.get_height()),
+	  aspectratio((float)window.get_width() / (float)window.get_height()) {};
 
 void Camera::update_viewport(const uint32 width, const uint32 height) noexcept {
 	this->width = width;
 	this->height = height;
+	this->aspectratio = (float)width / (float)height;
 	this->update_proj_matrix(); // OpenGL viewport update
 }
 

@@ -61,44 +61,102 @@ class ShaderProgram {
 
 		// Sends a mat4f to the shader
 		inline void set_matrix4f(const char* unif, const glm::mat4& mat, const uint32 index = 1) const noexcept {
+		#if !defined(BUILD_OPGL30)
 			glUniformMatrix4fv(glGetUniformLocation(this->programid, unif), static_cast<GLsizei>(index), GL_FALSE, glm::value_ptr(mat));
+		#else
+			const GLint loc = glGetUniformLocation(this->programid, unif);
+			if (loc >= 0) {
+				glProgramUniformMatrix4fv(this->programid, loc, static_cast<GLsizei>(index), GL_FALSE, glm::value_ptr(mat));
+			}
+		#endif
 		}
 
 		// Sends a vector of ints to the shader
 		inline void set_ivec(const char* unif, const std::vector<int>& vec, const uint32 index = 1) const noexcept {
-			glUniform1iv(glGetUniformLocation(this->programid, unif), static_cast<GLsizei>(index), &vec[0]);
+		#if !defined(BUILD_OPGL30)
+			glUniform1iv(glGetUniformLocation(this->programid, unif), static_cast<GLsizei>(index), vec.data());
+		#else
+			const GLint loc = glGetUniformLocation(this->programid, unif);
+			if (loc >= 0) {
+				glProgramUniform1iv(this->programid, loc, static_cast<GLsizei>(index), vec.data());
+			}
+		#endif
 		}
 
 		// Sends color type as vec4f to the shader
 		inline void set_color(const char* unif, const Color& color) const noexcept {
-			glUniform4f(glGetUniformLocation(this->programid, unif), color.red / 255.0f, color.green / 255.0f, color.blue / 255.0f, color.alpha / 255.0f);
+		#if !defined(BUILD_OPGL30)
+			glUniform4f(glGetUniformLocation(this->programid, unif),
+				color.red / 255.0f, color.green / 255.0f, color.blue / 255.0f, color.alpha / 255.0f);
+		#else
+			const GLint loc = glGetUniformLocation(this->programid, unif);
+			if(loc >= 0) {
+				glProgramUniform4f(this->programid, loc,
+					color.red / 255.0f, color.green / 255.0f, color.blue / 255.0f, color.alpha / 255.0f);
+			}
+		#endif
 		}
 		// Division on CPU side is better
 		// Otherwhise GPU would divide for each vertice
 
 		// Sends a vec2f uniform to the shader
 		inline void set_vector2f(const char* unif, const vec2<float>& vec) const noexcept {
+		#if !defined(BUILD_OPGL30)
 			glUniform2f(glGetUniformLocation(this->programid, unif), vec.x, vec.y);
+		#else
+			const GLint loc = glGetUniformLocation(this->programid, unif);
+			if(loc >= 0) {
+				glProgramUniform2f(this->programid, loc, vec.x, vec.y);
+			}
+		#endif
 		}
 
 		// Sends a vec3f uniform to the shader
 		inline void set_vector3f(const char* unif, const vec3<float>& vec) const noexcept {
+		#if !defined(BUILD_OPGL30)
 			glUniform3f(glGetUniformLocation(this->programid, unif), vec.x, vec.y, vec.z);
+		#else
+			const GLint loc = glGetUniformLocation(this->programid, unif);
+			if(loc >= 0) {
+				glProgramUniform3f(this->programid, loc, vec.x, vec.y, vec.z);
+			}
+		#endif
 		}
 
 		// Sends a vec4f uniform to the shader
 		inline void set_vector4f(const char* unif, const vec4<float>& vec) const noexcept {
+		#if !defined(BUILD_OPGL30)
 			glUniform4f(glGetUniformLocation(this->programid, unif), vec.x, vec.y, vec.z, vec.w);
+		#else
+			const GLint loc = glGetUniformLocation(this->programid, unif);
+			if(loc >= 0) {
+				glProgramUniform4f(this->programid, loc, vec.x, vec.y, vec.z, vec.w);
+			}
+		#endif
 		}
 
-		// Sends a int uniform to the shader
+		// Sends an int uniform to the shader
 		inline void set_int(const char* unif, const int val) const noexcept {
+		#if !defined(BUILD_OPGL30)
 			glUniform1i(glGetUniformLocation(this->programid, unif), val);
+		#else
+			const GLint loc = glGetUniformLocation(this->programid, unif);
+			if(loc >= 0) {
+				glProgramUniform1i(this->programid, loc, val);
+			}
+		#endif
 		}
 
-		// Sets value of a float value uniform and sends it to the shader
+		// Sends a float uniform to the shader
 		inline void set_float(const char* unif, const float val) const noexcept {
+		#if !defined(BUILD_OPGL30)
 			glUniform1f(glGetUniformLocation(this->programid, unif), val);
+		#else
+			const GLint loc = glGetUniformLocation(this->programid, unif);
+			if(loc >= 0) {
+				glProgramUniform1f(this->programid, loc, val);
+			}
+		#endif
 		}
 
 	private:

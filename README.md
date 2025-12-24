@@ -26,6 +26,7 @@ Currently, there is **no external documentation**. However, all methods are docu
 - **Memory Management**: Automatic memory handling with a built-in resource manager and batch renderer
 - **Simplified VAO creation**: Dynamic tools to create VAOs (just if needed) with minimal boilerplate
 - **Built-in systems**
+	+ Clock, Timer and Alarm
 	+ Sounds
 	+ Wavefront OBJ loading
 	+ AABB
@@ -36,7 +37,6 @@ Currently, there is **no external documentation**. However, all methods are docu
 ## Unfinished features
 These features are in-progress or partially working (expect bugs/performance issues):
 
-- **Timer**: Untested
 - **Bounding Box**: Working but unoptimized
 - **Collision System**: Untested
 - **Physics**: Partially implemented

@@ -1,4 +1,4 @@
-#include "scarablib/geometry/terrainmap.hpp"
+#include "scarablib/types/map/terrainmap.hpp"
 #include "scarablib/proper/error.hpp"
 #include "scarablib/gfx/image.hpp"
 

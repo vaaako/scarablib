@@ -49,57 +49,13 @@ The window object must be relased after all other OpenGL objects, otherwhise it 
 # Timer
 ## Clock
 ## Interval
-```cpp
-Clock clock;
-IntervalTimer anim_timer;
-IntervalTimer onesec_timer;
-
-const float animation_fps = 24.0f;
-const float anim_interval = 1.0f / animation_fps;
-
-// Game loop simulation
-while(window.is_open()) {
-	// Get delta time from clock
-	const float delta = clock.mark();
-
-	// Update animation
-	if(anim_timer.update(delta, anim_interval)) {
-		LOG_DEBUG("Updating animation frame!");
-	}
-
-	// Trigger when a second has passed
-	if (onesec_timer.update(delta, 1.0f)) {
-		LOG_DEBUG("A second has passed!");
-	}
-
-	// Simulate game work
-	std::this_thread::sleep_for(std::chrono::milliseconds(5));
-}
-```
-
 ## Alarms
-```cpp
-// Alarm Manager creation
-AlarmManager alarms = AlarmManager();
 
-// Adding an alarm
-alarms.add_alarm(5, true, [](){
-	LOG_DEBUG("Elapsed 5 seconds");
-});
-
-
-while(window.is_open()) {
-	// Process all window events and calculate delta time
-	window.process_events();
-	// Update Alarm Manager and check if needs to fire any alarm
-	alarms.update(window.dt());
-}
-```
 
 
 # Custom Shaders
 
-Default uniforms are:
+Avaiable uniforms are:
 - `shapeColor`: Mesh's color
 - `texSampler`: Texture 2D (one pixel solid white if none is set)
 - `texSamplerArray`: Texture Array
