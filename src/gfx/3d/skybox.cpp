@@ -134,8 +134,8 @@ Skybox::Skybox(const Camera& camera, const std::array<const char*, 6>& faces)
 void Skybox::draw() noexcept {
 	glDepthFunc(GL_LEQUAL);
 
-	std::shared_ptr<ShaderProgram> shader = this->shader; // cache
-	std::shared_ptr<VertexArray> vertexarray = this->vertexarray;
+	std::shared_ptr<ShaderProgram>& shader = this->shader; // cache
+	std::shared_ptr<VertexArray>& vertexarray = this->vertexarray;
 
 	shader->use();
 	// Remove translation from the view matrix to keep the skybox "centered" on the camera

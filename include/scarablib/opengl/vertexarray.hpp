@@ -19,6 +19,9 @@ class VertexArray {
 		// Pass empty indices if you don't want to make EBO
 		template <typename T, typename U>
 		VertexArray(const std::vector<T>& vertices, const std::vector<U>& indices = {}, const bool dynamic_vertex = false) noexcept;
+		// Build VertexArray using the total size only.
+		// This constructor uses "Vertex" structure
+		VertexArray(const size_t capacity, const size_t vertex_size, const bool dynamic_vertex = false) noexcept;
 		~VertexArray() noexcept;
 
 		// Activates the VAO buffer in the OpenGL context
@@ -101,6 +104,10 @@ class VertexArray {
 		void link_attrib(const uint32 index, const uint32 count,
 				const uint32 stride, const uint32 offset, const bool normalized = false) const noexcept;
 
+		// Update the data inside the VertexArray using Sub Data.
+		// VertexArray must have be created with `dynamic_vertex` set to true
+		void update_vertices(const void* data, size_t size) noexcept;
+
 	private:
 		uint32 vao_id;
 		uint32 vbo_id;
@@ -108,9 +115,11 @@ class VertexArray {
 
 		size_t hash = 0; // Only VertexManager changes this value
 		// Either vertices size (if vertices only) or indices size
-		int length = 0;
+		int length;
 		// Not used for 2D shapes
 		GLenum indices_type = GL_UNSIGNED_INT;
+		// Vertex Size
+		size_t vsize;
 
 		// Used for adding attributes to VBO
 		size_t stride = 0;
@@ -119,7 +128,7 @@ class VertexArray {
 
 template <typename T, typename U>
 VertexArray::VertexArray(const std::vector<T>& vertices, const std::vector<U>& indices, const bool dynamic_vertex) noexcept
-	: length(vertices.size()) {
+	: length(vertices.size()), vsize(sizeof(T)) {
 
 	static_assert(std::is_base_of_v<Vertex, T>, "T must derive from Vertex");
 	static_assert(std::is_unsigned_v<U>, "U must be an unsigned integer type");
@@ -189,7 +198,11 @@ void VertexArray::alloc_data(const std::vector<T>& data, const bool dynamic_vert
 	// );
 #else
 	glBindBuffer(GL_ARRAY_BUFFER, this->vbo_id);
-	glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizei>(data.size() * sizeof(T)), data.data(), (dynamic_vertex) ? GL_DYNAMIC_DRAW : 0);
+	glBufferData(
+		GL_ARRAY_BUFFER,
+		static_cast<GLsizei>(data.size() * sizeof(T)),
+		data.data(),
+		(dynamic_vertex) ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 #endif
 }
@@ -236,6 +249,6 @@ void VertexArray::link_attrib(const uint32 index, const uint32 count,
 template <typename T>
 void VertexArray::add_attribute(const uint32 count, const bool normalized) noexcept {
 	static_assert(std::is_arithmetic_v<T>, "Type must be an arithmetic value");
-	this->link_attrib<T>(this->index++, count, sizeof(Vertex), this->stride, normalized);
+	this->link_attrib<T>(this->index++, count, this->vsize, this->stride, normalized);
 	this->stride += count * sizeof(T);
 }

@@ -1,6 +1,8 @@
 #pragma once
 
 #include "scarablib/typedef.hpp"
+#include <algorithm>
+#include <variant>
 #include <vector>
 
 namespace ScarabOpenGL {
@@ -10,12 +12,11 @@ namespace ScarabOpenGL {
 
 	// Converts a vector type to another
 	template <typename T, typename U>
-	std::vector<T> convert_to(const std::vector<U>& indices) {
-		std::vector<T> output;
-		output.reserve(indices.size());
-		for(U val : indices) {
-			output.push_back(static_cast<T>(val));
-		}
+	std::vector<T> convert_to(const std::vector<U>& vec) {
+		std::vector<T> output = std::vector<T>(vec.size());
+		std::transform(vec.begin(), vec.end(), output.begin(), [](U v) {
+			return static_cast<T>(v);
+		});
 		return output;
 	}
 

@@ -35,9 +35,18 @@ class ResourcesManager {
 		// Creates a new VertexArray or returns an existing one, based on the vertices and indices.
 		// - `vertices`: The vertex data.
 		// - `indices`: (Optional) The index data.
+		// - `dynamic_vertex`: (Default: false) Set the Vertex Array to be changeable after creation.
+		// - `chash`: (Default: 0) If set to any value, will use it as a hash instead of creating one.
 		// Returns: The entry for this VAO
 		template <typename T, typename U>
-		std::shared_ptr<VertexArray> acquire_vertexarray(const std::vector<T>& vertices, const std::vector<U>& indices);
+		std::shared_ptr<VertexArray> acquire_vertexarray(const std::vector<T>& vertices, const std::vector<U>& indices, const bool dynamic_vertex = false, const size_t chash = 0);
+
+		// Creates a new Vertex Array or returns an existing one.
+		// - `capacity`: Vertex Array total capacity>.
+		// - `hash`: The hash identification.
+		// - `dynamic_vertex`: (Default: false) Set the Vertex Array to be changeable after creation
+		template <typename T>
+		std::shared_ptr<VertexArray> acquire_vertexarray(const size_t capacity, const size_t hash, const bool dynamic_vertex = false) noexcept;
 
 		// Returns an entry of a VAO using its hash.
 		// Returns nullptr if not found
@@ -80,7 +89,8 @@ class ResourcesManager {
 
 
 template <typename T, typename U>
-std::shared_ptr<VertexArray> ResourcesManager::acquire_vertexarray(const std::vector<T>& vertices, const std::vector<U>& indices) {
+std::shared_ptr<VertexArray> ResourcesManager::acquire_vertexarray(
+		const std::vector<T>& vertices, const std::vector<U>& indices, const bool dynamic_vertex, const size_t chash) {
 	static_assert(std::is_base_of_v<Vertex, T>, "T must derive from Vertex");
 	static_assert(std::is_unsigned_v<U>, "U must be an unsigned integer type");
 
@@ -89,7 +99,7 @@ std::shared_ptr<VertexArray> ResourcesManager::acquire_vertexarray(const std::ve
 	}
 
 	// -- CHECK IF CACHED
-	const size_t hash = this->compute_hash(vertices, indices);
+	const size_t hash = (chash) ? chash : this->compute_hash(vertices, indices);
 	std::shared_ptr<VertexArray> vertexarray = this->get_vertexarray(hash);
 	if(vertexarray != nullptr) {
 	#if defined(SCARAB_DEBUG_VAO_MANAGER)
@@ -102,43 +112,69 @@ std::shared_ptr<VertexArray> ResourcesManager::acquire_vertexarray(const std::ve
 	LOG_DEBUG("Hash %zu not found. Creating new VAO.", hash);
 #endif
 
-	if(!indices.empty()) {
-		// -- CREATE VAO WITH THE SMALLEST POSSIBLE TYPE FOR INDICES
-		
-		// Use uint64 to be safe
-		const uint64 max_val = *std::max_element(indices.begin(), indices.end());
-		if(max_val <= UINT8_MAX) {
-			vertexarray = std::make_shared<VertexArray>(vertices, ScarabOpenGL::convert_to<uint8>(indices));
+	if(indices.empty()) {
+		vertexarray = std::make_shared<VertexArray>(vertices, std::vector<uint8>{}, dynamic_vertex);
+
+	// -- CREATE VAO WITH THE SMALLEST POSSIBLE TYPE FOR INDICES
+	} else {
+	
+		// Counting vertices is possible to know what type to use
+		// Example: if have 100 vertices, indices can only go from 0 to 100
+		const size_t v_count = vertices.size();
+
+		// UINT8_MAX + 1 = 256. If v_count is 256, max index is 255 (fits in uint8)
+		if(v_count <= (UINT8_MAX + 1)) {
+			vertexarray = std::make_shared<VertexArray>(vertices, ScarabOpenGL::convert_to<uint8>(indices), dynamic_vertex);
 		#if defined(SCARAB_DEBUG_VAO_MANAGER)
 			LOG_DEBUG("Converted indices to uint8");
 		#endif
-		} else if(max_val <= UINT16_MAX) {
-			vertexarray = std::make_shared<VertexArray>(vertices, ScarabOpenGL::convert_to<uint16>(indices));
+		} else if(v_count <= (UINT16_MAX + 1)) {
+			vertexarray = std::make_shared<VertexArray>(vertices, ScarabOpenGL::convert_to<uint16>(indices), dynamic_vertex);
 		#if defined(SCARAB_DEBUG_VAO_MANAGER)
 			LOG_DEBUG("Converted indices to uint16");
 		#endif
-		// Is uint32, use existing indices
-		} else if(max_val <= UINT32_MAX){
-			vertexarray = std::make_shared<VertexArray>(vertices, ScarabOpenGL::convert_to<uint32>(indices));
+		} else {
 		#if defined(SCARAB_DEBUG_VAO_MANAGER)
 			LOG_DEBUG("Converted indices to uint32");
 		#endif
-		// Is uint64, use existing indices
-		} else {
-		#if defined(SCARAB_DEBUG_VAO_MANAGER)
-			LOG_DEBUG("Creating indices as uint64");
-		#endif
-			vertexarray = std::make_shared<VertexArray>(vertices, indices);
+			// No conversion needed. Move the existing vector to avoid a massive copy
+			vertexarray = std::make_shared<VertexArray>(vertices, std::move(indices), dynamic_vertex);
 		}
-	} else {
-		vertexarray = std::make_shared<VertexArray>(vertices, std::vector<uint8>{});
 	}
 
 #if defined(SCARAB_DEBUG_VAO_MANAGER)
 	LOG_DEBUG("VAO ID made: %zu", vertexarray->get_vaoid());
+	GL_CHECK();
 #endif
 
+	vertexarray->hash = hash;
+	this->vertexarray_cache[hash] = vertexarray;
+	return vertexarray;
+}
+
+
+template <typename T>
+std::shared_ptr<VertexArray> ResourcesManager::acquire_vertexarray(const size_t capacity, const size_t hash, const bool dynamic_vertex) noexcept {
+	// -- CHECK IF CACHED
+
+	std::shared_ptr<VertexArray> vertexarray = this->get_vertexarray(hash);
+	if(vertexarray != nullptr) {
+	#if defined(SCARAB_DEBUG_VAO_MANAGER)
+		LOG_DEBUG("Hash %zu found! Reusing VAO.", hash);
+	#endif
+		return vertexarray; // Return the existing entry
+	}
+
+#if defined(SCARAB_DEBUG_VAO_MANAGER)
+	LOG_DEBUG("Hash %zu not found. Creating new VAO.", hash);
+#endif
+
+	vertexarray = std::make_shared<VertexArray>(capacity, sizeof(T), dynamic_vertex);
+
+#if defined(SCARAB_DEBUG_VAO_MANAGER)
+	LOG_DEBUG("VAO ID made: %zu", vertexarray->get_vaoid());
 	GL_CHECK();
+#endif
 
 	vertexarray->hash = hash;
 	this->vertexarray_cache[hash] = vertexarray;

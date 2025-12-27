@@ -47,7 +47,10 @@ These features are in-progress or partially working (expect bugs/performance iss
 
 ## Roadmap
 - Physics and collision
-	+ AABB, OBB, Physics Engine, Terrain Map and Uniform Grid
+	+ Map builder
+	+ AABB, OBB
+	+ Terrain Map and Uniform Grid
+	+ Physics Engine
 - Lighting support
 - Networking support
 
@@ -138,13 +141,13 @@ int main() {
 
 ## Static Library (Recommended)
 ```sh
-cmake -B build -DSTATIC=1 -DCMAKE_BUILD_TYPE=Release
+cmake -B build -DSTATIC=1
 cmake --build build
 ```
 
 ## Shared Library
 ```sh
-cmake -B build -DSHARED=1 -DCMAKE_BUILD_TYPE=Release
+cmake -B build -DSHARED=1
 cmake --build build
 ```
 

@@ -8,7 +8,9 @@ struct Shader {
 	enum class Type {
 		// Just used to check when using a custom shader 
 		None     = 0,
+		// Vertex Shader
 		Vertex   = GL_VERTEX_SHADER,
+		// Fragment Shader
 		Fragment = GL_FRAGMENT_SHADER
 	};
 

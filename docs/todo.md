@@ -80,6 +80,7 @@ Stuff that are in progress and i need to finish
 - [ ] make transparency work without `if(tex.a == 0.0)`?
 - [ ] Discord RPC support?
 - [ ] Prioritize Material when organizing models to batch draw
+- [ ] Be able to build VertexArray step by step
 
 
 
@@ -192,6 +193,7 @@ Stuff that are in progress and i need to finish
 - [x] Remove `SCARAB_2D_AND_3D`
 - [x] Make it work with CULL_FACE
 - [ ] Finish font
+- [ ] Use `vec2<float>` for Sprites
 
 # TODO 3D
 - [ ] Camera

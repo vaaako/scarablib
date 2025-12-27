@@ -16,7 +16,8 @@ namespace ScarabHash {
 	}
 
 	// Makes a hash out of a value and return it.
-	// Do NOT use raw pointers like `char*` or `const char*`, it will nor work
+	// Do NOT use raw pointers like `char*` or `const char*`, it will nor work.
+	// Converting to `std::string` is fine though
 	template <typename T>
 	size_t hash_make(const T& value) noexcept {
 		size_t seed = 0;

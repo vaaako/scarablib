@@ -24,7 +24,7 @@ void Sprite::update_model_matrix() noexcept {
 
 	this->isdirty = false;
 
-	// Collision calculation will be here
+	// TODO: Collision calculation will be here
 }
 
 // I could just provide mvp if any of the matrix changes, because the value is stored in memory.

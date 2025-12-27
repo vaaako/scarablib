@@ -24,19 +24,20 @@ void IScene::remove_by_key(const std::string_view& key) {
 }
 
 // TODO: Not finished i need to check if its working and change a little bit
-void IScene::draw(Mesh& model) const noexcept {
-	std::shared_ptr<ShaderProgram> shader = model.material->shader;
+void IScene::draw(Mesh& mesh) const noexcept {
+	std::shared_ptr<ShaderProgram>& shader = mesh.material->shader;
 	shader->use();
 
 	shader->set_int("texSampler", 0);      // Bind texture to unit 0
 	shader->set_int("texSamplerArray", 1); // Bind to unit 1
+	// NOTE: Since shader probably has texSamplerArray, i need to bind so mix function can work
 
-	model.vertexarray->bind_vao();
+	mesh.vertexarray->bind_vao();
 
-	const MaterialComponent::TextureHandle& texture = model.material->texture;
-	const TextureArray* texture_array = model.material->texture_array;
+	const MaterialComponent::TextureHandle& texture = mesh.material->texture;
+	const TextureArray* texture_array = mesh.material->texture_array;
 
-	const bool hastex = model.material->texture != nullptr;
+	const bool hastex = mesh.material->texture != nullptr;
 	const bool hastexarray = texture_array != nullptr;
 
 	if(hastex) {
@@ -44,18 +45,18 @@ void IScene::draw(Mesh& model) const noexcept {
 	}
 
 	// Use texture array if it exists
+	float mix_amount = 0;
 	if(hastexarray) {
 		texture_array->bind(1); // Unit 1
 		shader->set_int("texlayer", texture_array->texture_index);
+		// Mix with texture
+		mix_amount = (hastex && hastexarray) ? mesh.material->mix_amount : (hastexarray ? 1.0f : 0.0f);
+		// Not need for cur_mixamount because this is irrelevant
+		shader->set_float("mixamount", mix_amount);
 	}
 
-	// Not need for cur_mixamount because this is irrelevant
-	const float mix_amount = (hastex && hastexarray) ? model.material->mix_amount : (hastexarray ? 1.0f : 0.0f);
-	shader->set_float("mixamount", mix_amount);
-
-	shader->set_color("shapeColor", model.material->color);
-
-	model.draw_logic(this->camera);
+	shader->set_color("shapeColor", mesh.material->color);
+	mesh.draw_logic(this->camera);
 }
 
 // glUseProgram      - Most expensive change
@@ -103,7 +104,7 @@ void IScene::draw_all() const noexcept {
 				cur_shader->set_int("texSampler", 0);      // Bind texture to unit 0
 				cur_shader->set_int("texSamplerArray", 1); // Bind to unit 1
 				cur_shader->set_color("shapeColor", cur_color);
-				// NOTE: Since shader probrably has texSamplerArray, i need to bind so mix function can work
+				// NOTE: Since shader probably has texSamplerArray, i need to bind so mix function can work
 			}
 			// SHADER -- //
 
@@ -128,10 +129,11 @@ void IScene::draw_all() const noexcept {
 				// This correctly changes billboard texture
 				cur_shader->set_int("texlayer", model->material->texture_array->texture_index);
 			}
-
 			// Not need for cur_mixamount because this is irrelevant
+			// NOTE: yeah, it needs to be outside the if-case above, so it changes when a texarray is nullptr
 			const float mix_amount = (model->material->texture != nullptr && hastexarray) ? model->material->mix_amount : (hastexarray ? 1.0f : 0.0f);
 			cur_shader->set_float("mixamount", mix_amount);
+
 			// TEXTURE -- //
 
 			// -- COLOR //
