@@ -17,7 +17,7 @@ namespace GeometryFactory {
 	std::vector<Vertex> make_fourcrossedplane_vertices() noexcept;
 
 	// Returns the vertices for a rectangle
-	std::vector<Vertex> make_rectangle_vertices() noexcept;
+	std::vector<Vertex2D> make_rectangle_vertices() noexcept;
 	// Returns the vertices for a triangle
-	std::vector<Vertex> make_triangle_vertices() noexcept;
+	std::vector<Vertex2D> make_triangle_vertices() noexcept;
 }

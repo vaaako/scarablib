@@ -74,7 +74,6 @@ Window::Window(const Window::Config& config)
 	// Culling
 	// glEnable(GL_CULL_FACE);
 
-
 	// SDL Configurations
 	SDL_SetWindowResizable(this->window, (SDL_bool)config.resizable);
 	if(SDL_GL_SetSwapInterval(config.vsync) < 0) {

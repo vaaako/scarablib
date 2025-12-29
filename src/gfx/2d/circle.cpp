@@ -36,7 +36,7 @@ Circle::Circle() noexcept
 
 	this->material->shader = ResourcesManager::get_instance().load_shader_program({
 		ResourcesManager::ShaderInfo {
-			.source = Shaders::DEFAULT_VERTEX,
+			.source = Shaders::DEFAULT_VERTEX2D,
 			.type   = Shader::Type::Vertex
 		},
 		ResourcesManager::ShaderInfo {

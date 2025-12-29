@@ -14,7 +14,7 @@ class Sprite : public Mesh {
 		// Rotation angle
 		DirtyProxy<float> angle = DirtyProxy(0.0f, this->isdirty);
 
-		Sprite(const std::vector<Vertex>& vertices) noexcept;
+		Sprite(const std::vector<Vertex2D>& vertices) noexcept;
 
 		// This method does not draw the model to the screen, as it does not bind the VAO and Shader (batch rendering)
 		virtual void draw_logic(const Camera& camera) noexcept override;

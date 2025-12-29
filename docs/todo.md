@@ -192,8 +192,12 @@ Stuff that are in progress and i need to finish
 - [x] If possible, use mesh.hpp for 2D shapes
 - [x] Remove `SCARAB_2D_AND_3D`
 - [x] Make it work with CULL_FACE
+- [x] Use `vec2<float>` for Sprites
 - [ ] Finish font
-- [ ] Use `vec2<float>` for Sprites
+- [ ] Convert a small image to a scenario
+	+ like raylib does
+- [ ] Tiled support
+- [ ] Fix texuv
 
 # TODO 3D
 - [ ] Camera
@@ -248,3 +252,5 @@ Stuff that are in progress and i need to finish
 	+ Ceilings are not being detected
 - [ ] Convert a small image to a scenario
 	+ like raylib does
+- [ ] Tiled support
+- [ ] Fix texuv

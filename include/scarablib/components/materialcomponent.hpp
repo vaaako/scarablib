@@ -113,6 +113,7 @@ struct MaterialComponent {
 	TextureArray* texture_array = nullptr;
 
 	// Material's default shader
+	// TODO: Make nullptr?
 	std::shared_ptr<ShaderProgram> shader = ResourcesManager::get_instance().load_shader_program({
 		// Default vertex and fragment shader source
 		{ .source = Shaders::DEFAULT_VERTEX,   .type = Shader::Type::Vertex },

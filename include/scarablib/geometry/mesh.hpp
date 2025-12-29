@@ -29,11 +29,12 @@ class Mesh {
 		// Mesh is not build, you should provide vertices and indices with `Mesh::set_geometry(...)` method
 		Mesh() noexcept = default;
 		// Build Mesh using vertices and indices
-		template <typename T>
-		Mesh(const std::vector<Vertex>& vertices, const std::vector<T>& indices) noexcept;
+		template <typename T, typename U>
+		Mesh(const std::vector<T>& vertices, const std::vector<U>& indices) noexcept;
 		// Build Mesh using only vertices.
 		// Mainly used for 2D Shapes. It will not make a collider
-		Mesh(const std::vector<Vertex>& vertices) noexcept;
+		template <typename T>
+		Mesh(const std::vector<T>& vertices) noexcept;
 
 		virtual ~Mesh() noexcept;
 
@@ -42,8 +43,8 @@ class Mesh {
 		virtual void draw_logic(const Camera& camera) noexcept = 0;
 
 		// Build Mesh using vertices and indices
-		template <typename T>
-		void set_geometry(const std::vector<Vertex>& vertices, const std::vector<T>& indices);
+		template <typename T, typename U>
+		void set_geometry(const std::vector<T>& vertices, const std::vector<U>& indices);
 
 		inline glm::mat4 get_model_matrix() const noexcept {
 			return this->model;
@@ -79,14 +80,23 @@ class Mesh {
 };
 
 
-template <typename T>
-Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<T>& indices) noexcept {
+template <typename T, typename U>
+Mesh::Mesh(const std::vector<T>& vertices, const std::vector<U>& indices) noexcept {
 	this->set_geometry(vertices, indices);
 }
 
-
+// Indices attributes are not needed to set here
+// I will not make Bounding Box here because this is probably a 2D model
 template <typename T>
-void Mesh::set_geometry(const std::vector<Vertex>& vertices, const std::vector<T>& indices) {
+Mesh::Mesh(const std::vector<T>& vertices) noexcept {
+	this->vertexarray = ResourcesManager::get_instance()
+		.acquire_vertexarray(vertices, std::vector<uint8>{});
+	this->vertexarray->add_attribute<float>(2, true);
+}
+
+
+template <typename T, typename U>
+void Mesh::set_geometry(const std::vector<T>& vertices, const std::vector<U>& indices) {
 	this->vertexarray = ResourcesManager::get_instance()
 		.acquire_vertexarray(vertices, indices);
 	this->vertexarray->add_attribute<float>(2, true);

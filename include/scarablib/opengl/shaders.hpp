@@ -28,6 +28,22 @@ namespace Shaders {
 		}
 	)glsl";
 
+	const char* const DEFAULT_VERTEX2D = R"glsl(
+		#version 330 core
+
+		layout (location = 0) in vec2 aPos;
+		layout (location = 1) in vec2 aTex;
+
+		out vec2 texuv;
+
+		uniform mat4 mvp;
+
+		void main() {
+			gl_Position = mvp * vec4(aPos, 0.0, 1.0);
+			texuv       = aTex;
+		}
+	)glsl";
+
 	const char* const DEFAULT_FRAGMENT = R"glsl(
 		#version 330 core
 

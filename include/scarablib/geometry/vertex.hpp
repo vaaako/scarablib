@@ -5,27 +5,41 @@
 #include <functional>
 
 // Mesh data uploaded to the GPU
-struct Vertex {
-	// Vertex positions
-	vec3<float> position; // 12 bytes
+template <typename T>
+struct VertexBase {
+	static_assert(
+		std::is_same_v<T, vec2<float>> ||
+		std::is_same_v<T, vec3<float>>,
+		"VertexBase<T>: T must be vec2<float> or vec3<float>"
+	);
+
+	// Vertex position
+	T position; // 12 bytes
 	// Normalized texture coordinates
 	vec2<float> texuv = vec2<float>(0.0f);
 
-	bool operator==(const Vertex& other) const noexcept {
+	bool operator==(const VertexBase& other) const noexcept {
 		return this->position == other.position &&
 			   this->texuv    == other.texuv;
 	}
 };
 
+// Aliases
+using Vertex   = VertexBase<vec3<float>>;
+using Vertex2D = VertexBase<vec2<float>>;
+
 // Be able to use Vertex as key in unordered_map
 namespace std {
-	template<> struct hash<Vertex> {
-		size_t operator()(const Vertex& vertex) const {
+	template <typename T>
+	struct hash<VertexBase<T>> {
+		size_t operator()(const VertexBase<T>& vertex) const {
 			size_t seed = 0;
 
 			ScarabHash::hash_combine(seed, vertex.position.x);
 			ScarabHash::hash_combine(seed, vertex.position.y);
-			ScarabHash::hash_combine(seed, vertex.position.z);
+			if constexpr (std::is_same_v<vec3<float>, T>) {
+				ScarabHash::hash_combine(seed, vertex.position.z);
+			}
 
 			ScarabHash::hash_combine(seed, vertex.texuv.x);
 			ScarabHash::hash_combine(seed, vertex.texuv.y);

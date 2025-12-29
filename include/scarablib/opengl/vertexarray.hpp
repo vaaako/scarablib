@@ -130,7 +130,7 @@ template <typename T, typename U>
 VertexArray::VertexArray(const std::vector<T>& vertices, const std::vector<U>& indices, const bool dynamic_vertex) noexcept
 	: length(vertices.size()), vsize(sizeof(T)) {
 
-	static_assert(std::is_base_of_v<Vertex, T>, "T must derive from Vertex");
+	static_assert(std::is_base_of_v<Vertex, T> || std::is_base_of_v<Vertex2D, T>, "T must derive from Vertex or Vertex2D");
 	static_assert(std::is_unsigned_v<U>, "U must be an unsigned integer type");
 
 #if !defined(BUILD_OPGL30)
@@ -138,7 +138,13 @@ VertexArray::VertexArray(const std::vector<T>& vertices, const std::vector<U>& i
 	glCreateBuffers(1, &this->vbo_id);
 	// Add position attribute and alloc data on VBO
 	this->alloc_data(vertices, dynamic_vertex);
-	this->add_attribute<float>(3, true); // Position
+
+	// Position attribute
+	if constexpr (std::is_same_v<vec2<float>, T>) {
+		this->add_attribute<float>(2, false);
+	} else {
+		this->add_attribute<float>(3, false);
+	}
 
 	if(!indices.empty()) {
 		glCreateBuffers(1, &this->ebo_id);
@@ -156,7 +162,13 @@ VertexArray::VertexArray(const std::vector<T>& vertices, const std::vector<U>& i
 	glGenBuffers(1, &this->vbo_id);
 	// Add position attribute and alloc data on VBO
 	this->alloc_data(vertices);
-	this->add_attribute<float>(3, true); // Position
+
+	// Position attribute
+	if constexpr (std::is_same_v<vec2<float>, T>) {
+		this->add_attribute<float>(2, false);
+	} else {
+		this->add_attribute<float>(3, false);
+	}
 
 	if(!indices.empty()) {
 		glGenBuffers(1, &this->ebo_id);
@@ -222,7 +234,7 @@ void VertexArray::link_attrib(const uint32 index, const uint32 count,
 		);
 	} else {
 		glVertexArrayAttribFormat(this->vao_id, index, static_cast<GLint>(count),
-			ScarabOpenGL::gl_type<T>(), (normalized) ? GL_TRUE : GL_FALSE, static_cast<GLuint>(offset)
+			ScarabOpenGL::gl_type<T>(), normalized, static_cast<GLuint>(offset)
 		);
 	}
 	// Attach VBO to VAO
@@ -237,7 +249,7 @@ void VertexArray::link_attrib(const uint32 index, const uint32 count,
 		glVertexAttribIPointer(index, static_cast<GLint>(count), ScarabOpenGL::gl_type<T>(),
 				static_cast<GLsizei>(stride), reinterpret_cast<void*>(offset));
 	} else {
-		glVertexAttribPointer(index, static_cast<GLint>(count), ScarabOpenGL::gl_type<T>(), (normalized) ? GL_TRUE : GL_FALSE,
+		glVertexAttribPointer(index, static_cast<GLint>(count), ScarabOpenGL::gl_type<T>(), normalized,
 				static_cast<GLsizei>(stride), reinterpret_cast<void*>(offset));
 	}
 

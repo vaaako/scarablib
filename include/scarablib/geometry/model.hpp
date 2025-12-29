@@ -73,4 +73,13 @@ class Model : public Mesh {
 
 template <typename T>
 Model::Model(const std::vector<Vertex>& vertices, const std::vector<T>& indices) noexcept
-	: Mesh(vertices, indices) {}
+	: Mesh(vertices, indices) {
+
+	// Set shader
+	// NOTE: Redundant because the same is set inside MaterialCompoment
+	std::shared_ptr<ShaderProgram> shader = ResourcesManager::get_instance().load_shader_program({
+		// Default vertex and fragment shader source
+		{ .source = Shaders::DEFAULT_VERTEX,   .type = Shader::Type::Vertex },
+		{ .source = Shaders::DEFAULT_FRAGMENT, .type = Shader::Type::Fragment },
+	});
+}

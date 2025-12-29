@@ -55,9 +55,9 @@ void Plane::draw_logic(const Camera& camera) noexcept {
 	glDrawElements(GL_TRIANGLES, this->vertexarray->get_length(), this->vertexarray->get_indices_type(), (void*)0);
 
 	// Cullface back to original state
-	if(fourcrossed && !enabled) {
-		glDisable(GL_CULL_FACE);
-	} else if(enabled) {
+	if(enabled) {
 		glEnable(GL_CULL_FACE);
+	} else {
+		glDisable(GL_CULL_FACE);
 	}
 }

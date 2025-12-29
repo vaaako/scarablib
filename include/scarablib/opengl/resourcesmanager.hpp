@@ -39,7 +39,8 @@ class ResourcesManager {
 		// - `chash`: (Default: 0) If set to any value, will use it as a hash instead of creating one.
 		// Returns: The entry for this VAO
 		template <typename T, typename U>
-		std::shared_ptr<VertexArray> acquire_vertexarray(const std::vector<T>& vertices, const std::vector<U>& indices, const bool dynamic_vertex = false, const size_t chash = 0);
+		std::shared_ptr<VertexArray> acquire_vertexarray(const std::vector<T>& vertices,
+				const std::vector<U>& indices, const bool dynamic_vertex = false, const size_t chash = 0);
 
 		// Creates a new Vertex Array or returns an existing one.
 		// - `capacity`: Vertex Array total capacity>.
@@ -91,7 +92,7 @@ class ResourcesManager {
 template <typename T, typename U>
 std::shared_ptr<VertexArray> ResourcesManager::acquire_vertexarray(
 		const std::vector<T>& vertices, const std::vector<U>& indices, const bool dynamic_vertex, const size_t chash) {
-	static_assert(std::is_base_of_v<Vertex, T>, "T must derive from Vertex");
+	static_assert(std::is_base_of_v<Vertex, T> || std::is_base_of_v<Vertex2D, T>, "T must derive from Vertex or Vertex2D");
 	static_assert(std::is_unsigned_v<U>, "U must be an unsigned integer type");
 
 	if(vertices.empty()) {

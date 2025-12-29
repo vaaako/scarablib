@@ -116,48 +116,55 @@ std::vector<Vertex> GeometryFactory::make_crossedplane_vertices() noexcept {
 std::vector<Vertex> GeometryFactory::make_fourcrossedplane_vertices() noexcept {
 	return {
 		// Quad 1 - Front
-		Vertex{ .position = glm::vec3(-0.5f, -0.5f, 0.0f), .texuv = glm::vec2(0.0f, 0.0f) },
-		Vertex{ .position = glm::vec3( 0.5f, -0.5f, 0.0f), .texuv = glm::vec2(1.0f, 0.0f) },
-		Vertex{ .position = glm::vec3( 0.5f,  0.5f, 0.0f), .texuv = glm::vec2(1.0f, 1.0f) },
-		Vertex{ .position = glm::vec3(-0.5f,  0.5f, 0.0f), .texuv = glm::vec2(0.0f, 1.0f) },
+		Vertex { .position = glm::vec3(-0.5f, -0.5f, 0.0f), .texuv = glm::vec2(0.0f, 0.0f) },
+		Vertex { .position = glm::vec3( 0.5f, -0.5f, 0.0f), .texuv = glm::vec2(1.0f, 0.0f) },
+		Vertex { .position = glm::vec3( 0.5f,  0.5f, 0.0f), .texuv = glm::vec2(1.0f, 1.0f) },
+		Vertex { .position = glm::vec3(-0.5f,  0.5f, 0.0f), .texuv = glm::vec2(0.0f, 1.0f) },
 
 		// Quad 1 - Back (same UVs, reversed winding)
-		Vertex{ .position = glm::vec3(-0.5f, -0.5f, 0.0f), .texuv = glm::vec2(1.0f, 0.0f) },
-		Vertex{ .position = glm::vec3(-0.5f,  0.5f, 0.0f), .texuv = glm::vec2(1.0f, 1.0f) },
-		Vertex{ .position = glm::vec3( 0.5f,  0.5f, 0.0f), .texuv = glm::vec2(0.0f, 1.0f) },
-		Vertex{ .position = glm::vec3( 0.5f, -0.5f, 0.0f), .texuv = glm::vec2(0.0f, 0.0f) },
+		Vertex { .position = glm::vec3(-0.5f, -0.5f, 0.0f), .texuv = glm::vec2(1.0f, 0.0f) },
+		Vertex { .position = glm::vec3(-0.5f,  0.5f, 0.0f), .texuv = glm::vec2(1.0f, 1.0f) },
+		Vertex { .position = glm::vec3( 0.5f,  0.5f, 0.0f), .texuv = glm::vec2(0.0f, 1.0f) },
+		Vertex { .position = glm::vec3( 0.5f, -0.5f, 0.0f), .texuv = glm::vec2(0.0f, 0.0f) },
 
 		// Quad 2 - Front (rotated around Y)
-		Vertex{ .position = glm::vec3(0.0f, -0.5f, -0.5f), .texuv = glm::vec2(0.0f, 0.0f) },
-		Vertex{ .position = glm::vec3(0.0f, -0.5f,  0.5f), .texuv = glm::vec2(1.0f, 0.0f) },
-		Vertex{ .position = glm::vec3(0.0f,  0.5f,  0.5f), .texuv = glm::vec2(1.0f, 1.0f) },
-		Vertex{ .position = glm::vec3(0.0f,  0.5f, -0.5f), .texuv = glm::vec2(0.0f, 1.0f) },
+		Vertex { .position = glm::vec3(0.0f, -0.5f, -0.5f), .texuv = glm::vec2(0.0f, 0.0f) },
+		Vertex { .position = glm::vec3(0.0f, -0.5f,  0.5f), .texuv = glm::vec2(1.0f, 0.0f) },
+		Vertex { .position = glm::vec3(0.0f,  0.5f,  0.5f), .texuv = glm::vec2(1.0f, 1.0f) },
+		Vertex { .position = glm::vec3(0.0f,  0.5f, -0.5f), .texuv = glm::vec2(0.0f, 1.0f) },
 
 		// Quad 2 - Back (same UVs, reversed winding)
-		Vertex{ .position = glm::vec3(0.0f, -0.5f, -0.5f), .texuv = glm::vec2(1.0f, 0.0f) },
-		Vertex{ .position = glm::vec3(0.0f,  0.5f, -0.5f), .texuv = glm::vec2(1.0f, 1.0f) },
-		Vertex{ .position = glm::vec3(0.0f,  0.5f,  0.5f), .texuv = glm::vec2(0.0f, 1.0f) },
-		Vertex{ .position = glm::vec3(0.0f, -0.5f,  0.5f), .texuv = glm::vec2(0.0f, 0.0f) },
+		Vertex { .position = glm::vec3(0.0f, -0.5f, -0.5f), .texuv = glm::vec2(1.0f, 0.0f) },
+		Vertex { .position = glm::vec3(0.0f,  0.5f, -0.5f), .texuv = glm::vec2(1.0f, 1.0f) },
+		Vertex { .position = glm::vec3(0.0f,  0.5f,  0.5f), .texuv = glm::vec2(0.0f, 1.0f) },
+		Vertex { .position = glm::vec3(0.0f, -0.5f,  0.5f), .texuv = glm::vec2(0.0f, 0.0f) },
 	};
 }
 
-std::vector<Vertex> GeometryFactory::make_rectangle_vertices() noexcept {
+std::vector<Vertex2D> GeometryFactory::make_rectangle_vertices() noexcept {
 	return {
+		// // Central vertex
+		// Vertex2D { .position = glm::vec2(0.0f, 0.0f), .texuv = glm::vec2(1.0f, 1.0f) }, // Bottom Left
+		// // CW fan around center
+		// Vertex2D { .position = glm::vec2(0.0f, 1.0f), .texuv = glm::vec2(0.0f, 1.0f) }, // Top Left
+		// Vertex2D { .position = glm::vec2(1.0f, 1.0f), .texuv = glm::vec2(0.0f, 0.0f) }, // Top Right
+		// Vertex2D { .position = glm::vec2(1.0f, 0.0f), .texuv = glm::vec2(0.0f, 1.0f) }  // Bottom Right
+	
 		// Central vertex
-		Vertex { .position = glm::vec3(0.0f, 0.0f, 0.0f), .texuv = glm::vec2(0.0f, 1.0f) }, // Bottom Left
+		Vertex2D { .position = glm::vec2(0.0f, 0.0f), .texuv = glm::vec2(1.0f, 1.0f) }, // Bottom Left
 		// CW fan around center
-		Vertex { .position = glm::vec3(0.0f, 1.0f, 0.0f), .texuv = glm::vec2(0.0f, 0.0f) }, // Top Left
-		Vertex { .position = glm::vec3(1.0f, 1.0f, 0.0f), .texuv = glm::vec2(1.0f, 0.0f) }, // Top Right
-		Vertex { .position = glm::vec3(1.0f, 0.0f, 0.0f), .texuv = glm::vec2(1.0f, 1.0f) }, // Bottom Right
+		Vertex2D { .position = glm::vec2(0.0f, 1.0f), .texuv = glm::vec2(0.0f, 1.0f) }, // Top Left
+		Vertex2D { .position = glm::vec2(1.0f, 1.0f), .texuv = glm::vec2(0.0f, 0.0f) }, // Top Right
+		Vertex2D { .position = glm::vec2(1.0f, 0.0f), .texuv = glm::vec2(0.0f, 1.0f) }  // Bottom Right
 	};
 }
 
-std::vector<Vertex> GeometryFactory::make_triangle_vertices() noexcept {
+std::vector<Vertex2D> GeometryFactory::make_triangle_vertices() noexcept {
 	return {
 		// CCW
-		Vertex { .position = glm::vec3(0.5f, 0.0f, 0.0f), .texuv = glm::vec2(0.5f, 1.0f) }, // Middle
-		Vertex { .position = glm::vec3(0.0f, 1.0f, 0.0f), .texuv = glm::vec2(0.0f, 0.0f) }, // Bottom Left
-		Vertex { .position = glm::vec3(1.0f, 1.0f, 0.0f), .texuv = glm::vec2(1.0f, 0.0f) }  // Bottom Right
+		Vertex2D { .position = glm::vec2(0.5f, 0.0f), .texuv = glm::vec2(0.5f, 1.0f) }, // Middle
+		Vertex2D { .position = glm::vec2(0.0f, 1.0f), .texuv = glm::vec2(0.0f, 0.0f) }, // Bottom Left
+		Vertex2D { .position = glm::vec2(1.0f, 1.0f), .texuv = glm::vec2(1.0f, 0.0f) }  // Bottom Right
 	};
 }
 
