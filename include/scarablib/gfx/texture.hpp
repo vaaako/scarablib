@@ -14,7 +14,7 @@ class Texture : public TextureBase {
 		Texture(const char* path, const bool flip_vertically = false, const bool flip_horizontally = false);
 
 		// Loads texture from raw memory data
-		Texture(const uint8* data, const uint32 width, const uint32 height, const uint32 channels, const uint32 internal_channels);
+		Texture(const uint8* data, const uint32 width, const uint32 height, const uint8 num_channels);
 
 		~Texture() noexcept = default;
 

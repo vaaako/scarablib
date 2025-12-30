@@ -96,7 +96,7 @@ Texture::Texture(const char* path, const bool flip_horizontally, const bool flip
 	#endif
 }
 
-Texture::Texture(const uint8* data, const uint32 width, const uint32 height, const uint32 channels, const uint32 internal_channels)
+Texture::Texture(const uint8* data, const uint32 width, const uint32 height, const uint8 num_channels)
 	: TextureBase(GL_TEXTURE_2D, width, height) {
 
 	if(data == nullptr) {
@@ -105,8 +105,8 @@ Texture::Texture(const uint8* data, const uint32 width, const uint32 height, con
 
 #if !defined(BUILD_OPGL30)
 	glCreateTextures(GL_TEXTURE_2D, 1, &this->id);
-	glTextureStorage2D(this->id, 1, internal_channels, width, height);
-	glTextureSubImage2D(this->id, 0, 0, 0, width, height, channels, GL_UNSIGNED_BYTE, data);
+	glTextureStorage2D(this->id, 1, TextureBase::extract_format(num_channels, true), width, height);
+	glTextureSubImage2D(this->id, 0, 0, 0, width, height, TextureBase::extract_format(num_channels, false), GL_UNSIGNED_BYTE, data);
 
 	glGenerateTextureMipmap(this->id);
 
