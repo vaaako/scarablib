@@ -65,6 +65,35 @@ std::shared_ptr<ShaderProgram> ResourcesManager::load_shader_program(const std::
 	return program;
 }
 
+
+std::shared_ptr<VertexArray> ResourcesManager::acquire_vertexarray(const void* data, const size_t capacity, const size_t vertex_size, const size_t hash, const bool dynamic_vertex) noexcept {
+	// -- CHECK IF CACHED
+
+	std::shared_ptr<VertexArray> vertexarray = this->get_vertexarray(hash);
+	if(vertexarray != nullptr) {
+	#if defined(SCARAB_DEBUG_VAO_MANAGER)
+		LOG_DEBUG("Hash %zu found! Reusing VAO.", hash);
+	#endif
+		return vertexarray; // Return the existing entry
+	}
+
+#if defined(SCARAB_DEBUG_VAO_MANAGER)
+	LOG_DEBUG("Hash %zu not found. Creating new VAO.", hash);
+#endif
+
+	vertexarray = std::make_shared<VertexArray>(data, capacity, vertex_size, dynamic_vertex);
+
+#if defined(SCARAB_DEBUG_VAO_MANAGER)
+	LOG_DEBUG("VAO ID made: %zu", vertexarray->get_vaoid());
+	GL_CHECK();
+#endif
+
+	vertexarray->hash = hash;
+	this->vertexarray_cache[hash] = vertexarray;
+	return vertexarray;
+}
+
+
 size_t ResourcesManager::combine_shader_hashes(const std::vector<std::shared_ptr<Shader>>& shaders) const noexcept {
 	size_t combined_hash = 0;
 	for(const auto& shader : shaders) {

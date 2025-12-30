@@ -16,7 +16,7 @@ Skybox::Skybox(const Camera& camera, const std::array<const char*, 6>& faces)
 	// TODO: Back to vec3<float> later
 	static const std::vector<Vertex> vertices = {
 		Vertex { glm::vec3(-1.0f,  1.0f, -1.0f) }, // 0 - Top-Left-Back
-		Vertex { glm::vec3( 1.0f,  1.0f, -1.0f) }, // 0 - Top-Right-Back
+		Vertex { glm::vec3( 1.0f,  1.0f, -1.0f) }, // 1 - Top-Right-Back
 		Vertex { glm::vec3( 1.0f, -1.0f, -1.0f) }, // 2 - Bottom-Right-Back
 		Vertex { glm::vec3(-1.0f, -1.0f, -1.0f) }, // 3 - Bottom-Left-Back
 		Vertex { glm::vec3(-1.0f,  1.0f,  1.0f) }, // 4 - Top-Left-Front
@@ -48,6 +48,7 @@ Skybox::Skybox(const Camera& camera, const std::array<const char*, 6>& faces)
 
 	this->vertexarray = ResourcesManager::get_instance()
 		.acquire_vertexarray(vertices, indices);
+	this->vertexarray->add_attribute<float>(3, false);
 
 
 #if !defined(BUILD_OPGL30)

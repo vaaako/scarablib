@@ -17,6 +17,8 @@ Model::Model(const char* path) : Mesh() {
 	// Create Vertex Array Buffer
 	this->vertexarray = ResourcesManager::get_instance()
 		.acquire_vertexarray(vertices, std::vector<uint8>{});
+	// Position and TexUV
+	this->vertexarray->add_attribute<float>(3, false);
 	this->vertexarray->add_attribute<float>(2, true);
 
 	// Free memory

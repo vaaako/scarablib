@@ -36,6 +36,10 @@ Plane::Plane(const Plane::Type type) noexcept : Model(), type(type) {
 		default:
 			break;
 	}
+
+	// Position and TexUV
+	this->vertexarray->add_attribute<float>(3, false);
+	this->vertexarray->add_attribute<float>(2, true);
 }
 
 

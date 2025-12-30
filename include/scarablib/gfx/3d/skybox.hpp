@@ -21,9 +21,9 @@ struct Skybox {
 		std::shared_ptr<VertexArray> vertexarray;
 		uint32 texid;
 
-	std::shared_ptr<ShaderProgram> shader = ResourcesManager::get_instance().load_shader_program({
-		// Default vertex and fragment shader source
-		{ .source = Shaders::SKYBOX_VERTEX,   .type = Shader::Type::Vertex },
-		{ .source = Shaders::SKYBOX_FRAGMENT, .type = Shader::Type::Fragment },
-	});
+		std::shared_ptr<ShaderProgram> shader = ResourcesManager::get_instance().load_shader_program({
+			// Default vertex and fragment shader source
+			{ .source = Shaders::SKYBOX_VERTEX,   .type = Shader::Type::Vertex },
+			{ .source = Shaders::SKYBOX_FRAGMENT, .type = Shader::Type::Fragment },
+		});
 };

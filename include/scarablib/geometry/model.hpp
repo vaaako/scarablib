@@ -74,6 +74,9 @@ class Model : public Mesh {
 template <typename T>
 Model::Model(const std::vector<Vertex>& vertices, const std::vector<T>& indices) noexcept
 	: Mesh(vertices, indices) {
+	// Position and TexUV
+	this->vertexarray->add_attribute<float>(3, false);
+	this->vertexarray->add_attribute<float>(2, true);
 
 	// Set shader
 	// NOTE: Redundant because the same is set inside MaterialCompoment

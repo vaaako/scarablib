@@ -4,6 +4,10 @@
 Sprite::Sprite(const std::vector<Vertex2D>& vertices) noexcept
 	: Mesh(vertices) {
 
+	// Position and TexUV
+	this->vertexarray->add_attribute<float>(3, false);
+	this->vertexarray->add_attribute<float>(2, true);
+
 	// Set 2D Shader
 	std::shared_ptr<ShaderProgram> shader = ResourcesManager::get_instance().load_shader_program({
 		// Default vertex and fragment shader source

@@ -42,12 +42,13 @@ class ResourcesManager {
 		std::shared_ptr<VertexArray> acquire_vertexarray(const std::vector<T>& vertices,
 				const std::vector<U>& indices, const bool dynamic_vertex = false, const size_t chash = 0);
 
-		// Creates a new Vertex Array or returns an existing one.
-		// - `capacity`: Vertex Array total capacity>.
+		// Manually creates a Vertex Array.
+		// - `data`: Vertex Array data.
+		// - `capacity`: Vertex Array total capacity.
+		// - `vertex_size`: Vertex size being used (e.g., `sizeof(Vertex2D)`).
 		// - `hash`: The hash identification.
 		// - `dynamic_vertex`: (Default: false) Set the Vertex Array to be changeable after creation
-		template <typename T>
-		std::shared_ptr<VertexArray> acquire_vertexarray(const size_t capacity, const size_t hash, const bool dynamic_vertex = false) noexcept;
+		std::shared_ptr<VertexArray> acquire_vertexarray(const void* data, const size_t capacity, const size_t vertex_size, const size_t hash, const bool dynamic_vertex = false) noexcept;
 
 		// Returns an entry of a VAO using its hash.
 		// Returns nullptr if not found
@@ -153,34 +154,6 @@ std::shared_ptr<VertexArray> ResourcesManager::acquire_vertexarray(
 	return vertexarray;
 }
 
-
-template <typename T>
-std::shared_ptr<VertexArray> ResourcesManager::acquire_vertexarray(const size_t capacity, const size_t hash, const bool dynamic_vertex) noexcept {
-	// -- CHECK IF CACHED
-
-	std::shared_ptr<VertexArray> vertexarray = this->get_vertexarray(hash);
-	if(vertexarray != nullptr) {
-	#if defined(SCARAB_DEBUG_VAO_MANAGER)
-		LOG_DEBUG("Hash %zu found! Reusing VAO.", hash);
-	#endif
-		return vertexarray; // Return the existing entry
-	}
-
-#if defined(SCARAB_DEBUG_VAO_MANAGER)
-	LOG_DEBUG("Hash %zu not found. Creating new VAO.", hash);
-#endif
-
-	vertexarray = std::make_shared<VertexArray>(capacity, sizeof(T), dynamic_vertex);
-
-#if defined(SCARAB_DEBUG_VAO_MANAGER)
-	LOG_DEBUG("VAO ID made: %zu", vertexarray->get_vaoid());
-	GL_CHECK();
-#endif
-
-	vertexarray->hash = hash;
-	this->vertexarray_cache[hash] = vertexarray;
-	return vertexarray;
-}
 
 template <typename T, typename U>
 std::size_t ResourcesManager::compute_hash(const std::vector<T>& vertices, const std::vector<U>& indices) const noexcept {

@@ -19,9 +19,8 @@ class VertexArray {
 		// Pass empty indices if you don't want to make EBO
 		template <typename T, typename U>
 		VertexArray(const std::vector<T>& vertices, const std::vector<U>& indices = {}, const bool dynamic_vertex = false) noexcept;
-		// Build VertexArray using the total size only.
-		// This constructor uses "Vertex" structure
-		VertexArray(const size_t capacity, const size_t vertex_size, const bool dynamic_vertex = false) noexcept;
+		// Manually creates a Vertex Array
+		VertexArray(const void* data, const size_t capacity, const size_t vertex_size, const bool dynamic_vertex = false) noexcept;
 		~VertexArray() noexcept;
 
 		// Activates the VAO buffer in the OpenGL context
@@ -76,10 +75,20 @@ class VertexArray {
 			return this->indices_type;
 		}
 
+		// Manually creates a Vertex Array
+		// - `data`: Vertex Array data.
+		// - `capacity`: Vertex Array total capacity.
+		// - `hash`: The hash identification.
+		// - `dynamic_vertex`: (Default: false) Set the Vertex Array to be changeable after creation.
+		// Usage example: `VertexArray::alloc_data(nullptr, 6 * this->buffer_capacity, true)`
+		void alloc_data(const void* data, const size_t capacity, const bool dynamic_vertex = false) const noexcept;
+
 		// Allocates and initializes the VBO's data store.
 		// - `data`: The vector to initialize the VBO. Usually the vertices
 		template <typename T>
-		void alloc_data(const std::vector<T>& data, const bool dynamic_vertex = false) const noexcept;
+		inline void alloc_data(const std::vector<T>& data, const bool dynamic_vertex = false) const noexcept {
+			this->alloc_data(data.data(), data.size(), dynamic_vertex);
+		}
 
 		// Allocate and initialize the data store for the VBO using a vector of Vertex
 		// void alloc_data(const std::vector<Vertex>& data, const GLenum drawtype = GL_STATIC_DRAW) noexcept;
@@ -136,15 +145,8 @@ VertexArray::VertexArray(const std::vector<T>& vertices, const std::vector<U>& i
 #if !defined(BUILD_OPGL30)
 	glCreateVertexArrays(1, &this->vao_id);
 	glCreateBuffers(1, &this->vbo_id);
-	// Add position attribute and alloc data on VBO
+	// Alloc data on VBO
 	this->alloc_data(vertices, dynamic_vertex);
-
-	// Position attribute
-	if constexpr (std::is_same_v<vec2<float>, T>) {
-		this->add_attribute<float>(2, false);
-	} else {
-		this->add_attribute<float>(3, false);
-	}
 
 	if(!indices.empty()) {
 		glCreateBuffers(1, &this->ebo_id);
@@ -156,19 +158,11 @@ VertexArray::VertexArray(const std::vector<T>& vertices, const std::vector<U>& i
 		this->length = indices.size();
 		this->indices_type = ScarabOpenGL::gl_type<U>();
 	}
-
 #else
 	glGenVertexArrays(1, &this->vao_id);
 	glGenBuffers(1, &this->vbo_id);
-	// Add position attribute and alloc data on VBO
+	// Alloc data on VBO
 	this->alloc_data(vertices);
-
-	// Position attribute
-	if constexpr (std::is_same_v<vec2<float>, T>) {
-		this->add_attribute<float>(2, false);
-	} else {
-		this->add_attribute<float>(3, false);
-	}
 
 	if(!indices.empty()) {
 		glGenBuffers(1, &this->ebo_id);
@@ -190,33 +184,6 @@ VertexArray::VertexArray(const std::vector<T>& vertices, const std::vector<U>& i
 #endif
 
 	GL_CHECK();
-}
-
-template <typename T>
-void VertexArray::alloc_data(const std::vector<T>& data, const bool dynamic_vertex) const noexcept {
-#if !defined(BUILD_OPGL30)
-	glNamedBufferData(
-		this->vbo_id,
-		static_cast<GLsizeiptr>(data.size() * sizeof(T)),
-		data.data(),
-		(dynamic_vertex) ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW
-	);
-
-	// glNamedBufferStorage(
-	// 	this->vbo_id,
-	// 	static_cast<GLsizeiptr>(data.size() * sizeof(T)),
-	// 	data.data(),
-	// 	flags
-	// );
-#else
-	glBindBuffer(GL_ARRAY_BUFFER, this->vbo_id);
-	glBufferData(
-		GL_ARRAY_BUFFER,
-		static_cast<GLsizei>(data.size() * sizeof(T)),
-		data.data(),
-		(dynamic_vertex) ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-#endif
 }
 
 
