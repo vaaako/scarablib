@@ -15,7 +15,6 @@ struct Shader {
 	};
 
 	uint32 id   = 0;
-	size_t hash = 0;
 	Shader::Type type = Shader::Type::None;
 
 	Shader(const char* source, const Shader::Type type);

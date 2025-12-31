@@ -1,9 +1,10 @@
 #include "scarablib/opengl/shader.hpp"
 #include "scarablib/proper/error.hpp"
-#include "scarablib/utils/hash.hpp"
 
-Shader::Shader(const char* source, const Shader::Type type)
-	: hash(ScarabHash::hash_make(std::string(source))) {
+Shader::Shader(const char* source, const Shader::Type type) {
+	if(source == nullptr) {
+		throw ScarabError("Shader source is empty");
+	}
 
 	// Compile vertex shader
 	this->id = glCreateShader((int)type);

@@ -86,7 +86,7 @@ class ResourcesManager {
 		size_t compute_hash(const std::vector<T>& vertices, const std::vector<U>& indices = {}) const noexcept;
 
 		// Helper method for making a single hash out of mulitple shader hashes
-		size_t combine_shader_hashes(const std::vector<std::shared_ptr<Shader>>& shaders) const noexcept;
+		// size_t combine_shader_hashes(const std::vector<std::shared_ptr<Shader>>& shaders) const noexcept;
 };
 
 

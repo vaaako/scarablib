@@ -14,6 +14,7 @@ std::shared_ptr<ShaderProgram> ResourcesManager::load_shader_program(const std::
 	// but inside the ShaderProgram's constructor this ownership is moved (not explicitly)
 	std::vector<std::shared_ptr<Shader>> shaders;
 
+	size_t combined_hash = 0; // To check if program exist
 	// -- VALIDATE SHADERS
 	for(const ResourcesManager::ShaderInfo& info : infos) {
 		if(info.source == nullptr) {
@@ -41,11 +42,11 @@ std::shared_ptr<ShaderProgram> ResourcesManager::load_shader_program(const std::
 			);
 		}
 		shaders.emplace_back(this->get_or_compile_shader(source.c_str(), info.type));
+		ScarabHash::hash_combine(combined_hash, ScarabHash::hash_make(std::string(source)));
 	}
 
 	// -- CHECK COMBINED HASHES
 	// Check if the program is already cached
-	size_t combined_hash = this->combine_shader_hashes(shaders);
 	if(std::shared_ptr<ShaderProgram> cache = this->get_program(combined_hash)) {
 	#if defined(SCARAB_DEBUG_SHADER_MANAGER)
 		LOG_DEBUG("Found shader program hash: %zu", combined_hash);
@@ -54,7 +55,12 @@ std::shared_ptr<ShaderProgram> ResourcesManager::load_shader_program(const std::
 	}
 
 #if defined(SCARAB_DEBUG_SHADER_MANAGER)
-	LOG_DEBUG("Not Found/Expired shader program hash: %zu", combined_hash);
+	LOG_DEBUG(
+		"Not Found/Expired shader program hash: %zu \nVertex Shader: \n%s \nFragment Shader: \n%s",
+		combined_hash,
+		infos[0].source,
+		infos[1].source
+	);
 #endif
 
 	// -- CREATE PROGRAM
@@ -94,19 +100,19 @@ std::shared_ptr<VertexArray> ResourcesManager::acquire_vertexarray(const void* d
 }
 
 
-size_t ResourcesManager::combine_shader_hashes(const std::vector<std::shared_ptr<Shader>>& shaders) const noexcept {
-	size_t combined_hash = 0;
-	for(const auto& shader : shaders) {
-		ScarabHash::hash_combine(combined_hash, shader->hash);
-	}
-	return combined_hash;
-}
+// size_t ResourcesManager::combine_shader_hashes(const std::vector<std::shared_ptr<Shader>>& shaders) const noexcept {
+// 	size_t combined_hash = 0;
+// 	for(const auto& shader : shaders) {
+// 		ScarabHash::hash_combine(combined_hash, shader->hash);
+// 	}
+// 	return combined_hash;
+// }
 
 std::shared_ptr<Shader> ResourcesManager::get_or_compile_shader(const char* source, Shader::Type type) {
 	size_t hash = ScarabHash::hash_make(std::string(source));
 
 	// Chek if the shader is already compiled and cached
-	if(source != nullptr && this->shader_cache.contains(hash)) {
+	if(this->shader_cache.contains(hash)) {
 	#if defined(SCARAB_DEBUG_SHADER_MANAGER)
 		LOG_DEBUG("Found %s shader hash: %zu", ((int)type == GL_VERTEX_SHADER) ? "VERTEX" : "FRAGMENT", hash);
 	#endif
@@ -120,7 +126,7 @@ std::shared_ptr<Shader> ResourcesManager::get_or_compile_shader(const char* sour
 #endif
 
 	std::shared_ptr<Shader> shader = std::make_shared<Shader>(source, type);
-	this->shader_cache[shader->hash] = shader;
+	this->shader_cache[hash] = shader;
 	return shader;
 }
 
