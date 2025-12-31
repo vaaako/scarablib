@@ -3,6 +3,7 @@
 #include "scarablib/gfx/color.hpp"
 #include "scarablib/gfx/texture.hpp"
 #include "scarablib/gfx/texture_array.hpp"
+#include "scarablib/opengl/assets.hpp"
 #include "scarablib/opengl/resourcesmanager.hpp"
 #include "scarablib/opengl/shaders.hpp"
 #include <cstddef>
@@ -21,9 +22,10 @@ struct MaterialComponent {
 			// Default texture
 			TextureHandle() noexcept;
 
-			explicit TextureHandle(Texture* texture) noexcept;
-			// From lvalue texture
+			// From lvalue Texture&
 			explicit TextureHandle(const Texture& texture) noexcept;
+			// From lvalue Texture*
+			explicit TextureHandle(Texture* texture) noexcept;
 			// From nullptr
 			TextureHandle(std::nullptr_t) noexcept;
 
@@ -67,17 +69,17 @@ struct MaterialComponent {
 			}
 
 			inline bool operator==(std::nullptr_t) noexcept {
-				return this->ptr->get_id() == Texture::default_texture()->get_id();
+				return this->ptr->get_id() == Assets::default_texture()->get_id();
 			}
 
 			inline bool operator!=(std::nullptr_t) noexcept {
-				return this->ptr->get_id() != Texture::default_texture()->get_id();
+				return this->ptr->get_id() != Assets::default_texture()->get_id();
 			}
 			// OPERATOR == -- //
 
 			// Assign nullptr reset to default texture
 			inline TextureHandle& operator=(std::nullptr_t) noexcept {
-				this->ptr = Texture::default_texture();
+				this->ptr = Assets::default_texture();
 				return *this;
 			}
 
@@ -95,7 +97,7 @@ struct MaterialComponent {
 
 			// Assign from rvalue Texture*
 			inline TextureHandle& operator=(Texture* texture) noexcept {
-				this->ptr = texture ? std::shared_ptr<Texture>(texture) : Texture::default_texture();
+				this->ptr = (texture) ? std::shared_ptr<Texture>(texture) : Assets::default_texture();
 				return *this;
 			}
 	};
@@ -113,7 +115,6 @@ struct MaterialComponent {
 	TextureArray* texture_array = nullptr;
 
 	// Material's default shader
-	// TODO: Make nullptr?
 	std::shared_ptr<ShaderProgram> shader = ResourcesManager::get_instance().load_shader_program({
 		// Default vertex and fragment shader source
 		{ .source = Shaders::DEFAULT_VERTEX,   .type = Shader::Type::Vertex },

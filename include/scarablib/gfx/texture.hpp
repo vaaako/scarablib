@@ -1,7 +1,6 @@
 #pragma once
 
 #include "scarablib/gfx/texturebase.hpp"
-#include <memory>
 
 // Texture object used for shapes (2D and 3D)
 class Texture : public TextureBase {
@@ -14,16 +13,7 @@ class Texture : public TextureBase {
 		Texture(const char* path, const bool flip_vertically = false, const bool flip_horizontally = false);
 
 		// Loads texture from raw memory data
-		Texture(const uint8* data, const uint32 width, const uint32 height, const uint8 num_channels);
+		Texture(const uint8* data, const uint32 width, const uint32 height, const uint8 channels);
 
 		~Texture() noexcept = default;
-
-		// Returns a default solid white texture
-		static std::shared_ptr<Texture> default_texture() noexcept {
-			// I don't like data being statically allocated this way
-			// Cant put inside IScene because MaterialComponent also uses this and
-			// not always batch drawing is used
-			static std::shared_ptr<Texture> def_tex = std::make_shared<Texture>();
-			return def_tex;
-		}
 };

@@ -80,7 +80,7 @@ Stuff that are in progress and i need to finish
 - [ ] make transparency work without `if(tex.a == 0.0)`?
 - [ ] Discord RPC support?
 - [ ] Prioritize Material when organizing models to batch draw
-- [ ] Be able to build VertexArray step by step
+- [x] Be able to build VertexArray step by step
 
 
 
@@ -241,7 +241,7 @@ Stuff that are in progress and i need to finish
 - [x] Billboard: Texture array
 - [ ] Different texture for each face (the other method that is not cubemap)
 - [x] Model loading to Model class
-	+ [ ] Multiple textures handling
+- [ ] Multiple textures handling
 
 - [x] Be able to stand on loaded terrain
 	+ Also implement collision with walls
@@ -254,3 +254,39 @@ Stuff that are in progress and i need to finish
 	+ like raylib does
 - [ ] Tiled support
 - [ ] Fix texuv
+
+- [ ] Class to load Map from trenchbroom
+	+ takes `.obj` and `.map`
+	+ `.map` automatically adds AABB to entities, so iteraction can be made
+		* May have exceptions
+	+ player can iterate over `.map` to set entities
+
+Example:
+```cpp
+LoadOBJ("map.obj"); // Used to render map only
+
+Map map = LoadMAP("map.map"); // Map logic
+
+for (auto& ent : map.entities) {
+
+	Entity e;
+	e.addComponent<Transform>(ent.origin);
+
+	if (ent.hasBrushes()) {
+		AABB box = ComputeBounds(ent.brushes);
+		e.addComponent<BoxCollider>(box);
+	}
+
+	if (ent.classname == "func_door") {
+		e.addComponent<Interactable>();
+		e.addComponent<DoorLogic>(ent.properties); // Player custom logic
+	}
+
+	if (ent.classname == "trigger_once") {
+		e.get<BoxCollider>().setTrigger(true);
+		e.addComponent<TriggerLogic>();
+	}
+}
+```
+
+- [ ] Class to player interaction?

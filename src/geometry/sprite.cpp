@@ -5,7 +5,7 @@ Sprite::Sprite(const std::vector<Vertex2D>& vertices) noexcept
 	: Mesh(vertices) {
 
 	// Position and TexUV
-	this->vertexarray->add_attribute<float>(3, false);
+	this->vertexarray->add_attribute<float>(2, false);
 	this->vertexarray->add_attribute<float>(2, true);
 
 	// Set 2D Shader
