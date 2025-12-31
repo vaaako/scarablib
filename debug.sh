@@ -51,14 +51,15 @@ case "$1" in
 esac
 
 # Run Valgrind
-echo -e "${GREEN}Running Valgrind...${NC}"
+echo -e "${GREEN}Running Valgrind...$LOG_FILE"
 echo "Command: valgrind $DEFAULT_OPTS $SUPPRESS --log-file=$LOG_FILE $TARGET"
 
 valgrind $DEFAULT_OPTS $SUPPRESS --log-file="$LOG_FILE" "$TARGET"
 
 # Show summary
+grep -A5 "LEAK SUMMARY" "${NC}"
+
 echo -e "\n${GREEN}Valgrind analysis complete.${NC}"
-echo -e "Log saved to: ${RED}$LOG_FILE${NC}"
-echo "View with:"
-echo "  less $LOG_FILE"
-echo "  grep -A5 'LEAK SUMMARY' $LOG_FILE"
+echo -e "Log saved to: ${RED}${LOG_FILE}${NC}"
+
+

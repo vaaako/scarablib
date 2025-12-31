@@ -10,11 +10,16 @@
 #define STB_TRUETYPE_IMPLEMENTATION
 #include <stb/stb_truetype.h>
 
+struct STBTruetype {
+	std::vector<stbtt_bakedchar> cdata;
+	STBTruetype() noexcept : cdata(96) {} // ASCII 32-127
+};
+
 // WARNING: NOT FINISHED YET. STILL DONT WORKING PROPERLY
 // TODO: Optimize. More characters
 
 Font::Font(const Camera2D& camera, const char* path, const uint16 size)
-	: camera(camera) {
+	: camera(camera), data(new STBTruetype()) {
 	const char* source = R"glsl(
 		void mainImage(out vec4 fragcolor, in vec2 texuv) {
 			// Sample red channel (glyph alpha)
@@ -35,97 +40,76 @@ Font::Font(const Camera2D& camera, const char* path, const uint16 size)
 		},
 	});
 
-	// If i declare cdata as stbtt_bakedchar in header file
-	// i will have to include stb_truetype.h and when sharing the library i would have to also share stb_truetype.h
-	// which i dont want
-	this->cdata = std::malloc(sizeof(stbtt_bakedchar) * 96);
-
+	// Load font file
 	std::vector<uint8> buffer = FileHelper::read_binary_file(path);
-
 	if(buffer.empty()) {
 		throw ScarabError("Font file (%s) is invalid", path);
-	} else if(buffer.size() < 4) {
-		throw ScarabError("Font file (%s) is too small", path);
 	}
 
-	// Most TTF files start with 0x00010000 or 0x74727565
-	uint32_t version = *reinterpret_cast<uint32_t*>(buffer.data());
-	if (version != 0x00010000 && version != 0x74727565) {
-		LOG_WARNING("Unexpected font version: %08x", version);
-	}
-
-	std::vector<uint8> temp_bitmap = std::vector<uint8>(static_cast<size_t>(this->atlas_width * this->atlas_height));
+	// Bake bitmap
+	std::vector<uint8> temp_bitmap =
+		std::vector<uint8>(this->ATLAS_WIDTH * this->ATLAS_HEIGHT);
 
 	int result = stbtt_BakeFontBitmap(
-		buffer.data(), 0,
-		size,
-		temp_bitmap.data(),
-		this->atlas_width, this->atlas_height,
+		buffer.data(), 0, (float)size,
+		temp_bitmap.data(), this->ATLAS_WIDTH, this->ATLAS_HEIGHT,
 		32, 96, // ASCII 32 to 127, 96 printable ASCII
-		(stbtt_bakedchar*)this->cdata
+		this->data->cdata.data()
 	);
 
-	if (result <= 0) {
-		// Maximum size is 88 btw, but im not sure, so i wont put it here
-		throw ScarabError("Failed to bake font (%s) bitmap. Maybe the size is too big or too small", path);
+	if(result <= 0) {
+		throw ScarabError("Failed to bake font (%s). Atlas too small?", path);
 	}
 
-	this->buffer_capacity = 20;
-	this->buffer_data = new Glyph[this->buffer_capacity * 6];
+	// Texture from bitmap
+	// 1-byte alignment for grayscale
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	this->material->texture = new Texture(temp_bitmap.data(),
+			this->ATLAS_WIDTH, this->ATLAS_HEIGHT, 1);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 4); // Reset to default
 
-	// Create Texture from bitmap
-	// NOTE: could use texture class and VBO class here
+	// Buffer setup
+	this->buffer_capacity = 128; // Start with a decent size
+	this->buffer_data = new Vertex2D[this->buffer_capacity * 6];
 
-	this->material->texture = new Texture(temp_bitmap.data(), this->atlas_width, this->atlas_height, GL_RED, GL_R8);
-
-	size_t hash = ScarabHash::hash_make(std::string(path));
 	this->vertexarray = ResourcesManager::get_instance()
-		.acquire_vertexarray<Glyph>(6 * this->buffer_capacity, hash, true);
+		.acquire_vertexarray(nullptr, 6 * this->buffer_capacity,
+			sizeof(Vertex2D), ScarabHash::hash_make(std::string(path)), true);
 
 	// Set position and texuv attributes
-	this->vertexarray->add_attribute<float>(2, false);
-	this->vertexarray->add_attribute<float>(2, false);
+	this->vertexarray->add_attribute<float>(2, false); // Position
+	this->vertexarray->add_attribute<float>(2, false); // UV
 }
 
+
 Font::~Font() noexcept {
-	std::free(this->cdata);
+	delete this->data;
 	delete[] this->buffer_data;
-};
+}
 
 void Font::draw_text(const std::string& text, const vec2<float>& pos, const float scale, const Color& color) noexcept {
-	// Bind VAO and VBO
-	std::shared_ptr<VertexArray>& vertexarray = this->vertexarray; // Cache
-	vertexarray->bind_vao();
-	vertexarray->bind_vbo();
-
-	// Bind Texture
-	this->material->texture->bind();
-
-	// Make model
-	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(pos.x, pos.y, 0.0f));
-	model = glm::scale(model, glm::vec3(scale, scale, 1.0f));
-
-	// Bind Shader
-	std::shared_ptr<ShaderProgram>& shader = this->material->shader;
-	shader->use();
-	shader->set_color("shapeColor", color);
-	shader->set_matrix4f("mvp", (this->camera.get_proj_matrix() * this->camera.get_view_matrix()) * model);
-
-	// Resize the vector to fit all characters
-	if(this->buffer_capacity < text.length()) {
-		this->buffer_capacity = text.length();
-		glBufferData(GL_ARRAY_BUFFER, sizeof(Glyph) * 6 * this->buffer_capacity, 0, GL_DYNAMIC_DRAW);
-		delete[] this->buffer_data;
-		this->buffer_data = new Glyph[this->buffer_capacity * 6];
+	if(text.empty()) {
+		return;
 	}
 
-	// Remove const
-	float x = pos.x;
-	float y = pos.y;
+	std::shared_ptr<VertexArray>& vertexarray = this->vertexarray; // Cache
 
+	// Grow buffer if needed
+	if(text.length() > this->buffer_capacity) {
+		this->buffer_capacity = text.length() + 64;
+		delete[] this->buffer_data;
+		this->buffer_data = new Vertex2D[this->buffer_capacity * 6];
+
+		// Orphan the old GPU buffer
+		vertexarray->alloc_data(nullptr, 6 * this->buffer_capacity, true);
+	}
+
+	// Generate quads
+	float curx = 0.0f; // Start at local 0 to let Model Matrix handle pos
+	float cury = 0.0f;
 	uint32 num_vertices = 0;
-	Glyph* data = this->buffer_data;
+
+	Vertex2D* data = this->buffer_data; // Cache
 	for(char c : text) {
 		// In range
 		if(c < 32 || c > 127) {
@@ -133,8 +117,8 @@ void Font::draw_text(const std::string& text, const vec2<float>& pos, const floa
 		}
 
 		stbtt_aligned_quad q;
-		stbtt_GetBakedQuad((stbtt_bakedchar*)this->cdata, this->atlas_width, this->atlas_height,
-				c - 32, &x, &y, &q, 1);
+		stbtt_GetBakedQuad(this->data->cdata.data(), this->ATLAS_WIDTH, this->ATLAS_HEIGHT,
+				c - 32, &curx, &cury, &q, 1);
 
 		// Apply scale if needed
 		// float x0 = q.x0 * scale;
@@ -142,6 +126,8 @@ void Font::draw_text(const std::string& text, const vec2<float>& pos, const floa
 		// float x1 = q.x1 * scale;
 		// float y1 = q.y1 * scale;
 
+		// Standard 6-vertex quad (Triangles: 0,1,2 and 0,2,3)
+		// Position data
 		data[0].position = vec2<float>(q.x0, q.y0);
 		data[1].position = vec2<float>(q.x1, q.y0);
 		data[2].position = vec2<float>(q.x1, q.y1);
@@ -149,6 +135,7 @@ void Font::draw_text(const std::string& text, const vec2<float>& pos, const floa
 		data[4].position = vec2<float>(q.x0, q.y0);
 		data[5].position = vec2<float>(q.x1, q.y1);
 
+		// UV data
 		data[0].texuv = vec2<float>(q.s0, q.t0);
 		data[1].texuv = vec2<float>(q.s1, q.t0);
 		data[2].texuv = vec2<float>(q.s1, q.t1);
@@ -160,6 +147,22 @@ void Font::draw_text(const std::string& text, const vec2<float>& pos, const floa
 		num_vertices += 6;
 	}
 
-	this->vertexarray->update_vertices(this->buffer_data, num_vertices * sizeof(Glyph));
-	glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(num_vertices));
+	// Render
+	this->material->texture->bind();
+
+	std::shared_ptr<ShaderProgram> shader = this->material->shader;
+	shader->use();
+
+
+	// Make model
+	glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(pos.x, pos.y, 0.0f));
+	model = glm::scale(model, glm::vec3(scale, scale, 1.0f));
+
+	// Bind Shader
+	shader->set_color("shapeColor", color);
+	shader->set_matrix4f("mvp", (this->camera.get_proj_matrix() * this->camera.get_view_matrix()) * model);
+
+	vertexarray->bind_vao();
+	vertexarray->update_vertices(this->buffer_data, num_vertices * sizeof(Vertex2D));
+	glDrawArrays(GL_TRIANGLES, 0, num_vertices);
 }

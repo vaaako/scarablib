@@ -107,7 +107,7 @@ class PerspectiveCamera : public Camera {
 		float min_fov = 1.0f;
 
 		float near_plane = 0.1f;
-		float far_plane  = 100.0f;
+		float far_plane  = 1000.0f;
 
 		// Movement
 		vec3<float> up          = vec3<float>(0.0f, 1.0f, 0.0f);

@@ -5,8 +5,9 @@
 #include "scarablib/typedef.hpp"
 #include <string>
 
-// To avoid exporting stb_truetype header with the library
-// struct _stbtt_bakedchar;
+// Forward declaration to avoid exporting stb_truetype header with the library
+struct STBTruetype;
+
 
 // Font object used to draw text on the screen
 // WARNING: NOT FINISHED YET. STILL DONT WORKING PROPERLY
@@ -17,29 +18,25 @@ class Font {
 		Font(const Camera2D& camera, const char* path, const uint16 size = 24);
 		~Font() noexcept;
 
+		// Disable copying to prevent double-free pointer bugs
+		Font(const Font&) = delete;
+		Font& operator=(const Font&) = delete;
+
 		// Add text to batch rendering
 		void draw_text(const std::string& text, const vec2<float>& pos, const float scale = 1.0f, const Color& color = Colors::WHITE) noexcept;
 
 	private:
-		static constexpr int atlas_height = 512;
-		static constexpr int atlas_width  = 512;
+		static constexpr int ATLAS_WIDTH  = 512;
+		static constexpr int ATLAS_HEIGHT = 512;
 
 		const Camera2D& camera;
 
-		struct Glyph {
-			vec2<float> position;
-			vec2<float> texuv;
-		};
-
 		// Font
-		void* cdata; // stbtt_bakedchar
-		Glyph* buffer_data;
-		size_t buffer_capacity;
+		STBTruetype* data; // Hidden STB data
+		Vertex2D* buffer_data = nullptr;
+		size_t buffer_capacity = 0;
 
-		// Material of this mesh
 		std::shared_ptr<MaterialComponent> material = std::make_shared<MaterialComponent>();
-
-		// Bundle for VAO, VBO and EBO
 		std::shared_ptr<VertexArray> vertexarray;
 };
 
