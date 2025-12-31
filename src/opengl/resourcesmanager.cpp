@@ -106,7 +106,7 @@ std::shared_ptr<Shader> ResourcesManager::get_or_compile_shader(const char* sour
 	size_t hash = ScarabHash::hash_make(std::string(source));
 
 	// Chek if the shader is already compiled and cached
-	if(source != nullptr && this->shader_cache.count(hash)) {
+	if(source != nullptr && this->shader_cache.contains(hash)) {
 	#if defined(SCARAB_DEBUG_SHADER_MANAGER)
 		LOG_DEBUG("Found %s shader hash: %zu", ((int)type == GL_VERTEX_SHADER) ? "VERTEX" : "FRAGMENT", hash);
 	#endif
