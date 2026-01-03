@@ -7,7 +7,7 @@
 
 Assets::Instance Assets::instance;
 
-std::shared_ptr<Texture> Assets::load(const char* path, const bool flip_vertically, const bool flip_horizontally) noexcept {
+std::shared_ptr<Texture> Assets::load(const char* path, const bool flip_v, const bool flip_h) noexcept {
 	if(path == nullptr) {
 		return Assets::default_texture();
 	}
@@ -16,8 +16,8 @@ std::shared_ptr<Texture> Assets::load(const char* path, const bool flip_vertical
 	// This "header" is added to prevent this collision
 	size_t hash = ScarabHash::hash_make(std::string_view("FILE_TEXTURE"));
 	ScarabHash::hash_combine(hash, std::string_view(path));
-	ScarabHash::hash_combine(hash, flip_vertically);
-	ScarabHash::hash_combine(hash, flip_horizontally);
+	ScarabHash::hash_combine(hash, flip_v);
+	ScarabHash::hash_combine(hash, flip_h);
 
 	// Chek if the texture is already compiled and cached
 	std::shared_ptr<Texture> texture = Assets::get_tex(hash);
@@ -29,41 +29,9 @@ std::shared_ptr<Texture> Assets::load(const char* path, const bool flip_vertical
 	LOG_DEBUG("NOT found/expired texture hash (%zu), compiling new", hash);
 #endif
 
-	Image image = Image(path, flip_vertically, flip_horizontally);
+	Image image = Image(path, flip_v, flip_h);
 	texture = std::make_shared<Texture>(image);
 	Assets::instance.tex_cache[hash] = texture;
-	return texture;
-}
-
-std::shared_ptr<Texture> Assets::load(uint8* data, const uint32 width, const uint32 height, const uint8 channels) noexcept {
-	if(data == nullptr) {
-		return Assets::default_texture();
-	}
-
-	const size_t byte_count =
-		size_t(width) * size_t(height) * size_t(channels);
-
-	// Theoretically raw-data textures and file textures can collide
-	// This "header" is added to prevent this collision
-	size_t hash = ScarabHash::hash_make(std::string_view("RAW_TEXTURE"));
-	ScarabHash::hash_combine(hash, ScarabHash::hash_bytes_fnv1a(data, byte_count));
-	ScarabHash::hash_combine(hash, width);
-	ScarabHash::hash_combine(hash, height);
-	ScarabHash::hash_combine(hash, channels);
-
-	// Chek if the texture is already compiled and cached
-	std::shared_ptr<Texture> texture = Assets::get_tex(hash);
-	if(texture != nullptr) {
-		return texture;
-	}
-
-#if defined(SCARAB_DEBUG_ASSETS_MANAGER)
-	LOG_DEBUG("NOT found/expired texture hash (%zu), compiling new", hash);
-#endif
-
-	Image image = Image(data, width, height, channels);
-	texture = std::make_shared<Texture>(image);
-	instance.tex_cache[hash] = texture;
 	return texture;
 }
 
@@ -72,20 +40,17 @@ std::shared_ptr<Texture> Assets::load(const Image& image) noexcept {
 		return Assets::default_texture();
 	}
 
-	const size_t byte_count =
-		size_t(image.width) * size_t(image.height) * size_t(image.nr_channels);
-
 	// Theoretically raw-data textures and file textures can collide
 	// This "header" is added to prevent this collision
 	size_t hash = ScarabHash::hash_make(std::string_view("IMAGE_TEXTURE"));
 	if(image.path) {
 		ScarabHash::hash_combine(hash, std::string_view(image.path));
 	} else {
-		ScarabHash::hash_combine(hash, ScarabHash::hash_bytes_fnv1a(image.data, byte_count));
+		ScarabHash::hash_combine(hash, ScarabHash::hash_bytes_fnv1a(image.data, image.byte_size()));
 	}
-	ScarabHash::hash_combine(hash, image.width);
-	ScarabHash::hash_combine(hash, image.height);
-	ScarabHash::hash_combine(hash, image.nr_channels);
+	// ScarabHash::hash_combine(hash, image.width);
+	// ScarabHash::hash_combine(hash, image.height);
+	// ScarabHash::hash_combine(hash, image.channels);
 
 	// Chek if the texture is already compiled and cached
 	std::shared_ptr<Texture> texture = Assets::get_tex(hash);

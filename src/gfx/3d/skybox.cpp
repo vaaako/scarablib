@@ -62,7 +62,7 @@ Skybox::Skybox(const Camera& camera, const std::array<const char*, 6>& faces)
 	}
 	glTextureStorage2D(this->texid,
 		1,
-		TextureBase::extract_format(firstimage->nr_channels, true),
+		TextureBase::extract_format(firstimage->channels, true),
 		firstimage->width, firstimage->height
 	);
 
@@ -75,14 +75,15 @@ Skybox::Skybox(const Camera& camera, const std::array<const char*, 6>& faces)
 
 	// Order: Right > Left > Top > Bottom > Back > Front
 	for(uint16 i = 0; i < 6; i++) {
-		// OpenGL loads cubemap textures differently, so here makes sense enabling flip vertically (which actually disables)
+		// OpenGL loads cubemap textures differently
+		// so here makes sense enabling flip vertically (which actually disables)
 		Image* image = new Image(faces.at(i), false, true);
 		if(image->data == nullptr) {
 			delete image;
 			throw ScarabError("Image (%s) in skybox was not found", image->path);
 		}
 
-		const GLenum format = Texture::extract_format((uint32)image->nr_channels, false);
+		const GLenum format = Texture::extract_format((uint32)image->channels, false);
 	#if !defined(BUILD_OPGL30)
 		glTextureSubImage3D(this->texid,
 			0, // mipmap level
@@ -95,9 +96,9 @@ Skybox::Skybox(const Camera& camera, const std::array<const char*, 6>& faces)
 	#else
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
 			0,
-			Texture::extract_format((uint32)image->nr_channels, true),
+			Texture::extract_format((uint32)image->channels, true),
 			image->width, image->height, 0,
-			Texture::extract_format((uint32)image->nr_channels, false),
+			Texture::extract_format((uint32)image->channels, false),
 			GL_UNSIGNED_BYTE,
 			image->data
 		);

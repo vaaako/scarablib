@@ -41,7 +41,8 @@ void Billboard::set_directional_textures(const std::vector<const char*> paths, c
 
 	// Load image to get dimensions and channels
 	Image* image = new Image(paths[0], false);
-	this->material->texture_array = new TextureArray(image->width, image->height, final_size, image->nr_channels);
+	this->material->texture_array
+		= new TextureArray(image->width, image->height, final_size, image->channels);
 	delete image;
 
 	for(size_t i = 0; i < paths.size(); i++) {

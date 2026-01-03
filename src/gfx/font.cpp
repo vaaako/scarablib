@@ -65,12 +65,10 @@ Font::Font(const Camera2D& camera, const char* path, const uint16 size)
 	// Texture from bitmap
 	// 1-byte alignment for grayscale
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	// this->material->texture = Assets::load(temp_bitmap.data(),
-	// 	this->ATLAS_WIDTH, this->ATLAS_HEIGHT, 1);
-
-	this->material->texture = std::make_shared<Texture>(temp_bitmap.data(),
-		this->ATLAS_WIDTH, this->ATLAS_HEIGHT, 1);
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 4); // Reset to default
+	Image tmpdata = Image(temp_bitmap.data(), this->ATLAS_WIDTH, this->ATLAS_HEIGHT, 1);
+	tmpdata.owns_data = false; // Disables free
+	// This avoids double free (inside Image and end of this method)
+	this->material->texture = Assets::load(tmpdata);
 
 	// Buffer setup
 	this->buffer_capacity = 128; // Start with a decent size

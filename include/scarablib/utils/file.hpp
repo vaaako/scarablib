@@ -4,6 +4,8 @@
 #include <filesystem>
 #include <vector>
 
+// std::filesystem::path(path).lexically_normal().string()
+
 // NOTE: Need to be a macro because of __FILE__
 // Get current file absolute path (implemented macro)
 #define THIS_FILE_DIR std::filesystem::path(__FILE__).parent_path().string()

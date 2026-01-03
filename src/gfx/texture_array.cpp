@@ -59,7 +59,7 @@ TextureArray::TextureArray(const std::vector<Image>& images)
 	// Set configuration
 	this->width    = images[0].width;
 	this->height   = images[0].height;
-	this->channels = images[0].nr_channels;
+	this->channels = images[0].channels;
 
 #if !defined(BUILD_OPGL30)
 	glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &this->id);
@@ -108,8 +108,8 @@ TextureArray::TextureArray(const std::vector<Image>& images)
 		}
 
 		// Validate channels
-		if(image.nr_channels > (int)this->channels) {
-			throw ScarabError("(%s) Too many channels in image (%i > %i)", image.path, image.nr_channels, this->channels);
+		if(image.channels > (int)this->channels) {
+			throw ScarabError("(%s) Too many channels in image (%i > %i)", image.path, image.channels, this->channels);
 		}
 
 #if !defined(BUILD_OPGL30)
@@ -118,7 +118,7 @@ TextureArray::TextureArray(const std::vector<Image>& images)
 			0, 0, this->next_layer, // x, y, layer (z)
 			this->width, this->height,
 			1, // Depth
-			TextureBase::extract_format(image.nr_channels, false),
+			TextureBase::extract_format(image.channels, false),
 			GL_UNSIGNED_BYTE,
 			image.data
 		);
@@ -130,7 +130,7 @@ TextureArray::TextureArray(const std::vector<Image>& images)
 			0, // Mipmap level
 			0, 0, this->next_texture, // x, y, layer (z)
 			this->width, this->height, 1, // Width, Height, Depth
-			TextureBase::extract_format(image.nr_channels, false),
+			TextureBase::extract_format(image.channels, false),
 			GL_UNSIGNED_BYTE,
 			image.data
 		);
@@ -140,7 +140,7 @@ TextureArray::TextureArray(const std::vector<Image>& images)
 	}
 }
 
-uint16 TextureArray::add_texture(const char* path, const bool flip_vertically, const bool flip_horizontally, const int layer) {
+uint16 TextureArray::add_texture(const char* path, const bool flip_v, const bool flip_h, const int layer) {
 	// Check if limit has been reached
 	if(this->num_layers >= this->max_layers) {
 		throw ScarabError("Texture array limit (%u) reached", this->max_layers);
@@ -154,7 +154,7 @@ uint16 TextureArray::add_texture(const char* path, const bool flip_vertically, c
 		throw ScarabError("Texture has null path");
 	}
 
-	Image* image = new Image(path, flip_vertically, flip_horizontally);
+	Image* image = new Image(path, flip_v, flip_h);
 	if(image->data == nullptr) {
 		throw ScarabError("Image (%s) was not found", image->path);
 	}
@@ -166,8 +166,8 @@ uint16 TextureArray::add_texture(const char* path, const bool flip_vertically, c
 	}
 
 	// Validate channels
-	if(image->nr_channels > (int)this->channels) {
-		throw ScarabError("(%s) Too many channels in image (%i > %i)", path, image->nr_channels, this->channels);
+	if(image->channels > (int)this->channels) {
+		throw ScarabError("(%s) Too many channels in image (%i > %i)", path, image->channels, this->channels);
 	}
 
 #if !defined(BUILD_OPGL30)
@@ -177,7 +177,7 @@ uint16 TextureArray::add_texture(const char* path, const bool flip_vertically, c
 		0, 0, (layer < 0) ? this->next_layer : layer, // x, y, layer (z)
 		this->width, this->height,
 		1, // Depth
-		TextureBase::extract_format(image->nr_channels, false),
+		TextureBase::extract_format(image->channels, false),
 		GL_UNSIGNED_BYTE,
 		image->data
 	);
@@ -190,7 +190,7 @@ uint16 TextureArray::add_texture(const char* path, const bool flip_vertically, c
 		// Put in specific layer or not (-1)
 		0, 0, (layer < 0) ? this->next_texture : layer, // x, y, layer (z)
 		this->width, this->height, 1, // Width, Height, Depth
-		TextureBase::extract_format(image->nr_channels, false),
+		TextureBase::extract_format(image->channels, false),
 		GL_UNSIGNED_BYTE,
 		image->data
 	);
@@ -212,7 +212,7 @@ uint16 TextureArray::add_textures(const std::vector<TextureArray::Layer>& paths)
 	uint16 index = 0;
 	for(size_t i = 0; i < paths.size(); i++) {
 		const TextureArray::Layer& tex = paths[i];
-		index = this->add_texture(tex.path, tex.flip_vertically, tex.flip_horizontally);
+		index = this->add_texture(tex.path, tex.flip_v, tex.flip_h);
 	}
 	this->generate_mipmap();
 	return index;

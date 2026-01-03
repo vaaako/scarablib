@@ -25,8 +25,7 @@ class Assets {
 		// static std::shared_ptr<Texture> load_texture(path, other stuff);
 		// static std::shared_ptr<TextureArray> load_texturearray(textures);
 
-		static std::shared_ptr<Texture> load(const char* path, const bool flip_vertically = false, const bool flip_horizontally = false) noexcept;
-		static std::shared_ptr<Texture> load(uint8* data, const uint32 width, const uint32 height, const uint8 channels) noexcept;
+		static std::shared_ptr<Texture> load(const char* path, const bool flip_v = false, const bool flip_h = false) noexcept;
 		static std::shared_ptr<Texture> load(const Image& image) noexcept;
 
 		// Cleans up all maps;

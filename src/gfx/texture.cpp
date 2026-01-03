@@ -25,11 +25,11 @@ Texture::Texture() noexcept : TextureBase(GL_TEXTURE_2D, 1, 1) {
 #endif
 }
 
-Texture::Texture(const char* path, const bool flip_horizontally, const bool flip_vertically)
+Texture::Texture(const char* path, const bool flip_h, const bool flip_v)
 	// Placeholder for width and height
 	: TextureBase(GL_TEXTURE_2D, 1, 1) {
 
-	Image* image = new Image(path, flip_horizontally, flip_vertically);
+	Image* image = new Image(path, flip_h, flip_v);
 	if(image->data == nullptr) {
 		delete image;
 		throw ScarabError("Image (%s) was not found", image->path);
@@ -41,7 +41,7 @@ Texture::Texture(const char* path, const bool flip_horizontally, const bool flip
 #if !defined(BUILD_OPGL30)
 	glCreateTextures(GL_TEXTURE_2D, 1, &this->id);
 	glTextureStorage2D(this->id, 1,
-		TextureBase::extract_format(image->nr_channels, true),
+		TextureBase::extract_format(image->channels, true),
 		image->width,
 		image->height
 	);
@@ -49,7 +49,7 @@ Texture::Texture(const char* path, const bool flip_horizontally, const bool flip
 		0,
 		0, 0,
 		image->width, image->height,
-		Texture::extract_format(image->nr_channels, false),
+		Texture::extract_format(image->channels, false),
 		GL_UNSIGNED_BYTE,
 		image->data
 	);
@@ -64,9 +64,9 @@ Texture::Texture(const char* path, const bool flip_horizontally, const bool flip
 	// Allocate data
 	glTexImage2D(
 		GL_TEXTURE_2D, 0,
-		TextureBase::extract_format(image->nr_channels, true),
+		TextureBase::extract_format(image->channels, true),
 		image->width, image->height, 0,
-		TextureBase::extract_format(image->nr_channels, false),
+		TextureBase::extract_format(image->channels, false),
 		GL_UNSIGNED_BYTE,
 		image->data
 	);
@@ -86,51 +86,6 @@ Texture::Texture(const char* path, const bool flip_horizontally, const bool flip
 #endif
 }
 
-Texture::Texture(const uint8* data, const uint32 width, const uint32 height, const uint8 channels)
-	: TextureBase(GL_TEXTURE_2D, width, height) {
-
-	if(data == nullptr) {
-		throw ScarabError("Data for texture is null");
-	}
-
-#if !defined(BUILD_OPGL30)
-	glCreateTextures(GL_TEXTURE_2D, 1, &this->id);
-	glTextureStorage2D(this->id, 1, TextureBase::extract_format(channels, true), width, height);
-	glTextureSubImage2D(this->id, 0, 0, 0, width, height, TextureBase::extract_format(channels, false), GL_UNSIGNED_BYTE, data);
-
-	glGenerateTextureMipmap(this->id);
-
-	this->set_wrap(TextureBase::Wrap::REPEAT);
-	this->set_filter(TextureBase::Filter::NEAREST);
-#else
-	// Generate and bind texture
-	glGenTextures(1, &this->id);
-	glBindTexture(GL_TEXTURE_2D, this->id);
-
-	// Allocate data
-	glTexImage2D(
-		GL_TEXTURE_2D, 0,
-		internal_channels,
-		width, height, 0,
-		channels,
-		GL_UNSIGNED_BYTE,
-		data
-	);
-
-	this->set_wrap(TextureBase::Wrap::REPEAT);
-	this->set_filter(TextureBase::Filter::NEAREST);
-
-	// Generate mipmap and unbind
-	glGenerateMipmap(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, 0);
-#endif
-
-#ifdef SCARAB_DEBUG_TEXTURE
-	LOG_INFO("Texture loaded succesfully! Width: %d, Height: %d", surface->w, surface->h);
-#endif
-}
-
-
 
 Texture::Texture(const Image& image)
 	: TextureBase(GL_TEXTURE_2D, image.width, image.height) {
@@ -142,7 +97,7 @@ Texture::Texture(const Image& image)
 #if !defined(BUILD_OPGL30)
 	glCreateTextures(GL_TEXTURE_2D, 1, &this->id);
 	glTextureStorage2D(this->id, 1,
-		TextureBase::extract_format(image.nr_channels, true),
+		TextureBase::extract_format(image.channels, true),
 		image.width,
 		image.height
 	);
@@ -150,7 +105,7 @@ Texture::Texture(const Image& image)
 		0,
 		0, 0,
 		image.width, image.height,
-		Texture::extract_format(image.nr_channels, false),
+		Texture::extract_format(image.channels, false),
 		GL_UNSIGNED_BYTE,
 		image.data
 	);
@@ -165,9 +120,9 @@ Texture::Texture(const Image& image)
 	// Allocate data
 	glTexImage2D(
 		GL_TEXTURE_2D, 0,
-		TextureBase::extract_format(image->nr_channels, true),
+		TextureBase::extract_format(image->channels, true),
 		image->width, image->height, 0,
-		TextureBase::extract_format(image->nr_channels, false),
+		TextureBase::extract_format(image->channels, false),
 		GL_UNSIGNED_BYTE,
 		image->data
 	);

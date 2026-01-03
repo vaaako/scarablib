@@ -10,18 +10,10 @@ class Texture : public TextureBase {
 
 		// Create a texture from an image file.
 		// You can also flip the texture vertically or horizontally
-		Texture(const char* path, const bool flip_vertically = false, const bool flip_horizontally = false);
-
-		// Loads texture from raw memory data
-		Texture(const uint8* data, const uint32 width, const uint32 height, const uint8 channels);
+		Texture(const char* path, const bool flip_v = false, const bool flip_h = false);
 
 		// Make texture from image
 		Texture(const Image& image);
 
 		~Texture() noexcept = default;
-
-		// static std::shared_ptr<Texture> default_texture() noexcept {
-		// 	static std::shared_ptr<Texture> def_tex = std::make_shared<Texture>();
-		// 	return def_tex;
-		// }
 };

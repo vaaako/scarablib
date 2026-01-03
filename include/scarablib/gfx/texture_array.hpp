@@ -16,8 +16,8 @@ class TextureArray : public TextureBase {
 		// Config struct used to create multiple layers
 		struct Layer {
 			const char* path;
-			bool flip_vertically = false;
-			bool flip_horizontally = false;
+			bool flip_v = false;
+			bool flip_h = false;
 		};
 
 		// Creates a texture array. All layers added to the array must have the same dimensions.
@@ -38,7 +38,7 @@ class TextureArray : public TextureBase {
 		// Adds or replaces a layer of the texture array and returns its index.
 		// All layers must have the same width and height.
 		// Does not generate mipmap automatically
-		uint16 add_texture(const char* path, const bool flip_vertically = false, const bool flip_horizontally = false, const int layer = -1);
+		uint16 add_texture(const char* path, const bool flip_v = false, const bool flip_h = false, const int layer = -1);
 
 		// Adds or replaces a layer of the texture array and returns its index.
 		// All layers must have the same width and height.
