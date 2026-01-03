@@ -17,8 +17,7 @@ class Assets {
 		// Returns a default solid white texture
 		static std::shared_ptr<Texture> default_texture() noexcept {
 			// I don't like data being statically allocated this way
-			// Cant put inside IScene because MaterialComponent also uses this and
-			// not always batch drawing is used
+			// Cant put as member because it will try to create before OpenGL starts
 			static std::shared_ptr<Texture> def_tex = std::make_shared<Texture>();
 			return def_tex;
 		}
@@ -26,9 +25,28 @@ class Assets {
 		// static std::shared_ptr<Texture> load_texture(path, other stuff);
 		// static std::shared_ptr<TextureArray> load_texturearray(textures);
 
-		static std::shared_ptr<Texture> load(const char* path, const bool flip_vertically = false, const bool flip_horizontally = false);
+		static std::shared_ptr<Texture> load(const char* path, const bool flip_vertically = false, const bool flip_horizontally = false) noexcept;
+		static std::shared_ptr<Texture> load(uint8* data, const uint32 width, const uint32 height, const uint8 channels) noexcept;
+		static std::shared_ptr<Texture> load(const Image& image) noexcept;
+
+		// Cleans up all maps;
+		// WARNING: This is called inside Window destructor, DO NOT call it manually
+		static void cleanup() noexcept;
+
+	private:
+		struct Instance {
+			std::unordered_map<size_t, std::weak_ptr<Texture>> tex_cache;
+			std::unordered_map<size_t, std::weak_ptr<TextureArray>> texarr_cache;
+			std::shared_ptr<Texture> def_tex;
+		};
+		static Instance instance;
+		static std::shared_ptr<Texture> get_tex(const size_t hash);
+};
 
 	// TODO:
+	// - Make Texture and Texture Array be created from Image class
+	// - Two methods each (in Assets) one using Image struct and other passing
+	//
 	// - Loading Texture2D: Put in a Image struct and hash the struct
 	// - Then check if the hash contains in texture2d_cache map
 	//
@@ -74,14 +92,3 @@ return TextureArrayCache.get(layers, params);
 	// 	}
 	// 	return nullptr; // not found or expired
 	// }
-
-
-		// Cleans up all maps;
-		// WARNING: This is called inside Window destructor, DO NOT call it manually
-		void cleanup() noexcept;
-
-	private:
-		// Texture ID
-		static std::unordered_map<size_t, std::weak_ptr<Texture>> tex_cache;
-		static std::unordered_map<size_t, std::weak_ptr<TextureArray>> texarr_cache;
-};

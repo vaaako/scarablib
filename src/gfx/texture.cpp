@@ -55,11 +55,8 @@ Texture::Texture(const char* path, const bool flip_horizontally, const bool flip
 	);
 	glGenerateTextureMipmap(this->id);
 
-	// Default textures
-	glTextureParameteri(this->id, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
-	glTextureParameteri(this->id, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTextureParameteri(this->id, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTextureParameteri(this->id, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	this->set_wrap(TextureBase::Wrap::REPEAT);
+	this->set_filter(TextureBase::Filter::NEAREST);
 #else
 	// Generate and bind texture
 	glGenTextures(1, &this->id);
@@ -74,15 +71,8 @@ Texture::Texture(const char* path, const bool flip_horizontally, const bool flip
 		image->data
 	);
 
-	// Set filter parameters
-	// Nearest: Pixelate
-	// Linear: Blur
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-	// Repeat, Mirrored Repeat, Clamp to Edge, Clamp to Border (then use array of RGBA to color the border)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	this->set_wrap(TextureBase::Wrap::REPEAT);
+	this->set_filter(TextureBase::Filter::NEAREST);
 
 	// Generate mipmap and unbind
 	glGenerateMipmap(GL_TEXTURE_2D);
@@ -91,9 +81,9 @@ Texture::Texture(const char* path, const bool flip_horizontally, const bool flip
 
 	delete image;
 
-	#ifdef SCARAB_DEBUG_TEXTURE
+#ifdef SCARAB_DEBUG_TEXTURE
 	LOG_INFO("Texture loaded succesfully! Width: %d, Height: %d", surface->w, surface->h);
-	#endif
+#endif
 }
 
 Texture::Texture(const uint8* data, const uint32 width, const uint32 height, const uint8 channels)
@@ -110,11 +100,8 @@ Texture::Texture(const uint8* data, const uint32 width, const uint32 height, con
 
 	glGenerateTextureMipmap(this->id);
 
-	// Default textures
-	glTextureParameteri(this->id, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
-	glTextureParameteri(this->id, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTextureParameteri(this->id, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTextureParameteri(this->id, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	this->set_wrap(TextureBase::Wrap::REPEAT);
+	this->set_filter(TextureBase::Filter::NEAREST);
 #else
 	// Generate and bind texture
 	glGenTextures(1, &this->id);
@@ -130,23 +117,70 @@ Texture::Texture(const uint8* data, const uint32 width, const uint32 height, con
 		data
 	);
 
-	// Set filter parameters
-	// Nearest: Pixelate
-	// Linear: Blur
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-	// Repeat, Mirrored Repeat, Clamp to Edge, Clamp to Border (then use array of RGBA to color the border)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	this->set_wrap(TextureBase::Wrap::REPEAT);
+	this->set_filter(TextureBase::Filter::NEAREST);
 
 	// Generate mipmap and unbind
 	glGenerateMipmap(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
 #endif
 
-	#ifdef SCARAB_DEBUG_TEXTURE
+#ifdef SCARAB_DEBUG_TEXTURE
 	LOG_INFO("Texture loaded succesfully! Width: %d, Height: %d", surface->w, surface->h);
-	#endif
+#endif
 }
 
+
+
+Texture::Texture(const Image& image)
+	: TextureBase(GL_TEXTURE_2D, image.width, image.height) {
+
+	if(image.data == nullptr) {
+		throw ScarabError("Image (%s) was not found", image.path);
+	}
+
+#if !defined(BUILD_OPGL30)
+	glCreateTextures(GL_TEXTURE_2D, 1, &this->id);
+	glTextureStorage2D(this->id, 1,
+		TextureBase::extract_format(image.nr_channels, true),
+		image.width,
+		image.height
+	);
+	glTextureSubImage2D(this->id,
+		0,
+		0, 0,
+		image.width, image.height,
+		Texture::extract_format(image.nr_channels, false),
+		GL_UNSIGNED_BYTE,
+		image.data
+	);
+	glGenerateTextureMipmap(this->id);
+
+	this->set_wrap(TextureBase::Wrap::REPEAT);
+	this->set_filter(TextureBase::Filter::NEAREST);
+#else
+	// Generate and bind texture
+	glGenTextures(1, &this->id);
+	glBindTexture(GL_TEXTURE_2D, this->id);
+	// Allocate data
+	glTexImage2D(
+		GL_TEXTURE_2D, 0,
+		TextureBase::extract_format(image->nr_channels, true),
+		image->width, image->height, 0,
+		TextureBase::extract_format(image->nr_channels, false),
+		GL_UNSIGNED_BYTE,
+		image->data
+	);
+
+	this->set_wrap(TextureBase::Wrap::REPEAT);
+	this->set_filter(TextureBase::Filter::NEAREST);
+
+	// Generate mipmap and unbind
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, 0);
+#endif
+
+#ifdef SCARAB_DEBUG_TEXTURE
+	LOG_INFO("Texture loaded succesfully! Width: %d, Height: %d", surface->w, surface->h);
+#endif
+}

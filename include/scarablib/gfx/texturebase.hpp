@@ -1,5 +1,6 @@
 #pragma once
 
+#include "scarablib/gfx/image.hpp"
 #include "scarablib/typedef.hpp"
 
 // WARNING: Do not use this class directly

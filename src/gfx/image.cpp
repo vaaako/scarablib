@@ -8,7 +8,8 @@
 Image::Image(const char* path, const bool flip_horizontally, const bool flip_vertically) noexcept : path(path) {
 	// Opposite because stbi acts the opposite
 	stbi_set_flip_vertically_on_load(!flip_vertically);
-
+ 
+	// std::filesystem::path(path).lexically_normal().string()
 	this->data = stbi_load(path, &this->width, &this->height, &nr_channels, 0); // STBI_rgb_alpha to standarlize
 
 	// This gives skybox a nice effect
@@ -32,6 +33,9 @@ Image::Image(const char* path, const bool flip_horizontally, const bool flip_ver
 		}
 	}
 }
+
+Image::Image(uint8* data, uint32 width, uint32 height, uint8 channels) noexcept
+	: path(nullptr), data(data), width((int)width), height((int)height), nr_channels((int)channels) {}
 
 Image::~Image() noexcept {
 	if(this->data != nullptr) {

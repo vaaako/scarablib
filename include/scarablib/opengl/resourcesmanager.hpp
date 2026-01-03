@@ -104,13 +104,13 @@ std::shared_ptr<VertexArray> ResourcesManager::acquire_vertexarray(
 	const size_t hash = (chash) ? chash : this->compute_hash(vertices, indices);
 	std::shared_ptr<VertexArray> vertexarray = this->get_vertexarray(hash);
 	if(vertexarray != nullptr) {
-	#if defined(SCARAB_DEBUG_VAO_MANAGER)
+	#if defined(SCARAB_DEBUG_VERTEXARRAY_MANAGER)
 		LOG_DEBUG("Hash %zu found! Reusing VAO.", hash);
 	#endif
 		return vertexarray; // Return the existing entry
 	}
 
-#if defined(SCARAB_DEBUG_VAO_MANAGER)
+#if defined(SCARAB_DEBUG_VERTEXARRAY_MANAGER)
 	LOG_DEBUG("Hash %zu not found. Creating new VAO.", hash);
 #endif
 
@@ -127,16 +127,16 @@ std::shared_ptr<VertexArray> ResourcesManager::acquire_vertexarray(
 		// UINT8_MAX + 1 = 256. If v_count is 256, max index is 255 (fits in uint8)
 		if(v_count <= (UINT8_MAX + 1)) {
 			vertexarray = std::make_shared<VertexArray>(vertices, ScarabOpenGL::convert_to<uint8>(indices), dynamic_vertex);
-		#if defined(SCARAB_DEBUG_VAO_MANAGER)
+		#if defined(SCARAB_DEBUG_VERTEXARRAY_MANAGER)
 			LOG_DEBUG("Converted indices to uint8");
 		#endif
 		} else if(v_count <= (UINT16_MAX + 1)) {
 			vertexarray = std::make_shared<VertexArray>(vertices, ScarabOpenGL::convert_to<uint16>(indices), dynamic_vertex);
-		#if defined(SCARAB_DEBUG_VAO_MANAGER)
+		#if defined(SCARAB_DEBUG_VERTEXARRAY_MANAGER)
 			LOG_DEBUG("Converted indices to uint16");
 		#endif
 		} else {
-		#if defined(SCARAB_DEBUG_VAO_MANAGER)
+		#if defined(SCARAB_DEBUG_VERTEXARRAY_MANAGER)
 			LOG_DEBUG("Converted indices to uint32");
 		#endif
 			// No conversion needed. Move the existing vector to avoid a massive copy
@@ -144,7 +144,7 @@ std::shared_ptr<VertexArray> ResourcesManager::acquire_vertexarray(
 		}
 	}
 
-#if defined(SCARAB_DEBUG_VAO_MANAGER)
+#if defined(SCARAB_DEBUG_VERTEXARRAY_MANAGER)
 	LOG_DEBUG("VAO ID made: %zu", vertexarray->get_vaoid());
 	GL_CHECK();
 #endif

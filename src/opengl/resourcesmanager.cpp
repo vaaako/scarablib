@@ -13,6 +13,7 @@ std::shared_ptr<ShaderProgram> ResourcesManager::load_shader_program(const std::
 	// This vector is now holding the owner of all shader's IDs
 	// but inside the ShaderProgram's constructor this ownership is moved (not explicitly)
 	std::vector<std::shared_ptr<Shader>> shaders;
+	shaders.reserve(infos.size());
 
 	size_t combined_hash = 0; // To check if program exist
 	// -- VALIDATE SHADERS
@@ -42,16 +43,14 @@ std::shared_ptr<ShaderProgram> ResourcesManager::load_shader_program(const std::
 			);
 		}
 		shaders.emplace_back(this->get_or_compile_shader(source.c_str(), info.type));
-		ScarabHash::hash_combine(combined_hash, ScarabHash::hash_make(std::string(source)));
+		ScarabHash::hash_combine(combined_hash, ScarabHash::hash_make(std::string_view(source)));
 	}
 
 	// -- CHECK COMBINED HASHES
 	// Check if the program is already cached
-	if(std::shared_ptr<ShaderProgram> cache = this->get_program(combined_hash)) {
-	#if defined(SCARAB_DEBUG_SHADER_MANAGER)
-		LOG_DEBUG("Found shader program hash: %zu", combined_hash);
-	#endif
-		return cache;
+	std::shared_ptr<ShaderProgram> program = this->get_program(combined_hash);
+	if(program != nullptr) {
+		return program;
 	}
 
 #if defined(SCARAB_DEBUG_SHADER_MANAGER)
@@ -65,7 +64,7 @@ std::shared_ptr<ShaderProgram> ResourcesManager::load_shader_program(const std::
 
 	// -- CREATE PROGRAM
 	// Create the ShaderProgram and cache it
-	std::shared_ptr<ShaderProgram> program = std::make_shared<ShaderProgram>(shaders);
+	program = std::make_shared<ShaderProgram>(shaders);
 	program->hash = combined_hash;
 	this->program_cache[combined_hash] = program;
 	return program;
@@ -77,19 +76,19 @@ std::shared_ptr<VertexArray> ResourcesManager::acquire_vertexarray(const void* d
 
 	std::shared_ptr<VertexArray> vertexarray = this->get_vertexarray(hash);
 	if(vertexarray != nullptr) {
-	#if defined(SCARAB_DEBUG_VAO_MANAGER)
+	#if defined(SCARAB_DEBUG_VERTEXARRAY_MANAGER)
 		LOG_DEBUG("Hash %zu found! Reusing VAO.", hash);
 	#endif
 		return vertexarray; // Return the existing entry
 	}
 
-#if defined(SCARAB_DEBUG_VAO_MANAGER)
+#if defined(SCARAB_DEBUG_VERTEXARRAY_MANAGER)
 	LOG_DEBUG("Hash %zu not found. Creating new VAO.", hash);
 #endif
 
 	vertexarray = std::make_shared<VertexArray>(data, capacity, vertex_size, dynamic_vertex);
 
-#if defined(SCARAB_DEBUG_VAO_MANAGER)
+#if defined(SCARAB_DEBUG_VERTEXARRAY_MANAGER)
 	LOG_DEBUG("VAO ID made: %zu", vertexarray->get_vaoid());
 	GL_CHECK();
 #endif
@@ -109,59 +108,78 @@ std::shared_ptr<VertexArray> ResourcesManager::acquire_vertexarray(const void* d
 // }
 
 std::shared_ptr<Shader> ResourcesManager::get_or_compile_shader(const char* source, Shader::Type type) {
-	size_t hash = ScarabHash::hash_make(std::string(source));
+	size_t hash = ScarabHash::hash_make(std::string_view(source));
 
-	// Chek if the shader is already compiled and cached
-	if(this->shader_cache.contains(hash)) {
-	#if defined(SCARAB_DEBUG_SHADER_MANAGER)
-		LOG_DEBUG("Found %s shader hash: %zu", ((int)type == GL_VERTEX_SHADER) ? "VERTEX" : "FRAGMENT", hash);
-	#endif
-		if(std::shared_ptr<Shader> cache = this->get_shader(hash)) {
-			return cache;
-		}
+	std::shared_ptr shader = this->get_shader(hash);
+	if(shader != nullptr) {
+		return shader;
 	}
 
 #if defined(SCARAB_DEBUG_SHADER_MANAGER)
 	LOG_DEBUG("NOT found/expired %s hash (%zu) not found, compiling new", ((int)type == GL_VERTEX_SHADER) ? "VERTEX" : "FRAGMENT", hash);
 #endif
 
-	std::shared_ptr<Shader> shader = std::make_shared<Shader>(source, type);
+	shader = std::make_shared<Shader>(source, type);
 	this->shader_cache[hash] = shader;
 	return shader;
 }
 
 std::shared_ptr<VertexArray> ResourcesManager::get_vertexarray(const size_t hash) noexcept {
+	// Chek if the Shader is already compiled and cached
 	auto it = this->vertexarray_cache.find(hash);
-	if(it != this->vertexarray_cache.end()) {
-		if(std::shared_ptr<VertexArray> ptr = it->second.lock()) {
-			return ptr;
-		}
-		this->vertexarray_cache.erase(it); // expired, remove entry
+	if(it == this->vertexarray_cache.end()) {
+		return nullptr;
 	}
-	return nullptr; // not found or expired
+
+	if(std::shared_ptr<VertexArray> cache = it->second.lock()) {
+	#if defined(SCARAB_DEBUG_SHADER_MANAGER)
+		LOG_DEBUG("Found Vertex Array with hash: %zu", hash);
+	#endif
+		return cache; // Get Cache
+	}
+
+	// weak_ptr expired, remove entry
+	this->vertexarray_cache.erase(it);
+	return nullptr;
 }
 
 
 std::shared_ptr<Shader> ResourcesManager::get_shader(const size_t hash) noexcept {
+	// Chek if the Shader is already compiled and cached
 	auto it = this->shader_cache.find(hash);
-	if(it != this->shader_cache.end()) {
-		if(std::shared_ptr<Shader> ptr = it->second.lock()) {
-			return ptr;
-		}
-		this->shader_cache.erase(it); // expired, remove entry
+	if(it == this->shader_cache.end()) {
+		return nullptr;
 	}
-	return nullptr; // not found or expired
+
+	if(std::shared_ptr<Shader> cache = it->second.lock()) {
+	#if defined(SCARAB_DEBUG_SHADER_MANAGER)
+		LOG_DEBUG("Found Shader with hash: %zu", hash);
+	#endif
+		return cache; // Get Cache
+	}
+
+	// weak_ptr expired, remove entry
+	this->shader_cache.erase(it);
+	return nullptr;
 }
 
 std::shared_ptr<ShaderProgram> ResourcesManager::get_program(const size_t hash) noexcept {
+	// Chek if the Shader Program is already compiled and cached
 	auto it = this->program_cache.find(hash);
-	if(it != this->program_cache.end()) {
-		if(std::shared_ptr<ShaderProgram> ptr = it->second.lock()) {
-			return ptr;
-		}
-		this->program_cache.erase(it); // expired, remove entry
+	if(it == this->program_cache.end()) {
+		return nullptr;
 	}
-	return nullptr; // not found or expired
+
+	if(std::shared_ptr<ShaderProgram> cache = it->second.lock()) {
+	#if defined(SCARAB_DEBUG_SHADER_MANAGER)
+		LOG_DEBUG("Found Shader Program with hash: %zu", hash);
+	#endif
+		return cache; // Get Cache
+	}
+
+	// weak_ptr expired, remove entry
+	this->program_cache.erase(it);
+	return nullptr;
 }
 
 

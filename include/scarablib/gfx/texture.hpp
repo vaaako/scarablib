@@ -15,5 +15,13 @@ class Texture : public TextureBase {
 		// Loads texture from raw memory data
 		Texture(const uint8* data, const uint32 width, const uint32 height, const uint8 channels);
 
+		// Make texture from image
+		Texture(const Image& image);
+
 		~Texture() noexcept = default;
+
+		// static std::shared_ptr<Texture> default_texture() noexcept {
+		// 	static std::shared_ptr<Texture> def_tex = std::make_shared<Texture>();
+		// 	return def_tex;
+		// }
 };

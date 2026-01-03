@@ -22,10 +22,6 @@ struct MaterialComponent {
 			// Default texture
 			TextureHandle() noexcept;
 
-			// From lvalue Texture&
-			explicit TextureHandle(const Texture& texture) noexcept;
-			// From lvalue Texture*
-			explicit TextureHandle(Texture* texture) noexcept;
 			// From nullptr
 			TextureHandle(std::nullptr_t) noexcept;
 
@@ -86,18 +82,6 @@ struct MaterialComponent {
 			// Assign shared_ptr
 			inline TextureHandle& operator=(const std::shared_ptr<Texture>& other) noexcept {
 				this->ptr = other;
-				return *this;
-			}
-
-			// Assign from rvalue Texture&
-			inline TextureHandle& operator=(const Texture& other) noexcept {
-				this->ptr = std::make_shared<Texture>(other);
-				return *this;
-			}
-
-			// Assign from rvalue Texture*
-			inline TextureHandle& operator=(Texture* texture) noexcept {
-				this->ptr = (texture) ? std::shared_ptr<Texture>(texture) : Assets::default_texture();
 				return *this;
 			}
 	};

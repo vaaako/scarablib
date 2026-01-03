@@ -30,14 +30,19 @@ class TextureArray : public TextureBase {
 		//    + 4: RGBA (e.g. PNG with alpha)
 		TextureArray(const uint16 width, const uint16 height, const uint16 max_layers, const uint8 channels = 4);
 
+		// Make texture from array of images
+		TextureArray(const std::vector<Image>& images);
+
 		~TextureArray() noexcept = default;
 
 		// Adds or replaces a layer of the texture array and returns its index.
-		// All layers must have the same width and height
+		// All layers must have the same width and height.
+		// Does not generate mipmap automatically
 		uint16 add_texture(const char* path, const bool flip_vertically = false, const bool flip_horizontally = false, const int layer = -1);
 
 		// Adds or replaces a layer of the texture array and returns its index.
-		// All layers must have the same width and height
+		// All layers must have the same width and height.
+		// Generates mipmap automatically
 		uint16 add_textures(const std::vector<TextureArray::Layer>& paths);
 
 		// Returns the current number of layers in the array

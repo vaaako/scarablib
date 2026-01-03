@@ -21,11 +21,8 @@ TextureArray::TextureArray(const uint16 width, const uint16 height, const uint16
 		width, height, this->max_layers
 	);
 
-	// Default textures
-	glTextureParameteri(this->id, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTextureParameteri(this->id, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTextureParameteri(this->id, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTextureParameteri(this->id, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	this->set_filter(TextureBase::Filter::NEAREST);
+	this->set_wrap(TextureBase::Wrap::REPEAT);
 #else
 	// Generate and bind texture
 	glGenTextures(1, &this->id);
@@ -40,12 +37,107 @@ TextureArray::TextureArray(const uint16 width, const uint16 height, const uint16
 		(int)max_textures
 	);
 
-	// Set default filters
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	this->set_filter(TextureBase::Filter::NEAREST);
+	this->set_wrap(TextureBase::Wrap::REPEAT);
 #endif
+}
+
+
+TextureArray::TextureArray(const std::vector<Image>& images)
+	// Placeholder
+	: TextureBase(GL_TEXTURE_2D_ARRAY, 1, 1) {
+
+	if(images.empty()) {
+		throw ScarabError("Images vector is empty!");
+	}
+
+	// Set number of textures
+	GLint maxlayers;
+	glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS, &maxlayers);
+	this->max_layers = std::clamp((uint32)maxlayers, 1u, (uint32)max_layers);
+
+	// Set configuration
+	this->width    = images[0].width;
+	this->height   = images[0].height;
+	this->channels = images[0].nr_channels;
+
+#if !defined(BUILD_OPGL30)
+	glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &this->id);
+	glTextureStorage3D(this->id,
+		1,
+		TextureBase::extract_format(channels, true),
+		width, height, this->max_layers
+	);
+
+	this->set_filter(TextureBase::Filter::NEAREST);
+	this->set_wrap(TextureBase::Wrap::REPEAT);
+#else
+	// Generate and bind texture
+	glGenTextures(1, &this->id);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, this->id);
+
+	// Allocate data
+	glTexStorage3D(
+		GL_TEXTURE_2D_ARRAY,
+		1, // Mipmap level
+		TextureBase::extract_format(channels, true),
+		(int)width, (int)height,
+		(int)max_textures
+	);
+
+	this->set_filter(TextureBase::Filter::NEAREST);
+	this->set_wrap(TextureBase::Wrap::REPEAT);
+#endif
+
+
+	for(size_t i = 0; i < images.size(); i++) {
+		const Image& image = images.at(i);
+
+		// Check if limit has been reached
+		if(this->num_layers >= this->max_layers) {
+			throw ScarabError("Texture array limit (%u) reached", this->max_layers);
+		}
+
+		if(image.data == nullptr) {
+			throw ScarabError("Image (%s) was not found", image.path);
+		}
+
+		// Validate dimensions
+		if((image.width != (int)this->width) || (image.height != (int)this->height)) {
+			throw ScarabError("Image (%s) dimensions (%ix%i) mismatch (%ix%i)i", image.path, this->width, this->height);
+		}
+
+		// Validate channels
+		if(image.nr_channels > (int)this->channels) {
+			throw ScarabError("(%s) Too many channels in image (%i > %i)", image.path, image.nr_channels, this->channels);
+		}
+
+#if !defined(BUILD_OPGL30)
+		glTextureSubImage3D(this->id,
+			0, // Mipmap level
+			0, 0, this->next_layer, // x, y, layer (z)
+			this->width, this->height,
+			1, // Depth
+			TextureBase::extract_format(image.nr_channels, false),
+			GL_UNSIGNED_BYTE,
+			image.data
+		);
+#else
+		glBindTexture(GL_TEXTURE_2D_ARRAY, this->id);
+		// Upload to texture array
+		glTexSubImage3D(
+			GL_TEXTURE_2D_ARRAY,
+			0, // Mipmap level
+			0, 0, this->next_texture, // x, y, layer (z)
+			this->width, this->height, 1, // Width, Height, Depth
+			TextureBase::extract_format(image.nr_channels, false),
+			GL_UNSIGNED_BYTE,
+			image.data
+		);
+		glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+#endif
+		this->next_layer++;
+	}
 }
 
 uint16 TextureArray::add_texture(const char* path, const bool flip_vertically, const bool flip_horizontally, const int layer) {
@@ -81,6 +173,7 @@ uint16 TextureArray::add_texture(const char* path, const bool flip_vertically, c
 #if !defined(BUILD_OPGL30)
 	glTextureSubImage3D(this->id,
 		0, // Mipmap level
+		// Put in specific layer or not (-1)
 		0, 0, (layer < 0) ? this->next_layer : layer, // x, y, layer (z)
 		this->width, this->height,
 		1, // Depth
@@ -94,6 +187,7 @@ uint16 TextureArray::add_texture(const char* path, const bool flip_vertically, c
 	glTexSubImage3D(
 		GL_TEXTURE_2D_ARRAY,
 		0, // Mipmap level
+		// Put in specific layer or not (-1)
 		0, 0, (layer < 0) ? this->next_texture : layer, // x, y, layer (z)
 		this->width, this->height, 1, // Width, Height, Depth
 		TextureBase::extract_format(image->nr_channels, false),
@@ -120,6 +214,7 @@ uint16 TextureArray::add_textures(const std::vector<TextureArray::Layer>& paths)
 		const TextureArray::Layer& tex = paths[i];
 		index = this->add_texture(tex.path, tex.flip_vertically, tex.flip_horizontally);
 	}
+	this->generate_mipmap();
 	return index;
 }
 

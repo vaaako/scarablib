@@ -37,7 +37,7 @@ void IScene::draw(Mesh& mesh) const noexcept {
 	const MaterialComponent::TextureHandle& texture = mesh.material->texture;
 	const TextureArray* texture_array = mesh.material->texture_array;
 
-	const bool hastex = mesh.material->texture != nullptr;
+	const bool hastex      = mesh.material->texture != nullptr;
 	const bool hastexarray = texture_array != nullptr;
 
 	if(hastex) {
