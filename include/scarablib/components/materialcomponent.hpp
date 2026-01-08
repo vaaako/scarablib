@@ -86,13 +86,6 @@ struct MaterialComponent {
 			}
 	};
 
-	// How much of the texture to mix with texture array.
-	// Where 0 is only texture and 1 is only texture array.
-	// Does not take any effect if texture is nullptr
-	float mix_amount = 0.0f;
-
-	// Material's color
-	Color color = Colors::WHITE;
 	// Material's texture
 	TextureHandle texture = nullptr; // nullptr: Default texture
 	// Material's texture array
@@ -104,6 +97,13 @@ struct MaterialComponent {
 		{ .source = Shaders::DEFAULT_VERTEX,   .type = Shader::Type::Vertex },
 		{ .source = Shaders::DEFAULT_FRAGMENT, .type = Shader::Type::Fragment },
 	});
+
+	// Material's color
+	Color color = Colors::WHITE;
+	// How much of the texture to mix with texture array.
+	// Where 0 is only texture and 1 is only texture array.
+	// Does not take any effect if texture is nullptr
+	float mix_amount = 0.0f;
 
 	// 1. First Mesh: A Mesh is created and its MaterialComponent asks the ResourcesManager for the default shader
 	// 2. ResourcesManager (Cache miss): The manager compiles the first shader and allocated memory for one ShaderProgram object and compiles the code.

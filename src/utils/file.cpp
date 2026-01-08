@@ -7,11 +7,11 @@
 
 #include <unistd.h> // readlink
 
-std::string FileHelper::read_file(const std::string& path) {
-	std::ifstream file = std::ifstream(path);
-	if(!file.is_open()) {
+std::string ScarabFile::read_file(const std::filesystem::path& path) noexcept {
+	if(!ScarabFile::file_exists(path)) {
 		return "";
 	}
+	std::ifstream file = std::ifstream(path);
 
 	// Prepare buffer
 	std::string buffer;
@@ -27,17 +27,12 @@ std::string FileHelper::read_file(const std::string& path) {
 	return buffer;
 }
 
-char* FileHelper::read_file_char(const std::string& path) {
-	std::ifstream file = std::ifstream(path, std::ios::binary);
-	if (!file) {
+char* ScarabFile::read_file_char(const std::filesystem::path& path) noexcept {
+	if(!ScarabFile::file_exists(path)) {
 		return nullptr;
 	}
 
-	// Read file content into a string stream
-	std::stringstream buffer;
-	buffer << file.rdbuf();
-
-	std::string content = buffer.str();
+	std::string content = ScarabFile::read_file(path);
 	size_t size = content.size();
 
 	// Allocate memory for the content
@@ -48,12 +43,12 @@ char* FileHelper::read_file_char(const std::string& path) {
 	return result;
 }
 
-std::vector<uint8> FileHelper::read_binary_file(const char* path) noexcept {
-	// Open in binary mode
-	std::ifstream file = std::ifstream(path, std::ios::binary | std::ios::ate);
-	if(!file.is_open()) {
+std::vector<uint8> ScarabFile::read_binary_file(const std::filesystem::path& path) noexcept {
+	if(!ScarabFile::file_exists(path)) {
 		return {};
 	}
+	// Open in binary mode
+	std::ifstream file = std::ifstream(path, std::ios::binary | std::ios::ate);
 
 	// Get file size
 	std::streamsize size = file.tellg();
@@ -72,8 +67,8 @@ std::vector<uint8> FileHelper::read_binary_file(const char* path) noexcept {
 	return buffer;
 }
 
-std::vector<std::string> FileHelper::list_files(const char* path, const bool sort) {
-	if(!std::filesystem::exists(path) || !std::filesystem::is_directory(path)) {
+std::vector<std::string> ScarabFile::list_files(const std::filesystem::path& path, const bool sort) noexcept {
+	if(!ScarabFile::file_exists(path) || !ScarabFile::is_dir(path)) {
 		return {};
 	}
 
@@ -93,7 +88,7 @@ std::vector<std::string> FileHelper::list_files(const char* path, const bool sor
 	return result;
 }
 
-std::string FileHelper::executable_path() {
+std::string ScarabFile::executable_path() {
 #ifdef _WIN32
 	char buffer[MAX_PATH];
 	GetModuleFileNameA(NULL, buffer, MAX_PATH);

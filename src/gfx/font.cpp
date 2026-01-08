@@ -3,7 +3,6 @@
 #include "scarablib/opengl/assets.hpp"
 #include "scarablib/opengl/shader_program.hpp"
 #include "scarablib/proper/error.hpp"
-#include "scarablib/proper/log.hpp"
 #include "scarablib/camera/camera2d.hpp"
 #include "scarablib/utils/file.hpp"
 #include "scarablib/utils/hash.hpp"
@@ -15,9 +14,6 @@ struct STBTruetype {
 	std::vector<stbtt_bakedchar> cdata;
 	STBTruetype() noexcept : cdata(96) {} // ASCII 32-127
 };
-
-// WARNING: NOT FINISHED YET. STILL DONT WORKING PROPERLY
-// TODO: Optimize. More characters
 
 Font::Font(const Camera2D& camera, const char* path, const uint16 size)
 	: camera(camera), data(new STBTruetype()) {
@@ -42,7 +38,7 @@ Font::Font(const Camera2D& camera, const char* path, const uint16 size)
 	});
 
 	// Load font file
-	std::vector<uint8> buffer = FileHelper::read_binary_file(path);
+	std::vector<uint8> buffer = ScarabFile::read_binary_file(path);
 	if(buffer.empty()) {
 		throw ScarabError("Font file (%s) is invalid", path);
 	}
@@ -65,10 +61,10 @@ Font::Font(const Camera2D& camera, const char* path, const uint16 size)
 	// Texture from bitmap
 	// 1-byte alignment for grayscale
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	Image tmpdata = Image(temp_bitmap.data(), this->ATLAS_WIDTH, this->ATLAS_HEIGHT, 1);
-	tmpdata.owns_data = false; // Disables free
+	Image tmpimg = Image(temp_bitmap.data(), this->ATLAS_WIDTH, this->ATLAS_HEIGHT, 1);
+	tmpimg.owns_data = false; // Disables free
 	// This avoids double free (inside Image and end of this method)
-	this->material->texture = Assets::load(tmpdata);
+	this->material->texture = Assets::load(tmpimg);
 
 	// Buffer setup
 	this->buffer_capacity = 128; // Start with a decent size

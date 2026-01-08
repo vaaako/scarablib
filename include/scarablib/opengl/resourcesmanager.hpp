@@ -48,7 +48,8 @@ class ResourcesManager {
 		// - `vertex_size`: Vertex size being used (e.g., `sizeof(Vertex2D)`).
 		// - `hash`: The hash identification.
 		// - `dynamic_vertex`: (Default: false) Set the Vertex Array to be changeable after creation
-		std::shared_ptr<VertexArray> acquire_vertexarray(const void* data, const size_t capacity, const size_t vertex_size, const size_t hash, const bool dynamic_vertex = false) noexcept;
+		std::shared_ptr<VertexArray> acquire_vertexarray(const void* data, const size_t capacity,
+				const size_t vertex_size, const size_t hash, const bool dynamic_vertex = false) noexcept;
 
 		// Returns an entry of a VAO using its hash.
 		// Returns nullptr if not found
@@ -88,7 +89,6 @@ class ResourcesManager {
 		// Helper method for making a single hash out of mulitple shader hashes
 		// size_t combine_shader_hashes(const std::vector<std::shared_ptr<Shader>>& shaders) const noexcept;
 };
-
 
 template <typename T, typename U>
 std::shared_ptr<VertexArray> ResourcesManager::acquire_vertexarray(

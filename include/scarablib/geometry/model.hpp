@@ -1,6 +1,7 @@
 #pragma once
 
 #include "scarablib/geometry/mesh.hpp"
+#include "scarablib/geometry/submesh.hpp"
 #include "scarablib/geometry/triangle.hpp"
 #include "scarablib/proper/dirtyproxy.hpp"
 #include "scarablib/camera/camera.hpp"
@@ -48,24 +49,20 @@ class Model : public Mesh {
 		// - `axis`: (must be normalized) Which axis the angle will be applied
 		void set_orientation(const float angle, const vec3<float>& axis) noexcept;
 
-
-		// Loads a wavefront .obj file.
-		// - `indices` is optional, pass nullptr if not needed
-		static std::vector<Vertex> load_obj(const char* path, std::vector<uint32>* indices);
-
 		// Returns a vector of triangles from the model
 		// - `transform`: (Optional) Transform applied to the model
 		static std::vector<MeshTriangle> get_obj_triangles(const char* path, const glm::mat4& transform = glm::mat4(1.0f));
 
 	protected:
-		// Axis where the orientation angle will be applied
-		float orient_angle      = 0.0f;
-		// Rotation based on orientation
-		vec3<float> orient_axis = vec3<float>(1.0f, 0.0f, 0.0f);
-		// Rotation
-		float angle             = 0.0f;
+		std::vector<SubMesh> submeshes;
 		// Need to have at least one axis to work, even if angle is 0.0
 		vec3<float> axis        = vec3<float>(1.0f, 0.0f, 0.0f);
+		// Rotation based on orientation
+		vec3<float> orient_axis = vec3<float>(1.0f, 0.0f, 0.0f);
+		// Axis where the orientation angle will be applied
+		float orient_angle      = 0.0f;
+		// Rotation
+		float angle             = 0.0f;
 
 		void update_model_matrix() noexcept override;
 };

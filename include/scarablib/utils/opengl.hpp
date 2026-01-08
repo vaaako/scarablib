@@ -2,7 +2,6 @@
 
 #include "scarablib/typedef.hpp"
 #include <algorithm>
-#include <variant>
 #include <vector>
 
 namespace ScarabOpenGL {

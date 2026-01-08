@@ -20,7 +20,7 @@ namespace StringHelper {
 
 	// Get the base directory from a path to a file.
 	// If not found, returns "."
-	inline std::string base_dir(const char* path) noexcept {
-		return StringHelper::base_dir(std::string(path));
-	}
+	// inline std::string base_dir(const char* path) noexcept {
+	// 	return StringHelper::base_dir(std::string(path));
+	// }
 }

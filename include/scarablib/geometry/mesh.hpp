@@ -10,13 +10,13 @@
 // Basic data for 3D and 2D shapes
 class Mesh {
 	public:
-		// Material of this mesh
-		std::shared_ptr<MaterialComponent> material = std::make_shared<MaterialComponent>();
-		// Since material can be shared i need to be a pointer so a double delete is not done
-
 		// Bundle for VAO, VBO and EBO
 		std::shared_ptr<VertexArray> vertexarray;
 		// This is kinda wrong, because each instance of a Mesh will have copied bundle (but same VAO at least)
+
+		// Material of this mesh
+		std::shared_ptr<MaterialComponent> material = std::make_shared<MaterialComponent>();
+		// Since material can be shared i need to be a pointer so a double delete is not done
 
 		// Bounding box
 		BoundingBox* bbox = nullptr;
@@ -73,8 +73,8 @@ class Mesh {
 
 	protected:
 		// Matrix
-		bool isdirty; // Calculate matrix if anything changed
 		glm::mat4 model = glm::mat4(1.0f);
+		bool isdirty; // Calculate matrix if anything changed
 
 		bool dynamic_bounding = false;
 };

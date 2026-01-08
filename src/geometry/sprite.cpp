@@ -6,7 +6,7 @@ Sprite::Sprite(const std::vector<Vertex2D>& vertices) noexcept
 
 	// Position and TexUV
 	this->vertexarray->add_attribute<float>(2, false);
-	this->vertexarray->add_attribute<float>(2, true);
+	this->vertexarray->add_attribute<float>(2, false);
 
 	// Set 2D Shader
 	std::shared_ptr<ShaderProgram> shader = ResourcesManager::get_instance().load_shader_program({

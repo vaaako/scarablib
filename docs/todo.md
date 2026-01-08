@@ -193,7 +193,8 @@ Stuff that are in progress and i need to finish
 - [x] Remove `SCARAB_2D_AND_3D`
 - [x] Make it work with CULL_FACE
 - [x] Use `vec2<float>` for Sprites
-- [ ] Finish font
+- [x] Finish font
+- [ ] Take font size inside `draw_text`: `font_size / user_size`
 - [ ] Convert a small image to a scenario
 	+ like raylib does
 - [ ] Tiled support

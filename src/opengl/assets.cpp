@@ -3,7 +3,7 @@
 #include "scarablib/utils/hash.hpp"
 #include "scarablib/window/window.hpp" // SDL_GL_GetCurrentContext
 
-#define SCARAB_DEBUG_ASSETS_MANAGER
+// #define SCARAB_DEBUG_ASSETS_MANAGER
 
 Assets::Instance Assets::instance;
 

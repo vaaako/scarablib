@@ -37,15 +37,15 @@ class VertexArray {
 		}
 
 		// Disables the VAO buffer in the OpenGL context
-		void unbind_vao() const noexcept {
+		inline void unbind_vao() const noexcept {
 			glBindVertexArray(0);
 		}
 		// Disables the VBO buffer in the OpenGL context
-		void unbind_vbo() const noexcept {
+		inline void unbind_vbo() const noexcept {
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}
 		// Disables the EBO buffer in the OpenGL context
-		void unbind_ebo() const noexcept {
+		inline void unbind_ebo() const noexcept {
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		}
 
@@ -53,26 +53,43 @@ class VertexArray {
 		void unbind_all() const noexcept;
 
 		// Get id from the VAO buffer
-		uint32 get_vaoid() const noexcept {
+		inline uint32 get_vaoid() const noexcept {
 			return this->vao_id;
 		}
 		// Get id from the VBO buffer
-		uint32 get_vboid() const noexcept {
+		inline uint32 get_vboid() const noexcept {
 			return this->vbo_id;
 		}
 		// Get id from the EBO buffer
-		uint32 get_eboid() const noexcept {
+		inline uint32 get_eboid() const noexcept {
 			return this->ebo_id;
 		}
 
-		// Length of indices and length of vertices, if not using indices
-		uint32 get_length() const noexcept {
+		// Length of indices or length of vertices, if not using indices
+		inline uint32 get_length() const noexcept {
 			return this->length;
 		}
 
 		// The type of indices as GLenum
-		GLenum get_indices_type() const noexcept {
+		inline GLenum get_indices_type() const noexcept {
 			return this->indices_type;
+		}
+
+		// The size of the Vertices type.
+		// sizeof(T)
+		inline uint32 get_vertex_size() const noexcept {
+			return this->vsize;
+		}
+
+		// The size of the Indices type.
+		// sizeof(U)
+		inline uint32 get_index_stride() const noexcept {
+			return this->indexstride;
+		}
+
+		// Calculates the Indices offset using a base_index
+		inline void* index_offset(const uint32 base_index) const {
+			return (void*)(uintptr_t)(base_index * this->indexstride);
 		}
 
 		// Manually creates a Vertex Array
@@ -118,26 +135,28 @@ class VertexArray {
 		void update_vertices(const void* data, size_t size) noexcept;
 
 	private:
+		size_t hash = 0; // Only VertexManager changes this value
+		// Used for adding attributes to VBO
+		size_t stride = 0;
+
 		uint32 vao_id;
 		uint32 vbo_id;
 		uint32 ebo_id = 0;
 
-		size_t hash = 0; // Only VertexManager changes this value
 		// Either vertices size (if vertices only) or indices size
 		int length;
 		// Not used for 2D shapes
 		GLenum indices_type = GL_UNSIGNED_INT;
-		// Vertex Size
-		size_t vsize;
-
-		// Used for adding attributes to VBO
-		size_t stride = 0;
 		uint32 index  = 0;
+		// Vertex type size
+		uint32 vsize;
+		// Indice type size
+		uint32 indexstride = 0;
 };
 
 template <typename T, typename U>
 VertexArray::VertexArray(const std::vector<T>& vertices, const std::vector<U>& indices, const bool dynamic_vertex) noexcept
-	: length(vertices.size()), vsize(sizeof(T)) {
+	: length(vertices.size()), vsize(sizeof(T)), indexstride(sizeof(U)) {
 
 	static_assert(std::is_base_of_v<Vertex, T> || std::is_base_of_v<Vertex2D, T>, "T must derive from Vertex or Vertex2D");
 	static_assert(std::is_unsigned_v<U>, "U must be an unsigned integer type");

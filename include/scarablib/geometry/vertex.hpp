@@ -1,5 +1,6 @@
 #pragma once
 
+#include "gtc/epsilon.hpp"
 #include "scarablib/typedef.hpp"
 #include "scarablib/utils/hash.hpp"
 #include <functional>
@@ -19,8 +20,8 @@ struct VertexBase {
 	vec2<float> texuv = vec2<float>(0.0f);
 
 	bool operator==(const VertexBase& other) const noexcept {
-		return this->position == other.position &&
-			   this->texuv    == other.texuv;
+		return glm::all(glm::epsilonEqual(position, other.position, 0.0001f)) &&
+			glm::all(glm::epsilonEqual(texuv, other.texuv, 0.0001f));
 	}
 };
 
