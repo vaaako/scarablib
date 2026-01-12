@@ -72,7 +72,7 @@ class TextureBase {
 			return this->id == other.id;
 		}
 	protected:
-		uint32 id;
+		GLuint id;
 		uint16 width;
 		uint16 height;
 	private:

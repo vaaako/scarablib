@@ -75,13 +75,24 @@ Stuff that are in progress and i need to finish
 	+ both?
 - [x] [Modern OpenGL](https://juandiegomontoya.github.io/modern_opengl.html) and [Modern functions](https://github.com/fendevel/Guide-to-Modern-OpenGL-Functions)
 - [x] Make a repository for the networking library
-
-- [ ] In Window::rotate i didnt have to clear the rotation before, why do i need it now? ([last commit]( https://github.com/vaaako/scarablib/commit/d2a5717958a1f73fde39dafbd6640e2c19dab076))
-- [ ] make transparency work without `if(tex.a == 0.0)`?
-- [ ] Discord RPC support?
-- [ ] Prioritize Material when organizing models to batch draw
 - [x] Be able to build VertexArray step by step
+- [ ] In Window::rotate i didnt have to clear the rotation before, why do i need it now? ([last commit]( https://github.com/vaaako/scarablib/commit/d2a5717958a1f73fde39dafbd6640e2c19dab076))
 
+- [ ] Discord RPC support?
+
+- [ ] Rename `MaterialComponent` to just `Material` for user friendly
+- [ ] Default texture on Asset Manager
+	+ Only used when a texture is not found or an error occurs
+	+ Pre-build like the White texture
+- [ ] Instanced rendering
+	+ Group identical meshes together
+	+ Store per-instance data (e.g., model matrices, billboard position) in a SSBO
+	+ Call `glDrawElementsInstanced` or `glDrawArraysInstanced` once per group
+	+ [ ] SSBO
+
+- [ ] Aim to:
+	+ Zero GL calls per draw
+	+ Predictable behavior
 
 
 # TODO Shaders
@@ -102,13 +113,13 @@ Stuff that are in progress and i need to finish
 - [x] Separate Shader Objects (`GL_ARB_separate_shader_objects`)
 	+ `ShaderProgram->bind_vertex()` and `ShaderProgram->bind_fragment()`?
 	+ Not necessary right now
+- [ ] make transparency work without `if(tex.a == 0.0)`?
 - [ ] Shader Pipeline
 	+ Do not replace program, make it optional
-- [ ] UBO?
-	+ idk if its really necessary, currently the common uniforms are centered in `Iscene.cpp`
-	+ maybe this could be necessary when implementing custom shaders
-- [ ] Shader back to external file?
-	+ convert to headers
+- [ ] UBO
+	+ Handle with `ResourcesManager`
+	+ Modify shaders to handle UBO
+	+ Matrix Multiplication to GPU
 
 
 # TODO Quick Fixes
@@ -240,9 +251,10 @@ Stuff that are in progress and i need to finish
 - [x] Better BoundingBox, not happy with the current state, dont know what to do
 - [x] Show bounding box
 - [x] Billboard: Texture array
-- [ ] Different texture for each face (the other method that is not cubemap)
 - [x] Model loading to Model class
-- [ ] Multiple textures handling
+	+ Put on a namespace under `utils`
+- [x] Multiple textures handling
+- [ ] Different texture for each face (the other method that is not cubemap)
 
 - [x] Be able to stand on loaded terrain
 	+ Also implement collision with walls
@@ -253,8 +265,7 @@ Stuff that are in progress and i need to finish
 	+ Ceilings are not being detected
 - [ ] Convert a small image to a scenario
 	+ like raylib does
-- [ ] Tiled support
-- [ ] Fix texuv
+- [ ] Fix texuv for 2D shapes
 
 - [ ] Class to load Map from trenchbroom
 	+ takes `.obj` and `.map`
@@ -290,4 +301,3 @@ for (auto& ent : map.entities) {
 }
 ```
 
-- [ ] Class to player interaction?

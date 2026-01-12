@@ -1,4 +1,5 @@
 #include "scarablib/geometry/model.hpp"
+#include "scarablib/opengl/shaders.hpp"
 #include "scarablib/typedef.hpp"
 #include "scarablib/utils/model.hpp"
 
@@ -66,8 +67,13 @@ void Model::draw_logic(const Camera& camera) noexcept {
 	this->update_model_matrix();
 
 	// NOTE: is_dirty for color wouldn't work because would set this color to the next meshes
-	this->material->shader->set_matrix4f("mvp",
-		(camera.get_proj_matrix() * camera.get_view_matrix()) * this->model);
+	// this->material->shader->set_matrix4f("mvp",
+	// 	(camera.get_proj_matrix() * camera.get_view_matrix()) * this->model);
+
+	Shaders::MeshUniformBuffer mesh = {
+		.model = this->model
+	};
+	ResourcesManager::get_instance().get_meshubo().update(&mesh, sizeof(mesh));
 
 	if(this->submeshes.empty()) {
 		glDrawElements(GL_TRIANGLES, this->vertexarray->get_length(), this->vertexarray->get_indices_type(), (void*)0);

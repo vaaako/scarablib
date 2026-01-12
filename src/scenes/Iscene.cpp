@@ -75,8 +75,13 @@ void IScene::draw_all() const noexcept {
 	TextureArray* cur_texarray                   = nullptr;
 	Color cur_color                              = Colors::WHITE;
 
+	// TODO: Make a new material and store all inside of it?
+
 	// Bind defaults
 	cur_texture->bind(); // Bind default texture
+
+
+	
 
 	for(const auto& [vao, models] : this->vao_groups) {
 		// Bind VAO if its a different from the currently bound
@@ -87,6 +92,12 @@ void IScene::draw_all() const noexcept {
 			glBindVertexArray(vao);
 			cur_vao = vao;
 		}
+
+		Shaders::CameraUniformBuffer cam = {
+			.view = camera.get_view_matrix(),
+			.proj = camera.get_proj_matrix()
+		};
+		ResourcesManager::get_instance().get_cameraubo().update(&cam, sizeof(cam));
 
 		// Draw all models with this VAO
 		for(const std::shared_ptr<Mesh>& model : models) {

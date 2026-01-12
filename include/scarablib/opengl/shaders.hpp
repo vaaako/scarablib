@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ext/matrix_float4x4.hpp"
 
 // Shaders in this namespace:
 // - DEFAULT_VERTEX: Default vertex shader for meshes
@@ -10,20 +11,45 @@
 //
 // - BILLBOARD_VERTEX: Vertex shader for billboards
 //
-// - FONT_FRAGMENT: (unfinished) Fragment shader for fonts
+// - FONT_FRAGMENT: Fragment shader for fonts
+//
+// Uniforms in this namespace:
+// - Camera: view and proj matrices
+// - Mesh: Model matrix and color vector
 namespace Shaders {
+	struct alignas(16) CameraUniformBuffer {
+		glm::mat4 view;
+		glm::mat4 proj;
+	};
+
+	struct alignas(16) MeshUniformBuffer {
+		glm::mat4 model;
+	};
+	
+	struct alignas(16) MaterialUniformBufferr {
+		glm::vec4 color;
+		glm::vec4 params; // x = mixamount, y = texlayer
+	};
+
 	const char* const DEFAULT_VERTEX = R"glsl(
-		#version 330 core
+		#version 420 core
 
 		layout (location = 0) in vec3 aPos;
 		layout (location = 1) in vec2 aTex;
 
 		out vec2 texuv;
 
-		uniform mat4 mvp;
+		layout(std140, binding = 0) uniform Camera {
+			mat4 view;
+			mat4 proj;
+		};
+
+		layout(std140, binding = 1) uniform Model {
+			mat4 model;
+		};
 
 		void main() {
-			gl_Position = mvp * vec4(aPos, 1.0);
+			gl_Position = proj * view * model * vec4(aPos, 1.0);
 			texuv       = aTex;
 		}
 	)glsl";
@@ -145,15 +171,10 @@ namespace Shaders {
 		uniform vec4 shapeColor;
 		uniform sampler2D texSampler;
 
-		// Multiplying by 0.004 gives an approximated result as dividing by 255
-		vec4 normalized_color(vec4 color) {
-			return vec4(color.rgba * 0.004);
-		}
-
 		void main() {
 			// Sample red channel (glyph alpha)
 			vec4 tex = vec4(texture(texSampler, texuv).r);
-			gl_FragColor = vec4(tex * normalized_color(shapeColor));
+			gl_FragColor = vec4(tex * shapeColor);
 		}
 	)glsl";
 };

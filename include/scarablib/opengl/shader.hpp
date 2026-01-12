@@ -14,7 +14,7 @@ struct Shader {
 		Fragment = GL_FRAGMENT_SHADER
 	};
 
-	uint32 id   = 0;
+	GLuint id   = 0;
 	Shader::Type type = Shader::Type::None;
 
 	Shader(const char* source, const Shader::Type type);

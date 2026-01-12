@@ -7,8 +7,7 @@ Shader::Shader(const char* source, const Shader::Type type) {
 	}
 
 	// Compile vertex shader
-	this->id = glCreateShader((int)type);
-	if(this->id == 0) {
+	if((this->id = glCreateShader((int)type)) == 0) {
 		throw ScarabError("Failed to compile shader.");
 	}
 	glShaderSource(this->id, 1, &source, nullptr);
@@ -22,7 +21,7 @@ Shader::Shader(const char* source, const Shader::Type type) {
 		glGetShaderInfoLog(this->id, 512, NULL, info_log);
 		glDeleteShader(this->id); // Clean up the failed shader
 		throw ScarabError("Error Compiling  %s: \n%s",
-			((int)type == GL_VERTEX_SHADER) ? "VERTEX" : "FRAGMENT",
+			(type == Shader::Type::Vertex) ? "VERTEX" : "FRAGMENT",
 			info_log
 		);
 	}

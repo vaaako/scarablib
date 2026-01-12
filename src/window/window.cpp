@@ -90,6 +90,7 @@ Window::Window(const Window::Config& config)
 		LOG_INFO("OpenGL Loaded!");
 		LOG_INFO("SDL version: %d.%d.%d", compiled.major, compiled.minor, compiled.patch);
 		LOG_INFO("GL Version: %s", glGetString(GL_VERSION));
+		LOG_INFO("GLSL Version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
 		LOG_INFO("Vendor: %s", glGetString(GL_VENDOR));
 		LOG_INFO("Renderer: %s", glGetString(GL_RENDERER));
 		LOG_INFO("Viewport: %dx%d", config.width, config.height);

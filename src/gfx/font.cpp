@@ -161,6 +161,6 @@ void Font::draw_text(const std::string& text, const vec2<float>& pos, const floa
 	shader->set_matrix4f("mvp", (this->camera.get_proj_matrix() * this->camera.get_view_matrix()) * model);
 
 	vertexarray->bind_vao();
-	vertexarray->update_vertices(this->buffer_data, num_vertices * sizeof(Vertex2D));
+	vertexarray->update_data(this->buffer_data, num_vertices * sizeof(Vertex2D));
 	glDrawArrays(GL_TRIANGLES, 0, num_vertices);
 }

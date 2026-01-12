@@ -18,10 +18,17 @@ class VertexArray {
 
 		// Pass empty indices if you don't want to make EBO
 		template <typename T, typename U>
-		VertexArray(const std::vector<T>& vertices, const std::vector<U>& indices = {}, const bool dynamic_vertex = false) noexcept;
+		VertexArray(const std::vector<T>& vertices, const std::vector<U>& indices = {}, const bool dynamic = false) noexcept;
 		// Manually creates a Vertex Array
-		VertexArray(const void* data, const size_t capacity, const size_t vertex_size, const bool dynamic_vertex = false) noexcept;
+		VertexArray(const void* data, const size_t capacity, const size_t vertex_size, const bool dynamic = false) noexcept;
 		~VertexArray() noexcept;
+
+		// Delete copy
+		VertexArray(const VertexArray&) = delete;
+		VertexArray& operator=(const VertexArray&) = delete;
+		// Delete move
+		VertexArray(const VertexArray&&) = delete;
+		VertexArray& operator=(const VertexArray&&) = delete;
 
 		// Activates the VAO buffer in the OpenGL context
 		inline void bind_vao() const noexcept {
@@ -96,15 +103,15 @@ class VertexArray {
 		// - `data`: Vertex Array data.
 		// - `capacity`: Vertex Array total capacity.
 		// - `hash`: The hash identification.
-		// - `dynamic_vertex`: (Default: false) Set the Vertex Array to be changeable after creation.
+		// - `dynamic`: (Default: false) Set the Vertex Array to be changeable after creation.
 		// Usage example: `VertexArray::alloc_data(nullptr, 6 * this->buffer_capacity, true)`
-		void alloc_data(const void* data, const size_t capacity, const bool dynamic_vertex = false) const noexcept;
+		void alloc_data(const void* data, const size_t capacity, const bool dynamic = false) const noexcept;
 
 		// Allocates and initializes the VBO's data store.
 		// - `data`: The vector to initialize the VBO. Usually the vertices
 		template <typename T>
-		inline void alloc_data(const std::vector<T>& data, const bool dynamic_vertex = false) const noexcept {
-			this->alloc_data(data.data(), data.size(), dynamic_vertex);
+		inline void alloc_data(const std::vector<T>& data, const bool dynamic = false) const noexcept {
+			this->alloc_data(data.data(), data.size(), dynamic);
 		}
 
 		// Allocate and initialize the data store for the VBO using a vector of Vertex
@@ -131,17 +138,17 @@ class VertexArray {
 				const uint32 stride, const uint32 offset, const bool normalized = false) const noexcept;
 
 		// Update the data inside the VertexArray using Sub Data.
-		// VertexArray must have be created with `dynamic_vertex` set to true
-		void update_vertices(const void* data, size_t size) noexcept;
+		// VertexArray must have be created with `dynamic` set to true
+		void update_data(const void* data, size_t size) noexcept;
 
 	private:
 		size_t hash = 0; // Only VertexManager changes this value
 		// Used for adding attributes to VBO
 		size_t stride = 0;
 
-		uint32 vao_id;
-		uint32 vbo_id;
-		uint32 ebo_id = 0;
+		GLuint vao_id;
+		GLuint vbo_id;
+		GLuint ebo_id = 0;
 
 		// Either vertices size (if vertices only) or indices size
 		int length;
@@ -155,7 +162,7 @@ class VertexArray {
 };
 
 template <typename T, typename U>
-VertexArray::VertexArray(const std::vector<T>& vertices, const std::vector<U>& indices, const bool dynamic_vertex) noexcept
+VertexArray::VertexArray(const std::vector<T>& vertices, const std::vector<U>& indices, const bool dynamic) noexcept
 	: length(vertices.size()), vsize(sizeof(T)), indexstride(sizeof(U)) {
 
 	static_assert(std::is_base_of_v<Vertex, T> || std::is_base_of_v<Vertex2D, T>, "T must derive from Vertex or Vertex2D");
@@ -165,7 +172,7 @@ VertexArray::VertexArray(const std::vector<T>& vertices, const std::vector<U>& i
 	glCreateVertexArrays(1, &this->vao_id);
 	glCreateBuffers(1, &this->vbo_id);
 	// Alloc data on VBO
-	this->alloc_data(vertices, dynamic_vertex);
+	this->alloc_data(vertices, dynamic);
 
 	if(!indices.empty()) {
 		glCreateBuffers(1, &this->ebo_id);

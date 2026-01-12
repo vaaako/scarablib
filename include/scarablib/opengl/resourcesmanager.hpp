@@ -2,6 +2,7 @@
 
 #include "scarablib/opengl/shader.hpp"
 #include "scarablib/opengl/shader_program.hpp"
+#include "scarablib/opengl/uniformbuffer.hpp"
 #include "scarablib/opengl/vertexarray.hpp"
 #include "scarablib/proper/error.hpp"
 #include "scarablib/proper/log.hpp"
@@ -9,8 +10,9 @@
 #include <memory>
 #include <unordered_map>
 
-// Manages Vertex Array Buffer, Shader Program and Shaders.
-// Granting that none of these are copied
+#include "scarablib/opengl/shaders.hpp"
+
+// Manages OpenGL elements, such as Vertex Array, Shader and Shader Program
 class ResourcesManager {
 	public:
 		// Shader information to pass to program.
@@ -30,26 +32,43 @@ class ResourcesManager {
 			return instance;
 		}
 
+		// TODO: Put this somewhere else
+		inline UniformBuffer& get_cameraubo() const noexcept {
+			static UniformBuffer ubo = UniformBuffer(sizeof(Shaders::CameraUniformBuffer), 0, true);
+			return ubo;
+		}
+
+		inline UniformBuffer& get_meshubo() const noexcept {
+			static UniformBuffer ubo = UniformBuffer(sizeof(Shaders::MeshUniformBuffer), 1, true);
+			return ubo;
+		}
+
+		inline UniformBuffer& get_materialubo() const noexcept {
+			static UniformBuffer ubo = UniformBuffer(sizeof(Shaders::MaterialUniformBufferr), 2, true);
+			return ubo;
+		}
+
+
 		// -- VERTEX ARRAY
 
 		// Creates a new VertexArray or returns an existing one, based on the vertices and indices.
 		// - `vertices`: The vertex data.
 		// - `indices`: (Optional) The index data.
-		// - `dynamic_vertex`: (Default: false) Set the Vertex Array to be changeable after creation.
+		// - `dynamic`: (Default: false) Set the Vertex Array to be changeable after creation.
 		// - `chash`: (Default: 0) If set to any value, will use it as a hash instead of creating one.
 		// Returns: The entry for this VAO
 		template <typename T, typename U>
 		std::shared_ptr<VertexArray> acquire_vertexarray(const std::vector<T>& vertices,
-				const std::vector<U>& indices, const bool dynamic_vertex = false, const size_t chash = 0);
+				const std::vector<U>& indices, const bool dynamic = false, const size_t chash = 0);
 
 		// Manually creates a Vertex Array.
 		// - `data`: Vertex Array data.
 		// - `capacity`: Vertex Array total capacity.
 		// - `vertex_size`: Vertex size being used (e.g., `sizeof(Vertex2D)`).
 		// - `hash`: The hash identification.
-		// - `dynamic_vertex`: (Default: false) Set the Vertex Array to be changeable after creation
+		// - `dynamic`: (Default: false) Set the Vertex Array to be changeable after creation
 		std::shared_ptr<VertexArray> acquire_vertexarray(const void* data, const size_t capacity,
-				const size_t vertex_size, const size_t hash, const bool dynamic_vertex = false) noexcept;
+				const size_t vertex_size, const size_t hash, const bool dynamic = false) noexcept;
 
 		// Returns an entry of a VAO using its hash.
 		// Returns nullptr if not found
@@ -92,7 +111,7 @@ class ResourcesManager {
 
 template <typename T, typename U>
 std::shared_ptr<VertexArray> ResourcesManager::acquire_vertexarray(
-		const std::vector<T>& vertices, const std::vector<U>& indices, const bool dynamic_vertex, const size_t chash) {
+		const std::vector<T>& vertices, const std::vector<U>& indices, const bool dynamic, const size_t chash) {
 	static_assert(std::is_base_of_v<Vertex, T> || std::is_base_of_v<Vertex2D, T>, "T must derive from Vertex or Vertex2D");
 	static_assert(std::is_unsigned_v<U>, "U must be an unsigned integer type");
 
@@ -115,7 +134,7 @@ std::shared_ptr<VertexArray> ResourcesManager::acquire_vertexarray(
 #endif
 
 	if(indices.empty()) {
-		vertexarray = std::make_shared<VertexArray>(vertices, std::vector<uint8>{}, dynamic_vertex);
+		vertexarray = std::make_shared<VertexArray>(vertices, std::vector<uint8>{}, dynamic);
 
 	// -- CREATE VAO WITH THE SMALLEST POSSIBLE TYPE FOR INDICES
 	} else {
@@ -126,12 +145,12 @@ std::shared_ptr<VertexArray> ResourcesManager::acquire_vertexarray(
 
 		// UINT8_MAX + 1 = 256. If v_count is 256, max index is 255 (fits in uint8)
 		if(v_count <= (UINT8_MAX + 1)) {
-			vertexarray = std::make_shared<VertexArray>(vertices, ScarabOpenGL::convert_to<uint8>(indices), dynamic_vertex);
+			vertexarray = std::make_shared<VertexArray>(vertices, ScarabOpenGL::convert_to<uint8>(indices), dynamic);
 		#if defined(SCARAB_DEBUG_VERTEXARRAY_MANAGER)
 			LOG_DEBUG("Converted indices to uint8");
 		#endif
 		} else if(v_count <= (UINT16_MAX + 1)) {
-			vertexarray = std::make_shared<VertexArray>(vertices, ScarabOpenGL::convert_to<uint16>(indices), dynamic_vertex);
+			vertexarray = std::make_shared<VertexArray>(vertices, ScarabOpenGL::convert_to<uint16>(indices), dynamic);
 		#if defined(SCARAB_DEBUG_VERTEXARRAY_MANAGER)
 			LOG_DEBUG("Converted indices to uint16");
 		#endif
@@ -140,7 +159,7 @@ std::shared_ptr<VertexArray> ResourcesManager::acquire_vertexarray(
 			LOG_DEBUG("Converted indices to uint32");
 		#endif
 			// No conversion needed. Move the existing vector to avoid a massive copy
-			vertexarray = std::make_shared<VertexArray>(vertices, std::move(indices), dynamic_vertex);
+			vertexarray = std::make_shared<VertexArray>(vertices, std::move(indices), dynamic);
 		}
 	}
 

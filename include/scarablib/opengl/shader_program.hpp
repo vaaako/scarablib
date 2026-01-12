@@ -160,9 +160,10 @@ class ShaderProgram {
 		}
 
 	private:
-		uint32 programid;
-		size_t hash = 0; // Only ResourcesManager changes this value
 		std::vector<std::shared_ptr<Shader>> attached_shaders;
 		// I need to store as a Shader struct and not only the IDs so the weak_ptr doesnt get expired
 		// I also need as struct because ResourcesManager uses this when making a custom shader
+		
+		size_t hash = 0; // Only ResourcesManager changes this value
+		GLuint programid;
 };

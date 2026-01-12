@@ -14,33 +14,30 @@ ShaderProgram::ShaderProgram(const std::vector<std::shared_ptr<Shader>>& shaders
 		}
 	}
 
-	uint32 programid = glCreateProgram();
-	if(programid == 0) {
+	if((this->programid = glCreateProgram()) == 0) {
 		throw ScarabError("Failed to create shader program");
 	}
 
 	for(const auto& shader : shaders) {
-		glAttachShader(programid, shader->id);
+		glAttachShader(this->programid, shader->id);
 	}
-	glLinkProgram(programid);
+	glLinkProgram(this->programid);
 
 	// Detach shaders (not needed anymore)
 	for(const auto& shader : shaders) {
-		glDetachShader(programid, shader->id);
+		glDetachShader(this->programid, shader->id);
 		// glDeleteShader(shaderid);
 	}
 
 	// Check for linking error
 	GLint success;
-	glGetProgramiv(programid, GL_LINK_STATUS, &success);
+	glGetProgramiv(this->programid, GL_LINK_STATUS, &success);
 	if(!success) {
 		GLchar info_log[512];
-		glGetProgramInfoLog(programid, 512, NULL, info_log);
-		glDeleteShader(programid); // Clean up the failed program
+		glGetProgramInfoLog(this->programid, 512, NULL, info_log);
+		glDeleteShader(this->programid); // Clean up the failed program
 		throw ScarabError("Error Linking shaders: \n%s", info_log);
 	}
-
-	this->programid = programid;
 	this->attached_shaders = shaders; // transfer ownership of weak_ptr of "shaders"
 }
 
