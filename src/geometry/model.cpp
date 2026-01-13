@@ -70,10 +70,10 @@ void Model::draw_logic(const Camera& camera) noexcept {
 	// this->material->shader->set_matrix4f("mvp",
 	// 	(camera.get_proj_matrix() * camera.get_view_matrix()) * this->model);
 
-	Shaders::MeshUniformBuffer mesh = {
+	Shaders::TransformUniformBuffer mesh = {
 		.model = this->model
 	};
-	ResourcesManager::get_instance().get_meshubo().update(&mesh, sizeof(mesh));
+	ResourcesManager::u_transform()->update(&mesh);
 
 	if(this->submeshes.empty()) {
 		glDrawElements(GL_TRIANGLES, this->vertexarray->get_length(), this->vertexarray->get_indices_type(), (void*)0);

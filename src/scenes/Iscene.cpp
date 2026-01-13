@@ -97,7 +97,8 @@ void IScene::draw_all() const noexcept {
 			.view = camera.get_view_matrix(),
 			.proj = camera.get_proj_matrix()
 		};
-		ResourcesManager::get_instance().get_cameraubo().update(&cam, sizeof(cam));
+		ResourcesManager::u_camera()->update(&cam);
+
 
 		// Draw all models with this VAO
 		for(const std::shared_ptr<Mesh>& model : models) {

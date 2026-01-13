@@ -90,6 +90,7 @@ void Assets::cleanup() noexcept {
 	// Unable to relase VAOs correctly
 	if(SDL_GL_GetCurrentContext() == NULL) {
 		LOG_WARNING_FN("Called without a valid OpenGL context. Leaking GPU resources");
+		return;
 	}
 	// Has no effect since its called implicitly, but i like to have them here
 	Assets::instance.tex_cache.clear();

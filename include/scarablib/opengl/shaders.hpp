@@ -22,15 +22,16 @@ namespace Shaders {
 		glm::mat4 proj;
 	};
 
-	struct alignas(16) MeshUniformBuffer {
+	struct alignas(16) TransformUniformBuffer {
 		glm::mat4 model;
 	};
 	
-	struct alignas(16) MaterialUniformBufferr {
+	struct alignas(16) MaterialUniformBuffer {
 		glm::vec4 color;
 		glm::vec4 params; // x = mixamount, y = texlayer
 	};
 
+#if !defined(BUILD_OPGL30)
 	const char* const DEFAULT_VERTEX = R"glsl(
 		#version 420 core
 
@@ -44,7 +45,7 @@ namespace Shaders {
 			mat4 proj;
 		};
 
-		layout(std140, binding = 1) uniform Model {
+		layout(std140, binding = 1) uniform Transform {
 			mat4 model;
 		};
 
@@ -53,6 +54,30 @@ namespace Shaders {
 			texuv       = aTex;
 		}
 	)glsl";
+#else
+	const char* const DEFAULT_VERTEX = R"glsl(
+		#version 330 core
+
+		layout (location = 0) in vec3 aPos;
+		layout (location = 1) in vec2 aTex;
+
+		out vec2 texuv;
+
+		layout(std140) uniform Camera {
+			mat4 view;
+			mat4 proj;
+		};
+
+		layout(std140) uniform Transform {
+			mat4 model;
+		};
+
+		void main() {
+			gl_Position = proj * view * model * vec4(aPos, 1.0);
+			texuv       = aTex;
+		}
+	)glsl";
+#endif
 
 	const char* const DEFAULT_VERTEX2D = R"glsl(
 		#version 330 core

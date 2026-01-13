@@ -39,6 +39,19 @@ ShaderProgram::ShaderProgram(const std::vector<std::shared_ptr<Shader>>& shaders
 		throw ScarabError("Error Linking shaders: \n%s", info_log);
 	}
 	this->attached_shaders = shaders; // transfer ownership of weak_ptr of "shaders"
+
+#if defined(BUILD_OPGL30)
+	auto u_bind_block = [&](const char* name, const GLuint binding) {
+		const GLuint idx = glGetUniformBlockIndex(this->programid, name);
+		if(idx != GL_INVALID_INDEX) {
+			glUniformBlockBinding(this->programid, idx, binding);
+		}
+	};
+
+	u_bind_block("Camera", 0);
+	u_bind_block("Transform", 1);
+	u_bind_block("Material", 2);
+#endif
 }
 
 ShaderProgram::~ShaderProgram() noexcept {

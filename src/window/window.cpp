@@ -42,9 +42,9 @@ Window::Window(const Window::Config& config)
 	}
 
 	// Initialize OpenGL context
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
@@ -102,7 +102,14 @@ Window::~Window() noexcept {
 		LOG_INFO("Window %d destroyed", SDL_GetWindowID(this->window));
 	}
 
-	// Clean up VertexArrays, Shaders and ShaderPrograms
+	// Unable to relase correctly
+	if(SDL_GL_GetCurrentContext() == NULL) {
+		LOG_WARNING_FN("Called without a valid OpenGL context. Leaking GPU resources");
+		return;
+	}
+
+	// Clean up OpenGL Buffers
+	// Vertex Arrays, Shaders, Shader Programs and Uniform Buffers
 	ResourcesManager::get_instance().cleanup();
 	this->cleanup();
 }

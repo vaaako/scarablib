@@ -24,7 +24,7 @@ class Window {
 			// Required values
 			uint32 width;
 			uint32 height;
-			std::string title; // char* in c++ goes grrr
+			std::string title;
 
 			// Optional
 			bool vsync = true;
@@ -200,12 +200,6 @@ class Window {
 		// Frame capping will not work if VSync is enabled
 		void frame_capping(const float fps) const noexcept;
 
-		// Returns the number of milliseconds that have passed since the SDL library was initialized.
-		// Note: The value wraps after approximately 49 days of continuous program execution
-		inline uint32 timenow() const noexcept {
-			return SDL_GetTicks();
-		}
-
 
 		// INPUT HANDLERS //
 
@@ -289,6 +283,12 @@ class Window {
 
 		// Get the current size of the window
 		static vec2<int> get_size() noexcept;
+
+		// Returns the number of milliseconds that have passed since the SDL library was initialized.
+		// Note: The value wraps after approximately 49 days of continuous program execution
+		inline static uint32 timenow() noexcept {
+			return SDL_GetTicks();
+		}
 
 	private:
 		// Window information

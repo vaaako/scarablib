@@ -94,6 +94,52 @@ Stuff that are in progress and i need to finish
 	+ Zero GL calls per draw
 	+ Predictable behavior
 
+- [ ] Rendererer > Main Object > Make Scene and `RenderPipeline` inside of it
+	+ Default Cameras if user does not want to set it
+	+ User can add different Scenes but it is optional
+		* `Renderer::set_scene(Scene*)`
+		* I have to review this later
+	+ What `Renderer::draw()` does:
+		* `begin_frame`: Update frame count, clear screen, etc
+		* `buildqueues`: One for-loop for 3D and 2D. Organize Draw commands
+		* `render3d`: set camera, enable depthtest, enable cullface, for-loop to draw all meshes
+			* `bind_material`: Check current material and changes if needed (Shader, Texture, Texture Array and Color)
+			* `bind_vertexarray`
+			* `update_model_matrix()`: May be moved to `Mesh::peprare_draw`
+			* `drawmesh(Mesh& mesh)`
+		* `render2d`: set camera, disable depthtest, disablecullface
+			* basically the same as `render3d`
+	+ Review:
+		* a single map for all meshes
+		* a single loop for queue
+Example to refactor `draw_logic` and rename it to `prepare_draw`
+```cpp
+void Renderer::drawMesh(const Mesh& mesh, const Camera& camera) {
+	bindMaterial(mesh.material);
+	bindVertexArray(mesh.vao);
+
+	DrawContext ctx { camera, *mesh.material->shader };
+	mesh.prepare_draw(ctx);
+
+	// Renderer decides HOW to draw
+	if (mesh.usesIndices()) {
+		glDrawElements(mesh.primitive, mesh.indexCount, mesh.indexType, nullptr);
+	} else {
+		glDrawArrays(mesh.primitive, 0, mesh.vertexCount);
+	}
+}
+```
+	
+- [ ] RendererPipeline
+	+ Unify Scene2D and Scene3D
+		* Scene
+		+ Scene is passed to Renderer
+	+ A map for Sprites and a map for Models
+	+ When adding meshes to it, identify if is a Model or Sprite
+	+ Keep Uniform Buffers inside `ResourcesManager` (i think it fits better)
+		+ Or not
+	+ One for-loop for 3D Shapes and 2D Shapes
+		* On 2D shapes loop change camera and disable cull face
 
 # TODO Shaders
 - [x] Revise ShaderManager
@@ -113,13 +159,13 @@ Stuff that are in progress and i need to finish
 - [x] Separate Shader Objects (`GL_ARB_separate_shader_objects`)
 	+ `ShaderProgram->bind_vertex()` and `ShaderProgram->bind_fragment()`?
 	+ Not necessary right now
-- [ ] make transparency work without `if(tex.a == 0.0)`?
-- [ ] Shader Pipeline
-	+ Do not replace program, make it optional
-- [ ] UBO
+- [x] UBO
 	+ Handle with `ResourcesManager`
 	+ Modify shaders to handle UBO
 	+ Matrix Multiplication to GPU
+- [ ] make transparency work without `if(tex.a == 0.0)`?
+- [ ] Shader Pipeline
+	+ Do not replace program, make it optional
 
 
 # TODO Quick Fixes

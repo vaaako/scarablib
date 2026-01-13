@@ -32,22 +32,23 @@ class ResourcesManager {
 			return instance;
 		}
 
-		// TODO: Put this somewhere else
-		inline UniformBuffer& get_cameraubo() const noexcept {
-			static UniformBuffer ubo = UniformBuffer(sizeof(Shaders::CameraUniformBuffer), 0, true);
+		// Returns Uniform Buffer for Camera
+		static inline UniformBuffer* u_camera() noexcept {
+			static UniformBuffer* ubo = new UniformBuffer(sizeof(Shaders::CameraUniformBuffer), 0);
 			return ubo;
 		}
 
-		inline UniformBuffer& get_meshubo() const noexcept {
-			static UniformBuffer ubo = UniformBuffer(sizeof(Shaders::MeshUniformBuffer), 1, true);
+		// Returns Uniform Buffer for Mesh
+		static inline UniformBuffer* u_transform() noexcept {
+			static UniformBuffer* ubo = new UniformBuffer(sizeof(Shaders::TransformUniformBuffer), 1);
 			return ubo;
 		}
 
-		inline UniformBuffer& get_materialubo() const noexcept {
-			static UniformBuffer ubo = UniformBuffer(sizeof(Shaders::MaterialUniformBufferr), 2, true);
+		// Returns Uniform Buffer for Material
+		static inline UniformBuffer* u_material() noexcept {
+			static UniformBuffer* ubo = new UniformBuffer(sizeof(Shaders::MaterialUniformBuffer), 2);
 			return ubo;
 		}
-
 
 		// -- VERTEX ARRAY
 
