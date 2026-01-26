@@ -6,7 +6,6 @@ struct DirtyProxy {
 		T value;
 		bool& isdirty;
 	public:
-		// Reference to value and isdirty (change one)
 		DirtyProxy(const T& value, bool& isdirty) noexcept;
 
 		DirtyProxy(const DirtyProxy&) = delete;
@@ -14,6 +13,15 @@ struct DirtyProxy {
 
 		constexpr bool is_dirty() const noexcept {
 			return this->isdirty;
+		}
+
+		[[nodiscard]] constexpr const T& get() const noexcept {
+			return this->value;
+		}
+
+		[[nodiscard]] constexpr T& get() noexcept {
+			this->isdirty = true; // non-const access may mutate
+			return this->value;
 		}
 
 		constexpr bool operator==(const T& rhs) const noexcept {

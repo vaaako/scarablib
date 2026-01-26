@@ -3,6 +3,13 @@
 #include "scarablib/typedef.hpp"
 #include "scarablib/utils/model.hpp"
 
+Model::Model() noexcept {
+	this->material->shader = ResourcesManager::get_instance().load_shader_program({
+		{ .source = Shaders::DEFAULT_VERTEX,   .type = Shader::Type::Vertex },
+		{ .source = Shaders::DEFAULT_FRAGMENT, .type = Shader::Type::Fragment },
+	});
+}
+
 Model::Model(const char* path) : Mesh() {
 	// auto pair = ScarabModel::load_obj_old(path);
 	// this->vertexarray = ResourcesManager::get_instance()
@@ -10,6 +17,11 @@ Model::Model(const char* path) : Mesh() {
 	// // Position and TexUV
 	// this->vertexarray->add_attribute<float>(3, false);
 	// this->vertexarray->add_attribute<float>(2, true);
+
+	this->material->shader = ResourcesManager::get_instance().load_shader_program({
+		{ .source = Shaders::DEFAULT_VERTEX,   .type = Shader::Type::Vertex },
+		{ .source = Shaders::DEFAULT_FRAGMENT, .type = Shader::Type::Fragment },
+	});
 
 	auto pair = ScarabModel::load_obj(path);
 	this->submeshes   = pair.first;
@@ -45,12 +57,12 @@ void Model::update_model_matrix() noexcept {
 	this->model = glm::mat4(1.0f);
 
 	// Translate
-	this->model = glm::translate(this->model, static_cast<const glm::vec3&>(this->position));
+	this->model = glm::translate(this->model, this->position.get());
 	// Calculate rotation matrices
 	this->model = glm::rotate(this->model, glm::radians(this->orient_angle), this->orient_axis);
 	this->model = glm::rotate(this->model, glm::radians(this->angle), this->axis);
 	// Scale
-	this->model = glm::scale(this->model, static_cast<const glm::vec3&>(this->scale));
+	this->model = glm::scale(this->model, this->scale.get());
 
 	this->isdirty = false;
 
@@ -62,18 +74,11 @@ void Model::update_model_matrix() noexcept {
 
 // I just need to provide the mvp just if any of the matrix changes, because the value is stored
 // but i dont know how to do it currently (and i am lazy)
-void Model::draw_logic(const Camera& camera) noexcept {
-	// Shader is binded outside for batch rendering
-	this->update_model_matrix();
-
-	// NOTE: is_dirty for color wouldn't work because would set this color to the next meshes
-	// this->material->shader->set_matrix4f("mvp",
-	// 	(camera.get_proj_matrix() * camera.get_view_matrix()) * this->model);
-
-	Shaders::TransformUniformBuffer mesh = {
-		.model = this->model
-	};
-	ResourcesManager::u_transform()->update(&mesh);
+void Model::draw_logic() noexcept {
+	// Update the bounding box in world space
+	if(this->dynamic_bounding && this->bbox != nullptr) {
+		this->bbox->update_world_bounds(this->model);
+	}
 
 	if(this->submeshes.empty()) {
 		glDrawElements(GL_TRIANGLES, this->vertexarray->get_length(), this->vertexarray->get_indices_type(), (void*)0);
@@ -83,10 +88,15 @@ void Model::draw_logic(const Camera& camera) noexcept {
 	// Iterate and draw each submesh
 	uint32 last_texid = 0;
 	for(const SubMesh& submesh : this->submeshes) {
-		if(submesh.texture != nullptr) {
-			uint32 curid = submesh.texture->get_id();
+		if(submesh.textureid != 0) {
+			uint32 curid = submesh.textureid;
 			if(curid != last_texid) {
-				submesh.texture->bind(0);
+			#if !defined(BUILD_OPGL30)
+				glBindTextureUnit(0, curid);
+			#else
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, curid);
+			#endif
 				last_texid = curid;
 			}
 		} else {

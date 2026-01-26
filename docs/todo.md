@@ -141,6 +141,30 @@ void Renderer::drawMesh(const Mesh& mesh, const Camera& camera) {
 	+ One for-loop for 3D Shapes and 2D Shapes
 		* On 2D shapes loop change camera and disable cull face
 
+- [ ] Make `ResourcesManager` more user friendly
+	+ Make `ShaderProgram` accept only two shaders (vertex and fragment)
+	+ Use a struct maybe
+```cpp
+class ResourcesManager {
+	public:
+		static ResourcesManager& instance() {
+			static ResourcesManager inst;
+			return inst;
+		}
+
+		// Public method
+		static VertexArray& acquire_vertexarray(const VAODesc& desc) {
+			return instance().acquire_vertexarray_impl(desc);
+		}
+
+	private:
+		// Real implementation (not static)
+		VertexArray& acquire_vertexarray_impl(const VAODesc& desc) {
+			// real logic here
+		}
+};
+````
+
 # TODO Shaders
 - [x] Revise ShaderManager
 	+ I dont know if its fully optimized and working properly

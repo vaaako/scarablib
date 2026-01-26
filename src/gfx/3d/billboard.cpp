@@ -16,12 +16,12 @@ Billboard::Billboard() noexcept
 }
 
 
-void Billboard::draw_logic(const Camera& camera) noexcept {
+void Billboard::draw_logic() noexcept {
 	this->update_model_matrix();
 
 	std::shared_ptr<ShaderProgram> shader = this->material->shader; // cache
-	shader->set_matrix4f("proj", camera.get_proj_matrix());
-	shader->set_matrix4f("view", camera.get_view_matrix());
+	// shader->set_matrix4f("proj", camera.get_proj_matrix());
+	// shader->set_matrix4f("view", camera.get_view_matrix());
 
 	// Billboard stuff
 	shader->set_vector3f("billpos", this->position);

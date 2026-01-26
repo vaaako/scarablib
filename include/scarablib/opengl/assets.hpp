@@ -16,8 +16,7 @@ class Assets {
 	public:
 		// Returns a default solid white texture
 		static std::shared_ptr<Texture> default_texture() noexcept {
-			// I don't like data being statically allocated this way
-			// Cant put as member because it will try to create before OpenGL starts
+			// static std::shared_ptr<Texture> def_tex = std::make_shared<Texture>(white_pixel, 1, 1, 4);
 			static std::shared_ptr<Texture> def_tex = std::make_shared<Texture>();
 			return def_tex;
 		}

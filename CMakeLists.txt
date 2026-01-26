@@ -158,7 +158,8 @@ endif()
 target_compile_options(${PROJECT_NAME} PRIVATE
 	$<$<CONFIG:Debug>:
 		-O0 -g -fdiagnostics-color=always
-		-Wextra -Wall -Wpadded -Wuninitialized -Wunreachable-code
+		# -Wextra -Wall -Wpadded -Wuninitialized -Wunreachable-code
+		-Wextra -Wall -Wuninitialized -Wunreachable-code
 		-MMD -MP
 	>
 	$<$<CONFIG:Release>:

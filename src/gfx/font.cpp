@@ -1,6 +1,6 @@
 #include "scarablib/gfx/font.hpp"
-#include "scarablib/gfx/texture.hpp"
 #include "scarablib/opengl/assets.hpp"
+#include "scarablib/opengl/resourcesmanager.hpp"
 #include "scarablib/opengl/shader_program.hpp"
 #include "scarablib/proper/error.hpp"
 #include "scarablib/camera/camera2d.hpp"

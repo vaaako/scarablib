@@ -4,7 +4,6 @@
 #include "scarablib/geometry/submesh.hpp"
 #include "scarablib/geometry/triangle.hpp"
 #include "scarablib/proper/dirtyproxy.hpp"
-#include "scarablib/camera/camera.hpp"
 #include "scarablib/typedef.hpp"
 #include "scarablib/geometry/vertex.hpp"
 
@@ -17,7 +16,7 @@ class Model : public Mesh {
 		DirtyProxy<vec3<float>> scale    = DirtyProxy(vec3<float>(1.0f), this->isdirty);
 
 		// Model is not build, you should provide vertices and indices with `set_geometry` method
-		Model() noexcept = default;
+		Model() noexcept;
 		// To make a model use ModelFactory.
 		// Init model using custom config and pre-defined VAO.
 		// Vertices and Indices will be used to gerate VBO and EBO in this VAO
@@ -28,7 +27,7 @@ class Model : public Mesh {
 
 		// TODO: Remove shader from paramters and get from material
 		// This method does not draw the model to the screen, as it does not bind the VAO and Shader (batch rendering)
-		virtual void draw_logic(const Camera& camera) noexcept override;
+		virtual void draw_logic() noexcept override;
 
 		// Returns current angle
 		inline float get_angle() const noexcept {
@@ -75,10 +74,7 @@ Model::Model(const std::vector<Vertex>& vertices, const std::vector<T>& indices)
 	this->vertexarray->add_attribute<float>(3, false);
 	this->vertexarray->add_attribute<float>(2, true);
 
-	// Set shader
-	// NOTE: Redundant because the same is set inside MaterialCompoment
-	std::shared_ptr<ShaderProgram> shader = ResourcesManager::get_instance().load_shader_program({
-		// Default vertex and fragment shader source
+	this->material->shader = ResourcesManager::get_instance().load_shader_program({
 		{ .source = Shaders::DEFAULT_VERTEX,   .type = Shader::Type::Vertex },
 		{ .source = Shaders::DEFAULT_FRAGMENT, .type = Shader::Type::Fragment },
 	});

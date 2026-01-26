@@ -8,12 +8,10 @@ class Texture : public TextureBase {
 		// Create a solid white texture
 		Texture() noexcept;
 
-		// Create a texture from an image file.
-		// You can also flip the texture vertically or horizontally
-		Texture(const char* path, const bool flip_v = false, const bool flip_h = false);
-
-		// Make texture from image
+		// Create a new texture out of an image
 		Texture(const Image& image);
+
+		Texture(const uint8* data, const uint32 width, const uint32 height, const uint8 channels);
 
 		~Texture() noexcept = default;
 };

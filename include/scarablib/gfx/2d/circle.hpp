@@ -10,5 +10,5 @@ struct Circle : public Sprite {
 	Circle() noexcept;
 
 	// This method does not draw the model to the screen, as it does not bind the VAO and Shader
-	void draw_logic(const Camera& camera) noexcept override;
+	void draw_logic() noexcept override;
 };

@@ -3,7 +3,6 @@
 
 Sprite::Sprite(const std::vector<Vertex2D>& vertices) noexcept
 	: Mesh(vertices) {
-
 	// Position and TexUV
 	this->vertexarray->add_attribute<float>(2, false);
 	this->vertexarray->add_attribute<float>(2, false);
@@ -41,10 +40,10 @@ void Sprite::update_model_matrix() noexcept {
 
 // I could just provide mvp if any of the matrix changes, because the value is stored in memory.
 // But i just know when model changes, and camera matrix is likely to change everytime
-void Sprite::draw_logic(const Camera& camera) noexcept {
+void Sprite::draw_logic() noexcept {
 	this->update_model_matrix();
 
-	this->material->shader->set_matrix4f("mvp", (camera.get_proj_matrix() * camera.get_view_matrix()) * this->model);
+	// this->material->shader->set_matrix4f("mvp", (camera.get_proj_matrix() * camera.get_view_matrix()) * this->model);
 
 	// Not indices btw
 	glDrawArrays(GL_TRIANGLE_FAN, 0, this->vertexarray->get_length());

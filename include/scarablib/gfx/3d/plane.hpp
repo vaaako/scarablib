@@ -22,5 +22,5 @@ struct Plane : public Model {
 	Plane(const Plane::Type type) noexcept;
 
 	// Overrides to disable Cullface when drawing
-	void draw_logic(const Camera &camera) noexcept override;
+	void draw_logic() noexcept override;
 };

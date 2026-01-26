@@ -62,7 +62,7 @@ struct Billboard : public Model {
 	void update_facing_texture(const vec3<float>& point_pos) noexcept;
 
 	// Overrides to correctly update the vertex shader
-	void draw_logic(const Camera& camera) noexcept override;
+	void draw_logic() noexcept override;
 
 	private:
 		// Precalculated directions

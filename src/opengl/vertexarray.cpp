@@ -2,7 +2,7 @@
 #include "scarablib/typedef.hpp"
 
 VertexArray::VertexArray(const void* data, const size_t capacity, const size_t vertex_size, const bool dynamic) noexcept
-	: length(0), vsize(vertex_size) {
+	: vsize(vertex_size), length(0) {
 
 #if !defined(BUILD_OPGL30)
 	glCreateVertexArrays(1, &this->vao_id);

@@ -94,6 +94,10 @@ class VertexArray {
 			return this->indexstride;
 		}
 
+		inline bool use_indices() const noexcept {
+			return this->ebo_id == 0;
+		}
+
 		// Calculates the Indices offset using a base_index
 		inline void* index_offset(const uint32 base_index) const {
 			return (void*)(uintptr_t)(base_index * this->indexstride);
@@ -150,20 +154,23 @@ class VertexArray {
 		GLuint vbo_id;
 		GLuint ebo_id = 0;
 
+		// Current index inside VBO
+		uint32 index  = 0;
+		// Vertices type size
+		uint32 vsize;
+		// Indices type size
+		uint32 indexstride = 0;
+
+		// Not used for glDrawElements
+		GLenum indices_type = GL_UNSIGNED_INT;
+
 		// Either vertices size (if vertices only) or indices size
 		int length;
-		// Not used for 2D shapes
-		GLenum indices_type = GL_UNSIGNED_INT;
-		uint32 index  = 0;
-		// Vertex type size
-		uint32 vsize;
-		// Indice type size
-		uint32 indexstride = 0;
 };
 
 template <typename T, typename U>
 VertexArray::VertexArray(const std::vector<T>& vertices, const std::vector<U>& indices, const bool dynamic) noexcept
-	: length(vertices.size()), vsize(sizeof(T)), indexstride(sizeof(U)) {
+	: vsize(sizeof(T)), indexstride(sizeof(U)), length(vertices.size()) {
 
 	static_assert(std::is_base_of_v<Vertex, T> || std::is_base_of_v<Vertex2D, T>, "T must derive from Vertex or Vertex2D");
 	static_assert(std::is_unsigned_v<U>, "U must be an unsigned integer type");

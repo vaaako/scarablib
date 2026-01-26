@@ -10,14 +10,14 @@ class Sprite : public Mesh {
 		// Sprite's position
 		DirtyProxy<vec2<float>> position = DirtyProxy(vec2<float>(0.0f), this->isdirty);
 		// Sprite's size in pixels
-		DirtyProxy<vec2<float>> size = DirtyProxy(vec2<float>(1.0f), this->isdirty);
+		DirtyProxy<vec2<float>> size    = DirtyProxy(vec2<float>(1.0f), this->isdirty);
 		// Rotation angle
 		DirtyProxy<float> angle = DirtyProxy(0.0f, this->isdirty);
 
 		Sprite(const std::vector<Vertex2D>& vertices) noexcept;
 
 		// This method does not draw the model to the screen, as it does not bind the VAO and Shader (batch rendering)
-		virtual void draw_logic(const Camera& camera) noexcept override;
+		virtual void draw_logic() noexcept override;
 
 	protected:
 		void update_model_matrix() noexcept override;

@@ -33,12 +33,12 @@ class Camera {
 		float aspectratio;
 		float zoom = 1.0f;
 
-		// Matrices
-		glm::mat4 proj;
-
 		vec3<float> up          = vec3<float>(0.0f, 1.0f, 0.0f);
 		vec3<float> forward     = vec3<float>(0.0f, 0.0f, -1.0f);
 		vec3<float> right       = vec3<float>(1.0f, 0.0f, 0.0f);
+
+		// Matrices
+		glm::mat4 proj;
 
 		// Pre-calculate proj matrix, since it doesnt change often
 		virtual void update_proj_matrix() noexcept = 0;

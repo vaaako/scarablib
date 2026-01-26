@@ -14,7 +14,7 @@ Skybox::Skybox(const Camera& camera, const std::array<const char*, 6>& faces)
 	: camera(camera) {
 
 	// TODO: Back to vec3<float> later
-	static const std::vector<Vertex> vertices = {
+	const std::vector<Vertex> vertices = {
 		Vertex { glm::vec3(-1.0f,  1.0f, -1.0f) }, // 0 - Top-Left-Back
 		Vertex { glm::vec3( 1.0f,  1.0f, -1.0f) }, // 1 - Top-Right-Back
 		Vertex { glm::vec3( 1.0f, -1.0f, -1.0f) }, // 2 - Bottom-Right-Back
@@ -25,7 +25,7 @@ Skybox::Skybox(const Camera& camera, const std::array<const char*, 6>& faces)
 		Vertex { glm::vec3(-1.0f, -1.0f,  1.0f )}  // 7 - Bottom-Left-Front
 	};
 
-	static const std::vector<uint8> indices = {
+	const std::vector<uint8> indices = {
 		// Back face
 		0, 3, 2,
 		2, 1, 0,
@@ -134,7 +134,7 @@ Skybox::Skybox(const Camera& camera, const std::array<const char*, 6>& faces)
 }
 
 void Skybox::draw() noexcept {
-	glDepthFunc(GL_LEQUAL);
+	// glDepthFunc(GL_LEQUAL);
 
 	std::shared_ptr<ShaderProgram>& shader = this->shader; // cache
 	std::shared_ptr<VertexArray>& vertexarray = this->vertexarray;
@@ -162,5 +162,5 @@ void Skybox::draw() noexcept {
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 #endif
 
-	glDepthFunc(GL_LESS);
+	// glDepthFunc(GL_LESS);
 }

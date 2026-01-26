@@ -59,6 +59,11 @@ class ShaderProgram {
 
 		// -- UNIFORMS
 
+		// Returns true if program has uniform
+		inline bool has_uniform(const char* unif) const noexcept {
+			return glGetUniformLocation(this->programid, unif) >= 0;
+		}
+
 		// Sends a mat4f to the shader
 		inline void set_matrix4f(const char* unif, const glm::mat4& mat, const uint32 index = 1) const noexcept {
 		#if !defined(BUILD_OPGL30)

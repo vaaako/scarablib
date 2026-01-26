@@ -5,10 +5,6 @@
 
 // Helper namespace with methods related to string manipulation
 namespace ScarabMath {
-	namespace {
-		constexpr float EPSILON = 1e-6f; // Small tolerance value for floating-point comparison
-	}
-
 	// Convert degrees to radians
 	[[nodiscard]] inline constexpr float radians(const float degrees) noexcept {
 		return degrees * static_cast<float>(0.01745329251994329576923690768489);
@@ -22,7 +18,8 @@ namespace ScarabMath {
 	// Safe comparison for near-zero floating-point values
 	template <typename T>
 	[[nodiscard]] inline constexpr bool is_near_zero(const T value) noexcept {
-		return std::fabs(value) < EPSILON;
+		return std::fabs(value) < 1e-6f; // Small tolerance value for floating-point comparison
+ 
 	}
 
 

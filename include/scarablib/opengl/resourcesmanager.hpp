@@ -28,8 +28,8 @@ class ResourcesManager {
 		};
 
 		static ResourcesManager& get_instance() {
-			static ResourcesManager instance;
-			return instance;
+			static ResourcesManager inst;
+			return inst;
 		}
 
 		// Returns Uniform Buffer for Camera
@@ -48,6 +48,16 @@ class ResourcesManager {
 		static inline UniformBuffer* u_material() noexcept {
 			static UniformBuffer* ubo = new UniformBuffer(sizeof(Shaders::MaterialUniformBuffer), 2);
 			return ubo;
+		}
+
+		// Returns a default shader
+		static inline std::shared_ptr<ShaderProgram> default_shader() noexcept {
+			static std::shared_ptr<ShaderProgram> shader = ResourcesManager::get_instance().load_shader_program({
+				// Default vertex and fragment shader source
+				{ .source = Shaders::DEFAULT_VERTEX2D,   .type = Shader::Type::Vertex },
+				{ .source = Shaders::DEFAULT_FRAGMENT, .type = Shader::Type::Fragment },
+			});
+			return shader;
 		}
 
 		// -- VERTEX ARRAY

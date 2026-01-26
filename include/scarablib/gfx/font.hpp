@@ -2,6 +2,7 @@
 
 #include "scarablib/camera/camera2d.hpp"
 #include "scarablib/components/materialcomponent.hpp"
+#include "scarablib/opengl/vertexarray.hpp"
 #include "scarablib/typedef.hpp"
 #include <string>
 
@@ -36,7 +37,7 @@ class Font {
 		Vertex2D* buffer_data = nullptr;
 		size_t buffer_capacity = 0;
 
-		std::shared_ptr<MaterialComponent> material = std::make_shared<MaterialComponent>();
+		std::shared_ptr<Material> material = std::make_shared<Material>();
 		std::shared_ptr<VertexArray> vertexarray;
 };
 

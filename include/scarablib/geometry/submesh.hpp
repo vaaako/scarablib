@@ -1,10 +1,9 @@
 #pragma once
 
-#include "scarablib/gfx/texture.hpp"
-#include <memory>
+#include "scarablib/typedef.hpp"
 
 struct SubMesh {
-	std::shared_ptr<Texture> texture = nullptr;
+	uint32 textureid = 0;
 	// Indices size
 	uint32 indices_count = 0;
 	// Start position in the master index buffer

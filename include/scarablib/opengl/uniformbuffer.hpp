@@ -20,6 +20,13 @@ class UniformBuffer {
 		// Update the buffer's data
 		void update(const void* data, const size_t size, const uint32 offset = 0) const;
 
+		// Update the buffer's data
+		inline void update(const void* data) const {
+			this->update(data, this->size, 0);
+		};
+		
+		// void* allocate(const size_t size) const noexcept;
+
 		// Calculates Ring Buffer. Use the returned value as offset on `UniformBuffer::update()`.
 		// Sometimes GPU tries to read old data from CPU. This calculates the frame where GPU can write to.
 		// - `frameindex`: How many frames was submitted to the GPU.
@@ -29,7 +36,7 @@ class UniformBuffer {
 		// - `drawindex`: Draw call index within the frame.
 		//   (declare a variable equal to 0 and increment it each frame).
 		// - `size`: `sizeof(UBO struct)`, std140-aligned.
-		// - `maxdraws` (Default: 2048): 
+		// - `maxdraws` (Default: 2048):
 		//
 		// Use it for:
 		//    - Per-draw uniforms: model matrices, material parameters
@@ -37,7 +44,7 @@ class UniformBuffer {
 		// Do not use it for:
 		//    - Per-frame globals: camera, time, resolution
 		//    - Static or rarelyt updated uniforms
-		inline size_t calc_ringbuffer(const uint32 frameindex, const uint32 drawindex, const size_t size, const uint32 maxdraws = 2048) const noexcept {
+		static inline size_t calc_ringbuffer(const uint32 frameindex, const uint32 drawindex, const size_t size, const uint32 maxdraws = 2048) noexcept {
 			const size_t framestride = maxdraws * size;
 
 			// FRAME_IN_FLIGHT = 3
@@ -50,11 +57,6 @@ class UniformBuffer {
 			return frameindex * framestride +
 				   drawindex * size;
 		}
-
-		// Update the buffer's data
-		inline void update(const void* data) const {
-			this->update(data, this->size);
-		};
 
 		// Get the Buffer's ID
 		inline uint32 get_id() const noexcept {

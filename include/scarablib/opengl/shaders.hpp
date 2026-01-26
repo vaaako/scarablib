@@ -96,40 +96,78 @@ namespace Shaders {
 	)glsl";
 
 	const char* const DEFAULT_FRAGMENT = R"glsl(
-		#version 330 core
+		#version 420 core
 
-		in vec2  texuv;
+		in  vec2  texuv;
 		out vec4 fragcolor;
 
-		uniform vec4 shapeColor;
+		layout(std140, binding = 2) uniform Material {
+			vec4 color;
+			vec4 params; // x = mixamount, y = texlayer
+		};
+		
+		uniform sampler2D      texSampler; // Bound to texture unit 0
+		uniform sampler2DArray texSamplerArray; // Bound to texture unit 1	
 
-		uniform sampler2D      texSampler;      // Bound to texture unit 0
-		uniform sampler2DArray texSamplerArray; // Bound to texture unit 1
-		uniform int   texlayer;                 // If using texSamplerArray
-		uniform float mixamount;                // Blend amount (0.0 = only tex2D, 1.0 = only array)
+		void main() {
+			// Extract mixamount and texlayer from params
+			float mixamount = params.x;
+			float texlayer  = params.y;
 
-		// User shader will be injected here
-		// it will also be injected a "HAS_USER_SHADER" macro
-		// {{USER_CODE}}
+			vec4 final_color = color;
+			vec4 tex = texture(texSampler, texuv);
 
-		#ifndef HAS_USER_SHADER
-		void mainImage(out vec4 fragcolor, in vec2 texuv) {
-			vec4 mixedtex = mix(
-				texture(texSampler, texuv),
-				texture(texSamplerArray, vec3(texuv, texlayer)),
-				mixamount
-			);
-			if(mixedtex.a < 0.001) {
+			// If mixamount is significant, mix with array texture
+			if(mixamount > 0.001) {
+				vec4 array_tex_color = texture(texSamplerArray, vec3(texuv, texlayer));
+				final_color = final_color * mix(tex, array_tex_color, mixamount);
+			} else {
+				final_color = final_color * tex;
+			}
+
+			if(final_color.a < 0.001) {
 				discard;
 			}
-			fragcolor = mixedtex * shapeColor;
-		}
-		#endif
-		
-		void main() {
-			mainImage(fragcolor, texuv);
+
+			fragcolor = final_color;
 		}
 	)glsl";
+
+	// const char* const DEFAULT_FRAGMENT = R"glsl(
+	// 	#version 330 core
+	//
+	// 	in vec2  texuv;
+	// 	out vec4 fragcolor;
+	//
+	// 	uniform vec4 shapeColor;
+	//
+	// 	uniform sampler2D      texSampler;      // Bound to texture unit 0
+	// 	uniform sampler2DArray texSamplerArray; // Bound to texture unit 1
+	// 	uniform int   texlayer;                 // If using texSamplerArray
+	// 	uniform float mixamount;                // Blend amount (0.0 = only tex2D, 1.0 = only array)
+	//
+	// 	// User shader will be injected here
+	// 	// it will also be injected a "HAS_USER_SHADER" macro
+	// 	// {{USER_CODE}}
+	//
+	// 	#ifndef HAS_USER_SHADER
+	// 	void mainImage(out vec4 fragcolor, in vec2 texuv) {
+	// 		vec4 mixedtex = mix(
+	// 			texture(texSampler, texuv),
+	// 			texture(texSamplerArray, vec3(texuv, texlayer)),
+	// 			mixamount
+	// 		);
+	// 		if(mixedtex.a < 0.001) {
+	// 			discard;
+	// 		}
+	// 		fragcolor = mixedtex * shapeColor;
+	// 	}
+	// 	#endif
+	//
+	// 	void main() {
+	// 		mainImage(fragcolor, texuv);
+	// 	}
+	// )glsl";
 
 	const char* const SKYBOX_VERTEX = R"glsl(
 		#version 330 core

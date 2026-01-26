@@ -19,6 +19,11 @@ namespace ScarabOpenGL {
 		return output;
 	}
 
+	// Helper function to pad a size to the required alignment
+	inline size_t align_size(const size_t original_size, const GLint alignment) {
+		return (original_size + alignment - 1) & ~(alignment - 1);
+	}
+
 	// Used on GL_CHECK macro
 	void check_gl_error(const char* file, int line);
 };

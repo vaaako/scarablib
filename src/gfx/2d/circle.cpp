@@ -47,11 +47,10 @@ Circle::Circle() noexcept
 	});
 }
 
-void Circle::draw_logic(const Camera& camera) noexcept {
+void Circle::draw_logic() noexcept {
 	this->update_model_matrix();
 
 	std::shared_ptr<ShaderProgram> shader = this->material->shader; // cache
-	shader->set_matrix4f("mvp", (camera.get_proj_matrix() * camera.get_view_matrix()) * this->model);
 	shader->set_float("blur", this->blur);
 
 	// hard coded vertices size

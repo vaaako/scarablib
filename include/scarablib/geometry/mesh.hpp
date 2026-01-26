@@ -11,11 +11,11 @@
 class Mesh {
 	public:
 		// Bundle for VAO, VBO and EBO
-		std::shared_ptr<VertexArray> vertexarray;
+		std::shared_ptr<VertexArray> vertexarray = nullptr;
 		// This is kinda wrong, because each instance of a Mesh will have copied bundle (but same VAO at least)
 
 		// Material of this mesh
-		std::shared_ptr<MaterialComponent> material = std::make_shared<MaterialComponent>();
+		std::shared_ptr<Material> material = std::make_shared<Material>();
 		// Since material can be shared i need to be a pointer so a double delete is not done
 
 		// Bounding box
@@ -40,7 +40,7 @@ class Mesh {
 
 		// This method does not draw the Mesh to the screen.
 		// As it does not bind the VAO, Shader and Texture (batch rendering)
-		virtual void draw_logic(const Camera& camera) noexcept = 0;
+		virtual void draw_logic() noexcept = 0;
 
 		// Build Mesh using vertices and indices
 		template <typename T, typename U>
@@ -57,7 +57,8 @@ class Mesh {
 			if(this->bbox == nullptr) {
 				return;
 			}
-			this->update_model_matrix(); // Needs updated matrix
+			// Needs updated matrix
+			this->update_model_matrix();
 			this->bbox->update_world_bounds(this->model);
 		}
 
@@ -74,9 +75,17 @@ class Mesh {
 	protected:
 		// Matrix
 		glm::mat4 model = glm::mat4(1.0f);
-		bool isdirty; // Calculate matrix if anything changed
-
+		bool isdirty = true;
 		bool dynamic_bounding = false;
+
+		// This bitfield uses less memory
+		// 1 byte shared to both members (if bool, both would be 2 bytes)
+		// struct {
+		// 	// Calculate matrix if anything changed
+		// 	uint8 isdirty : 1;
+		// 	// Update Bounding Box every frame 
+		// 	uint8 dynamic_bounding : 1;
+		// } flags;
 };
 
 

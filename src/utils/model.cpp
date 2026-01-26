@@ -151,9 +151,9 @@ std::pair<std::vector<SubMesh>, std::shared_ptr<VertexArray>> ScarabModel::load_
 		if(matid >= 0 && matid < (int)materials.size()) {
 			const tinyobj::material_t& mat = materials[matid];
 			if(!mat.diffuse_texname.empty()) {
-				submesh.texture = Assets::load(
+				submesh.textureid = Assets::load(
 					(modeldir / ScarabModel::treat_texname(mat.diffuse_texname)).c_str()
-				);
+				)->get_id();
 			}
 		}
 

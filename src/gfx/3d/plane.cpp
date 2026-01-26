@@ -44,7 +44,7 @@ Plane::Plane(const Plane::Type type) noexcept : Model(), type(type) {
 
 
 
-void Plane::draw_logic(const Camera& camera) noexcept {
+void Plane::draw_logic() noexcept {
 	// Enable cullface if fourcrossed else disable it
 	bool enabled     = glIsEnabled(GL_CULL_FACE);
 	bool fourcrossed = this->type == Plane::Type::FOUR_CROSSED_PLANE;
@@ -55,7 +55,7 @@ void Plane::draw_logic(const Camera& camera) noexcept {
 	}
 
 	this->update_model_matrix();
-	this->material->shader->set_matrix4f("mvp", (camera.get_proj_matrix() * camera.get_view_matrix()) * this->model);
+	// this->material->shader->set_matrix4f("mvp", (camera.get_proj_matrix() * camera.get_view_matrix()) * this->model);
 	glDrawElements(GL_TRIANGLES, this->vertexarray->get_length(), this->vertexarray->get_indices_type(), (void*)0);
 
 	// Cullface back to original state
